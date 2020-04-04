@@ -1,0 +1,17 @@
+###### RHRS z calib ##########
+/home/itabashi/ana/E12-17-003/HallA-Online-Tritium/replay/ana/mmcalb/matrix/zt_RHRS_opt.dat
+##### RHRS Raster calib #####
+
+### RHRS RHRS theta calib ###
+/home/itabashi/ana/E12-17-003/HallA-Online-Tritium/replay/ana/mmcalb/matrix/ang_RHRS_721_xpt_1.dat
+### RHRS RHRS phi calib ###
+/home/itabashi/ana/E12-17-003/HallA-Online-Tritium/replay/ana/mmcalb/matrix/ang_RHRS_721_ypt_1.dat
+###############################################################################################
+###### LHRS z calib ##########
+/home/itabashi/ana/E12-17-003/HallA-Online-Tritium/replay/ana/mmcalb/matrix/zt_LHRS_opt.dat
+##### LHRS Raster calib #####
+
+### LHRS RHRS theta calib ###
+/home/itabashi/ana/E12-17-003/HallA-Online-Tritium/replay/ana/mmcalb/matrix/ang_LHRS_721_xpt_1.dat
+### lHRS RHRS phi calib ###
+/home/itabashi/ana/E12-17-003/HallA-Online-Tritium/replay/ana/mmcalb/matrix/ang_LHRS_721_ypt_1.dat

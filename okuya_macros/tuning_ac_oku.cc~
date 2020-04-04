@@ -1,0 +1,387 @@
+#include <iostream>
+#include <fstream>
+using namespace std;
+#include "TApplication.h"
+#include "tuning_ac_oku.h"
+#include "Param.h"
+
+////////////////////////////////////////////////////////////////
+
+tuningAC::tuningAC(){
+  set= new Setting();
+  set->Initialize();
+}
+
+tuningAC::~tuningAC(){}
+
+////////////////////////////////////////////////////////////////
+void okuyana::CoinCalc(int RS2_seg, int LS2_seg, int rhit, int lhit){
+
+  
+  convertF1TDCR(param);
+  convertF1TDCL(param);
+  PathCalib(rhit,lhit);
+  
+  double Beta_R=R_tr_p[rhit]/sqrt(R_tr_p[rhit]*R_tr_p[rhit]+MK*MK);
+  double Beta_L=L_tr_p[lhit]/sqrt(L_tr_p[lhit]*L_tr_p[lhit]+Me*Me);
+  
+ 
+
+  double tof_r  = RS2_F1time[RS2_seg] - R_pathl/(Beta_R*LightVelocity);
+  double tof_l  = LS2_F1time[LS2_seg] - L_pathl/(Beta_L*LightVelocity);
+  double tof_rc = RS2_F1time_c[RS2_seg] - R_pathl/(Beta_R*LightVelocity);
+  double tof_lc = LS2_F1time_c[LS2_seg] - L_pathl/(Beta_L*LightVelocity);
+
+  double tof_lg = LS2_F1time_g[LS2_seg] - L_pathl/(Beta_L*LightVelocity);
+
+  
+    tr.RS2T_ref=RF1Ref[0];
+    tr.RS2B_ref=RF1Ref[1];
+    tr.LS2T_ref=LF1Ref[0];
+    tr.LS2B_ref=LF1Ref[1];
+    tr.RS2T_F1[RS2_seg]=RS2T_F1[RS2_seg];
+    tr.RS2B_F1[RS2_seg]=RS2B_F1[RS2_seg];
+    tr.LS2T_F1[LS2_seg]=LS2T_F1[LS2_seg];
+    tr.LS2B_F1[LS2_seg]=LS2B_F1[LS2_seg];
+    tr.RS2T_F1_c[RS2_seg]=RS2T_F1_c[RS2_seg];
+    tr.RS2B_F1_c[RS2_seg]=RS2B_F1_c[RS2_seg];
+    tr.LS2T_F1_c[LS2_seg]=LS2T_F1_c[LS2_seg];
+    tr.LS2B_F1_c[LS2_seg]=LS2B_F1_c[LS2_seg];
+    tr.RS2T_F1_b[RS2_seg]=RS2T_F1_b[RS2_seg];
+    tr.RS2B_F1_b[RS2_seg]=RS2B_F1_b[RS2_seg];
+    tr.LS2T_F1_b[LS2_seg]=LS2T_F1_b[LS2_seg];
+    tr.LS2B_F1_b[LS2_seg]=LS2B_F1_b[LS2_seg];         
+    tr.Rtof[RS2_seg]=tof_r;
+    tr.Ltof[LS2_seg]=tof_l;
+    
+
+ 
+  if(RS2_F1time[RS2_seg]!=-9999. && LS2_F1time[LS2_seg]!=-9999.){
+    ct       = - tof_rc + tof_lc - coin_offset;
+    tr.ct_b  = - tof_r + tof_l - coin_offset;
+    tr.ct_c  = - tof_rc + tof_lc - coin_offset;
+    //    tr.ct_g    = - tof_rc + tof_lg - coin_offset;
+  }else if(RS2_F1time[RS2_seg]!=-9999. && LS2_F1time[LS2_seg]==-9999.){
+    tr.ct_b  = - tof_r + tof_l - coin_offset;
+    tr.ct_c  = - tof_rc + tof_lc - coin_offset - coin_shift;
+    ct       = - tof_rc + tof_lc - coin_offset - coin_shift;
+    //    tr.ct_g    = - tof_rc + tof_lg - coin_offset - coin_shift;
+  }else{
+    ct=-1000;
+    tr.ct_c =-1000;
+    tr.ct_b =-1000;
+    //    tr.ct_g =-1000;
+  }
+
+
+  if(RS2_seg<0 || LS2_seg<0){
+    tr.ct_c =-1000;
+    tr.ct_b =-1000;
+    //    tr.ct_g =-1000;
+  }
+
+
+  tr.ct_g=-1000.;
+  tr.ct_gb=-1000.;
+  tr.ct_g=CoinCalc_gogami(RS2_seg,LS2_seg,rhit,lhit);
+
+  
+}
+
+
+////////////////////////////////////////////////////////////////////////////
+
+double okuyana::CoinCalc_gogami(int RS2_seg, int LS2_seg,int rhit, int lhit){
+
+
+
+  double beta_R  = R_tr_p[rhit]/sqrt(R_tr_p[rhit]*R_tr_p[rhit]+Mpi*Mpi);
+  double beta_L  = L_tr_p[lhit]/sqrt(L_tr_p[lhit]*L_tr_p[lhit]+Me*Me);  
+
+  double LenL  = L_tr_pathl[lhit];// - L_s2_trpath[lhit];
+  double LenR  = R_tr_pathl[rhit];// - R_s2_trpath[rhit];
+  
+  double cor_L = (LenL-3.18)/(beta_L*LightVelocity);
+  double cor_R = (LenR- R_s2_trpath[rhit])/(beta_R*LightVelocity);
+
+
+
+  double tref_L  = LTDC_F1FirstHit[40]       * tdc_time;
+  double tref_R  = RTDC_F1FirstHit[9]        * tdc_time;
+  //  double rf      = LTDC_F1FirstHit[47]       * tdc_time;
+  //  double rf_R    = RTDC_F1FirstHit[15]        * tdc_time;
+
+
+ double timeL_R = RTDC_F1FirstHit[RS2_seg+16] * tdc_time;
+ double timeR_R = RTDC_F1FirstHit[RS2_seg+48] * tdc_time; 
+ double timeL_L = LTDC_F1FirstHit[LS2_seg] * tdc_time;
+ double timeR_L = LTDC_F1FirstHit[LS2_seg+48] * tdc_time; 
+
+
+ double toffset_R = -364.6-150.; // for H2_1
+ double toffset_L = 1762.0;
+
+ double meantime_L = tref_L - (timeL_L+timeR_L)/2.0 + toffset_L + cor_L;
+ double meantime_R = tref_R - (timeL_R+timeR_R)/2.0 + toffset_R + cor_R;
+
+ // meantime_R=100;RS2_seg=7;LS2_seg=7;
+
+
+ double s2_tzero_R[16]={0,-1.02037,0.0046854,0.0534834,-0.534372,-0.60597,0.343139,-0.293262,0.267898,-0.666823,0.272364,0.0969059,-0.893806,-1.01129,-1.13495,-0.784991};
+ double s2_tzero_L[16]={0,2.005,0.654413,1.34976,0.0290891,0.187557,0.00499421,-0.914343,-1.24058,-0.535878,-0.77564,2.22918,0.804909,0.607826,-0.635764,0};
+
+ meantime_R= meantime_R - s2_tzero_R[RS2_seg] -s2_tzero_L[LS2_seg];
+
+ double yfp_cor_R =R_tr_y[rhit]*-0.182869 +R_tr_ph[rhit]*-0.0211276;
+ double yfp_cor_L = -10.0* L_tr_y[lhit] -28.0* L_tr_ph[lhit];
+
+ // cout<<"yfp_cor_R "<<yfp_cor_R<<" yfp_corL "<<yfp_cor_L<<endl;
+ 
+ meantime_R= meantime_R + yfp_cor_R + yfp_cor_L;
+ meantime_R= meantime_R - cor_L +75.4;
+ 
+ tr.yp_cor=0.0;
+ tr.yp_cor= + yfp_cor_R + yfp_cor_L;
+
+
+
+
+  //======= Nomalization ==================//
+  R_tr_x[rhit]    = (R_tr_x[rhit]-XFPm)/XFPr;
+  R_tr_th[rhit]   = (R_tr_th[rhit]-XpFPm)/XpFPr;
+  R_tr_y[rhit]    = (R_tr_y[rhit]-YFPm)/YFPr;
+  R_tr_ph[rhit]   = (R_tr_ph[rhit]-YpFPm)/YpFPr;
+  R_tr_vz[rhit]   = (R_tr_vz[rhit]-Ztm)/Ztr;
+
+
+  L_tr_x[lhit]    = (L_tr_x[lhit]-XFPm)/XFPr; 
+  L_tr_th[lhit]   = (L_tr_th[lhit]-XpFPm)/XpFPr;
+  L_tr_y[lhit]    = (L_tr_y[lhit]-YFPm)/YFPr;
+  L_tr_ph[lhit]   = (L_tr_ph[lhit]-YpFPm)/YpFPr;
+  L_tr_vz[lhit]   = (L_tr_vz[lhit]-Ztm)/Ztr;
+
+
+
+
+ double ctimecorR = calcf2t_3rd(PctimeR, R_tr_x[rhit],R_tr_th[rhit],R_tr_y[rhit],R_tr_ph[rhit],R_tr_vz[rhit]);
+ double ctimecorL = calcf2t_3rd(PctimeL, L_tr_x[lhit],L_tr_th[lhit],L_tr_y[lhit],L_tr_ph[lhit],L_tr_vz[lhit]);
+
+
+    //========== Scaled at FP ==================//
+    R_tr_x[rhit]  = R_tr_x[rhit]  * XFPr + XFPm;
+    R_tr_th[rhit] = R_tr_th[rhit] * XpFPr + XpFPm;
+    R_tr_y[rhit]  = R_tr_y[rhit]  * YFPr + YFPm;
+    R_tr_ph[rhit] = R_tr_ph[rhit] * YpFPr + YpFPm;
+
+    L_tr_x[lhit]  = L_tr_x[lhit]  * XFPr + XFPm;
+    L_tr_th[lhit] = L_tr_th[lhit] * XpFPr + XpFPm;
+    L_tr_y[lhit]  = L_tr_y[lhit]  * YFPr + YFPm;
+    L_tr_ph[lhit] = L_tr_ph[lhit] * YpFPr + YpFPm;    
+
+
+
+ double kcenter = 3.122;
+ kcenter=0.0;
+ double ctime = - meantime_R - kcenter + ctimecorL + ctimecorR;
+
+ tr.ctimecorR=ctimecorR;
+ tr.ctimecorL=ctimecorL;
+ // double time_rf = rf - meantime;
+ // double time_rf_R = rf - meantime_R -tref_R;
+ // double ctime = - meantime_R + mean_time - kcenter;
+
+
+
+
+
+ // cout<<"======== check coin time ====== "<<endl;
+ // cout<<"s2R off "<<s2_tzero_R[RS2_seg]<<" s2L off "<<s2_tzero_L[LS2_seg]<<" meantime_R "<<meantime_R<<" ctime "<<ctime<<endl;
+ // cout<<" meantime_L "<<meantime_L<<" meantime_R "<<meantime_R<<" corL "<<cor_L<<" corR "<<cor_R<<" ctime "<<ctime<<endl;
+ // cout<<" ctimecorL "<<ctimecorL<<" ctimecorR "<<ctimecorR<<" yfp_cor_R "<<yfp_cor_R<<" yfp_cor_L "<<yfp_cor_L<<endl;
+
+ ctime=ctime -1.4;
+
+
+ tr.ct_gb=-ctime;
+
+ if(3600.0<ctime && ctime<3665){
+   ctime = ctime - 3637.88 - 12.76;
+   ctime = ctime - 12.0-3.1;
+ }
+
+ ctime=-ctime;
+
+ return ctime;
+
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//=======================================================//
+//================     Main       =======================//
+//=======================================================//
+
+
+int main(int argc, char** argv){
+
+//  gStyle->SetOptFit(111111111);
+//  int ch;
+  //string ifname = "/adaqfs/home/a-onl/tritium_work/itabashi/nnL/HallA-Online-Tritium/replay/scripts/ita_scripts/run_list/Lambda_test.list";
+  //string ofname = "/pdf/hydro1_AC_eff_test.pdf";
+  string ifname = "../test.list";
+  string runlistname;
+  string pname;
+  string maparam;
+  string root_init;
+  string root_end;
+  string pdf_init;
+  string pdf_end;
+  string ofname = "./test.pdf";
+  string root_name = "./test.root";
+  string print_name = "./test_print.pdf";
+  bool output_flag = false;
+  bool output_tree_flag = false;
+  bool draw_flag  = true;
+  bool coin_flag  = false;
+  bool print_flag = true;
+  bool root_flag  = true;
+  //  bool ac2_min=true;
+  string itel;  
+  string pngname;
+  //  bool single_flag=false;
+
+  
+//  extern char *optarg;
+//  while((ch=getopt(argc,argv,"h:f:w:s:n:r:i:o:bcop:GHT12"))!=-1){
+//    switch(ch){
+//    case 'f':
+//      ifname = optarg;
+//      cout<<"input filename : "<<ifname<<endl;
+//      break;
+//    case 's':
+//      ifname = optarg;
+//      cout<<"input filename : "<<ifname<<endl;
+//      single_flag=true;
+//      root_flag = true;
+//      draw_flag = false;            
+//      break;
+//
+//      
+//    case 'w':
+//      print_flag = true;
+//       draw_flag = false;
+//      print_name = optarg;
+//      cout<<"output PDF filename : "<<print_name<<endl;
+//      break;
+//
+//
+//    case 'r':
+//      root_flag = true;
+//      draw_flag = false;      
+//      root_name = optarg;
+//      cout<<"output root filename : "<<root_name<<endl;      
+//      break;
+//
+//    case 'o':
+//      root_flag=true;
+//      draw_flag=false;
+//      print_flag=true;
+//      ofname = optarg;
+//      root_name="./../rootfiles/ACtuning/" + ofname + ".root";
+//      print_name="./../pdf/ACtuning/" +ofname + ".pdf";
+//      break;
+//      
+//    case 'i':
+//      itel= optarg;
+//      nth= atoi(itel.c_str());
+//      break;
+//
+//      
+//    case 'b':
+//      draw_flag = false;
+//      cout<<"BACH MODE!"<<endl;
+//      break;
+//  
+//    case 'G':
+//    mode="G";
+//      break;
+//  
+//    case 'H':
+//    mode="H";
+//      break;
+//
+//    case 'T':
+//      mode="T";    
+//	break;
+//
+//    case 'U':
+//      ac2_min=false;    
+//	break;
+//
+//  case '1':
+//    tdc_time=56.23e-3;//[ns]
+//    kine=1;
+//      break;
+//
+//  case '2':
+//    tdc_time=58e-3;//[ns]
+//    kine=2;
+//      break;
+//
+//
+//    case 'h':
+//      cout<<"-f : input root filename"<<endl;
+//      cout<<"-w : output pdf filename"<<endl;
+//      cout<<"-r : output root filename"<<endl;      
+//      cout<<"-o : output pdf & root  filename"<<endl;
+//      cout<<"-1 : F1TDC resolution 56 ns"<<endl;
+//      cout<<"-2 : F1TDC resolution 58 ns"<<endl;      
+//      cout<<"-T or H or G : Mode of root"<<endl;      
+//      return 0;
+//      break;
+//    case '?':
+//      cout<<"unknown option...."<<endl;
+//      return 0;
+//      break;
+//    default:
+//      cout<<"type -h to see help!!"<<endl;
+//      return 0;
+//    }
+//  }
+
+
+  
+  tuningAC* AC=new tuningAC();
+ // if(single_flag)AC->SetRun(ifname);
+ // else AC->SetRunList(ifname);
+  AC->SetRunList(ifname);
+  if(root_flag)AC->SetRoot(root_name);
+  AC->SetBranch();
+  AC->SetParam();
+  AC->MakeHist();
+  AC->Fill();
+	cout << "AC->Fill() is done" << endl;
+  AC->Fitting();
+	cout << "AC->Fitting() is done" << endl;
+//  AC->Tuning();
+//	cout << "AC->Tuning() is done" << endl;
+  AC->Draw();
+  if(print_flag)AC->Print(print_name);
+  if(root_flag)AC->Write();
+//  AC->Comment();
+  
+  cout<<"=========== Output files ============="<<endl;
+//  cout<<"output rootfile: "<<root_name<<endl;
+  
+  
+	
+//  TApplication *theApp =new TApplication("App",&argc,argv);
+// if(draw_flag==0)gROOT->SetBatch(1);
+// if(draw_flag==0)gSystem->Exit(1);
+// theApp->Run();
+ return 0;
+
+}
+
+

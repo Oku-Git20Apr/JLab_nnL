@@ -1,0 +1,40 @@
+#########READ ME for Kosuke#############
+1)Setting enviroment (a-onl1 special)
+$mkdir bin
+$mkdir lib
+$ln -s /chafs1/work1/tritium/nnL_smallroot nnL_smallroot
+$ln -s /adaqfs/home/a-onl/tritium/replay/t2root/Rootfiles full_replay_root
+Please make your own directory in disk space(not home)
+$make
+
+###Lambda analysis###
+1)Phase1 (run111157--111220) LHRS=2.1 GeV
+input rootfiles: ../runlist/nnlambda/Lambda_small_H1.list
+
+then you will be able to see Lambda peak in h_mm
+2)Phase2 (run111480--111576) LHRS=2.1 GeV
+input rootfiles: ../runlist/nnlambda/Lambda_small_H2.list
+
+
+
+#### nnL analysis ######
+1)Phase1 (run 111221--111368) F1TDC resolution=56 ps
+input rootfiles: ../runlist/nnlambda/nnL_small_T1.list
+#### nnL analysis ######
+2)Phase2
+input rootfiles: ../runlist/nnlambda/nnL_small_T2.list (run 111368--111479)
+input rootfiles: ../runlist/nnlambda/nnL_small_T3.list (run 111577--111697)
+input rootfiles: ../runlist/nnlambda/nnL_small_T4.list (run 111738--111830)
+
+###Time walk correction parameter###
+mk_f1twc_tree.cc makes small tree of cointime, ADC and pathl.
+s2f1_twc.cc makes twc param file(s2_twc_L.sh & s2_twc_R.sh will be helpful)
+
+###t0 calibration###
+draw_cointime.cc & s2_t0_tune_by_hand.C will be useful
+
+###Beam Charge calculation###
+./charge.sh [start run] [end run]
+
+##to plot graph of beam charge##
+./bin/plot_charge [txtfile]

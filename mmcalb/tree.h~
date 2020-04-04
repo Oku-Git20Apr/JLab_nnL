@@ -1,0 +1,73 @@
+#ifndef tree_h
+#define tree_h 1
+
+#include <iostream>
+#include <fstream>
+#include "Setting.h"
+#include "define.h"
+
+#define max 100
+//const int max=100;
+class tree{
+
+ public:
+  tree();
+  ~tree();
+ public:
+
+  
+  void ChainTree(string ifname);
+  void SetBranch();
+  void NewBranch(string ofname, bool rarm);
+
+  //----- ChainTree -------//
+  TChain* T;
+  int ent;
+
+
+  //------ SetBranch -------//
+  
+  double runnum;
+  double hallap;
+  double DRevtype;
+  
+  //----- Scintillation Triger Counters -------// 
+  double RF1[max],LF1[max];
+  double Rs0r_ac[max],Rs0l_ac[max],Ls0r_ac[max],Ls0l_ac[max];
+  double Rs2r_ac[max],Rs2l_ac[max],Ls2r_ac[max],Ls2l_ac[max];
+  double Rs0r_tc[max],Rs0l_tc[max],Ls0r_tc[max],Ls0l_tc[max];
+  double Rs2r_tc[max],Rs2l_tc[max],Ls2r_tc[max],Ls2l_tc[max];
+  double Rtrn,Ltrn;
+  //----- PID Detectors --------------------//
+  double Ra1t[max],Ra1a[max],Ra1a_p[max],Ra1a_c[max],Ra1sum;
+  double Ra2t[max],Ra2a[max],Ra2a_p[max],Ra2a_c[max],Ra2sum;
+  double La1t[max],La1a[max],La1a_p[max],La1a_c[max],La1sum;
+  double La2t[max],La2a[max],La2a_p[max],La2a_c[max],La2sum;
+  double Rgssum;
+  double Lpssum;
+  double Lshsum;
+  //----- at target ----------//
+  double Rp[max],Rpx[max],Rpy[max],Lp[max],Lpx[max],Lpy[max];
+  double Rth[max],Rph[max],Rx[max],Ry[max],Rz[max];
+  double Lth[max],Lph[max],Lx[max],Ly[max],Lz[max];
+  //----- at FP -------------//
+  double Rth_fp[max],Rph_fp[max],Rx_fp[max],Ry_fp[max];
+  double Lth_fp[max],Lph_fp[max],Lx_fp[max],Ly_fp[max];
+  
+  double Rbeta[max],Lbeta[max];
+  double rs2pathl[max],rs0pathl[max],rtrpathl[max];
+  double ls2pathl[max],ls0pathl[max],ltrpathl[max];
+  double trigger[100];
+  double Rs2tpads[100],Ls2tpads[100];
+  double Rs2trpad[100],Ls2trpad[100];
+
+  //----- SetNewBranch -----//
+  
+  TFile* fnew;
+  TTree* tnew;
+
+
+  
+};
+
+#endif

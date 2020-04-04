@@ -1,0 +1,14 @@
+make clean
+make 
+(inside this directry)
+
+
+./bin/hrs_tuning -f ../test.list -w ../test.pdf -H1 -r ../test.root
+
+
+
+Note)
+This directry was copied from itabashi-san's farmio and modifed by me.
+c32 is not printed out in pdf (comment out for debug)
+"nth" has to be greater than 3.
+Most of data is empty. I don't know why.
