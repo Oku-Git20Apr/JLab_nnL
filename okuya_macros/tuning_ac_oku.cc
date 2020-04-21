@@ -998,40 +998,112 @@ cout << "mt = " << mt << endl;
  max_adc=20000.;
 
 	//=== AC Threshold variable ===//
-	 th1_max=2000.;
-	 ac1_adc[0]=400.;
-	 ac1_adc[1]=420.;
-	 ac1_adc[2]=440.;
-	 ac1_adc[3]=460.;
-	 ac1_adc[4]=480.;
-	 ac1_adc[5]=500.;
-	 ac1_adc[6]=520.;
-	 ac1_adc[7]=540.;
-	 ac1_adc[8]=560.;
-	 ac1_adc[9]=580.;
+	 //th1_max=2000.;
+	 //ac1_adc[0]=400.;
+	 //ac1_adc[1]=420.;
+	 //ac1_adc[2]=440.;
+	 //ac1_adc[3]=460.;
+	 //ac1_adc[4]=480.;
+	 //ac1_adc[5]=500.;
+	 //ac1_adc[6]=520.;
+	 //ac1_adc[7]=540.;
+	 //ac1_adc[8]=560.;
+	 //ac1_adc[9]=580.;
 
-     th2_max=6000.;
-     ac2d_adc[0]=600.;
-     ac2d_adc[1]=650.;
-     ac2d_adc[2]=700.;
-     ac2d_adc[3]=750.;
-     ac2d_adc[4]=800.;
-     ac2d_adc[5]=850.;
-     ac2d_adc[6]=900.;
-     ac2d_adc[7]=950.;
-     ac2d_adc[8]=1000.;
-     ac2d_adc[9]=1050.;
+     //th2_max=6000.;
+     //ac2l_adc[0]=600.;
+     //ac2l_adc[1]=650.;
+     //ac2l_adc[2]=700.;
+     //ac2l_adc[3]=750.;
+     //ac2l_adc[4]=800.;
+     //ac2l_adc[5]=850.;
+     //ac2l_adc[6]=900.;
+     //ac2l_adc[7]=950.;
+     //ac2l_adc[8]=1000.;
+     //ac2l_adc[9]=1050.;
 
-     ac2u_adc[0]=1500.;
-     ac2u_adc[1]=1600.;
-     ac2u_adc[2]=1700.;
-     ac2u_adc[3]=1800.;
-     ac2u_adc[4]=1900.;
-     ac2u_adc[5]=2000.;
-     ac2u_adc[6]=2500.;
-     ac2u_adc[7]=3000.;
-     ac2u_adc[8]=3500.;
-     ac2u_adc[9]=4000.;
+     //ac2u_adc[0]=1500.;
+     //ac2u_adc[1]=1600.;
+     //ac2u_adc[2]=1700.;
+     //ac2u_adc[3]=1800.;
+     //ac2u_adc[4]=1900.;
+     //ac2u_adc[5]=2000.;
+     //ac2u_adc[6]=2500.;
+     //ac2u_adc[7]=3000.;
+     //ac2u_adc[8]=3500.;
+     //ac2u_adc[9]=4000.;
+     //----------------NPE---------------//
+	 th1_max=2.0;
+
+	 ac1_adc[0]=0.;
+	 ac1_adc[1]=0.5;
+	 ac1_adc[2]=1.0;
+	 ac1_adc[3]=1.5;
+	 ac1_adc[4]=2.0;
+	 ac1_adc[5]=2.5;
+	 ac1_adc[6]=3.0;
+	 ac1_adc[7]=3.5;
+	 ac1_adc[8]=4.0;
+	 ac1_adc[9]=4.5;
+
+     th2_max=6.0;
+     th2_min=2.0;
+     ac2l_adc[0]=0.;
+     ac2l_adc[1]=0.4;
+     ac2l_adc[2]=0.8;
+     ac2l_adc[3]=1.2;
+     ac2l_adc[4]=1.6;
+     ac2l_adc[5]=2.0;
+     ac2l_adc[6]=2.4;
+     ac2l_adc[7]=2.8;
+     ac2l_adc[8]=3.2;
+     ac2l_adc[9]=3.6;
+
+     ac2u_adc[0]=4.0;
+     ac2u_adc[1]=5.0;
+     ac2u_adc[2]=6.0;
+     ac2u_adc[3]=7.0;
+     ac2u_adc[4]=8.0;
+     ac2u_adc[5]=9.0;
+     ac2u_adc[6]=10.0;
+     ac2u_adc[7]=11.0;
+     ac2u_adc[8]=12.0;
+     ac2u_adc[9]=13.0;
+     //-----------tuning_ac_oku_10.pdf--------------//
+	 //ac1_adc[0]=0.;
+	 //ac1_adc[1]=0.1;
+	 //ac1_adc[2]=0.2;
+	 //ac1_adc[3]=0.3;
+	 //ac1_adc[4]=0.4;
+	 //ac1_adc[5]=0.5;
+	 //ac1_adc[6]=0.6;
+	 //ac1_adc[7]=0.7;
+	 //ac1_adc[8]=0.8;
+	 //ac1_adc[9]=0.9;
+
+     //th2_max=6.0;
+     //th2_min=2.0;
+     //ac2l_adc[0]=0.;
+     //ac2l_adc[1]=0.4;
+     //ac2l_adc[2]=0.8;
+     //ac2l_adc[3]=1.2;
+     //ac2l_adc[4]=0.6;
+     //ac2l_adc[5]=2.0;
+     //ac2l_adc[6]=2.4;
+     //ac2l_adc[7]=2.8;
+     //ac2l_adc[8]=3.2;
+     //ac2l_adc[9]=3.6;
+
+     //ac2u_adc[0]=6.0;
+     //ac2u_adc[1]=6.2;
+     //ac2u_adc[2]=6.4;
+     //ac2u_adc[3]=6.6;
+     //ac2u_adc[4]=6.8;
+     //ac2u_adc[5]=7.0;
+     //ac2u_adc[6]=7.2;
+     //ac2u_adc[7]=7.4;
+     //ac2u_adc[8]=7.6;
+     //ac2u_adc[9]=7.8;
 	//---Kaon Cut ----//
  	ac1_kcut=100.;
  	ac2_kcut_min=1000.;
@@ -1517,28 +1589,28 @@ for (int i=0;i<nth;i++){
    set->SetTH1(hcoin_t2[i],"Coincidence time ","","");
  hcoin_k_ac1[i]=new TH1F(Form("hcoin_k_ac1[%d]",i), Form("Cointime (Kaon) AC1<%lf  cut",ac1_adc[i]),bin_coin_c,min_coin_c,max_coin_c);
    set->SetTH1(hcoin_k_ac1[i],Form("Cointime (Kaon) AC1<%lf  cut",ac1_adc[i]),"","");
- hcoin_k_ac2[i]=new TH1F(Form("hcoin_k_ac2[%d]",i), Form("Cointime (Kaon) 1000<AC2<%lf  cut",ac2d_adc[i]),bin_coin_c,min_coin_c,max_coin_c);
-   set->SetTH1(hcoin_k_ac2[i],Form("Cointime (Kaon) %lf<AC2<4000  cut",ac2d_adc[i]),"","");
+ hcoin_k_ac2[i]=new TH1F(Form("hcoin_k_ac2[%d]",i), Form("Cointime (Kaon) 1000<AC2<%lf  cut",ac2l_adc[i]),bin_coin_c,min_coin_c,max_coin_c);
+   set->SetTH1(hcoin_k_ac2[i],Form("Cointime (Kaon) %lf<AC2<4000  cut",ac2l_adc[i]),"","");
  }
 
 
 	for (int i=0;i<nth;i++){
 		for (int j=0;j<nth;j++){
 			for (int l=0;l<nth;l++){
-				hcoin_k_fom[i][j][l]=new TH1F(Form("hcoin_k_fom[%d][%d][%d]",i,j,l), Form("Cointime (Kaon) AC1<%lf, %lf<AC2<%lf  cut",ac1_adc[i],ac2d_adc[j],ac2u_adc[l]),bin_coin_c,min_coin_c,max_coin_c);
-				set->SetTH1(hcoin_k_fom[i][j][l],Form("Cointime (Kaon) AC1<%lf, %lf<AC2<%lf  cut",ac1_adc[i],ac2d_adc[j],ac2u_adc[l]),"","");
-				hcoin_bg_fom[i][j][l]=new TH1F(Form("hcoin_bg_fom[%d][%d][%d]",i,j,l), Form("Cointime (Kaon) AC1<%lf, %lf<AC2<%lf  cut",ac1_adc[i],ac2d_adc[j],ac2u_adc[l]),bin_coin_c,min_coin_c,max_coin_c);
-				set->SetTH1(hcoin_bg_fom[i][j][l],Form("Cointime (Kaon) AC1<%lf, %lf<AC2<%lf  cut",ac1_adc[i],ac2d_adc[j],ac2u_adc[l]),"","");
-				hcoin_wo_bg_fom[i][j][l]=new TH1F(Form("hcoin_wo_bg_fom[%d][%d][%d]",i,j,l), Form("Cointime (Kaon) AC1<%lf, %lf<AC2<%lf  cut",ac1_adc[i],ac2d_adc[j],ac2u_adc[l]),bin_coin_c,min_coin_c,max_coin_c);
-				set->SetTH1(hcoin_wo_bg_fom[i][j][l],Form("Cointime (Kaon) AC1<%lf, %lf<AC2<%lf  cut",ac1_adc[i],ac2d_adc[j],ac2u_adc[l]),"","");
+				hcoin_k_fom[i][j][l]=new TH1F(Form("hcoin_k_fom[%d][%d][%d]",i,j,l), Form("Cointime (Kaon) AC1<%lf, %lf<AC2<%lf  cut",ac1_adc[i],ac2l_adc[j],ac2u_adc[l]),bin_coin_c,min_coin_c,max_coin_c);
+				set->SetTH1(hcoin_k_fom[i][j][l],Form("Cointime (Kaon) AC1<%lf, %lf<AC2<%lf  cut",ac1_adc[i],ac2l_adc[j],ac2u_adc[l]),"","");
+				hcoin_bg_fom[i][j][l]=new TH1F(Form("hcoin_bg_fom[%d][%d][%d]",i,j,l), Form("Cointime (Kaon) AC1<%lf, %lf<AC2<%lf  cut",ac1_adc[i],ac2l_adc[j],ac2u_adc[l]),bin_coin_c,min_coin_c,max_coin_c);
+				set->SetTH1(hcoin_bg_fom[i][j][l],Form("Cointime (Kaon) AC1<%lf, %lf<AC2<%lf  cut",ac1_adc[i],ac2l_adc[j],ac2u_adc[l]),"","");
+				hcoin_wo_bg_fom[i][j][l]=new TH1F(Form("hcoin_wo_bg_fom[%d][%d][%d]",i,j,l), Form("Cointime (Kaon) AC1<%lf, %lf<AC2<%lf  cut",ac1_adc[i],ac2l_adc[j],ac2u_adc[l]),bin_coin_c,min_coin_c,max_coin_c);
+				set->SetTH1(hcoin_wo_bg_fom[i][j][l],Form("Cointime (Kaon) AC1<%lf, %lf<AC2<%lf  cut",ac1_adc[i],ac2l_adc[j],ac2u_adc[l]),"","");
 
 
-				hmm_L_fom[i][j][l]=new TH1F(Form("hmm_L_fom[%d][%d][%d]",i,j,l), Form("Missing Mass AC1<%lf, %lf<AC2<%lf  cut",ac1_adc[i],ac2d_adc[j],ac2u_adc[l]),bin_mm,min_mm,max_mm);
-				set->SetTH1(hmm_L_fom[i][j][l],Form("Missing Mass AC1<%lf, %lf<AC2<%lf  cut",ac1_adc[i],ac2d_adc[j],ac2u_adc[l]),"","");
-				hmm_bg_fom[i][j][l]=new TH1F(Form("hmm_bg_fom[%d][%d][%d]",i,j,l), Form("Missing Mass AC1<%lf, %lf<AC2<%lf  cut",ac1_adc[i],ac2d_adc[j],ac2u_adc[l]),bin_mm,min_mm,max_mm);
-				set->SetTH1(hmm_bg_fom[i][j][l],Form("Missing Mass AC1<%lf, %lf<AC2<%lf  cut",ac1_adc[i],ac2d_adc[j],ac2u_adc[l]),"","");
-				hmm_wo_bg_fom[i][j][l]=new TH1F(Form("hmm_wo_bg_fom[%d][%d][%d]",i,j,l), Form("Missing Mass AC1<%lf, %lf<AC2<%lf  cut",ac1_adc[i],ac2d_adc[j],ac2u_adc[l]),bin_mm,min_mm,max_mm);
-				set->SetTH1(hmm_wo_bg_fom[i][j][l],Form("Missing Mass AC1<%lf, %lf<AC2<%lf  cut",ac1_adc[i],ac2d_adc[j],ac2u_adc[l]),"","");
+				hmm_L_fom[i][j][l]=new TH1F(Form("hmm_L_fom[%d][%d][%d]",i,j,l), Form("Missing Mass AC1<%lf, %lf<AC2<%lf  cut",ac1_adc[i],ac2l_adc[j],ac2u_adc[l]),bin_mm,min_mm,max_mm);
+				set->SetTH1(hmm_L_fom[i][j][l],Form("Missing Mass AC1<%lf, %lf<AC2<%lf  cut",ac1_adc[i],ac2l_adc[j],ac2u_adc[l]),"","");
+				hmm_bg_fom[i][j][l]=new TH1F(Form("hmm_bg_fom[%d][%d][%d]",i,j,l), Form("Missing Mass AC1<%lf, %lf<AC2<%lf  cut",ac1_adc[i],ac2l_adc[j],ac2u_adc[l]),bin_mm,min_mm,max_mm);
+				set->SetTH1(hmm_bg_fom[i][j][l],Form("Missing Mass AC1<%lf, %lf<AC2<%lf  cut",ac1_adc[i],ac2l_adc[j],ac2u_adc[l]),"","");
+				hmm_wo_bg_fom[i][j][l]=new TH1F(Form("hmm_wo_bg_fom[%d][%d][%d]",i,j,l), Form("Missing Mass AC1<%lf, %lf<AC2<%lf  cut",ac1_adc[i],ac2l_adc[j],ac2u_adc[l]),bin_mm,min_mm,max_mm);
+				set->SetTH1(hmm_wo_bg_fom[i][j][l],Form("Missing Mass AC1<%lf, %lf<AC2<%lf  cut",ac1_adc[i],ac2l_adc[j],ac2u_adc[l]),"","");
 			}
 		}
 	}
@@ -1836,10 +1908,10 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 
 
           //Kaon = true; // Without AC CUT
-	  	  if( R_a1_asum_p<200 && R_a2_asum_p>1000 && R_a2_asum_p<4000) Kaon = true;
+//2020 Okuyama	  	  if( R_a1_asum_p<200 && R_a2_asum_p>1000 && R_a2_asum_p<4000) Kaon = true;
 	  // if( R_a1_asum_p<a1_th && R_a2_asum_p>a2_th) Kaon = true;
 	  //	  if( R_a1_asum_p<1.0 && R_a2_asum_p>3.0 && R_a2_asum_p<7.0) Kaon = true;	  
-//	  if( tr.AC1_npe_sum < a1_th && tr.AC2_npe_sum > a2_th_min) Kaon = true;
+	  if( tr.AC1_npe_sum < th1_max && tr.AC2_npe_sum > th2_min) Kaon = true;
 	  //	  if(fabs(R_tr_vz[rt])<0.1
 	  //         && fabs(L_tr_vz[lt])<0.1 && fabs(R_tr_vz[rt] - L_tr_vz[lt])<0.03)zcut=true;
 
@@ -2118,9 +2190,11 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 			for(int l=0;l<nth;l++){
 				cut_ac1=false;
 				cut_ac2=false;
-				if(R_a1_asum_p<ac1_adc[i])cut_ac1=true;
-				//if(ac2d_adc[j]<R_a2_asum_p && R_a2_asum_p < 4000)cut_ac2=true;
-		    	if(ac2d_adc[j]<R_a2_asum_p && R_a2_asum_p < ac2u_adc[l])cut_ac2=true;
+//Okuyama				//if(R_a1_asum_p<ac1_adc[i])cut_ac1=true;
+				if(tr.AC1_npe_sum<ac1_adc[i])cut_ac1=true;
+				//if(ac2l_adc[j]<R_a2_asum_p && R_a2_asum_p < 4000)cut_ac2=true;
+//Okuyama		    	//if(ac2l_adc[j]<R_a2_asum_p && R_a2_asum_p < ac2u_adc[l])cut_ac2=true;
+		    	if(ac2l_adc[j]<tr.AC2_npe_sum && tr.AC2_npe_sum < ac2u_adc[l])cut_ac2=true;
 				if(zcut && cut_ac1 && cut_ac2){
 				hcoin_k_fom[i][j][l]->Fill(ct);
 			    //cout<<"hcoin_k_fom is filled" << endl;
@@ -2411,7 +2485,7 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
  if(coin_trig && cut_vz && cut_lpathl && cut_rpathl && cut_track && cut_ac1)hcoin_k_ac1[j]->Fill(ct);
    
   //-------with AC2 Cut --------------------//
-   if(ac2d_adc[j]<R_a2_asum_p && R_a2_asum_p < 4000)cut_ac2=true;
+   if(ac2l_adc[j]<R_a2_asum_p && R_a2_asum_p < 4000)cut_ac2=true;
  if(coin_trig && cut_vz && cut_lpathl && cut_rpathl && cut_track && cut_ac1 && cut_ac2){
 hcoin_k_ac2[j]->Fill(ct);
 cout<<"hcoin_k_ac2 is filled" << endl;
@@ -2419,16 +2493,16 @@ cout<<"hcoin_k_ac2 is filled" << endl;
   //-------with AC2 Cut --------------------//
 //   for(int i=0;i<nth;i++){
 //     cut_ac2=false;
-//     //    if(ac2_min && R_a2_asum_p>ac2d_adc[i] && R_a2_asum_p<th_ac2_t)cut_ac2=true;
-//     //    if(ac2_min==0 && R_a2_asum_p>th_ac2_b && R_a2_asum_p<ac2d_adc[i])cut_ac2=true;
+//     //    if(ac2_min && R_a2_asum_p>ac2l_adc[i] && R_a2_asum_p<th_ac2_t)cut_ac2=true;
+//     //    if(ac2_min==0 && R_a2_asum_p>th_ac2_b && R_a2_asum_p<ac2l_adc[i])cut_ac2=true;
 //
 //     
-//     //      if(ac2_min && R_a2_asum_p>ac2d_adc[i] && R_a2_asum_p<th_ac2_t)cut_ac2=true;
-//     //      if(ac2_min==0 && R_a2_asum_p>th_ac2_b && R_a2_asum_p<ac2d_adc[i])cut_ac2=true;
+//     //      if(ac2_min && R_a2_asum_p>ac2l_adc[i] && R_a2_asum_p<th_ac2_t)cut_ac2=true;
+//     //      if(ac2_min==0 && R_a2_asum_p>th_ac2_b && R_a2_asum_p<ac2l_adc[i])cut_ac2=true;
 //
 //     //-------- Coin time study -----------//
-//     if(ac2_min &&R_a2_asum_p>ac2d_adc[i] &&R_a2_asum_p< ac2_kcut_max)cut_ac2=true;
-//     //   if(ac2_min==0 && R_a2_asum_p<ac2d_adc[i] &&R_a2_asum_p>th2_min)cut_ac2=true;
+//     if(ac2_min &&R_a2_asum_p>ac2l_adc[i] &&R_a2_asum_p< ac2_kcut_max)cut_ac2=true;
+//     //   if(ac2_min==0 && R_a2_asum_p<ac2l_adc[i] &&R_a2_asum_p>th2_min)cut_ac2=true;
 //     // if(10.0>R_a2_asum_p && R_a2_asum_p>3.0)cut_ac2=true;
 //    if(cut_ac2 && R_a1_asum_p<th1_max){
 //    hcoin_t1[i]->Fill(coin_tc); // AC2 cut
@@ -2563,7 +2637,11 @@ void tuning::ACtune(){
  def_sig_S=0.004; def_mean_S=MS0-ML;
 
 //-----Main FOM histgram------//
- h3_fom = new TH3D("h3_fom","",10,400.,4000.,10,400.,4000.,10,400.,4000.);
+ int h3_fom_bin_ac1 = 10;
+ int h3_fom_bin_ac2l = 10;
+ int h3_fom_bin_ac2u = 10;
+ //h3_fom = new TH3D("h3_fom","",10,400.,600.,10,600.,1050.,25,1500.,4000.);
+ h3_fom = new TH3D("h3_fom","",h3_fom_bin_ac1,ac1_adc[0],ac1_adc[9],h3_fom_bin_ac2l,ac2l_adc[0],ac2l_adc[9],h3_fom_bin_ac2u,ac2u_adc[0],ac2u_adc[9]);
  //h3_fom = new TH3D("h3_fom","",10,400.,580.,10,600.,1050.,10,1500.,4000.);
 
 	for(int i=0;i<nth;i++){
@@ -2571,13 +2649,13 @@ void tuning::ACtune(){
 			for(int l=0;l<nth;l++){
 //-----Background subtraction-----//
 //------------cointime------------//
-cout<<"BG subtraction cointime"<<endl;
+//cout<<"BG subtraction cointime"<<endl;
  hcoin_bg_fom[i][j][l]->Scale(40./160.);
  hcoin_wo_bg_fom[i][j][l]->Add(hcoin_k_fom[i][j][l],hcoin_bg_fom[i][j][l],1.0,-1.0);
 
 //-----Background subtraction-----//
 //--------Missing Mass------------//
-cout<<"BG subtraction MM"<<endl;
+//cout<<"BG subtraction MM"<<endl;
  hmm_bg_fom[i][j][l]->Scale(2./40.);
  hmm_wo_bg_fom[i][j][l]->Add(hmm_L_fom[i][j][l],hmm_bg_fom[i][j][l],1.0,-1.0);
 
@@ -2587,17 +2665,17 @@ cout<<"BG subtraction MM"<<endl;
  fpi[i][j][l]->SetNpx(2000);
  fk[i][j][l]=new TF1(Form("fk[%d][%d][%d]",i,j,l),"gausn(0)",min_coin_c,max_coin_c);
  fk[i][j][l]->SetNpx(2000);
-cout<<"fp fit start"<<endl;
+//cout<<"fp fit start"<<endl;
  hcoin_wo_bg_fom[i][j][l]->Fit(Form("fp[%d][%d][%d]",i,j,l),"Rq","",def_mean_p-3*def_sig_p,def_mean_p+3*def_sig_p);
  n_p[i][j][l]=fp[i][j][l]->GetParameter(0);
  mean_p[i][j][l]=fp[i][j][l]->GetParameter(1);
  sig_p[i][j][l]=fp[i][j][l]->GetParameter(2);
-cout<<"fpi fit start"<<endl;
+//cout<<"fpi fit start"<<endl;
  hcoin_wo_bg_fom[i][j][l]->Fit(Form("fpi[%d][%d][%d]",i,j,l),"Rq","",def_mean_pi-3*def_sig_pi,def_mean_pi+3*def_sig_pi);
  n_pi[i][j][l]=fpi[i][j][l]->GetParameter(0);
  mean_pi[i][j][l]=fpi[i][j][l]->GetParameter(1);
  sig_pi[i][j][l]=fpi[i][j][l]->GetParameter(2);
-cout<<"fk fit start"<<endl;
+//cout<<"fk fit start"<<endl;
  hcoin_wo_bg_fom[i][j][l]->Fit(Form("fk[%d][%d][%d]",i,j,l),"Rq","",def_mean_k-3*def_sig_k,def_mean_k+3*def_sig_k);
  n_k[i][j][l]=fk[i][j][l]->GetParameter(0);
  mean_k[i][j][l]=fk[i][j][l]->GetParameter(1);
@@ -2614,7 +2692,7 @@ cout<<"fk fit start"<<endl;
 
  fcoin[i][j][l] =new TF1(Form("fcoin[%d][%d][%d]",i,j,l),"gausn(0)+gausn(3)+gausn(6)",min_coin_c,max_coin_c);
  fcoin[i][j][l]->SetNpx(2000);
- fcoin[i][j][l]->SetTitle(Form("Coin-Time w AC cut (AC1 Cut <%lf ch && %lf ch < AC2 Cut < %lf ch);Coin time [ns];Counts [1/56 ns]",ac1_adc[i],ac2d_adc[j],ac2u_adc[l]));
+ fcoin[i][j][l]->SetTitle(Form("Coin-Time w AC cut (AC1 Cut <%lf ch && %lf ch < AC2 Cut < %lf ch);Coin time [ns];Counts [1/56 ns]",ac1_adc[i],ac2l_adc[j],ac2u_adc[l]));
  fcoin[i][j][l]->SetParameters(n_pi[i][j][l],mean_pi[i][j][l],sig_pi[i][j][l],n_k[i][j][l],mean_k[i][j][l],sig_k[i][j][l],n_p[i][j][l],mean_p[i][j][l],sig_p[i][j][l]);
 
 
@@ -2632,33 +2710,33 @@ cout<<"fk fit start"<<endl;
  
  fmm[i][j][l]=new TF1(Form("fmm[%d][%d][%d]",i,j,l),"gausn(0)+gausn(3)+pol3(6)",min_mm,max_mm);
  fmm[i][j][l]->SetNpx(2000);
- fmm[i][j][l]->SetTitle(Form("Missing Mass w AC cut (AC1 Cut <%lf ch && %lf ch < AC2 Cut < %lf ch);Coin time [ns];Counts [1/56 ns]",ac1_adc[i],ac2d_adc[j],ac2u_adc[l]));
+ fmm[i][j][l]->SetTitle(Form("Missing Mass w AC cut (AC1 Cut <%lf ch && %lf ch < AC2 Cut < %lf ch);Coin time [ns];Counts [1/56 ns]",ac1_adc[i],ac2l_adc[j],ac2u_adc[l]));
 
 
 
  //------- Fitting ----------//
 
-cout<<"fmmbg fit start"<<endl;
+//cout<<"fmmbg fit start"<<endl;
  hmm_bg_fom[i][j][l]->Fit(Form("fmmbg[%d][%d][%d]",i,j,l),"Rq","",min_mm,max_mm);
  double d = fmmbg[i][j][l]->GetParameter(0);
  double c = fmmbg[i][j][l]->GetParameter(1);
  double b = fmmbg[i][j][l]->GetParameter(2);
  double a = fmmbg[i][j][l]->GetParameter(3);
 
-cout<<"fL fit start"<<endl;
+//cout<<"fL fit start"<<endl;
  hmm_wo_bg_fom[i][j][l]->Fit(Form("fL[%d][%d][%d]",i,j,l),"Rq","",def_mean_L-3*def_sig_L,def_mean_L+3*def_sig_L);
  n_L[i][j][l]=fL[i][j][l]->GetParameter(0);
  mean_L[i][j][l]=fL[i][j][l]->GetParameter(1);
  sig_L[i][j][l]=fL[i][j][l]->GetParameter(2);
 
-cout<<"fS fit start"<<endl;
+//cout<<"fS fit start"<<endl;
  hmm_wo_bg_fom[i][j][l]->Fit(Form("fS[%d][%d][%d]",i,j,l),"Rq","",def_mean_S-3*def_sig_S,def_mean_S+3*def_sig_S);
  n_S[i][j][l]=fS[i][j][l]->GetParameter(0);
  mean_S[i][j][l]=fS[i][j][l]->GetParameter(1);
  sig_S[i][j][l]=fS[i][j][l]->GetParameter(2);
-cout<<"n_S"<<n_S[i][j][l]<<endl;
-cout<<"mean_S"<<mean_S[i][j][l]<<endl;
-cout<<"sig_S"<<sig_S[i][j][l]<<endl;
+//cout<<"n_S"<<n_S[i][j][l]<<endl;
+//cout<<"mean_S"<<mean_S[i][j][l]<<endl;
+//cout<<"sig_S"<<sig_S[i][j][l]<<endl;
 
 
  //--Fitting again as a total function--//
@@ -2686,402 +2764,404 @@ cout<<"sig_S"<<sig_S[i][j][l]<<endl;
 	if(noise[i][j][l]==0)noise[i][j][l]=1;
  signal[i][j][l] = n_L[i][j][l];
  fom_L[i][j][l] = sqrt(signal[i][j][l]*signal[i][j][l]/noise[i][j][l]);
-cout << "i,j,l= " << i <<", "<<j<<", "<<l<<endl;
+//cout << "i,j,l= " << i <<", "<<j<<", "<<l<<endl;
+	if(fom_L[i][j][l]>100)fom_L[i][j][l]=0;
+	if(signal[i][j][l]>100)fom_L[i][j][l]=0;
 cout <<  "S = " << signal[i][j][l] << "/ N = " << noise[i][j][l] << "... sqrt(S*S/N) = " << fom_L[i][j][l] << endl;
- h3_fom->Fill(i,j,l,fom_L[i][j][l]);
+ h3_fom->Fill(ac1_adc[i],ac2l_adc[j],ac2u_adc[l],fom_L[i][j][l]);
 			}//for l
 		}//for j
 	}//for i
 
 
 
-#if 0
-	//=========== FOMANA ========================//
-
-	ac2_up=false;
-    ac2_down=false;
-	bool coin_flag=false;
-   if(ac2_min)ac2_up=true;//tuning_ac_oku.cc
-   if(ac2_min==0)ac2_down=true;
-	ev=0;
-
-	bool mass_flag;
-	bool z_cut;
-	for(int k=0;k<ENum;k++){
-	  tree->GetEntry(k);
-
-
-	  if(k==ev*100000){
-     cout<<"Fill Event: "<<k<<"/"<<ENum<<endl; 
-     ev=ev+1;
-   }
-
-   mm_c=-100.0; //Initialization
-   ct_c=-100;
-   ac2_flag = false;
-   coin_flag = false;
-   z_cut=false;
-
-      int NLtr = (int)L_tr_n;  if(NLtr>MAX) NLtr = MAX;
-      int NRtr = (int)R_tr_n;  if(NRtr>MAX) NRtr = MAX;
-  bool L_Tr = false; // LHRS Tracking Chi2 cut
-  bool L_FP = false; // LHRS FP plane cut
-  bool R_Tr = false; // RHRS Tracking Chi2 cut
-  bool R_FP = false; // RHRS FP plane cut
-  bool Kaon = false; // Kaon cut
-      
-      for(int lt=0;lt<NLtr;lt++){
-        L_Tr = L_FP = false;
-        if( L_tr_chi2[lt]<0.01 ) L_Tr = true;
-        if( L_tr_th[lt]<0.17*L_tr_x[lt]+0.025
-         && L_tr_th[lt]>0.17*L_tr_x[lt]-0.035
-         && L_tr_th[lt]<0.40*L_tr_x[lt]+0.130 ) L_FP = true;
-	
-        for(int rt=0;rt<NRtr;rt++){
-        R_Tr = R_FP = false;
-        // FP and chi2 cuts
-        if( R_tr_chi2[rt]<0.01 ) R_Tr = true;
-        if( R_tr_th[rt]<0.17*R_tr_x[rt]+0.025
-         && R_tr_th[rt]>0.17*R_tr_x[rt]-0.035
-         && R_tr_th[rt]<0.40*R_tr_x[rt]+0.130 ) R_FP = true;
-
-
-////If you do something against gain
-//	    tr.AC1_npe_sum=0.0;
-//	    tr.AC2_npe_sum=0.0;
-//	    for(int seg=0;seg<24;seg++)
-//	      tr.AC1_npe[seg]=0.0;
-//	    for(int seg=0;seg<26;seg++)
-//	      tr.AC2_npe[seg]=0.0;	  
+//#if 0
+//	//=========== FOMANA ========================//
+//
+//	ac2_up=false;
+//    ac2_down=false;
+//	bool coin_flag=false;
+//   if(ac2_min)ac2_up=true;//tuning_ac_oku.cc
+//   if(ac2_min==0)ac2_down=true;
+//	ev=0;
+//
+//	bool mass_flag;
+//	bool z_cut;
+//	for(int k=0;k<ENum;k++){
+//	  tree->GetEntry(k);
+//
+//
+//	  if(k==ev*100000){
+//     cout<<"Fill Event: "<<k<<"/"<<ENum<<endl; 
+//     ev=ev+1;
+//   }
+//
+//   mm_c=-100.0; //Initialization
+//   ct_c=-100;
+//   ac2_flag = false;
+//   coin_flag = false;
+//   z_cut=false;
+//
+//      int NLtr = (int)L_tr_n;  if(NLtr>MAX) NLtr = MAX;
+//      int NRtr = (int)R_tr_n;  if(NRtr>MAX) NRtr = MAX;
+//  bool L_Tr = false; // LHRS Tracking Chi2 cut
+//  bool L_FP = false; // LHRS FP plane cut
+//  bool R_Tr = false; // RHRS Tracking Chi2 cut
+//  bool R_FP = false; // RHRS FP plane cut
+//  bool Kaon = false; // Kaon cut
+//      
+//      for(int lt=0;lt<NLtr;lt++){
+//        L_Tr = L_FP = false;
+//        if( L_tr_chi2[lt]<0.01 ) L_Tr = true;
+//        if( L_tr_th[lt]<0.17*L_tr_x[lt]+0.025
+//         && L_tr_th[lt]>0.17*L_tr_x[lt]-0.035
+//         && L_tr_th[lt]<0.40*L_tr_x[lt]+0.130 ) L_FP = true;
+//	
+//        for(int rt=0;rt<NRtr;rt++){
+//        R_Tr = R_FP = false;
+//        // FP and chi2 cuts
+//        if( R_tr_chi2[rt]<0.01 ) R_Tr = true;
+//        if( R_tr_th[rt]<0.17*R_tr_x[rt]+0.025
+//         && R_tr_th[rt]>0.17*R_tr_x[rt]-0.035
+//         && R_tr_th[rt]<0.40*R_tr_x[rt]+0.130 ) R_FP = true;
+//
+//
+//////If you do something against gain
+////	    tr.AC1_npe_sum=0.0;
+////	    tr.AC2_npe_sum=0.0;
+////	    for(int seg=0;seg<24;seg++)
+////	      tr.AC1_npe[seg]=0.0;
+////	    for(int seg=0;seg<26;seg++)
+////	      tr.AC2_npe[seg]=0.0;	  
+////
+////	    
+////	  //==== AC ADC convert ch to npe =======//
+////	  //	  tr.AC1_npe_sum=R_a1_asum_p/400.;
+////	  //	  tr.AC2_npe_sum=R_a2_asum_p/400.;
+////
+////	  for(int seg=0;seg<24;seg++){
+////	    tr.AC1_npe[seg]=AC_npe(1,seg,R_a1_a_p[seg]);
+////	    tr.AC1_npe_sum+=tr.AC1_npe[seg];
+////	  }
+////	  for(int seg=0;seg<26;seg++){
+////	    tr.AC2_npe[seg]=AC_npe(2,seg,R_a2_a_p[seg]);
+////	    tr.AC2_npe_sum+=tr.AC2_npe[seg];
+////	  }    
+////
+//
+//
+//
+//          //Kaon = true; // Without AC CUT
+//	  	  if( R_a1_asum_p<200 && R_a2_asum_p>1000 && R_a2_asum_p<4000) Kaon = true;
+//	  // if( R_a1_asum_p<a1_th && R_a2_asum_p>a2_th) Kaon = true;
+//	  //	  if( R_a1_asum_p<1.0 && R_a2_asum_p>3.0 && R_a2_asum_p<7.0) Kaon = true;	  
+////	  if( tr.AC1_npe_sum < a1_th && tr.AC2_npe_sum > a2_th_min) Kaon = true;
+//	  //	  if(fabs(R_tr_vz[rt])<0.1
+//	  //         && fabs(L_tr_vz[lt])<0.1 && fabs(R_tr_vz[rt] - L_tr_vz[lt])<0.03)zcut=true;
+//
+//
+//
 //
 //	    
-//	  //==== AC ADC convert ch to npe =======//
-//	  //	  tr.AC1_npe_sum=R_a1_asum_p/400.;
-//	  //	  tr.AC2_npe_sum=R_a2_asum_p/400.;
+//            int L_s2pad = (int)L_s2_trpad[lt];
+//            int R_s2pad    = (int)R_s2_trpad[rt];
+//			CoinCalc(R_s2pad,L_s2pad,rt,lt);
+//   
+//  if(-RF1[43]+RF1[46]>0 && -RF1[44]+RF1[46]>0 && -LF1[27]+LF1[30]>0 && -LF1[28]+LF1[30]>0)cut_s0=true;
+//  if(RF1[48+Rs2pads]>0 && RF1[16+Rs2pads]>0)cut_Rs2=true;
+//  if(LF1[Ls2pads]>0 && LF1[Ls2pads+48]>0)cut_Ls2=true;
+//  if(cut_Rs2 && cut_Ls2 && cut_s0)coin_trig=true;  
 //
-//	  for(int seg=0;seg<24;seg++){
-//	    tr.AC1_npe[seg]=AC_npe(1,seg,R_a1_a_p[seg]);
-//	    tr.AC1_npe_sum+=tr.AC1_npe[seg];
-//	  }
-//	  for(int seg=0;seg<26;seg++){
-//	    tr.AC2_npe[seg]=AC_npe(2,seg,R_a2_a_p[seg]);
-//	    tr.AC2_npe_sum+=tr.AC2_npe[seg];
-//	  }    
+//   
+////     coin_tc=ctime[0];
+//     Rz=Rvz[0];
+//     Lz=Lvz[0];
+////     if(coin_tc>-100)coin_trig=true;
 //
-
-
-
-          //Kaon = true; // Without AC CUT
-	  	  if( R_a1_asum_p<200 && R_a2_asum_p>1000 && R_a2_asum_p<4000) Kaon = true;
-	  // if( R_a1_asum_p<a1_th && R_a2_asum_p>a2_th) Kaon = true;
-	  //	  if( R_a1_asum_p<1.0 && R_a2_asum_p>3.0 && R_a2_asum_p<7.0) Kaon = true;	  
-//	  if( tr.AC1_npe_sum < a1_th && tr.AC2_npe_sum > a2_th_min) Kaon = true;
-	  //	  if(fabs(R_tr_vz[rt])<0.1
-	  //         && fabs(L_tr_vz[lt])<0.1 && fabs(R_tr_vz[rt] - L_tr_vz[lt])<0.03)zcut=true;
-
-
-
-
-	    
-            int L_s2pad = (int)L_s2_trpad[lt];
-            int R_s2pad    = (int)R_s2_trpad[rt];
-			CoinCalc(R_s2pad,L_s2pad,rt,lt);
-   
-  if(-RF1[43]+RF1[46]>0 && -RF1[44]+RF1[46]>0 && -LF1[27]+LF1[30]>0 && -LF1[28]+LF1[30]>0)cut_s0=true;
-  if(RF1[48+Rs2pads]>0 && RF1[16+Rs2pads]>0)cut_Rs2=true;
-  if(LF1[Ls2pads]>0 && LF1[Ls2pads+48]>0)cut_Ls2=true;
-  if(cut_Rs2 && cut_Ls2 && cut_s0)coin_trig=true;  
-
-   
-//     coin_tc=ctime[0];
-     Rz=Rvz[0];
-     Lz=Lvz[0];
-//     if(coin_tc>-100)coin_trig=true;
-
-   
-//cout << " Rz:Lz" << Rz << ":" << Lz << endl;
-   if(Rvz_cutmin<Rz && Rz<Rvz_cutmax && Lvz_cutmin<Lz && Lz<Lvz_cutmax)z_cut=true;
-   
-//cout << " fom_th1:fom_th2" << fom_th1 << ":" << fom_th2 << endl;
-//change  
-//  th_ac2_t=10000.; // FIll Cut of hmm_ac1 (Upper cut)
-   if(ac2_up && z_cut && R_a2_asum_p<th_ac2_t)ac2_flag=true;
-
-//cout << " R_a2_asum_p===" << R_a2_asum_p << endl;
-   if(ac2_down && z_cut && R_a2_asum_p>th_ac2_b)ac2_flag=true;
-//   if(ac2_up && z_cut
-//      && R_a1_asum_p<th_ac1[fom_th1] &&th_ac2[fom_th2]<R_a2_asum_p && R_a2_asum_p<th_ac2_t)ac2_flag=true;
+//   
+////cout << " Rz:Lz" << Rz << ":" << Lz << endl;
+//   if(Rvz_cutmin<Rz && Rz<Rvz_cutmax && Lvz_cutmin<Lz && Lz<Lvz_cutmax)z_cut=true;
+//   
+////cout << " fom_th1:fom_th2" << fom_th1 << ":" << fom_th2 << endl;
+////change  
+////  th_ac2_t=10000.; // FIll Cut of hmm_ac1 (Upper cut)
+//   if(ac2_up && z_cut && R_a2_asum_p<th_ac2_t)ac2_flag=true;
 //
-//   if(ac2_down && z_cut
-//       && R_a1_asum_p<th_ac1[fom_th1] &&th_ac2[fom_th2]>R_a2_asum_p && R_a2_asum_p>th_ac2_b)ac2_flag=true;
-
-   
-   if(z_cut && coin_trig)ct_c=coin_tc;
-//   if(z_cut || ac2_flag){
-//cout << "ac2_flag" << ac2_flag <<endl;
-//cout << "z_cut" << z_cut <<endl;
-//cout << "coin_trig" << coin_trig <<endl;
+////cout << " R_a2_asum_p===" << R_a2_asum_p << endl;
+//   if(ac2_down && z_cut && R_a2_asum_p>th_ac2_b)ac2_flag=true;
+////   if(ac2_up && z_cut
+////      && R_a1_asum_p<th_ac1[fom_th1] &&th_ac2[fom_th2]<R_a2_asum_p && R_a2_asum_p<th_ac2_t)ac2_flag=true;
+////
+////   if(ac2_down && z_cut
+////       && R_a1_asum_p<th_ac1[fom_th1] &&th_ac2[fom_th2]>R_a2_asum_p && R_a2_asum_p>th_ac2_b)ac2_flag=true;
+//
+//   
+//   if(z_cut && coin_trig)ct_c=coin_tc;
+////   if(z_cut || ac2_flag){
+////cout << "ac2_flag" << ac2_flag <<endl;
+////cout << "z_cut" << z_cut <<endl;
+////cout << "coin_trig" << coin_trig <<endl;
+////   }
+//   if(ac2_flag && z_cut && coin_trig){
+//cout << "befor hcoin_fom" <<endl;
+//	    hcoin_fom->Fill(ct);
+//cout << "after hcoin_fom" <<endl;
+//   	    if(-1.0<ct && ct<1.0){
+//	      hmm_fom->Fill(mm);
+//	      mm_c=mm;
+//	    }
+//    //----------------------------------------------------------------------------//	
 //   }
-   if(ac2_flag && z_cut && coin_trig){
-cout << "befor hcoin_fom" <<endl;
-	    hcoin_fom->Fill(ct);
-cout << "after hcoin_fom" <<endl;
-   	    if(-1.0<ct && ct<1.0){
-	      hmm_fom->Fill(mm);
-	      mm_c=mm;
-	    }
-    //----------------------------------------------------------------------------//	
-   }
-//cout << " kkk===" << k << endl;
-}//for NRtr
-}//for NLtr
-   
-//   tnew->Fill();
-
-   
-	}
-#endif
+////cout << " kkk===" << k << endl;
+//}//for NRtr
+//}//for NLtr
+//   
+////   tnew->Fill();
+//
+//   
+//	}
+//#endif
 
 
 cout << "After fill" << endl;
 
 	
-#if 0
-	//========== w/o AC tuning hist =============//
-	
-	hmm_acc->Scale(20./100.);
-	hmm_p->Add(hmm,hmm_acc,1.0,-1.0);
-
-cout << "aaaaaaaaaaaaa" << endl;
-cout << "w/o AC" << endl;
-	
-  //======== Lambda B.G. ============//
-  fbg_L=new TF1("fbg_L","pol1(0)",1.02,1.3);  
-  //  fbg_L->FixParameter(0,-1137.13); 
-  //  fbg_L->FixParameter(1,1071.8);
-  fbg_L->SetParameter(0,-1137.13); 
-  fbg_L->SetParameter(1,1071.8);
-
-  hmm_p->Fit("fbg_L","","",1.09,1.13);
-  pbg[0]=fbg_L->GetParameter(0);
-  pbg[1]=fbg_L->GetParameter(1);
-
-
-cout << "aaaaaaaaaaaaa" << endl;
-cout << "Lambda BG" << endl;
-  //======== Sigma B.G. ==============//
-  fbg_S=new TF1("fbg_S","pol1(0)",1.17,1.26);  
-  //  fbg_S->FixParameter(0,448.634); 
-  //  fbg_S->FixParameter(1,-352.65);
-  fbg_S->SetParameter(0,448.634); 
-  fbg_S->SetParameter(1,-352.65);
-  hmm_p->Fit("fbg_S","","",1.17,1.26);
-  pbg_S[0]=fbg_S->GetParameter(0);
-  pbg_S[1]=fbg_S->GetParameter(1);
-
-  
-cout << "aaaaaaaaaaaaa" << endl;
-cout << "Sigma BG" << endl;
-
-
-  //======== Lambda Peak ============//
-  double min_L=1.105;
-  double max_L=1.13;
-
-  fL_p->SetParameter(0,3.07090e+00); 
-  fL_p->SetParameter(1,1.11546e+00);
-  fL_p->SetParameter(2,3.6814e-03);
-  hmm_p->Fit("fL_p","","",min_L,max_L);
-  pL[0]=fL_p->GetParameter(0);
-  pL[1]=fL_p->GetParameter(1); 
-  pL[2]=fL_p->GetParameter(2);  
-
-  pL_err[0]=fL_p->GetParError(0);
-  pL_err[1]=fL_p->GetParError(1); 
-  pL_err[2]=fL_p->GetParError(2);  
-
-cout << "aaaaaaaaaaaaa" << endl;
-cout << "Lambda peak" << endl;
-  //======== Sigma Peak ============//
-  double min_S=1.19;
-  double max_S=1.21;
-
-
-  fS_p->SetParameter(0,1.06770); 
-  fS_p->SetParameter(1,1.19941);
-  fS_p->SetParameter(2,4.9135e-3);
-  hmm_p->Fit("fS_p","","",min_S,max_S);
-
-  pS[0]=fS_p->GetParameter(0);
-  pS[1]=fS_p->GetParameter(1); 
-  pS[2]=fS_p->GetParameter(2);  
-
-  pS_err[0]=fS_p->GetParError(0);
-  pS_err[1]=fS_p->GetParError(1); 
-  pS_err[2]=fS_p->GetParError(2);  
-
-
-cout << "aaaaaaaaaaaaa" << endl;
-cout << "Lambda peak" << endl;
-  //======== Lambda Peak + B.G. =============//
-
-
-  fL_all=new TF1("fL_all","pol1(0)+gausn(2)",min_L,max_L);
-  fL_all->SetParameter(0,fbg_L->GetParameter(0)); 
-  fL_all->SetParameter(1,fbg_L->GetParameter(1));
-  fL_all->SetParameter(2,pL[0]); 
-  fL_all->SetParameter(3,pL[1]);
-  fL_all->SetParameter(4,pL[2]);
-
-  hmm_p->Fit("fL_all","","",min_L,max_L);
-  pbg[0]=fL_all->GetParameter(0);
-  pbg[1]=fL_all->GetParameter(1);
-  pL[0]=fL_all->GetParameter(2);
-  pL[1]=fL_all->GetParameter(3); 
-  pL[2]=fL_all->GetParameter(4);  
-  pL_err[0]=fL_all->GetParError(2);
-  pL_err[1]=fL_all->GetParError(3); 
-  pL_err[2]=fL_all->GetParError(4);
-
-
- 
-  fL_p->SetParameters(pL[0],pL[1],pL[2]);
-  fbg_L->SetParameters(pbg[0],pbg[1]);
-
-
-  
-  //======== Sigma Peak + B.G. =============//
-  fS_all=new TF1("fS_all","pol1(0)+gausn(2)",min_S,max_S);
-  fS_all->SetParameter(0,fbg_S->GetParameter(0)); 
-  fS_all->SetParameter(1,fbg_S->GetParameter(1));
-  fS_all->SetParameter(2,pS[0]); 
-  fS_all->SetParameter(3,pS[1]);
-  fS_all->SetParameter(4,pS[2]);
-
-  hmm_p->Fit("fS_all","","",min_S,max_S);
-  pbg_S[0]=fS_all->GetParameter(0);
-  pbg_S[1]=fS_all->GetParameter(1);
-  pS[0]=fS_all->GetParameter(2);
-  pS[1]=fS_all->GetParameter(3); 
-  pS[2]=fS_all->GetParameter(4);  
-  pS_err[0]=fS_all->GetParError(2);
-  pS_err[1]=fS_all->GetParError(3); 
-  pS_err[2]=fS_all->GetParError(4);
-
-
- 
-  fS_p->SetParameters(pS[0],pS[1],pS[2]);
-  fbg_S->SetParameters(pbg_S[0],pbg_S[1]);
-
-
-
-  double bin_min_mmL,bin_max_mmL;
-  bin_min_mmL=hmm->GetXaxis()->FindBin(pL[1]-3*pL[2]);
-  bin_max_mmL=hmm->GetXaxis()->FindBin(pL[1]+3*pL[2]);
-  sum_L=hmm->Integral(bin_min_mmL,bin_max_mmL);
-
-  double bin_min_mmS,bin_max_mmS;
-  bin_min_mmS=hmm->GetXaxis()->FindBin(pS[1]-3*pS[2]);
-  bin_max_mmS=hmm->GetXaxis()->FindBin(pS[1]+3*pS[2]);
-  sum_S=hmm->Integral(bin_min_mmS,bin_max_mmS);
-
-
-
-
-  
-
-	//======== w/ AC tuning hist ===============//
-
-  
-	hmm_fom_acc->Scale(2.0/100.);
-	hmm_fom_p->Add(hmm_fom,hmm_fom_acc,1.0,-1.0);
-
-	hmm_fom->Fit("fL_fom_bg","Rq","",1.08,1.15);
-	hmm_fom->Fit("fS_fom_bg","Rq","",1.17,1.23);
-
-	
-	for(int i=0;i<3;i++){
-	  Lbg_fom[i]=fL_fom_bg->GetParameter(i);
-	  Sbg_fom[i]=fS_fom_bg->GetParameter(i);
-	  fL_fom->FixParameter(i+3,Lbg_fom[i]);
-	  fS_fom->FixParameter(i+3,Sbg_fom[i]);}
-
-        fL_fom->SetParameter(0,1.0);
-        fL_fom->SetParameter(1,1.115);
-	fL_fom->SetParameter(2,1.5e-3);
-
-        fS_fom->SetParLimits(0,0.0,10);
-	fS_fom->SetParLimits(1,1.180,1.200);
-	fS_fom->SetParameter(2,6.0e-3);
-
-	hmm_fom->Fit("fL_fom","Rq","",1.1,1.15);
-	hmm_fom->Fit("fS_fom","Rq","",1.17,1.23);
-
-	NL_err=fL_fom->GetParError(0);
-	NS_err=fS_fom->GetParError(0);
-
-	for(int i=0;i<3;i++){
-	 Lam_p[i]=fL_fom->GetParameter(i);
-	 Sig_p[i]=fS_fom->GetParameter(i);
-	 Lam_p_err[i]=fL_fom->GetParError(i);
-	 Sig_p_err[i]=fS_fom->GetParError(i);
-}
-
-
-
-    all_L=hmm_fom->Integral(hmm_fom->FindBin(Lam_p[1]-3*Lam_p[2]),hmm_fom->FindBin(Lam_p[1]+3*Lam_p[2]));
-    all_S=hmm_fom->Integral(hmm_fom->FindBin(Sig_p[1]-3*Sig_p[2]),hmm_fom->FindBin(Sig_p[1]+3*Sig_p[2]));
-
-
-    bg_L=all_L-(Lam_p[0]/0.002);
-    bg_S=all_S-(Sig_p[0]/0.002);
-
-
-
-    //===== FOM Peak Fit =========//
-    
-	fL_fom_p->SetNpx(2000);	
-	fL_fom_p->SetParameter(0,Lam_p[0]);
-	fL_fom_p->SetParameter(1,Lam_p[1]);
-	fL_fom_p->SetParameter(2,Lam_p[2]);
-
-	fS_fom_p->SetNpx(2000);	
-	fS_fom_p->SetParameter(0,Sig_p[0]);
-	fS_fom_p->SetParameter(1,Sig_p[1]);
-	fS_fom_p->SetParameter(2,Sig_p[2]);
-
-
-
-	
-	
-        hcoin_acc->Scale(20./100.);
-	hcoin_fom_p->Add(hcoin_fom,hcoin_acc,1.0,-1.0);
-	set->SetTH1(hcoin_fom_p,"","","");
-
-
-        fk_fom->SetNpx(2000);
-        fk_fom->FixParameter(1,def_mean_k);
-        fk_fom->FixParameter(2,def_sig_k);
-	hcoin_fom_p->Fit("fk_fom","","",def_mean_k-3*def_sig_k,def_mean_k+3*def_sig_k);
-	sumk_fom=fk_fom->GetParameter(0);
-	meank_fom=fk_fom->GetParameter(1);
-        sigk_fom=fk_fom->GetParameter(2);
-	sumk_fom=sumk_fom/tdc_time;
-        sk_fom=hcoin_fom_p->Integral(hcoin_fom_p->FindBin(-3*sigk_fom+meank_fom)
-					    ,hcoin_fom_p->FindBin(3*sigk_fom+meank_fom));
-
-        sk_fom_ct=hcoin_fom_p->Integral(hcoin_fom_p->FindBin(-1.0)
-					    ,hcoin_fom_p->FindBin(1.0));
-
-
-        nk_fom=hcoin_acc->Integral(hcoin_acc->FindBin(-3*sigk_fom+meank_fom)
-					    ,hcoin_acc->FindBin(3*sigk_fom+meank_fom));
-
-	snk_fom=sk_fom/nk_fom; 
-	fom=sqrt(snk_fom*sumk_fom);
-
-
-#endif
+//#if 0
+//	//========== w/o AC tuning hist =============//
+//	
+//	hmm_acc->Scale(20./100.);
+//	hmm_p->Add(hmm,hmm_acc,1.0,-1.0);
+//
+//cout << "aaaaaaaaaaaaa" << endl;
+//cout << "w/o AC" << endl;
+//	
+//  //======== Lambda B.G. ============//
+//  fbg_L=new TF1("fbg_L","pol1(0)",1.02,1.3);  
+//  //  fbg_L->FixParameter(0,-1137.13); 
+//  //  fbg_L->FixParameter(1,1071.8);
+//  fbg_L->SetParameter(0,-1137.13); 
+//  fbg_L->SetParameter(1,1071.8);
+//
+//  hmm_p->Fit("fbg_L","","",1.09,1.13);
+//  pbg[0]=fbg_L->GetParameter(0);
+//  pbg[1]=fbg_L->GetParameter(1);
+//
+//
+//cout << "aaaaaaaaaaaaa" << endl;
+//cout << "Lambda BG" << endl;
+//  //======== Sigma B.G. ==============//
+//  fbg_S=new TF1("fbg_S","pol1(0)",1.17,1.26);  
+//  //  fbg_S->FixParameter(0,448.634); 
+//  //  fbg_S->FixParameter(1,-352.65);
+//  fbg_S->SetParameter(0,448.634); 
+//  fbg_S->SetParameter(1,-352.65);
+//  hmm_p->Fit("fbg_S","","",1.17,1.26);
+//  pbg_S[0]=fbg_S->GetParameter(0);
+//  pbg_S[1]=fbg_S->GetParameter(1);
+//
+//  
+//cout << "aaaaaaaaaaaaa" << endl;
+//cout << "Sigma BG" << endl;
+//
+//
+//  //======== Lambda Peak ============//
+//  double min_L=1.105;
+//  double max_L=1.13;
+//
+//  fL_p->SetParameter(0,3.07090e+00); 
+//  fL_p->SetParameter(1,1.11546e+00);
+//  fL_p->SetParameter(2,3.6814e-03);
+//  hmm_p->Fit("fL_p","","",min_L,max_L);
+//  pL[0]=fL_p->GetParameter(0);
+//  pL[1]=fL_p->GetParameter(1); 
+//  pL[2]=fL_p->GetParameter(2);  
+//
+//  pL_err[0]=fL_p->GetParError(0);
+//  pL_err[1]=fL_p->GetParError(1); 
+//  pL_err[2]=fL_p->GetParError(2);  
+//
+//cout << "aaaaaaaaaaaaa" << endl;
+//cout << "Lambda peak" << endl;
+//  //======== Sigma Peak ============//
+//  double min_S=1.19;
+//  double max_S=1.21;
+//
+//
+//  fS_p->SetParameter(0,1.06770); 
+//  fS_p->SetParameter(1,1.19941);
+//  fS_p->SetParameter(2,4.9135e-3);
+//  hmm_p->Fit("fS_p","","",min_S,max_S);
+//
+//  pS[0]=fS_p->GetParameter(0);
+//  pS[1]=fS_p->GetParameter(1); 
+//  pS[2]=fS_p->GetParameter(2);  
+//
+//  pS_err[0]=fS_p->GetParError(0);
+//  pS_err[1]=fS_p->GetParError(1); 
+//  pS_err[2]=fS_p->GetParError(2);  
+//
+//
+//cout << "aaaaaaaaaaaaa" << endl;
+//cout << "Lambda peak" << endl;
+//  //======== Lambda Peak + B.G. =============//
+//
+//
+//  fL_all=new TF1("fL_all","pol1(0)+gausn(2)",min_L,max_L);
+//  fL_all->SetParameter(0,fbg_L->GetParameter(0)); 
+//  fL_all->SetParameter(1,fbg_L->GetParameter(1));
+//  fL_all->SetParameter(2,pL[0]); 
+//  fL_all->SetParameter(3,pL[1]);
+//  fL_all->SetParameter(4,pL[2]);
+//
+//  hmm_p->Fit("fL_all","","",min_L,max_L);
+//  pbg[0]=fL_all->GetParameter(0);
+//  pbg[1]=fL_all->GetParameter(1);
+//  pL[0]=fL_all->GetParameter(2);
+//  pL[1]=fL_all->GetParameter(3); 
+//  pL[2]=fL_all->GetParameter(4);  
+//  pL_err[0]=fL_all->GetParError(2);
+//  pL_err[1]=fL_all->GetParError(3); 
+//  pL_err[2]=fL_all->GetParError(4);
+//
+//
+// 
+//  fL_p->SetParameters(pL[0],pL[1],pL[2]);
+//  fbg_L->SetParameters(pbg[0],pbg[1]);
+//
+//
+//  
+//  //======== Sigma Peak + B.G. =============//
+//  fS_all=new TF1("fS_all","pol1(0)+gausn(2)",min_S,max_S);
+//  fS_all->SetParameter(0,fbg_S->GetParameter(0)); 
+//  fS_all->SetParameter(1,fbg_S->GetParameter(1));
+//  fS_all->SetParameter(2,pS[0]); 
+//  fS_all->SetParameter(3,pS[1]);
+//  fS_all->SetParameter(4,pS[2]);
+//
+//  hmm_p->Fit("fS_all","","",min_S,max_S);
+//  pbg_S[0]=fS_all->GetParameter(0);
+//  pbg_S[1]=fS_all->GetParameter(1);
+//  pS[0]=fS_all->GetParameter(2);
+//  pS[1]=fS_all->GetParameter(3); 
+//  pS[2]=fS_all->GetParameter(4);  
+//  pS_err[0]=fS_all->GetParError(2);
+//  pS_err[1]=fS_all->GetParError(3); 
+//  pS_err[2]=fS_all->GetParError(4);
+//
+//
+// 
+//  fS_p->SetParameters(pS[0],pS[1],pS[2]);
+//  fbg_S->SetParameters(pbg_S[0],pbg_S[1]);
+//
+//
+//
+//  double bin_min_mmL,bin_max_mmL;
+//  bin_min_mmL=hmm->GetXaxis()->FindBin(pL[1]-3*pL[2]);
+//  bin_max_mmL=hmm->GetXaxis()->FindBin(pL[1]+3*pL[2]);
+//  sum_L=hmm->Integral(bin_min_mmL,bin_max_mmL);
+//
+//  double bin_min_mmS,bin_max_mmS;
+//  bin_min_mmS=hmm->GetXaxis()->FindBin(pS[1]-3*pS[2]);
+//  bin_max_mmS=hmm->GetXaxis()->FindBin(pS[1]+3*pS[2]);
+//  sum_S=hmm->Integral(bin_min_mmS,bin_max_mmS);
+//
+//
+//
+//
+//  
+//
+//	//======== w/ AC tuning hist ===============//
+//
+//  
+//	hmm_fom_acc->Scale(2.0/100.);
+//	hmm_fom_p->Add(hmm_fom,hmm_fom_acc,1.0,-1.0);
+//
+//	hmm_fom->Fit("fL_fom_bg","Rq","",1.08,1.15);
+//	hmm_fom->Fit("fS_fom_bg","Rq","",1.17,1.23);
+//
+//	
+//	for(int i=0;i<3;i++){
+//	  Lbg_fom[i]=fL_fom_bg->GetParameter(i);
+//	  Sbg_fom[i]=fS_fom_bg->GetParameter(i);
+//	  fL_fom->FixParameter(i+3,Lbg_fom[i]);
+//	  fS_fom->FixParameter(i+3,Sbg_fom[i]);}
+//
+//        fL_fom->SetParameter(0,1.0);
+//        fL_fom->SetParameter(1,1.115);
+//	fL_fom->SetParameter(2,1.5e-3);
+//
+//        fS_fom->SetParLimits(0,0.0,10);
+//	fS_fom->SetParLimits(1,1.180,1.200);
+//	fS_fom->SetParameter(2,6.0e-3);
+//
+//	hmm_fom->Fit("fL_fom","Rq","",1.1,1.15);
+//	hmm_fom->Fit("fS_fom","Rq","",1.17,1.23);
+//
+//	NL_err=fL_fom->GetParError(0);
+//	NS_err=fS_fom->GetParError(0);
+//
+//	for(int i=0;i<3;i++){
+//	 Lam_p[i]=fL_fom->GetParameter(i);
+//	 Sig_p[i]=fS_fom->GetParameter(i);
+//	 Lam_p_err[i]=fL_fom->GetParError(i);
+//	 Sig_p_err[i]=fS_fom->GetParError(i);
+//}
+//
+//
+//
+//    all_L=hmm_fom->Integral(hmm_fom->FindBin(Lam_p[1]-3*Lam_p[2]),hmm_fom->FindBin(Lam_p[1]+3*Lam_p[2]));
+//    all_S=hmm_fom->Integral(hmm_fom->FindBin(Sig_p[1]-3*Sig_p[2]),hmm_fom->FindBin(Sig_p[1]+3*Sig_p[2]));
+//
+//
+//    bg_L=all_L-(Lam_p[0]/0.002);
+//    bg_S=all_S-(Sig_p[0]/0.002);
+//
+//
+//
+//    //===== FOM Peak Fit =========//
+//    
+//	fL_fom_p->SetNpx(2000);	
+//	fL_fom_p->SetParameter(0,Lam_p[0]);
+//	fL_fom_p->SetParameter(1,Lam_p[1]);
+//	fL_fom_p->SetParameter(2,Lam_p[2]);
+//
+//	fS_fom_p->SetNpx(2000);	
+//	fS_fom_p->SetParameter(0,Sig_p[0]);
+//	fS_fom_p->SetParameter(1,Sig_p[1]);
+//	fS_fom_p->SetParameter(2,Sig_p[2]);
+//
+//
+//
+//	
+//	
+//        hcoin_acc->Scale(20./100.);
+//	hcoin_fom_p->Add(hcoin_fom,hcoin_acc,1.0,-1.0);
+//	set->SetTH1(hcoin_fom_p,"","","");
+//
+//
+//        fk_fom->SetNpx(2000);
+//        fk_fom->FixParameter(1,def_mean_k);
+//        fk_fom->FixParameter(2,def_sig_k);
+//	hcoin_fom_p->Fit("fk_fom","","",def_mean_k-3*def_sig_k,def_mean_k+3*def_sig_k);
+//	sumk_fom=fk_fom->GetParameter(0);
+//	meank_fom=fk_fom->GetParameter(1);
+//        sigk_fom=fk_fom->GetParameter(2);
+//	sumk_fom=sumk_fom/tdc_time;
+//        sk_fom=hcoin_fom_p->Integral(hcoin_fom_p->FindBin(-3*sigk_fom+meank_fom)
+//					    ,hcoin_fom_p->FindBin(3*sigk_fom+meank_fom));
+//
+//        sk_fom_ct=hcoin_fom_p->Integral(hcoin_fom_p->FindBin(-1.0)
+//					    ,hcoin_fom_p->FindBin(1.0));
+//
+//
+//        nk_fom=hcoin_acc->Integral(hcoin_acc->FindBin(-3*sigk_fom+meank_fom)
+//					    ,hcoin_acc->FindBin(3*sigk_fom+meank_fom));
+//
+//	snk_fom=sk_fom/nk_fom; 
+//	fom=sqrt(snk_fom*sumk_fom);
+//
+//
+//#endif
 
 	cout<<"FOM ana is done"<<endl;
 }
@@ -3099,8 +3179,14 @@ c4 = new TCanvas("c4","c4",800.,800.);
 c5 = new TCanvas("c5","c5",800.,800.);
 c6 = new TCanvas("c6","c6",800.,800.);
 c7 = new TCanvas("c7","c7",800.,800.);
+c8 = new TCanvas("c8","c8",800.,800.);
+c9 = new TCanvas("c9","c9",800.,800.);
+c10 = new TCanvas("c10","c10",800.,800.);
+c11 = new TCanvas("c11","c11",800.,800.);
+c12 = new TCanvas("c12","c12",800.,800.);
+c13 = new TCanvas("c13","c13",800.,800.);
 
-c1->Divide(3,2);
+c1->Divide(3,3);
 //cout << "start hcoin_tc" << endl;
 //c1->cd(1);hcoin_tc->Draw("");
 c1->cd(1);h_ct->Draw("");
@@ -3109,9 +3195,20 @@ c1->cd(3);h_ct_wK->Draw("");fk_kc->SetLineColor(kRed);fk_kc->Draw("same");
 //c1->cd(4);h_mmall->Draw("");
 //c1->cd(5);h_mmfoil->Draw("");
 //c1->cd(6);h_mm->Draw("");
-c1->cd(4);hmm_bg_fom[0][0][0]->Draw("");
-c1->cd(5);hmm_wo_bg_fom[0][0][0]->Draw("");
-c1->cd(6);h3_fom->Draw("glcolz");
+//c1->cd(4);hmm_bg_fom[0][0][0]->Draw("");
+c1->cd(4);hcoin_wo_bg_fom[8][8][8]->Draw("");fcoin[8][8][8]->SetLineColor(kRed);fcoin[8][8][8]->Draw("same");
+//c1->cd(5);hmm_wo_bg_fom[0][0][0]->Draw("");
+c1->cd(5);hmm_L_fom[8][8][8]->Draw("");fmm[8][8][8]->SetLineColor(kRed);fmm[8][8][8]->Draw("same");
+c1->cd(6);h3_fom->Draw("box2 z");
+//h3_fom->GetXaxis()->SetRange(ac1_adc[0],ac1_adc[9]);
+TH2D *hProjectionyz = (TH2D*) h3_fom->Project3D("yz");
+//h3_fom->GetYaxis()->SetRange(ac2l_adc[0],ac2l_adc[9]);
+TH2D *hProjectionxz = (TH2D*) h3_fom->Project3D("xz");
+//h3_fom->GetZaxis()->SetRange(ac2u_adc[0],ac2u_adc[9]);
+TH2D *hProjectionxy = (TH2D*) h3_fom->Project3D("xy");
+c1->cd(7);hProjectionyz->Draw("colz");
+c1->cd(8);hProjectionxz->Draw("colz");
+c1->cd(9);hProjectionxy->Draw("colz");
 //c1->cd(1);hcoin_pi->Draw("");fpi_pic->SetLineColor(kRed);fpi_pic->Draw("same");
 //c1->cd(2);hcoin_k->Draw("");fk_kc->SetLineColor(kRed);fk_kc->Draw("same");
 //c1->cd(3);hcoin_p->Draw("");fp_pc->SetLineColor(kRed);fp_pc->Draw("same");
@@ -3122,9 +3219,9 @@ c1->cd(6);h3_fom->Draw("glcolz");
 c2->Divide(3,3);
 c3->Divide(3,3);
 c4->Divide(3,3);
-for(int i=0;i<nth;i++){
-	for(int j=0;j<nth;j++){
-		for(int l=0;l<nth;l++){
+for(int i=0;i<3;i++){
+	for(int j=0;j<3;j++){
+		for(int l=0;l<3;l++){
 			if(i==0)c2->cd(j*3+l+1);
 			if(i==1)c3->cd(j*3+l+1);
 			if(i==2)c4->cd(j*3+l+1);
@@ -3132,16 +3229,28 @@ for(int i=0;i<nth;i++){
 		}
 	}
 }
-c5->Divide(3,3);
-c6->Divide(3,3);
-c7->Divide(3,3);
-for(int i=0;i<nth;i++){
-	for(int j=0;j<nth;j++){
-		for(int l=0;l<nth;l++){
+c5->Divide(9,3);
+c6->Divide(9,3);
+c7->Divide(9,3);
+c8->Divide(9,3);
+c9->Divide(9,3);
+c10->Divide(9,3);
+c11->Divide(9,3);
+c12->Divide(9,3);
+c13->Divide(9,3);
+for(int i=0;i<9;i++){
+	for(int j=0;j<3;j++){
+		for(int l=0;l<9;l++){
 			//c3->cd(i*9+j*3+l+1);
-			if(i==0)c5->cd(j*3+l+1);
-			if(i==1)c6->cd(j*3+l+1);
-			if(i==2)c7->cd(j*3+l+1);
+			if(i==0)c5->cd(j*9+l+1);
+			if(i==1)c6->cd(j*9+l+1);
+			if(i==2)c7->cd(j*9+l+1);
+			if(i==3)c8->cd(j*9+l+1);
+			if(i==4)c9->cd(j*9+l+1);
+			if(i==5)c10->cd(j*9+l+1);
+			if(i==6)c11->cd(j*9+l+1);
+			if(i==7)c12->cd(j*9+l+1);
+			if(i==8)c13->cd(j*9+l+1);
 			hmm_L_fom[i][j][l]->Draw("");fmm[i][j][l]->SetLineColor(kRed);fmm[i][j][l]->Draw("same");
 		}
 	}
@@ -3167,7 +3276,13 @@ void tuning::Print(string ofname){
  c5->Print(Form("%s",ofname.c_str()));
  c6->Print(Form("%s",ofname.c_str()));
  c7->Print(Form("%s",ofname.c_str()));
- c7->Print(Form("%s]",ofname.c_str()));
+ c8->Print(Form("%s",ofname.c_str()));
+ c9->Print(Form("%s",ofname.c_str()));
+ c10->Print(Form("%s",ofname.c_str()));
+ c11->Print(Form("%s",ofname.c_str()));
+ c12->Print(Form("%s",ofname.c_str()));
+ c13->Print(Form("%s",ofname.c_str()));
+ c13->Print(Form("%s]",ofname.c_str()));
 // c11->Print(Form("%s[",ofname.c_str()));
 // c11->Print(Form("%s",ofname.c_str()));
 // c14->Print(Form("%s",ofname.c_str()));
@@ -3351,6 +3466,7 @@ int main(int argc, char** argv){
   //string ifname = "/adaqfs/home/a-onl/tritium_work/itabashi/nnL/HallA-Online-Tritium/replay/scripts/ita_scripts/run_list/Lambda_test.list";
   //string ofname = "/pdf/hydro1_AC_eff_test.pdf";
   string ifname = "../small.list";
+  //string ifname = "../small_temp.list";
   //string ifname = "../test.list";
 //  string runlistname;
   string pname = "./Lambda_H1.param";
@@ -3482,6 +3598,7 @@ cout << "Start SetRunList" << endl;
 //  if(root_flag)AC->SetRoot(ifname);//root_name?
 //cout << "Start SetBranch" << endl;
 //  AC->SetBranch();
+  AC->GetACParam();
 cout << "Start SetParam" << endl;
   AC->SetParam();
 cout << "Start MakeHist" << endl;
@@ -3702,6 +3819,40 @@ double calcf2t_zt(double* P, double xf, double xpf,
 
 
 // #################################################
+void tuning::GetACParam(){
+
+  cout<<"==================================="<<endl;
+  cout<<"========== GetACParam ============="<<endl;
+  cout<<"==================================="<<endl;
+  // taken by /ac/param/offset_ac.dat 
+  string pname="../ac/param/offset_ac.dat";
+  ifstream ifp(pname.c_str(),ios::in);
+  if (ifp.fail()){ cerr << "failed open files" <<pname.c_str()<<endl; exit(1);}
+  cout<<" Param file : "<<pname.c_str()<<endl;
+  
+  string buf;
+  int AC,Seg;
+  double off,pe;
+  while(1){
+    getline(ifp,buf);
+    if( buf[0]=='#' ){ continue; }
+    if( ifp.eof() ) break;
+    stringstream sbuf(buf);
+    sbuf >> AC >> Seg >> off >> pe;
+
+    if(AC==1){
+      ac1_off[Seg]=off;
+      ac1_1pe[Seg]=pe;
+    }else if(AC==2){
+      ac2_off[Seg]=off;
+      ac2_1pe[Seg]=pe;
+    }else{
+      cout<<"Error :"<<endl; exit(1);
+    }
+
+  }
+
+  }
 
 double tuning::AC_npe(int nac, int seg, double adc){
 

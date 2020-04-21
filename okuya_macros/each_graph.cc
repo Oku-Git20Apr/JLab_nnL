@@ -1,7 +1,7 @@
 void each_graph(){
 
-	string pname[100];
-	int total_run = 64;
+	string pname[900];
+	int total_run = 684;
 	int n_run = 0;
 	int nofsegment1 = 24;
 	int nofsegment2 = 26;
@@ -15,7 +15,7 @@ void each_graph(){
 	for(int i=157;i-157<total_run;i++){
 	if(i==193 || i==199) continue;
 	n = i - 157;
-	pname[n] = Form("./ac_gain_20200323/gain_run111%d.dat",i); 
+	pname[n] = Form("./ac_gain_20200406/gain_run111%d.dat",i); 
 	ifstream ifp(pname[n].c_str(),ios::in);
 	if (ifp.fail()){ cout << "Failed" << endl; exit(1);}
 cout << "Param file : " << pname[n].c_str() << endl;
@@ -91,7 +91,7 @@ cout << "Param file : " << pname[n].c_str() << endl;
 	if (ifp.fail()){ cout << "Failed" << endl; exit(1);}
 cout << "Param file : " << paraname.c_str() << endl;
 
-	string pdfname = "each_gain_graph.pdf";
+	string pdfname = "each_graph.pdf";
 	cout << "output pdf file name is " << pdfname << endl;
 	
 	string buf;

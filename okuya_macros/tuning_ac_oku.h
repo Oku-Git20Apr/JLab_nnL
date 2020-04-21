@@ -124,6 +124,10 @@ class tuning : public Tree
 	//This is my old version. 	
 	//Now that I am using linked "Tree.cc", so this function has not been used anymore.
 
+  void GetACParam();  
+	//Reading AC parameters from offset_ac.dat,
+	//in order to convert "ch" to "npe".
+
   void ReadParam(string pname);  
 	//Reading parameters from "pname"
 	
@@ -160,7 +164,6 @@ class tuning : public Tree
   void Write();
   void Write_coin();  
   void Comment();
-    void GetACParam();
     double  AC_npe(int nac, int seg, double adc);
     void Calib(int rt, int lt);
     double BG_Al(int events);
@@ -179,6 +182,7 @@ class tuning : public Tree
     TH2D *h_rbay_rbax, *h_rbby_rbbx;
     TH2D *h_rby_rbx;
     TH3D *h3_fom;
+    TH2D *hProjectionxy, *hProjectionyz, *hProjectionzx;
   TTree* tree_out;
 
 ////////////////////////////////////
@@ -250,7 +254,7 @@ double Rs2trpad[100],Ls2trpad[100];
 // //===== SetParam ======//
 //
 //
- double ac1_adc[100],ac2d_adc[100],ac2u_adc[100];
+ double ac1_adc[100],ac2l_adc[100],ac2u_adc[100];
  double min_coin,max_coin,min_coin_c,max_coin_c;
  double min_ac1,max_ac1,min_ac2,max_ac2,min_adc,max_adc;
  double th1_max,th2_max,th2_min;
@@ -726,11 +730,12 @@ public:
  TCanvas* c5;
  TCanvas* c6;
  TCanvas* c7;
-// TCanvas* c9;
-// TCanvas* c10;
-// TCanvas* c11;
-// TCanvas* c12;
-// TCanvas* c13; 
+ TCanvas* c8;
+ TCanvas* c9;
+ TCanvas* c10;
+ TCanvas* c11;
+ TCanvas* c12;
+ TCanvas* c13; 
 // TCanvas* c14;
 // TCanvas* c15;
 // TCanvas* c16;

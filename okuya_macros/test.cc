@@ -17,16 +17,16 @@
 //
 
 
-void gain_all_segment(){
+void test(){
 
 
 	/*-- Minimum of Nrun is 244 because of a definition of a1shift[Nrun][seg]--*/
 //	const int Nrun = 64;//Run111157 ~ Run111220
 	const int Nrun = 244;//Run111157 ~ Run111400
 
-	for(int loop=0;loop<Nrun;loop++){
+	for(int loop=0;loop<1;loop++){
 	//int runnum = 157;
-	int runnum = 600;
+	int runnum = 800;
 		runnum = runnum+loop;
 
 
@@ -437,7 +437,7 @@ cout << " output pdf file name is " << pdfname << endl;
 	double sigma1[nofsegment1], sigma2[nofsegment2];
 	double sigma_err1[nofsegment1], sigma_err2[nofsegment2];
 
-	double main_part1[nofsegment1], main_part2[nofsegment2];//1p.e. center position
+	double main_part2;
 	int index = runnum - 157;
 	//a1 fit range shift
 	double a1shift[900][nofsegment1]={ 
@@ -940,7 +940,8 @@ cout << " output pdf file name is " << pdfname << endl;
 		{50, 0, 0, -50, 0, -50, 0, 0, 0, -50, 0, 0, 50, 0, 0, 0, -50, 0, 0, 0, 0, 0, 0, 0, 0, 0},//Run111220
 		{50, 0, 0, -50, 0, -50, 0, 0, 0, -50, 0, 0, 50, 0, 0, 0, -50, 0, 0, 0, 0, 0, 0, 0, 0, 0},//Run111220
 		{50, 0, 0, -50, 0, -50, 0, 0, 0, -50, 0, 0, 50, 0, 0, 0, -50, 0, 0, 0, 0, 0, 0, 0, 0, 0}};//Run111220
-	TH1D *H1_temp[nofsegment1], *H2_temp[nofsegment2];
+	//TH1D *H1_temp[nofsegment1], *H2_temp[nofsegment2];
+	TH1D *H2_temp;
 	TH1D *H1[nofsegment1], *H2[nofsegment2];
 	TF1 *f1[nofsegment1], *f2[nofsegment2];
 
@@ -949,18 +950,10 @@ cout << " output pdf file name is " << pdfname << endl;
 ///////////////////////////////////////////////////
 ///I've really wanted to know the maximum bin!!////
 ///////////////////////////////////////////////////
-	for(int i=0;i<nofsegment1;i++){
-	H1_temp[i] = new TH1D(Form("H1_temp[%d]",i),Form("R.a1.a_p[%d]",i),999,2.,2000.);
-	tr->Project(Form("H1_temp[%d]",i),Form("R.a1.a_p[%d]",i),Form("R.a1.a_p[%d]>200.",i),"");
-	main_part1[i] = (H1_temp[i]->GetBinCenter(H1_temp[i]->GetMaximumBin()));
-cout << "a1_center[" << i << "] = " << main_part1[i] << endl;
-	}
-	for(int i=0;i<nofsegment2;i++){
-	H2_temp[i] = new TH1D(Form("H2_temp[%d]",i),Form("R.a2.a_p[%d]",i),999,2.,2000.);
-	tr->Project(Form("H2_temp[%d]",i),Form("R.a2.a_p[%d]",i),Form("R.a2.a_p[%d]>100.",i),"");
-	main_part2[i] = (H2_temp[i]->GetBinCenter(H2_temp[i]->GetMaximumBin()));
-cout << "a2_center[" << i << "] = " << main_part2[i] << endl;
-	}
+	H2_temp = new TH1D("H2_temp","R.a2.a_p[0]",999,2.,2000.);
+	tr->Project("H2_temp","R.a2.a_p[0]","R.a2.a_p[0]>100.","");
+	main_part2 = H2_temp->GetBinCenter(H2_temp->GetMaximumBin());
+cout << "a2_center"<< main_part2 << endl;
 ///////////////////////////////////////////////////
 ///////////////////////////////////////////////////
 	
@@ -969,46 +962,17 @@ cout << "a2_center[" << i << "] = " << main_part2[i] << endl;
 	TCanvas *c2 = new TCanvas("c2","A2",800.,600.);
 
 
-	for(int i=0;i<nofsegment1;i++){
-	H1[i] = new TH1D(Form("H1[%d]",i),Form("R.a1.a_p[%d]",i),999,2.,2000.);
-	tr->Project(Form("H1[%d]",i),Form("R.a1.a_p[%d]",i),"","");
-	f1[i] = new TF1(Form("f1[%d]",i),"gausn",0.,2000.);
-	f1[i]->SetParameter(1,main_part1[i]);
-	}
-	for(int i=0;i<nofsegment2;i++){
+	int i=0;
 	H2[i] = new TH1D(Form("H2[%d]",i),Form("R.a2.a_p[%d]",i),999,2.,2000.);
 	tr->Project(Form("H2[%d]",i),Form("R.a2.a_p[%d]",i),"","");
 	f2[i] = new TF1(Form("f2[%d]",i),"gausn",0.,2000.);
-	f2[i]->SetParameter(1,main_part2[i]);
-	}
+	f2[i]->SetParameter(1,main_part2);
 	
 
-	c1->Divide(6,4);
-	////////////////A1 Fit Range
-	for(int i=0;i<nofsegment1;i++){
-	c1->cd(i+1)->SetLogy(1);
-	H1[i]->Draw("");
-	H1[i]->Fit(Form("f1[%d]",i),"","",main_part1[i]-100.+a1shift[index][i],main_part1[i]+100.+a1shift[index][i]);
-	mean1[i]	  = f1[i]->GetParameter(1);
-	H1[i]->Fit(Form("f1[%d]",i),"","",mean1[i]-100.,mean1[i]+100.);//fitting again (Width is fixed at 200ch)
-	count1[i]	  = f1[i]->GetParameter(0);
-	count_err1[i] = f1[i]->GetParError(0);
-	mean1[i]	  = f1[i]->GetParameter(1);
-	mean_err1[i]  = f1[i]->GetParError(1);
-	sigma1[i]	  = f1[i]->GetParameter(2);
-	sigma_err1[i] = f1[i]->GetParError(2);
-	f1[i]->SetLineStyle(2);
-	f1[i]->Draw("same");
-	H1[i]->SetStats(0);
-	cout << "ac1[" << i <<"]: " << count1[i] <<"/"<< count_err1[i] <<"/"<<mean1[i]<<"/"<<mean_err1[i]<<"/"<<sigma1[i]<<"/"<<sigma_err1[i]<<"/"<<endl;
-	}
-
-	c2->Divide(7,4);
-	////////////////A2 Fit Range
-	for(int i=0;i<nofsegment2;i++){
-	c2->cd(i+1)->SetLogy(1);
+	c2->SetLogy(1);
 	H2[i]->Draw("");
-	H2[i]->Fit(Form("f2[%d]",i),"","",main_part2[i]-100+a2shift[index][i],main_part2[i]+100.+a2shift[index][i]);
+	H2[i]->Fit(Form("f2[%d]",i),"","",main_part2-100+a2shift[index][i],main_part2+100.+a2shift[index][i]);
+	cout<<"a2shift = "<<a2shift[index][i]<<endl;
 	mean2[i]	  = f2[i]->GetParameter(1);
 	H2[i]->Fit(Form("f2[%d]",i),"","",mean2[i]-100.,mean2[i]+100.);
 	count2[i]	  = f2[i]->GetParameter(0);
@@ -1021,37 +985,6 @@ cout << "a2_center[" << i << "] = " << main_part2[i] << endl;
 	f2[i]->Draw("same");
 	H2[i]->SetStats(0);
 	cout << "ac2[" << i <<"]: " << count2[i] <<"/"<< count_err2[i] <<"/"<<mean2[i]<<"/"<<mean_err2[i]<<"/"<<sigma2[i]<<"/"<<sigma_err2[i]<<"/"<<endl;
-	}
-
-
-	ofstream writing_file;
-	writing_file.open(ofname,ios::out);
-	cout << "Fit data is filled in " << ofname << endl;
-
-	for(int i=0;i<nofsegment1;i++){
-	writing_file << "1 " <<i <<" "<< count1[i] <<" "<< count_err1[i] <<" "<<mean1[i]<<" "<<mean_err1[i]<<" "<<sigma1[i]<<" "<<sigma_err1[i]<<" "<<endl;
-	}
-	for(int i=0;i<nofsegment2;i++){
-	writing_file << "2 " <<i << " "<< count2[i] <<" "<< count_err2[i] <<" "<<mean2[i]<<" "<<mean_err2[i]<<" "<<sigma2[i]<<" "<<sigma_err2[i]<<" "<<endl;
-	}	
-
-cout << "Print is starting" << endl;
-	c1->Print(Form("%s[",pdfname.c_str()));
-	c1->Print(Form("%s",pdfname.c_str()));
-	c2->Print(Form("%s",pdfname.c_str()));
-	c2->Print(Form("%s]",pdfname.c_str()));
-
-	c1->Close();
-	c2->Close();
-	for(int i=0;i<nofsegment1;i++){
-delete gROOT->Get(Form("H1[%d]",i));
-delete gROOT->Get(Form("H1_temp[%d]",i));
-	}
-	for(int i=0;i<nofsegment2;i++){
-delete gROOT->Get(Form("H2[%d]",i));
-delete gROOT->Get(Form("H2_temp[%d]",i));
-	}
-	
 	}//loop	
 
  return 0;
