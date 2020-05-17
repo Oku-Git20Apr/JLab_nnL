@@ -1035,40 +1035,76 @@ cout << "mt = " << mt << endl;
      //----------------NPE---------------//
 	 th1_max=2.0;
 
-	 ac1_adc[0]=0.;
-	 ac1_adc[1]=0.5;
-	 ac1_adc[2]=1.0;
-	 ac1_adc[3]=1.5;
-	 ac1_adc[4]=2.0;
-	 ac1_adc[5]=2.5;
-	 ac1_adc[6]=3.0;
-	 ac1_adc[7]=3.5;
-	 ac1_adc[8]=4.0;
-	 ac1_adc[9]=4.5;
+	 ac1_adc[0]=0.2;
+	 ac1_adc[1]=0.4;
+	 ac1_adc[2]=0.6;
+	 ac1_adc[3]=0.8;
+	 ac1_adc[4]=1.0;
+	 ac1_adc[5]=1.2;
+	 ac1_adc[6]=1.4;
+	 ac1_adc[7]=1.6;
+	 ac1_adc[8]=1.8;
+	 ac1_adc[9]=2.0;
 
      th2_max=6.0;
      th2_min=2.0;
-     ac2l_adc[0]=0.;
-     ac2l_adc[1]=0.4;
-     ac2l_adc[2]=0.8;
-     ac2l_adc[3]=1.2;
-     ac2l_adc[4]=1.6;
-     ac2l_adc[5]=2.0;
-     ac2l_adc[6]=2.4;
-     ac2l_adc[7]=2.8;
-     ac2l_adc[8]=3.2;
-     ac2l_adc[9]=3.6;
+     ac2l_adc[0]=0.4;
+     ac2l_adc[1]=0.8;
+     ac2l_adc[2]=1.2;
+     ac2l_adc[3]=1.6;
+     ac2l_adc[4]=2.0;
+     ac2l_adc[5]=2.4;
+     ac2l_adc[6]=2.8;
+     ac2l_adc[7]=3.2;
+     ac2l_adc[8]=3.6;
+     ac2l_adc[9]=4.0;
 
-     ac2u_adc[0]=4.0;
-     ac2u_adc[1]=5.0;
-     ac2u_adc[2]=6.0;
-     ac2u_adc[3]=7.0;
-     ac2u_adc[4]=8.0;
-     ac2u_adc[5]=9.0;
-     ac2u_adc[6]=10.0;
-     ac2u_adc[7]=11.0;
-     ac2u_adc[8]=12.0;
-     ac2u_adc[9]=13.0;
+     ac2u_adc[0]=14.0;
+     ac2u_adc[1]=15.0;
+     ac2u_adc[2]=16.0;
+     ac2u_adc[3]=17.0;
+     ac2u_adc[4]=18.0;
+     ac2u_adc[5]=19.0;
+     ac2u_adc[6]=20.0;
+     ac2u_adc[7]=21.0;
+     ac2u_adc[8]=22.0;
+     ac2u_adc[9]=23.0;
+	// th1_max=2.0;
+
+	// ac1_adc[0]=0.;
+	// ac1_adc[1]=0.5;
+	// ac1_adc[2]=1.0;
+	// ac1_adc[3]=1.5;
+	// ac1_adc[4]=2.0;
+	// ac1_adc[5]=2.5;
+	// ac1_adc[6]=3.0;
+	// ac1_adc[7]=3.5;
+	// ac1_adc[8]=4.0;
+	// ac1_adc[9]=4.5;
+
+    // th2_max=6.0;
+    // th2_min=2.0;
+    // ac2l_adc[0]=0.;
+    // ac2l_adc[1]=0.4;
+    // ac2l_adc[2]=0.8;
+    // ac2l_adc[3]=1.2;
+    // ac2l_adc[4]=1.6;
+    // ac2l_adc[5]=2.0;
+    // ac2l_adc[6]=2.4;
+    // ac2l_adc[7]=2.8;
+    // ac2l_adc[8]=3.2;
+    // ac2l_adc[9]=3.6;
+
+    // ac2u_adc[0]=4.0;
+    // ac2u_adc[1]=5.0;
+    // ac2u_adc[2]=6.0;
+    // ac2u_adc[3]=7.0;
+    // ac2u_adc[4]=8.0;
+    // ac2u_adc[5]=9.0;
+    // ac2u_adc[6]=10.0;
+    // ac2u_adc[7]=11.0;
+    // ac2u_adc[8]=12.0;
+    // ac2u_adc[9]=13.0;
      //-----------tuning_ac_oku_10.pdf--------------//
 	 //ac1_adc[0]=0.;
 	 //ac1_adc[1]=0.1;
@@ -2591,20 +2627,20 @@ void tuning::Fitting(){
 
 // hcoin_k->Fit("fk_kc","Rq","",def_mean_k-3*def_sig_k,def_mean_k+3*def_sig_k);
  h_ct_wK->Fit("fk_kc","Rq","",-1,1);
-// hcoin_pi->Fit("fpi_pic","Rq","",def_mean_pi-3*def_sig_pi,def_mean_pi+3*def_sig_pi);
-// hcoin_p->Fit("fp_pc","Rq","",def_mean_p-3*def_sig_p,def_mean_p+3*def_sig_p);
+ h_ct_wK->Fit("fpi_pic","Rq","",def_mean_pi-3*def_sig_pi,def_mean_pi+3*def_sig_pi);
+ h_ct_wK->Fit("fp_pc","Rq","",def_mean_p-3*def_sig_p,def_mean_p+3*def_sig_p);
 
  def_num_k=fk_kc->GetParameter(0);
  def_mean_k=fk_kc->GetParameter(1);
  def_sig_k=fk_kc->GetParameter(2);
 
-// def_num_p=fp_pc->GetParameter(0);
-// def_mean_p=fp_pc->GetParameter(1);
-// def_sig_p=fp_pc->GetParameter(2);
-//
-// def_num_pi=fpi_pic->GetParameter(0);
-// def_mean_pi=fpi_pic->GetParameter(1);
-// def_sig_pi=fpi_pic->GetParameter(2);
+ def_num_p=fp_pc->GetParameter(0);
+ def_mean_p=fp_pc->GetParameter(1);
+ def_sig_p=fp_pc->GetParameter(2);
+
+ def_num_pi=fpi_pic->GetParameter(0);
+ def_mean_pi=fpi_pic->GetParameter(1);
+ def_sig_pi=fpi_pic->GetParameter(2);
  
 //for(int i=0;i<nth;i++){
 // noise[i]=signal[i]=0.;
@@ -2656,7 +2692,8 @@ void tuning::ACtune(){
 //-----Background subtraction-----//
 //--------Missing Mass------------//
 //cout<<"BG subtraction MM"<<endl;
- hmm_bg_fom[i][j][l]->Scale(2./40.);
+// hmm_bg_fom[i][j][l]->Scale(2./40.);
+ hmm_bg_fom[i][j][l]->Scale(1./4.);
  hmm_wo_bg_fom[i][j][l]->Add(hmm_L_fom[i][j][l],hmm_bg_fom[i][j][l],1.0,-1.0);
 
  fp[i][j][l]=new TF1(Form("fp[%d][%d][%d]",i,j,l),"gausn(0)",min_coin_c,max_coin_c);
@@ -2741,7 +2778,7 @@ void tuning::ACtune(){
 
  //--Fitting again as a total function--//
  fmm[i][j][l]->SetParameters(n_L[i][j][l],mean_L[i][j][l],sig_L[i][j][l],n_S[i][j][l],mean_S[i][j][l],sig_S[i][j][l],d,c,b,a);
- hmm_L_fom[i][j][l]->Fit(Form("fmm[%d][%d][%d]",i,j,l),"Rq","",min_mm,max_mm);
+// hmm_L_fom[i][j][l]->Fit(Form("fmm[%d][%d][%d]",i,j,l),"Rq","",min_mm,max_mm);
  n_L[i][j][l]=fmm[i][j][l]->GetParameter(0);
  mean_L[i][j][l]=fmm[i][j][l]->GetParameter(1);
  sig_L[i][j][l]=fmm[i][j][l]->GetParameter(2);
@@ -2760,13 +2797,18 @@ void tuning::ACtune(){
  b = fmm[i][j][l]->GetParError(8); 
  a = fmm[i][j][l]->GetParError(9); 
  double range = 6*sig_L[i][j][l];//(meanL-3sigmaL, meanL+3sigmaL)
- noise[i][j][l] = a*range*range*range*range/4+b*range*range*range/3+c*range*range/2+d*range;//polynominal integral 
+ double upp = mean_L[i][j][l]+3*sig_L[i][j][l];
+ double low = mean_L[i][j][l]-3*sig_L[i][j][l];
+ //noise[i][j][l] = a*range*range*range*range/4+b*range*range*range/3+c*range*range/2+d*range;//polynominal integral 
+ noise[i][j][l] = a*(pow(upp,4)-pow(low,4))/4+b*(pow(upp,3)-pow(low,3))/3+c*(pow(upp,2)-pow(low,2))/2+d*(upp-low);//polynominal integral 
 	if(noise[i][j][l]==0)noise[i][j][l]=1;
  signal[i][j][l] = n_L[i][j][l];
- fom_L[i][j][l] = sqrt(signal[i][j][l]*signal[i][j][l]/noise[i][j][l]);
+//FOM old // fom_L[i][j][l] = sqrt(signal[i][j][l]*signal[i][j][l]/noise[i][j][l]);
+ fom_L[i][j][l] = (signal[i][j][l])/(sqrt(signal[i][j][l]+noise[i][j][l]));//peak significance
 //cout << "i,j,l= " << i <<", "<<j<<", "<<l<<endl;
 	if(fom_L[i][j][l]>100)fom_L[i][j][l]=0;
 	if(signal[i][j][l]>100)fom_L[i][j][l]=0;
+	if(fom_L[i][j][l]<0)fom_L[i][j][l]=0;
 cout <<  "S = " << signal[i][j][l] << "/ N = " << noise[i][j][l] << "... sqrt(S*S/N) = " << fom_L[i][j][l] << endl;
  h3_fom->Fill(ac1_adc[i],ac2l_adc[j],ac2u_adc[l],fom_L[i][j][l]);
 			}//for l
@@ -3453,7 +3495,9 @@ void tuning::Write(){
  //fnew->Close();
 }
 
-///////////////////////////////////////////////////////////////////////////
+
+
+// #################################################
 //=======================================================//
 //================     Main       =======================//
 //=======================================================//
@@ -3633,6 +3677,8 @@ cout << "Start Fill" << endl;
 }
 
 
+
+// #################################################
 double s2f1_off(int i,char* ARM,char* MODE, int KINE){
 
 
@@ -3666,6 +3712,8 @@ double  LS2_off_H1[16]={-25335,-25385.6,-25367,-25392.1,-25391.7,-25386.4,-25422
   return s2f1_offset;
 
 }
+
+
 
 // ###################################################
 double calcf2t_mom(double* P, double xf, double xpf, 
@@ -3771,6 +3819,7 @@ double calcf2t_ang(double* P, double xf, double xpf,
 }
       	
 
+
 // #################################################
 double calcf2t_zt(double* P, double xf, double xpf, 
                  double yf, double ypf){
@@ -3818,6 +3867,7 @@ double calcf2t_zt(double* P, double xf, double xpf,
 }
 
 
+
 // #################################################
 void tuning::GetACParam(){
 
@@ -3854,6 +3904,9 @@ void tuning::GetACParam(){
 
   }
 
+
+
+// #################################################
 double tuning::AC_npe(int nac, int seg, double adc){
 
 
@@ -3875,6 +3928,8 @@ double tuning::AC_npe(int nac, int seg, double adc){
     // in this case, we need scale gain parameter 2 times
   return npe;  
 }
+
+
 
 // #################################################
 double calcf_pathl(double* P, double xf, double xpf, double yf, double ypf, double zt){
@@ -3919,9 +3974,8 @@ double calcf_pathl(double* P, double xf, double xpf, double yf, double ypf, doub
     }
   }
   return Y;  
-
-
 }
+
 
 
 //////////////////////////////////////////////////

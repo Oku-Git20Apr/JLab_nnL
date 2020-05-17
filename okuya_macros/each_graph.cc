@@ -1,21 +1,33 @@
 void each_graph(){
 
 	string pname[900];
-	int total_run = 684;
+	static const int total_run = 709;
 	int n_run = 0;
-	int nofsegment1 = 24;
-	int nofsegment2 = 26;
+	static const int nofsegment1 = 24;
+	static const int nofsegment2 = 26;
 //	int nofcanvas = 4;
-
-	double gain1[nofsegment1][total_run], err1[nofsegment1][total_run], segment1[nofsegment1][total_run];
-	double gain2[nofsegment2][total_run], err2[nofsegment2][total_run], segment2[nofsegment2][total_run];
-	double null1[nofsegment2][total_run], null2[nofsegment2][total_run], runnum[total_run];
+	double gain1[nofsegment1][total_run];
+	double err1[nofsegment1][total_run];
+	double segment1[nofsegment1][total_run];
+	double gain2[nofsegment2][total_run];
+	double err2[nofsegment2][total_run];
+	double segment2[nofsegment2][total_run];
+	double null1[nofsegment2][total_run];
+	double null2[nofsegment2][total_run];
+	double peak1[nofsegment1][total_run];
+	double peak2[nofsegment2][total_run];
+	double rms1[nofsegment1][total_run];
+	double rms2[nofsegment2][total_run];
+	double runnum[total_run];
 
 	int n;
-	for(int i=157;i-157<total_run;i++){
+	for(int i=132;i-132<total_run;i++){
 	if(i==193 || i==199) continue;
-	n = i - 157;
-	pname[n] = Form("./ac_gain_20200406/gain_run111%d.dat",i); 
+	n = i - 132;
+	pname[n] = Form("./ac_gain_20200516/gain_run111%d.dat",i); 
+	//pname[n] = Form("./ac_gain_20200501/gain_run111%d.dat",i); 
+	//pname[n] = Form("./ac_gain_20200406/gain_run111%d.dat",i); 
+	//pname[n] = Form("./ac_gain_20200421/gain_run111%d.dat",i); 
 	ifstream ifp(pname[n].c_str(),ios::in);
 	if (ifp.fail()){ cout << "Failed" << endl; exit(1);}
 cout << "Param file : " << pname[n].c_str() << endl;
@@ -25,7 +37,7 @@ cout << "Param file : " << pname[n].c_str() << endl;
 	int n_seg1 = 0;
 	int n_seg2 = 0;
 	double err_val;
-	double count, count_err, mean, mean_err, sigma, sigma_err;
+	double count, count_err, mean, mean_err, sigma, sigma_err, peak, rms;
 
 
 
@@ -34,7 +46,9 @@ cout << "Param file : " << pname[n].c_str() << endl;
 		if(buf[0]=='#'){continue;}
 		if(ifp.eof())break;
 		stringstream sbuf(buf);
-		sbuf >> ac >> seg >> count >> count_err >> mean >> mean_err >> sigma >> sigma_err;
+		sbuf >> ac >> seg >> count >> count_err >> mean >> mean_err >> sigma >> sigma_err >> peak >> rms; //0501,0516
+		//sbuf >> ac >> seg >> count >> count_err >> mean >> mean_err >> sigma >> sigma_err; //0406
+		//sbuf >> ac >> seg >> count >> count_err >> mean >> mean_err >> sigma >> sigma_err >> peak; //0421
 		//cout << ac << seg << count << count_err << mean << mean_err << sigma << sigma_err << endl;
 
 		if (ac == 1){
@@ -44,6 +58,9 @@ cout << "Param file : " << pname[n].c_str() << endl;
 		err1[n_seg1][n_run] = err_val;//y_error
 		segment1[n_seg1][n_run] = (double)seg;
 		null1[n_seg1][n_run] = 0.;//x_error
+		peak1[n_seg1][n_run] = peak;
+		rms1[n_seg1][n_run] = rms;
+		//if (rms == 0) gain1[n_seg1][n_run]=err1[n_seg1][n_run]=0.;
 		n_seg1++;
 		}
 		else if (ac == 2){
@@ -53,6 +70,9 @@ cout << "Param file : " << pname[n].c_str() << endl;
 		err2[n_seg2][n_run] = err_val;//y_error
 		segment2[n_seg2][n_run] = (double)seg;
 		null2[n_seg2][n_run] = 0.;//x_error
+		peak2[n_seg2][n_run] = peak;
+		rms2[n_seg2][n_run] = rms;
+		//if (rms == 0) gain2[n_seg2][n_run]=err2[n_seg2][n_run]=0.;
 		n_seg2++;
 		}
 	}
@@ -70,6 +90,7 @@ cout << "Param file : " << pname[n].c_str() << endl;
 		TGraphErrors *g1[nofsegment1], *g2[nofsegment2];
 		for(int j=0;j<nofsegment1;j++){
 		g1[j] = new TGraphErrors(n_run, runnum, gain1[j], null1[j], err1[j] );
+		//g1[j] = new TGraphErrors(n_run, runnum, peak1[j], null1[j], null1[j] );
 		g1[j]->SetMarkerStyle(21);
 		g1[j]->SetMarkerColor(kAzure+j);
 		g1[j]->SetMarkerSize(1.0);
@@ -78,6 +99,7 @@ cout << "Param file : " << pname[n].c_str() << endl;
 		}
 		for(int j=0;j<nofsegment2;j++){
 		g2[j] = new TGraphErrors(n_run, runnum, gain2[j], null2[j], err2[j] );
+		//g2[j] = new TGraphErrors(n_run, runnum, peak2[j], null2[j], null2[j] );
 		g2[j]->SetMarkerStyle(21);
 		g2[j]->SetMarkerColor(kAzure+j);
 		g2[j]->SetMarkerSize(1.0);
@@ -85,7 +107,7 @@ cout << "Param file : " << pname[n].c_str() << endl;
 //	cout << "g2 is created now:  " << j << endl;
 		}
 
-	string paraname = "/data/40a/okuyama/Itabashi_20200310/ac/param/offset_ac.dat"; 
+	string paraname = "/data/41a/ELS/okuyama/Itabashi_20200310/ac/param/offset_ac.dat"; 
 	cout << "gain.dat" << endl;
 	ifstream ifp(paraname.c_str(),ios::in);
 	if (ifp.fail()){ cout << "Failed" << endl; exit(1);}
@@ -132,17 +154,17 @@ cout << "Param file : " << paraname.c_str() << endl;
 	int seg = 4*k+l;
 	c[k]->cd(l+1)->SetGrid();
 	if(seg==14){
-	TH1 *frame = c[k]->cd(l+1)->DrawFrame(157.,line1[seg]-500.,157.+(double)total_run,line1[seg]+500.);
+	TH1 *frame = c[k]->cd(l+1)->DrawFrame(132.,line1[seg]-500.,132.+(double)total_run,line1[seg]+500.);
 	frame->SetTitle(Form("a1[%d] gain",seg));
 	}else{
-	TH1 *frame = c[k]->cd(l+1)->DrawFrame(157.,line1[seg]-100.,157.+(double)total_run,line1[seg]+100.);
+	TH1 *frame = c[k]->cd(l+1)->DrawFrame(132.,line1[seg]-100.,132.+(double)total_run,line1[seg]+100.);
 	frame->SetTitle(Form("a1[%d] gain",seg));
 	}
-	tl1[seg] = new TLine(157.,line1[seg],157.+(double)total_run,line1[seg]);
+	tl1[seg] = new TLine(132.,line1[seg],132.+(double)total_run,line1[seg]);
 	tl1[seg]->SetLineWidth(3);
 	tl1[seg]->SetLineColor(kBlack);
 	tl1[seg]->Draw("same");
-	g1[seg]->Draw("plsame");
+	g1[seg]->Draw("psame");
 //cout << "ac1 " << seg << endl;
 	}
 }
@@ -156,17 +178,17 @@ cout << "Param file : " << paraname.c_str() << endl;
 	if(seg >= 26)break;
 	c2[k]->cd(l+1)->SetGrid();
 	if(seg==3 || seg==5){//range change
-	TH1 *frame = c2[k]->cd(l+1)->DrawFrame(157.,line2[seg]-500.,157.+(double)total_run,line2[seg]+500.);
+	TH1 *frame = c2[k]->cd(l+1)->DrawFrame(132.,line2[seg]-500.,132.+(double)total_run,line2[seg]+500.);
 	frame->SetTitle(Form("a2[%d] gain",seg));
 	}else{
-	TH1 *frame = c2[k]->cd(l+1)->DrawFrame(157.,line2[seg]-100.,157.+(double)total_run,line2[seg]+100.);
+	TH1 *frame = c2[k]->cd(l+1)->DrawFrame(132.,line2[seg]-100.,132.+(double)total_run,line2[seg]+100.);
 	frame->SetTitle(Form("a2[%d] gain",seg));
 	}
-	tl2[seg] = new TLine(157.,line2[seg],157.+(double)total_run,line2[seg]);
+	tl2[seg] = new TLine(132.,line2[seg],132.+(double)total_run,line2[seg]);
 	tl2[seg]->SetLineWidth(3);
 	tl2[seg]->SetLineColor(kBlack);
 	tl2[seg]->Draw("same");
-	g2[seg]->Draw("plsame");
+	g2[seg]->Draw("psame");
 //cout << "ac2 " << seg << endl;
 	}
 }
