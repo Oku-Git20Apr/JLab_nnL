@@ -24,7 +24,7 @@ void each_graph(){
 	for(int i=132;i-132<total_run;i++){
 	if(i==193 || i==199) continue;
 	n = i - 132;
-	pname[n] = Form("./ac_gain_20200516/gain_run111%d.dat",i); 
+	pname[n] = Form("/data/41a/ELS/okuyama/nnL_output/ac_gain_20200516/gain_run111%d.dat",i); 
 	//pname[n] = Form("./ac_gain_20200501/gain_run111%d.dat",i); 
 	//pname[n] = Form("./ac_gain_20200406/gain_run111%d.dat",i); 
 	//pname[n] = Form("./ac_gain_20200421/gain_run111%d.dat",i); 
@@ -107,7 +107,8 @@ cout << "Param file : " << pname[n].c_str() << endl;
 //	cout << "g2 is created now:  " << j << endl;
 		}
 
-	string paraname = "/data/41a/ELS/okuyama/Itabashi_20200310/ac/param/offset_ac.dat"; 
+//	string paraname = "/data/41a/ELS/okuyama/Itabashi_20200310/ac/param/offset_ac.dat"; 
+	string paraname = "/home/kazuki/Git_projects/JLab_nnL/ac/param/offset_ac.dat"; 
 	cout << "gain.dat" << endl;
 	ifstream ifp(paraname.c_str(),ios::in);
 	if (ifp.fail()){ cout << "Failed" << endl; exit(1);}

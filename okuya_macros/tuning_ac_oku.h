@@ -41,6 +41,7 @@
 #include "ParamMan.h"
 #include "Tree.h"
 #include "define.h"
+#include "TEfficiency.h"
 
 struct TreeBranch{
   
@@ -95,7 +96,7 @@ static TreeBranch tr;
 ////////////////////////////////////
 ////SET PARAMETERS//////////////////
 ////////////////////////////////////
-int nth=10;//change, nth=0 originally
+int nth=99;//change, nth=0 originally, max 99
 char* mode="H";
 int kine=1;
 //double tdc_time=56.23;
@@ -170,7 +171,7 @@ class tuning : public Tree
     void PathCalib(int rhit, int lhit);
     double Eloss(double yp,double z,char* arm);
     void CoinCalc(int RS2_seg, int LS2_seg, int rhit, int lhit);
-   // double CoinCalc_gogami(int RS2_seg, int LS2_seg, int rhit, int lhit);
+    double CoinCalc_gogami(int RS2_seg, int LS2_seg, int rhit, int lhit);
   //    double CoinCalc(int RS2_seg, int LS2_seg, int rhit, int lhit);
   //double CoinCalc_c(int RS2_seg, int LS2_seg, int rhit, int lhit);
  private:
@@ -266,6 +267,14 @@ double Rs2trpad[100],Ls2trpad[100];
  TH1F* hmm;
  TH1F* hmm_acc;
  TH1F* hmm_p;
+ TH1F* npe_sum_a1;
+ TH1F* npe_sum_a2;
+ TH1F* h_pisr;
+ TH1F* h_ksr;
+ TH1F* h_psr;
+ TH1F* h_pitot;
+ TH1F* h_ktot;
+ TH1F* h_ptot;
 // TH1F* hRu1_time_c;
 // TH1F* hRu1_time_s; 
 // TH2F* hcoin_ac1[100];
@@ -384,6 +393,9 @@ double Rs2trpad[100],Ls2trpad[100];
 // TGraphErrors* gL_N_ac2[100];
 // TGraphErrors* gL_FOM_ac1[100];    
 // TGraphErrors* gL_FOM_ac2[100];  
+ TGraphErrors* gcoin_pi_sr[100];  
+ TGraphErrors* gcoin_k_sr[100];  
+ TGraphErrors* gcoin_p_sr[100];  
 //
 //
 // TF1* facc_t1def[100][100];
@@ -563,6 +575,12 @@ double Rs2trpad[100],Ls2trpad[100];
 
     TF1* fAl_R;
 
+	TEfficiency* pEff1=0;
+	TEfficiency* pEff2=0;
+	TEfficiency* pEff3=0;
+	TEfficiency* pEff4=0;
+	TEfficiency* pEff5=0;
+
  private:
     double L_s0l_toff    , L_s0r_toff;
     double L_s2l_toff[16], L_s2r_toff[16];
@@ -666,6 +684,12 @@ public:
  double def_sig_L,def_mean_L,def_mean_S,def_sig_S;
  double def_num_k,def_num_p,def_num_pi,def_acc_k,def_acc_pi,def_acc_p;
  double signal[100][100][100], noise[100][100][100], fom_L[100][100][100];
+ double fom_pi1[100], fom_pi2l[100], fom_pi2u[100];
+ double fom_k1[100], fom_k2l[100], fom_k2u[100];
+ double fom_p1[100], fom_p2l[100], fom_p2u[100];
+ double err_fom_pi1[100], err_fom_pi2l[100], err_fom_pi2u[100];
+ double err_fom_k1[100], err_fom_k2l[100], err_fom_k2u[100];
+ double err_fom_p1[100], err_fom_p2l[100], err_fom_p2u[100];
 //
 // double def_t1_k[100][100],def_t1_pi[100][100],def_t1_p[100][100],def_t1_acc[100][100];
 // double def_t1_k_err[100][100],def_t1_pi_err[100][100],def_t1_p_err[100][100],def_t1_acc_err[100][100];
