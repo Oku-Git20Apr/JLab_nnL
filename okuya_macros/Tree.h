@@ -284,7 +284,8 @@ public:
   void chain_tree(string ifname);
   void new_tree(string ofname);
   void readtreeHRSLR();
-  bool F1Shift(bool RHRS, bool F1TOP,int seg);
+//  bool F1Shift(bool RHRS, bool F1TOP,int seg);
+  void F1Shift(bool RHRS, bool F1TOP,int seg);
   
   ////////
   //Left//

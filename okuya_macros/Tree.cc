@@ -211,7 +211,7 @@ void Tree::convertF1TDCL(ParamMan *param)
 
   bool F1Shift_L=true;
 
-  double F1res=  param->GetF1reso();
+//  double F1res=  param->GetF1reso();
   //  doulbe F1shift= param->GetF1ShiftOffset();
   double LF1shift_off[LS2];
 
@@ -330,7 +330,7 @@ void Tree::convertF1TDCL_rhit(ParamMan *param, int seg)
 
   bool F1Shift_L=true;
 
-  double F1res=  param->GetF1reso();
+//  double F1res=  param->GetF1reso();
   double F1shift= param->GetF1ShiftOffset();
   double LF1shift_off[LS2];
 
@@ -663,7 +663,7 @@ double Tree::GetBeta_S0S2wF1TDCR(int itrack)
   return betaR;
 }
 
-bool Tree::F1Shift(bool RHRS, bool F1TOP, int seg){
+void Tree::F1Shift(bool RHRS, bool F1TOP, int seg){
 
   //======= RHRS =================//
 

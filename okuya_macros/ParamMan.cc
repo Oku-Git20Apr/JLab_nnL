@@ -241,6 +241,7 @@ double ParamMan::GetF1Shift(int seg, int lr, int tb){
   double shift;
     if(lr==0)shift= L_F1shift[seg];
     else if(lr==1)shift= R_F1shift[seg];
+	else shift=0.;
 
     return shift;
 }
@@ -641,19 +642,19 @@ double ParamMan::F1Res(){
 }
 
 
-double ParamMan::GetF1Offset(int cid, int seg, int lr, int tb){
-
-  double RS2T_F1[nS2],RS2B_F1[nS2],LS2T_F1[nS2],LS2B_F1[nS2];
-  
-  for(int i=0;i<nS2;i++){
-    RS2T_F1[i]= R_F1S2T.tdcOffset[i];
-    RS2B_F1[i]= R_F1S2B.tdcOffset[i];
-    LS2T_F1[i]= L_F1S2T.tdcOffset[i];
-    LS2B_F1[i]= L_F1S2B.tdcOffset[i];
-  }
-
-
-
-
-
-}
+//double ParamMan::GetF1Offset(int cid, int seg, int lr, int tb){
+//
+//  double RS2T_F1[nS2],RS2B_F1[nS2],LS2T_F1[nS2],LS2B_F1[nS2];
+//  
+//  for(int i=0;i<nS2;i++){
+//    RS2T_F1[i]= R_F1S2T.tdcOffset[i];
+//    RS2B_F1[i]= R_F1S2B.tdcOffset[i];
+//    LS2T_F1[i]= L_F1S2T.tdcOffset[i];
+//    LS2B_F1[i]= L_F1S2B.tdcOffset[i];
+//  }
+//
+//
+//
+//
+//
+//}

@@ -1,7 +1,6 @@
 // This macro can make histograms of all segments of AC1,2
 // If you want to change input files, you just have to change "Nrun".
 // However, it starts to count from "runnum".
-// Only one things.
 // 
 // -------a1shift & a2shift are no longer used.-------
 // Their fit ranges have been roughly tuned by Okuyama (2020.3.21)
@@ -28,12 +27,12 @@
 //
 // I added that we can monitor RMS value. (2020.4.30)
 // Run111132~Run111156 were added.
-// Using root, not small
+// Using root/, not small/
 // 2ch/bin -> 6ch/bin
 // but this didn't work well. (2020.5.4)
 //
 // 6ch/bin -> 2ch/bin
-// Using root (2020.5.5) 
+// Using root/ (2020.5.5) 
 
 void gain_all_segment(){
 

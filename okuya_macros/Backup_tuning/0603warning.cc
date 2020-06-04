@@ -6,7 +6,7 @@ using namespace std;
 #include "Param.h"
 #include "Tree.h"
 
-double s2f1_off(int i,char const* ARM,char const* MODE, int KINE);
+double s2f1_off(int i,char* ARM,char* MODE, int KINE);
 double Calc_ras(double a,double b,double c){return  a *b + c;};  
 double calcf2t_ang(double* P,double xf, double xpf, double yf, double fpf,double z);
 double calcf2t_zt(double* P, double xf, double xpf, double yf, double ypf);
@@ -574,7 +574,7 @@ void tuning::CoinCalc(int RS2_seg, int LS2_seg, int rhit, int lhit){
   double tof_rc = RS2_F1time_c[RS2_seg] - R_pathl/(Beta_R*LightVelocity);
   double tof_lc = LS2_F1time_c[LS2_seg] - L_pathl/(Beta_L*LightVelocity);
 
-//  double tof_lg = LS2_F1time_g[LS2_seg] - L_pathl/(Beta_L*LightVelocity);
+  double tof_lg = LS2_F1time_g[LS2_seg] - L_pathl/(Beta_L*LightVelocity);
 
   
     tr.RS2T_ref=RF1Ref[0];
@@ -651,7 +651,7 @@ double tuning::CoinCalc_gogami(int RS2_seg, int LS2_seg,int rhit, int lhit){
 
 
 
-//  double tref_L  = LTDC_F1FirstHit[40]       * tdc_time;
+  double tref_L  = LTDC_F1FirstHit[40]       * tdc_time;
   double tref_R  = RTDC_F1FirstHit[9]        * tdc_time;
   //  double rf      = LTDC_F1FirstHit[47]       * tdc_time;
   //  double rf_R    = RTDC_F1FirstHit[15]        * tdc_time;
@@ -659,14 +659,14 @@ double tuning::CoinCalc_gogami(int RS2_seg, int LS2_seg,int rhit, int lhit){
 
  double timeL_R = RTDC_F1FirstHit[RS2_seg+16] * tdc_time;
  double timeR_R = RTDC_F1FirstHit[RS2_seg+48] * tdc_time; 
-// double timeL_L = LTDC_F1FirstHit[LS2_seg] * tdc_time;
-// double timeR_L = LTDC_F1FirstHit[LS2_seg+48] * tdc_time; 
+ double timeL_L = LTDC_F1FirstHit[LS2_seg] * tdc_time;
+ double timeR_L = LTDC_F1FirstHit[LS2_seg+48] * tdc_time; 
 
 
  double toffset_R = -364.6-150.; // for H2_1
-// double toffset_L = 1762.0;
+ double toffset_L = 1762.0;
 
-// double meantime_L = tref_L - (timeL_L+timeR_L)/2.0 + toffset_L + cor_L;
+ double meantime_L = tref_L - (timeL_L+timeR_L)/2.0 + toffset_L + cor_L;
  double meantime_R = tref_R - (timeL_R+timeR_R)/2.0 + toffset_R + cor_R;
 
  // meantime_R=100;RS2_seg=7;LS2_seg=7;
@@ -877,8 +877,8 @@ double tuning::Eloss(double yp,double z,char const* arm){
   // R-HRS : right hand coordinate (Unticlockwise rotation)//
   // L-HRS : left  hand coordinate (    Clockwise rotation)//
   
-  if(*arm=='R')        x = - hrs_ang - yp; //yp : phi [rad] RHRS
-  else if(*arm=='L')   x = - hrs_ang + yp; //yp : phi [rad] LHRS
+  if(arm=="R")        x = - hrs_ang - yp; //yp : phi [rad] RHRS
+  else if(arm=="L")   x = - hrs_ang + yp; //yp : phi [rad] LHRS
   else x=0.0;
   double ph[3],pl[2];
   double dEloss=0.0;
@@ -890,19 +890,19 @@ double tuning::Eloss(double yp,double z,char const* arm){
   
     //==== thickness 0.400 mm ========//
 
-  if(*arm=='R'){
+  if(arm=="R"){
     ph[0] = -1.3175;
     ph[1] = -4.6151;
     ph[2] = 2.0369;
     pl[0] = 3.158e-2;
     pl[1] = 4.058e-1;
-  }else if(*arm=='L'){
+  }else if(arm=="L"){
     ph[0] = -1.3576;
     ph[1] = -4.5957;
     ph[2] = 2.0909;
     pl[0] = 6.2341e-3;
     pl[1] = 4.0336e-1;
-  }else ph[0]=0.;ph[1]=0.;ph[2]=0.;pl[0]=0.;pl[1]=0.;//Okuyama
+  }
 
  
   if(high){
@@ -912,7 +912,7 @@ double tuning::Eloss(double yp,double z,char const* arm){
     dEloss_l = pl[0]*x +pl[1];    
     dEloss = dEloss_l;}
   //==== thickness 0.4 mm in beam energy loss ======//
-  if(*arm=='B')dEloss=0.184; //[MeV/c]
+  if(arm=="B")dEloss=0.184; //[MeV/c]
   dEloss=dEloss/1000.; // [GeV/c]
   return dEloss;
 
@@ -1713,7 +1713,7 @@ void tuning::MakeHist(){
   set->SetTH2(h_Lph_mm  ,"LHRS FP phi v.s B_{Lambda}"          ,"-B_{Lambda} (GeV/c^{2})","phi_{FP} (rad)");
   set->SetTH2(h_Rp_Lp   ,"RHRS momentum v.s LHRS momentum"       ,"Lp (GeV/c)"              ,"Rp (GeV/c)");
 
-//  TF1* fAl_R=new TF1("fAl_R","gausn(0)",-0.135,-0.115);
+  TF1* fAl_R=new TF1("fAl_R","gausn(0)",-0.135,-0.115);
 
 
 // min_vdc=-0.2e-6;
@@ -1924,13 +1924,12 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 	tr.Ls2ra_p[s2pad]=L_s2_ra_p[s2pad];
 	tr.Ls2la_p[s2pad]=L_s2_la_p[s2pad];
 	tr.Ls2_pad[t]=(int)L_s2_trpad[t];
-//        double p    = L_tr_p[t];
-//        double path = L_s2_trpath[t] - L_s0_trpath[t];
-//        double beta = -99;
-		//double m2 = -99;
+        double p    = L_tr_p[t];
+        double path = L_s2_trpath[t] - L_s0_trpath[t];
+        double beta = -99, m2 = -99;
         if( L_s2_t[s2pad]>0 && L_s0_t>0 && s2pad>=0 ){
-//          beta = path / ( L_s2_t[s2pad] - L_s0_t ) / c;
-//          m2 = ( 1./beta/beta - 1. ) * p * p;
+          beta = path / ( L_s2_t[s2pad] - L_s0_t ) / c;
+          m2 = ( 1./beta/beta - 1. ) * p * p;
         }
 //        double betae = p / sqrt(Me*Me + p*p);
 
@@ -1970,10 +1969,9 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
         int s2pad = (int)R_s2_trpad[t];
 	if(s2pad<0)break;
         tr.Rs2_pad[t] =(int)R_s2_trpad[t];
-//	    double p    = R_tr_p[t];
-//        double path = R_s2_trpath[t] - R_s0_trpath[t];
-//        double beta = 0;
-//		double m2 = 0;
+	    double p    = R_tr_p[t];
+        double path = R_s2_trpath[t] - R_s0_trpath[t];
+        double beta = 0, m2 = 0;
 
 
 	
@@ -1990,8 +1988,8 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
     tr.RXpt=R_tr_tg_th[0];
     tr.RYpt=R_tr_tg_ph[0];
         if( R_s2_t[s2pad]>0 && R_s0_t>0 && s2pad>=0 ){
-//          beta = path / ( R_s2_t[s2pad] - R_s0_t ) / c;
-//          m2 = ( 1./beta/beta - 1. ) * p * p;
+          beta = path / ( R_s2_t[s2pad] - R_s0_t ) / c;
+          m2 = ( 1./beta/beta - 1. ) * p * p;
         } 
 //        double betaK = p / sqrt(MK*MK + p*p);
 	
@@ -2123,26 +2121,26 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 	    
 	    //==== Energy Loss calibration ======//
 
-//	    double B_pc,R_pc,L_pc;
+	    double B_pc,R_pc,L_pc;
 
 	    tr.dpe     = Eloss(0.0,R_tr_vz[0],"B");
 	    tr.dpk[rt] = Eloss(R_tr_tg_ph[rt],R_tr_vz[rt],"R");
 	    tr.dpe_[lt]= Eloss(L_tr_tg_ph[lt],L_tr_vz[lt],"L");
-	  //  
-	  //  R_pc = R_p + tr.dpk[rt];
-	  //  L_pc = L_p + tr.dpe_[lt];
-	  //  B_pc = B_p - tr.dpe;
+	    
+	    R_pc = R_p + tr.dpk[rt];
+	    L_pc = L_p + tr.dpe_[lt];
+	    B_pc = B_p - tr.dpe;
 
 	    //===================================//	    
-//	    double B_E     = sqrt( Me*Me + B_p*B_p );
+	    double B_E     = sqrt( Me*Me + B_p*B_p );
             int L_s2pad = (int)L_s2_trpad[lt];
             double L_E     = sqrt( Me*Me + L_p*L_p );
-//            double L_betae = L_p / sqrt(Me*Me + L_p*L_p);
+            double L_betae = L_p / sqrt(Me*Me + L_p*L_p);
             int R_s2pad    = (int)R_s2_trpad[rt];
             double R_E     = sqrt( MK*MK + R_p*R_p );
-//	    double R_Epi   = sqrt( Mpi*Mpi + R_p*R_p );
+	    double R_Epi   = sqrt( Mpi*Mpi + R_p*R_p );
             double R_betaK = R_p / sqrt(MK*MK + R_p*R_p);
-//	    double R_betaPi =R_p/ sqrt(Mpi*Mpi + R_p*R_p);
+	    double R_betaPi =R_p/ sqrt(Mpi*Mpi + R_p*R_p);
 
 
 	    CoinCalc(R_s2pad,L_s2pad,rt,lt);
@@ -2217,8 +2215,7 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 
 	    
 	    
-	    double mass_b, mm_b;
-//		double mm_Lb;
+	    double mass_b, mm_b, mm_Lb;
             mass_b = sqrt( (Ee_b + mt - L_Eb - R_Eb)*(Ee_b + mt - L_Eb - R_Eb)
 			 - (B_vb - L_vb - R_vb)*(B_vb - L_vb - R_vb) );
 
@@ -2295,8 +2292,7 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 
 
 	   	    
-        double mass,mm,mass_L,mass_nnL,mm_L,mm_nnL,mm_Al,mass_Al,mass_MgL;
-//		double mass_c, mm_c, mm2, mass2;
+            double mass,mass_c, mm,mm_c,mass_L,mass_nnL,mm_L,mm_nnL,mm_Al,mass_Al,mass2,mm2,mass_MgL;
 	    double mass_pc, mass_H3L,mm_H3L,mm_MgL;
 
 	    
@@ -2304,8 +2300,8 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
                               - (B_v - L_v - R_v)*(B_v - L_v - R_v) );
 
    
-//            mass2= sqrt( (Ee + mt - L_E - R_Epi)*(Ee + mt - L_E - R_Epi)
-//                              - (B_v - L_v - R_v)*(B_v - L_v - R_v) );
+            mass2= sqrt( (Ee + mt - L_E - R_Epi)*(Ee + mt - L_E - R_Epi)
+                              - (B_v - L_v - R_v)*(B_v - L_v - R_v) );
 
 	    
             mass_pc = sqrt( (Eec + mt - L_Ec - R_Ec)*(Eec + mt - L_Ec - R_Ec)
@@ -2314,7 +2310,7 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 
 	    
 	    mm=mass - mh;
-            //mm2=mass2 - mh;
+            mm2=mass2 - mh;
 
 	   // mm = mm*1000.; // GeV -> MeV
 	    //mm2 = mm2*100.; // GeV ->MeV 
@@ -2384,7 +2380,7 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 	cut_ac2=false;
    	//if(ac2l_adc[30]<tr.AC2_npe_sum && tr.AC2_npe_sum < ac2u_adc[16])cut_ac2=true;
    	if(3.<tr.AC2_npe_sum && tr.AC2_npe_sum > 0.)cut_ac2=true;
-	if(zcut && cut_ac2){//no AC1 cut
+	if(zcut&&cut_ac2){//no AC1 cut
 	hcoin_k_fom_noAC1->Fill(ct);
 				if((-100.<ct && ct <-20.) || (20.<ct && ct<100.)){
 					double ct_ = ct;
@@ -2568,9 +2564,12 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 
 				    
 
-              if((Kaon && fabs(ct)<1.0) && ((-0.15<(L_tr_vz[lt]) && (L_tr_vz[lt])<-0.1) || (( 0.1<(L_tr_vz[lt])) && (L_tr_vz[lt])<0.15)) &&  (fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025) && ((-0.15<(R_tr_vz[rt]) && (R_tr_vz[rt])<-0.1) ||( 0.1<(R_tr_vz[rt]) && (R_tr_vz[rt])<0.15)))h_mm_MgL->Fill(mm_MgL);//h_mm_Al->Fill(mm_Al);
+              if(Kaon && fabs(ct)<1.0 && ((-0.15<(L_tr_vz[lt]) && (L_tr_vz[lt])<-0.1) || ( 0.1<(L_tr_vz[lt]) && (L_tr_vz[lt])<0.15) &&  fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025) 
+		 && ((-0.15<(R_tr_vz[rt]) && (R_tr_vz[rt])<-0.1) ||( 0.1<(R_tr_vz[rt]) && (R_tr_vz[rt])<0.15)))h_mm_MgL->Fill(mm_MgL);//h_mm_Al->Fill(mm_Al);
 
-	      if((Kaon) && (((-35<ct) && (ct<-15.0)) || ((15.0<ct) && (ct<35))) && (((-0.15<(L_tr_vz[lt])) && ((L_tr_vz[lt])<-0.1)) || ( (0.1<(L_tr_vz[lt])) && ((L_tr_vz[lt])<0.15))) && (fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025) && (((-0.15<(R_tr_vz[rt]-0.01)) && ((R_tr_vz[rt])<-0.1)) ||( (0.1<(R_tr_vz[rt])) && ((R_tr_vz[rt])<0.15)))){
+	      if(Kaon && ((-35<ct && ct<-15.0) || (15.0<ct && ct<35)) 
+                 && ((-0.15<(L_tr_vz[lt]) && (L_tr_vz[lt])<-0.1) || ( 0.1<(L_tr_vz[lt]) && (L_tr_vz[lt])<0.15) && fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025) 
+		 && ((-0.15<(R_tr_vz[rt]-0.01) && (R_tr_vz[rt])<-0.1) ||( 0.1<(R_tr_vz[rt]) && (R_tr_vz[rt])<0.15))){
 		tr.missing_mass_MgL_acc=mm_MgL;
 		
 		h_mm_MgL_acc->Fill(mm_MgL);
@@ -4538,11 +4537,11 @@ cout << "Start Fill" << endl;
 
 
 // #################################################
-double s2f1_off(int i,char const* ARM,char const* MODE, int KINE){
+double s2f1_off(int i,char* ARM,char* MODE, int KINE){
 
 
   double RS2_offset[16],LS2_offset[16];
-  if(*MODE=='H' && KINE==2){
+  if(MODE=="H" && KINE==2){
  
  double  RS2_off_H2[16]={-16911.4,-16864.3,-16900,-16897,-16873.8,-16868.4,-16901.1,-16876.8,-16895.4,-16860.9,-16893.1,-16884.4,-16847.3,-16842.7,-16836.9,-16882.6};
  double  LS2_off_H2[16]={-25336.9,-25386.6,-25367.5,-25392.3,-25391.1,-25386.2,-25422,-25428.9,-25417.3,-25426.8,-25438.7,-25383.4,-25396,-25418.5,-25436.4,-26082.1};
@@ -4552,7 +4551,7 @@ double s2f1_off(int i,char const* ARM,char const* MODE, int KINE){
   }
 
 
-  if(*MODE=='H' && KINE==1){
+  if(MODE=="H" && KINE==1){
     
     //double  RS2_off_H1[16]={-16911.4,-16864.9,-16900,-16897.6,-16874.8,-16869.3,-16901.1,-16876.8,-16895.6,-16860.3,-16892.6,-16885,-16847.3,-16843.3,-16838.4,-16882.6};
     //double  LS2_off_H1[16]={-25336.9,-25385.7,-25367,-25392.2,-25391,-25386.3,-25422,-25428.9,-25415.2,-25425,-25438,-25381,-25394.4,-25417.5,-25432.8,-26082.1};
@@ -4564,9 +4563,9 @@ double  LS2_off_H1[16]={-25335,-25385.6,-25367,-25392.1,-25391.7,-25386.4,-25422
   }
 
  double s2f1_offset; 
- if(*ARM=='R')s2f1_offset=RS2_offset[i];
- else  if(*ARM=='L')s2f1_offset=LS2_offset[i];
- else {s2f1_offset=0.;cout<<"false read out !!"<<endl;}
+ if(ARM=="R")s2f1_offset=RS2_offset[i];
+ else  if(ARM=="L")s2f1_offset=LS2_offset[i];
+ else {cout<<"false read out !!"<<endl;}
 
   return s2f1_offset;
 
@@ -4595,7 +4594,7 @@ double calcf2t_mom(double* P, double xf, double xpf,
   double Y=0.;
   double x=1.; 
   int npar=0;
-  int a=0,b=0,c=0,d=0,e=0;
+  int a=0,b=0,c=0,d=0,e=0,f=0,g=0,h=0,i=0;
   for (int n=0;n<nMatT+1;n++){
 	    for(e=0;e<n+1;e++){
 	      for (d=0;d<n+1;d++){

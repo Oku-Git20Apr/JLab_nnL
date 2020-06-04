@@ -49,7 +49,7 @@ OBJS14=   okuyana.o Setting.o Tree.o ParamMan.o
 
 .PHONY: all
 all:$(TARGET13)\
-     $(TARGET14)\
+#     $(TARGET14)\
 #     $(TARGET11)
 #$(TARGET1)\
 #     $(TARGET2)\

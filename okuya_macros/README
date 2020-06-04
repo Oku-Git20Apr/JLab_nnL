@@ -1,3 +1,22 @@
+*tuning_ac_oku.cc
+Macrofile for tuning AC counters.
+This concept is based on hrs_tuningAC.h (by Itabashi-san),
+but the analysis inside is taken over from ana_Lambda.cc
+
+--0531th1.copy 
+Backup of tuning_ac_oku.cc. When I make graphs of Survival Ratio vs th1
+--0531th2u.copy 
+Backup of tuning_ac_oku.cc. When I make graphs of Survival Ratio vs th2u
+
+*gain_all_segment.cc
+This can fit all AC segments' ADC distribution and get 1p.e. position, run by run.
+This information is stored in "gain_run111???.dat"
+
+*each_graph.cc
+This shows all AC segments' run dependences from "gain_run111???.dat"
+2 x 2 display
+
+
 These files should be under this directry.
 
 *Tree.h
