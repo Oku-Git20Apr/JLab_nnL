@@ -100,7 +100,7 @@ int nth=100;//change, nth=0 originally, max 99
 char const* mode="H";
 int kine=1;
 //double tdc_time=56.23;
-double tdc_time=0.05623;//[ps/ch]
+//double tdc_time=0.05623;//[ns/ch]
 bool ac2_min = true;
 
 
@@ -299,6 +299,11 @@ double Rs2trpad[100],Ls2trpad[100];
  TH1F* h_ptot2u;
  TH1F* h_Ltot2u;
  TH1F* h_Stot2u;
+ TH2F* h_pisr12l;
+ TH2F* h_ksr12l;
+ TH2F* h_psr12l;
+ TH2F* h_Lsr12l;
+ TH2F* h_Ssr12l;
 // TH1F* hRu1_time_c;
 // TH1F* hRu1_time_s; 
 // TH2F* hcoin_ac1[100];
@@ -327,32 +332,54 @@ double Rs2trpad[100],Ls2trpad[100];
  TH1F* hcoin_k_fom_noAC2;
  TH1F* hcoin_bg_fom_noAC2;
  TH1F* hcoin_wo_bg_fom_noAC2;//SR(No AC2 Cut)
+ TH1F* hcoin_k_fom_noAC;
+ TH1F* hcoin_bg_fom_noAC;
+ TH1F* hcoin_wo_bg_fom_noAC;//SR(No AC Cut, neither 1 nor 2)
  TH1F* hmm_L_fom_noAC1;
  TH1F* hmm_L_fom_noAC2;
+ TH1F* hmm_L_fom_noAC;
  TH1F* hmm_bg_fom_noAC1;
  TH1F* hmm_bg_fom_noAC2;
+ TH1F* hmm_pibg_fom_noAC;
  TH1F* hmm_wo_bg_fom_noAC1;
  TH1F* hmm_wo_bg_fom_noAC2;
+ TH1F* hmm_wo_bg_fom_noAC;
+ TH1F* hmm_pi_fom_noAC;//MM if pion
+ TH1F* hmm_bg_fom_noAC;
+ TH1F* hmm_pi_wobg_fom_noAC;
+ TH2D* h_m2_mm;
+ TH2D* h_m2_ac;
 
  TF1* fcoin_noAC1;
  TF1* fcoin_noAC2;
+ TF1* fcoin_noAC;
  TF1* fpi_noAC1;
  TF1* fk_noAC1;
  TF1* fp_noAC1;
  TF1* fpi_noAC2;
  TF1* fk_noAC2;
  TF1* fp_noAC2;
+ TF1* fpi_noAC;
+ TF1* fk_noAC;
+ TF1* fp_noAC;
  TF1* fmmbg_noAC1;
  TF1* fmmbg_noAC2;
+ TF1* fmmbg_noAC;
  TF1* fL_noAC1;
  TF1* fS_noAC1;
  TF1* fmm_noAC1;
  TF1* fL_noAC2;
  TF1* fS_noAC2;
  TF1* fmm_noAC2;
+ TF1* fL_noAC;
+ TF1* fS_noAC;
+ TF1* fmm_noAC;
  TH1F* hmm_L_fom[100][100][100];
  TH1F* hmm_bg_fom[100][100][100];
  TH1F* hmm_wo_bg_fom[100][100][100];
+ TH1F* hmm_pi_fom[100][100][100];
+ TH1F* hmm_pibg_fom[100][100][100];
+ TH1F* hmm_pi_wobg_fom[100][100][100];
 // TH1F* hcoin_ac1_max[100];
 // TH1F* hcoin_ac2_max[100];
 // TH1F* hcoin_t3[100][100];
@@ -668,7 +695,7 @@ public:
   string param_mt[100];
   bool MT_p[100];
   bool ploss;
-  double tdc_time;
+  double tdc_time=0.05623;//[ns/ch]
   bool Lp_scale=false;
   bool nnL_flag=false;
   double ac1_off[24],ac1_1pe[24],ac2_off[26],ac2_1pe[26];
@@ -736,6 +763,11 @@ public:
  double n_p_noAC2,sig_p_noAC2,mean_p_noAC2;
  double n_L_noAC2,sig_L_noAC2,mean_L_noAC2;
  double n_S_noAC2,sig_S_noAC2,mean_S_noAC2;
+ double n_pi_noAC,sig_pi_noAC,mean_pi_noAC;
+ double n_k_noAC,sig_k_noAC,mean_k_noAC;
+ double n_p_noAC,sig_p_noAC,mean_p_noAC;
+ double n_L_noAC,sig_L_noAC,mean_L_noAC;
+ double n_S_noAC,sig_S_noAC,mean_S_noAC;
  double n_L[100][100][100],sig_L[100][100][100],mean_L[100][100][100];
  double n_S[100][100][100],sig_S[100][100][100],mean_S[100][100][100];
 // int bin_ac1_adc[100][100],bin_min_ac1,bin_max_ac1,bin_ac2_adc[100][100],bin_max_ac2,bin_min_ac2;
@@ -749,6 +781,7 @@ public:
  double n_p_err[100][100][100],n_pi_err[100][100][100],n_k_err[100][100][100];
  double n_p_err_noAC1,n_pi_err_noAC1,n_k_err_noAC1;
  double n_p_err_noAC2,n_pi_err_noAC2,n_k_err_noAC2;
+ double n_p_err_noAC,n_pi_err_noAC,n_k_err_noAC;
  double n_L_err[100][100][100],n_S_err[100][100][100];
 // double FOM_ac1[100][100],FOM_ac2[100][100];
 // double max_fom_ac1,max_fom_ac2;
@@ -798,6 +831,7 @@ public:
 //
 //
 // //====== Tuning ============//
+//
  bool ac2_up,ac2_down,ac2_flag; 
  double Lbg_fom[3],Sbg_fom[3];
  double Lam_p[3],Sig_p[3];
@@ -823,6 +857,14 @@ public:
  double snk_fom;
  double fom;
 //
+//-- Integral Range Definition --//
+double center_pi=0., range_pi=0.;
+double center_k=0., range_k=0.;
+double center_p=0., range_p=0.;
+double center_L=0., range_L=0.;
+double center_S=0., range_S=0.;
+
+
 // //====== Draw ===========//
  TCanvas* c1;
  TCanvas* c2;
@@ -838,11 +880,11 @@ public:
  TCanvas* c12;
  TCanvas* c13; 
  TCanvas* c14;
-// TCanvas* c15;
-// TCanvas* c16;
-// TCanvas* c17;
-// TCanvas* c18;
-// TCanvas* c19;
+ TCanvas* c15;
+ TCanvas* c16;
+ TCanvas* c17;
+ TCanvas* c18;
+ TCanvas* c19;
 // TCanvas* c20;
 // TCanvas* c21;
 // TCanvas* c22;

@@ -44,12 +44,23 @@ CXXLIBS = $(ROOTLIBS)
 #OBJS12=   hrs_tuningAC.o Setting.o
 TARGET13= tuning_ac_oku
 OBJS13=   tuning_ac_oku.o Setting.o Tree.o ParamMan.o
-TARGET14= okuyana 
-OBJS14=   okuyana.o Setting.o Tree.o ParamMan.o
+TARGET14= eff_z
+OBJS14=   eff_z.o Setting.o Tree.o ParamMan.o
+TARGET15= eff_fp
+OBJS15=   eff_fp.o Setting.o Tree.o ParamMan.o
+TARGET16= eff_chi2
+OBJS16=   eff_chi2.o Setting.o Tree.o ParamMan.o
+TARGET16= eff_z2d
+OBJS16=   eff_z2d.o Setting.o Tree.o ParamMan.o
+#TARGET14= okuyana 
+#OBJS14=   okuyana.o Setting.o Tree.o ParamMan.o
 
 .PHONY: all
 all:$(TARGET13)\
-#     $(TARGET14)\
+     $(TARGET14)\
+     $(TARGET15)\
+     $(TARGET16)\
+     $(TARGET17)
 #     $(TARGET11)
 #$(TARGET1)\
 #     $(TARGET2)\
@@ -95,6 +106,12 @@ $(LIBDIR)/%.o : %.cc
 $(TARGET13): $(patsubst %,$(LIBDIR)/%,$(OBJS13))
 	$(CXX) $(CFLAGS) -o $(BINDIR)/$@ $^ $(CXXLIBS) $(CXXFLAGS)
 $(TARGET14): $(patsubst %,$(LIBDIR)/%,$(OBJS14))
+	$(CXX) $(CFLAGS) -o $(BINDIR)/$@ $^ $(CXXLIBS) $(CXXFLAGS)
+$(TARGET15): $(patsubst %,$(LIBDIR)/%,$(OBJS15))
+	$(CXX) $(CFLAGS) -o $(BINDIR)/$@ $^ $(CXXLIBS) $(CXXFLAGS)
+$(TARGET16): $(patsubst %,$(LIBDIR)/%,$(OBJS16))
+	$(CXX) $(CFLAGS) -o $(BINDIR)/$@ $^ $(CXXLIBS) $(CXXFLAGS)
+$(TARGET17): $(patsubst %,$(LIBDIR)/%,$(OBJS17))
 	$(CXX) $(CFLAGS) -o $(BINDIR)/$@ $^ $(CXXLIBS) $(CXXFLAGS)
 .PHONY: clean
 clean:

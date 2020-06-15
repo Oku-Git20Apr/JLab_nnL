@@ -52,9 +52,11 @@ cout << "Param file : " << pname[n].c_str() << endl;
 		//cout << ac << seg << count << count_err << mean << mean_err << sigma << sigma_err << endl;
 
 		if (ac == 1){
-		err_val  = mean_err;
+		//err_val  = mean_err;
+		err_val  = sigma_err;
 		//err_val  = sigma;
-		gain1[n_seg1][n_run] = mean;//y_val
+		//gain1[n_seg1][n_run] = mean;//y_val
+		gain1[n_seg1][n_run] = sigma;//y_val
 		err1[n_seg1][n_run] = err_val;//y_error
 		segment1[n_seg1][n_run] = (double)seg;
 		null1[n_seg1][n_run] = 0.;//x_error
@@ -64,9 +66,11 @@ cout << "Param file : " << pname[n].c_str() << endl;
 		n_seg1++;
 		}
 		else if (ac == 2){
-		err_val  = mean_err;
+		//err_val  = mean_err;
+		err_val  = sigma_err;
 		//err_val  = sigma;
-		gain2[n_seg2][n_run] = mean;//y_val
+		//gain2[n_seg2][n_run] = mean;//y_val
+		gain2[n_seg2][n_run] = sigma;//y_val
 		err2[n_seg2][n_run] = err_val;//y_error
 		segment2[n_seg2][n_run] = (double)seg;
 		null2[n_seg2][n_run] = 0.;//x_error
@@ -114,7 +118,7 @@ cout << "Param file : " << pname[n].c_str() << endl;
 	if (ifp.fail()){ cout << "Failed" << endl; exit(1);}
 cout << "Param file : " << paraname.c_str() << endl;
 
-	string pdfname = "each_graph.pdf";
+	string pdfname = "each_graph.pdf~~~";
 	cout << "output pdf file name is " << pdfname << endl;
 	
 	string buf;
@@ -146,6 +150,7 @@ cout << "Param file : " << paraname.c_str() << endl;
 	}
 	
 
+/*----Gain----------*/
 	TCanvas *c[6];
 	TLine *tl1[nofsegment1];
 	for(int k=0;k<6;k++){
@@ -155,13 +160,13 @@ cout << "Param file : " << paraname.c_str() << endl;
 	int seg = 4*k+l;
 	c[k]->cd(l+1)->SetGrid();
 	if(seg==14){
-	TH1 *frame = c[k]->cd(l+1)->DrawFrame(132.,line1[seg]-500.,132.+(double)total_run,line1[seg]+500.);
+	TH1 *frame = c[k]->cd(l+1)->DrawFrame(132.,gain1[seg][157]-500.,132.+(double)total_run,gain1[seg][157]+500.);
 	frame->SetTitle(Form("a1[%d] gain",seg));
 	}else{
-	TH1 *frame = c[k]->cd(l+1)->DrawFrame(132.,line1[seg]-100.,132.+(double)total_run,line1[seg]+100.);
+	TH1 *frame = c[k]->cd(l+1)->DrawFrame(132.,gain1[seg][157]-100.,132.+(double)total_run,gain1[seg][157]+100.);
 	frame->SetTitle(Form("a1[%d] gain",seg));
 	}
-	tl1[seg] = new TLine(132.,line1[seg],132.+(double)total_run,line1[seg]);
+	tl1[seg] = new TLine(132.,gain1[seg][157],132.+(double)total_run,gain1[seg][157]);
 	tl1[seg]->SetLineWidth(3);
 	tl1[seg]->SetLineColor(kBlack);
 	tl1[seg]->Draw("same");
@@ -179,13 +184,13 @@ cout << "Param file : " << paraname.c_str() << endl;
 	if(seg >= 26)break;
 	c2[k]->cd(l+1)->SetGrid();
 	if(seg==3 || seg==5){//range change
-	TH1 *frame = c2[k]->cd(l+1)->DrawFrame(132.,line2[seg]-500.,132.+(double)total_run,line2[seg]+500.);
+	TH1 *frame = c2[k]->cd(l+1)->DrawFrame(132.,gain2[seg][157]-500.,132.+(double)total_run,gain2[seg][157]+500.);
 	frame->SetTitle(Form("a2[%d] gain",seg));
 	}else{
-	TH1 *frame = c2[k]->cd(l+1)->DrawFrame(132.,line2[seg]-100.,132.+(double)total_run,line2[seg]+100.);
+	TH1 *frame = c2[k]->cd(l+1)->DrawFrame(132.,gain2[seg][157]-100.,132.+(double)total_run,gain2[seg][157]+100.);
 	frame->SetTitle(Form("a2[%d] gain",seg));
 	}
-	tl2[seg] = new TLine(132.,line2[seg],132.+(double)total_run,line2[seg]);
+	tl2[seg] = new TLine(132.,gain2[seg][157],132.+(double)total_run,gain2[seg][157]);
 	tl2[seg]->SetLineWidth(3);
 	tl2[seg]->SetLineColor(kBlack);
 	tl2[seg]->Draw("same");
@@ -193,6 +198,54 @@ cout << "Param file : " << paraname.c_str() << endl;
 //cout << "ac2 " << seg << endl;
 	}
 }
+/*----Gain----------*/
+//	TCanvas *c[6];
+//	TLine *tl1[nofsegment1];
+//	for(int k=0;k<6;k++){
+//	c[k] =  new TCanvas(Form("c[%d]",k),Form("a1[%d]~a1[%d] gain",4*k,4*k+3),600.,600.);
+//	c[k]->Divide(2,2);
+//	for(int l=0;l<4;l++){
+//	int seg = 4*k+l;
+//	c[k]->cd(l+1)->SetGrid();
+//	if(seg==14){
+//	TH1 *frame = c[k]->cd(l+1)->DrawFrame(132.,line1[seg]-500.,132.+(double)total_run,line1[seg]+500.);
+//	frame->SetTitle(Form("a1[%d] gain",seg));
+//	}else{
+//	TH1 *frame = c[k]->cd(l+1)->DrawFrame(132.,line1[seg]-100.,132.+(double)total_run,line1[seg]+100.);
+//	frame->SetTitle(Form("a1[%d] gain",seg));
+//	}
+//	tl1[seg] = new TLine(132.,line1[seg],132.+(double)total_run,line1[seg]);
+//	tl1[seg]->SetLineWidth(3);
+//	tl1[seg]->SetLineColor(kBlack);
+//	tl1[seg]->Draw("same");
+//	g1[seg]->Draw("psame");
+////cout << "ac1 " << seg << endl;
+//	}
+//}
+//	TCanvas *c2[7];
+//	TLine *tl2[nofsegment2];
+//	for(int k=0;k<7;k++){
+//	c2[k] =  new TCanvas(Form("c2[%d]",k),Form("a2[%d]~a2[%d] gain",4*k,4*k+3),600.,600.);
+//	c2[k]->Divide(2,2);
+//	for(int l=0;l<4;l++){
+//	int seg = 4*k+l;
+//	if(seg >= 26)break;
+//	c2[k]->cd(l+1)->SetGrid();
+//	if(seg==3 || seg==5){//range change
+//	TH1 *frame = c2[k]->cd(l+1)->DrawFrame(132.,line2[seg]-500.,132.+(double)total_run,line2[seg]+500.);
+//	frame->SetTitle(Form("a2[%d] gain",seg));
+//	}else{
+//	TH1 *frame = c2[k]->cd(l+1)->DrawFrame(132.,line2[seg]-100.,132.+(double)total_run,line2[seg]+100.);
+//	frame->SetTitle(Form("a2[%d] gain",seg));
+//	}
+//	tl2[seg] = new TLine(132.,line2[seg],132.+(double)total_run,line2[seg]);
+//	tl2[seg]->SetLineWidth(3);
+//	tl2[seg]->SetLineColor(kBlack);
+//	tl2[seg]->Draw("same");
+//	g2[seg]->Draw("psame");
+////cout << "ac2 " << seg << endl;
+//	}
+//}
 cout << "Print is starting" << endl;
 	c[0]->Print(Form("%s[",pdfname.c_str()));
 	c[0]->Print(Form("%s",pdfname.c_str()));
