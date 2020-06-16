@@ -50,8 +50,10 @@ TARGET15= eff_fp
 OBJS15=   eff_fp.o Setting.o Tree.o ParamMan.o
 TARGET16= eff_chi2
 OBJS16=   eff_chi2.o Setting.o Tree.o ParamMan.o
-TARGET16= eff_z2d
-OBJS16=   eff_z2d.o Setting.o Tree.o ParamMan.o
+TARGET17= eff_z2d
+OBJS17=   eff_z2d.o Setting.o Tree.o ParamMan.o
+TARGET18= eff_coin
+OBJS18=   eff_coin.o Setting.o Tree.o ParamMan.o
 #TARGET14= okuyana 
 #OBJS14=   okuyana.o Setting.o Tree.o ParamMan.o
 
@@ -60,7 +62,8 @@ all:$(TARGET13)\
      $(TARGET14)\
      $(TARGET15)\
      $(TARGET16)\
-     $(TARGET17)
+     $(TARGET17)\
+     $(TARGET18)
 #     $(TARGET11)
 #$(TARGET1)\
 #     $(TARGET2)\
@@ -112,6 +115,8 @@ $(TARGET15): $(patsubst %,$(LIBDIR)/%,$(OBJS15))
 $(TARGET16): $(patsubst %,$(LIBDIR)/%,$(OBJS16))
 	$(CXX) $(CFLAGS) -o $(BINDIR)/$@ $^ $(CXXLIBS) $(CXXFLAGS)
 $(TARGET17): $(patsubst %,$(LIBDIR)/%,$(OBJS17))
+	$(CXX) $(CFLAGS) -o $(BINDIR)/$@ $^ $(CXXLIBS) $(CXXFLAGS)
+$(TARGET18): $(patsubst %,$(LIBDIR)/%,$(OBJS18))
 	$(CXX) $(CFLAGS) -o $(BINDIR)/$@ $^ $(CXXLIBS) $(CXXFLAGS)
 .PHONY: clean
 clean:
