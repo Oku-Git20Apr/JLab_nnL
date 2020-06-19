@@ -2,7 +2,7 @@
 #include <fstream>
 using namespace std;
 #include "TApplication.h"
-#include "eff_coin.h"
+#include "eff_ac.h"
 #include "Param.h"
 #include "Tree.h"
 #include "TMath.h"
@@ -23,6 +23,15 @@ double F_Voigt( double *x, double *par )
     // par[2] : gaussian sigma
     // par[3] : lorentz fwhm
     double val = par[0] * TMath::Voigt(x[0]-par[1],par[2],par[3],4);
+    return val;
+  }
+double F_mmnoAC( double *x, double *par )// Npar=10
+  {
+    // par[0] : scale 
+    // par[1] : location
+    // par[2] : gaussian sigma
+    // par[3] : lorentz fwhm
+    double val = par[0] * TMath::Voigt(x[0]-par[1],par[2],par[3],4) + par[4]*TMath::Gaus(x[0],par[5],par[6],1)+par[7]*TMath::Gaus(x[0],par[8],par[9],1);
     return val;
   }
 
@@ -1349,11 +1358,6 @@ cout << "mt = " << mt << endl;
      //ac2u_adc[8]=3500.;
      //ac2u_adc[9]=4000.;
      //----------------NPE---------------//
-	 coinvar[0]=0.;
-	 for(int i=1; i<nth; i++) coinvar[i]=coinvar[i-1]+20.;
-	 zver[0]=0.000;
-	 //for(int i=1; i<nth; i++) zver[i]=zver[i-1]+0.01;//SUM
-	 for(int i=1; i<nth; i++) zver[i]=zver[i-1]+0.001;//Diff
 	 th1_max=2.0;
 
 	 ac1_adc[0]=0.0;
@@ -1586,23 +1590,52 @@ void tuning::MakeHist(){
 	iter_ac1=30;//iteration number
 
 /////////////
-//// Z  /////
+//// AC  ////
 /////////////
 
 	  npe_sum_a1 = new TH1F("npe_sum_a1","NPE SUM A1",2000,0.,40.);
 //	  npe_sum_a2 = new TH1F("npe_sum_a2","NPE SUM A2",4000,0.,80.);
 	  npe_sum_a2 = new TH1F("npe_sum_a2","NPE SUM A2 (Kaon)",300,0.,30.);
 ////--------------------------------------------//
-	  h_pisr1 = new TH1F("h_pisr1","Pion Survival Ratio",nth-1,coinvar[0],coinvar[nth-1]);
-	  h_ksr1 = new TH1F("h_ksr1","Kaon Survival Ratio",nth-1,coinvar[0],coinvar[nth-1]);
-	  h_psr1 = new TH1F("h_psr1","Proton Survival Ratio",nth-1,coinvar[0],coinvar[nth-1]);
-	  h_Lsr1 = new TH1F("h_Lsr1","Lambda Survival Ratio",nth-1,coinvar[0],coinvar[nth-1]);
-	  h_Ssr1 = new TH1F("h_Ssr1","Signa Survival Ratio",nth-1,coinvar[0],coinvar[nth-1]);
-	  h_pitot1 = new TH1F("h_pitot1","Pion Survival Ratio",nth-1,coinvar[0],coinvar[nth-1]);
-	  h_ktot1 = new TH1F("h_ktot1","Kaon Survival Ratio",nth-1,coinvar[0],coinvar[nth-1]);
-	  h_ptot1 = new TH1F("h_ptot1","Proton Survival Ratio",nth-1,coinvar[0],coinvar[nth-1]);
-	  h_Ltot1 = new TH1F("h_Ltot1","Lambda Survival Ratio",nth-1,coinvar[0],coinvar[nth-1]);
-	  h_Stot1 = new TH1F("h_Stot1","Sigma Survival Ratio",nth-1,coinvar[0],coinvar[nth-1]);
+	  h_pisr1 = new TH1F("h_pisr1","Pion Survival Ratio",nth-1,ac1_adc[0],ac1_adc[nth-1]);
+	  h_ksr1 = new TH1F("h_ksr","Kaon Survival Ratio",nth-1,ac1_adc[0],ac1_adc[nth-1]);
+	  h_psr1 = new TH1F("h_psr","Proton Survival Ratio",nth-1,ac1_adc[0],ac1_adc[nth-1]);
+	  h_Lsr1 = new TH1F("h_Lsr","Lambda Survival Ratio",nth-1,ac1_adc[0],ac1_adc[nth-1]);
+	  h_Ssr1 = new TH1F("h_Ssr","Signa Survival Ratio",nth-1,ac1_adc[0],ac1_adc[nth-1]);
+	  h_pitot1 = new TH1F("h_pitot","Pion Survival Ratio",nth-1,ac1_adc[0],ac1_adc[nth-1]);
+	  h_ktot1 = new TH1F("h_ktot","Kaon Survival Ratio",nth-1,ac1_adc[0],ac1_adc[nth-1]);
+	  h_ptot1 = new TH1F("h_ptot","Proton Survival Ratio",nth-1,ac1_adc[0],ac1_adc[nth-1]);
+	  h_Ltot1 = new TH1F("h_Ltot","Lambda Survival Ratio",nth-1,ac1_adc[0],ac1_adc[nth-1]);
+	  h_Stot1 = new TH1F("h_Stot","Sigma Survival Ratio",nth-1,ac1_adc[0],ac1_adc[nth-1]);
+//--------------------------------------------//
+	  h_pisr2l = new TH1F("h_pisr2l","Pion Survival Ratio",nth-1,ac2l_adc[0],ac2l_adc[nth-1]);
+	  h_ksr2l = new TH1F("h_ksr2l","Kaon Survival Ratio",nth-1,ac2l_adc[0],ac2l_adc[nth-1]);
+	  h_psr2l = new TH1F("h_psr2l","Proton Survival Ratio",nth-1,ac2l_adc[0],ac2l_adc[nth-1]);
+	  h_Lsr2l = new TH1F("h_Lsr2l","Lambda Survival Ratio",nth-1,ac2l_adc[0],ac2l_adc[nth-1]);
+	  h_Ssr2l = new TH1F("h_Ssr2l","Sigma Survival Ratio",nth-1,ac2l_adc[0],ac2l_adc[nth-1]);
+	  h_pitot2l = new TH1F("h_pitot2l","Pion Survival Ratio",nth-1,ac2l_adc[0],ac2l_adc[nth-1]);
+	  h_ktot2l = new TH1F("h_ktot2l","Kaon Survival Ratio",nth-1,ac2l_adc[0],ac2l_adc[nth-1]);
+	  h_ptot2l = new TH1F("h_ptot2l","Proton Survival Ratio",nth-1,ac2l_adc[0],ac2l_adc[nth-1]);
+	  h_Ltot2l = new TH1F("h_Ltot2l","Lambda Survival Ratio",nth-1,ac2l_adc[0],ac2l_adc[nth-1]);
+	  h_Stot2l = new TH1F("h_Stot2l","Sigma Survival Ratio",nth-1,ac2l_adc[0],ac2l_adc[nth-1]);
+//--------------------------------------------//
+	  h_pisr2u = new TH1F("h_pisr2u","Pion Survival Ratio",nth-1,ac2u_adc[0],ac2u_adc[nth-1]);
+	  h_ksr2u = new TH1F("h_ksr2u","Kaon Survival Ratio",nth-1,ac2u_adc[0],ac2u_adc[nth-1]);
+	  h_psr2u = new TH1F("h_psr2u","Proton Survival Ratio",nth-1,ac2u_adc[0],ac2u_adc[nth-1]);
+	  h_Lsr2u = new TH1F("h_Lsr2u","Lambda Survival Ratio",nth-1,ac2u_adc[0],ac2u_adc[nth-1]);
+	  h_Ssr2u = new TH1F("h_Ssr2u","Sigma Survival Ratio",nth-1,ac2u_adc[0],ac2u_adc[nth-1]);
+	  h_pitot2u = new TH1F("h_pitot2u","Pion Survival Ratio",nth-1,ac2u_adc[0],ac2u_adc[nth-1]);
+	  h_ktot2u = new TH1F("h_ktot2u","Kaon Survival Ratio",nth-1,ac2u_adc[0],ac2u_adc[nth-1]);
+	  h_ptot2u = new TH1F("h_ptot2u","Proton Survival Ratio",nth-1,ac2u_adc[0],ac2u_adc[nth-1]);
+	  h_Ltot2u = new TH1F("h_Ltot2u","Lambda Survival Ratio",nth-1,ac2u_adc[0],ac2u_adc[nth-1]);
+	  h_Stot2u = new TH1F("h_Stot2u","Sigma Survival Ratio",nth-1,ac2u_adc[0],ac2u_adc[nth-1]);
+//--------------------------------------------//
+//2D Eff., ac2u = Const.
+	  h_pisr12l = new TH2F("h_pisr12l","Pion Survival Ratio",nth-1,ac1_adc[0],ac1_adc[nth-1],nth-1,ac2l_adc[0],ac2l_adc[nth-1]);
+	  h_ksr12l = new TH2F("h_ksr12l","Kaon Survival Ratio",nth-1,ac1_adc[0],ac1_adc[nth-1],nth-1,ac2l_adc[0],ac2l_adc[nth-1]);
+	  h_psr12l = new TH2F("h_psr12l","Proton Survival Ratio",nth-1,ac1_adc[0],ac1_adc[nth-1],nth-1,ac2l_adc[0],ac2l_adc[nth-1]);
+	  h_Lsr12l = new TH2F("h_Lsr12l","Lambda Survival Ratio",nth-1,ac1_adc[0],ac1_adc[nth-1],nth-1,ac2l_adc[0],ac2l_adc[nth-1]);
+	  h_Ssr12l = new TH2F("h_Ssr12l","Sigma Survival Ratio",nth-1,ac1_adc[0],ac1_adc[nth-1],nth-1,ac2l_adc[0],ac2l_adc[nth-1]);
 //--------------------------------------------//
 	  h_pisr1->Sumw2();
 	  h_pisr1->SetLineColor(kRed);
@@ -1624,6 +1657,46 @@ void tuning::MakeHist(){
 	  h_Ltot1->SetLineColor(kAzure);
 	  h_Stot1->Sumw2();
 	  h_Stot1->SetLineColor(kCyan);
+	  h_pisr2l->Sumw2();
+	  h_pisr2l->SetLineColor(kRed);
+	  h_ksr2l->Sumw2();
+	  h_ksr2l->SetLineColor(kRed);
+	  h_psr2l->Sumw2();
+	  h_psr2l->SetLineColor(kRed);
+	  h_Lsr2l->Sumw2();
+	  h_Lsr2l->SetLineColor(kAzure);
+	  h_Ssr2l->Sumw2();
+	  h_Ssr2l->SetLineColor(kCyan);
+	  h_pitot2l->Sumw2();
+	  h_pitot2l->SetLineColor(kBlack);
+	  h_ktot2l->Sumw2();
+	  h_ktot2l->SetLineColor(kBlack);
+	  h_ptot2l->Sumw2();
+	  h_ptot2l->SetLineColor(kBlack);
+	  h_Ltot2l->Sumw2();
+	  h_Ltot2l->SetLineColor(kAzure);
+	  h_Stot2l->Sumw2();
+	  h_Stot2l->SetLineColor(kCyan);
+	  h_pisr2u->Sumw2();
+	  h_pisr2u->SetLineColor(kRed);
+	  h_ksr2u->Sumw2();
+	  h_ksr2u->SetLineColor(kRed);
+	  h_psr2u->Sumw2();
+	  h_psr2u->SetLineColor(kRed);
+	  h_Lsr2u->Sumw2();
+	  h_Lsr2u->SetLineColor(kAzure);
+	  h_Ssr2u->Sumw2();
+	  h_Ssr2u->SetLineColor(kCyan);
+	  h_pitot2u->Sumw2();
+	  h_pitot2u->SetLineColor(kBlack);
+	  h_ktot2u->Sumw2();
+	  h_ktot2u->SetLineColor(kBlack);
+	  h_ptot2u->Sumw2();
+	  h_ptot2u->SetLineColor(kBlack);
+	  h_Ltot2u->Sumw2();
+	  h_Ltot2u->SetLineColor(kAzure);
+	  h_Stot2u->Sumw2();
+	  h_Stot2u->SetLineColor(kCyan);
   
 /////////////
 //// BPM ////
@@ -1654,7 +1727,6 @@ void tuning::MakeHist(){
   h_L_vx        = new TH1D("h_L_vx"       ,"h_L_vx"       ,400,-0.005,0.002);
   h_L_vy        = new TH1D("h_L_vy"       ,"h_L_vy"       ,400,-0.004,0.003);
   h_L_vz        = new TH1D("h_L_vz"       ,"h_L_vz"       ,400,-0.25,0.25);
-  h_L_vz2       = new TH1D("h_L_vz2"      ,"h_L_vz2"      ,400,-0.25,0.25);
   h_L_y_x       = new TH2D("h_L_y_x"      ,"h_L_y_x"      ,200,   -1,  1 ,200,-0.1,0.1);
   h_L_th_x      = new TH2D("h_L_th_x"     ,"h_L_th_x"     ,200,   -1,  1 ,200,-0.2,0.2);
   h_L_ph_y      = new TH2D("h_L_ph_y"     ,"h_L_ph_y"     ,200, -0.1, 0.1,200,-0.1,0.1);
@@ -1748,7 +1820,6 @@ void tuning::MakeHist(){
   h_R_vx        = new TH1D("h_R_vx"       ,"h_R_vx"       ,400,-0.005,0.002);
   h_R_vy        = new TH1D("h_R_vy"       ,"h_R_vy"       ,400,-0.004,0.003);
   h_R_vz        = new TH1D("h_R_vz"       ,"h_R_vz"       ,400,-0.25,0.25);
-  h_R_vz2       = new TH1D("h_R_vz2"      ,"h_R_vz2"      ,400,-0.25,0.25);
   h_R_y_x       = new TH2D("h_R_y_x"      ,"h_R_y_x"      ,200,   -1,  1 ,200,-0.1,0.1);
   h_R_th_x      = new TH2D("h_R_th_x"     ,"h_R_th_x"     ,200,   -1,  1 ,200,-0.2,0.2);
   h_R_ph_y      = new TH2D("h_R_ph_y"     ,"h_R_ph_y"     ,200, -0.1, 0.1,200,-0.1,0.1);
@@ -1943,7 +2014,6 @@ void tuning::MakeHist(){
   h_m2_mm    = new TH2D("h_m2_mm"   ,"h_m2_mm"   , 100,  -0.4, 1.4,bin_mm,min_mm,max_mm); 
  // h_m2_mm    = new TH2D("h_m2_mm"   ,"h_m2_mm"   ,bin_mm,min_mm,max_mm,400,0.,20.); 
   h_m2_ac    = new TH2D("h_m2_ac"   ,"h_m2_ac"   , 100,-0.4,1.4,400,  0., 20.); 
-  h_zz    = new TH2D("h_zz"   ,"h_zz"   , 400,-0.25,0.25,400,  -0.25, 0.25); 
 
 
   set->SetTH1(h_ct      ,"Coincidence Time"                      ,"Cointime (ns)"           ,"Counts");
@@ -2009,43 +2079,60 @@ for (int i=0;i<nth;i++){
  }
 
 
-    //-------No Z cut------------//
-	hcoin_k_fom_noZ=new TH1F("hcoin_k_fom_noZ", "No Z cut",bin_coin_c,min_coin_c,max_coin_c);
-	set->SetTH1(hcoin_k_fom_noZ,"No Z cut","","");
-	hcoin_bg_fom_noZ=new TH1F("hcoin_bg_fom_noZ", "No Z cut", bin_coin_c,min_coin_c,max_coin_c);
-	set->SetTH1(hcoin_bg_fom_noZ,"No Z cut","","");
-	hcoin_wo_bg_fom_noZ=new TH1F("hcoin_wo_bg_fom_noZ", "No Z cut", bin_coin_c,min_coin_c,max_coin_c);
-	set->SetTH1(hcoin_wo_bg_fom_noZ,"No Z cut","","");
+    //-------No AC1 cut------------//
+	hcoin_k_fom_noAC1=new TH1F("hcoin_k_fom_noAC1", "No AC1 cut",bin_coin_c,min_coin_c,max_coin_c);
+	set->SetTH1(hcoin_k_fom_noAC1,"No AC1 cut","","");
+	hcoin_bg_fom_noAC1=new TH1F("hcoin_bg_fom_noAC1", "No AC1 cut", bin_coin_c,min_coin_c,max_coin_c);
+	set->SetTH1(hcoin_bg_fom_noAC1,"No AC1 cut","","");
+	hcoin_wo_bg_fom_noAC1=new TH1F("hcoin_wo_bg_fom_noAC1", "No AC1 cut", bin_coin_c,min_coin_c,max_coin_c);
 
-	hmm_L_fom_noZ=new TH1F("hmm_L_fom_noZ", "No Z cut",bin_mm,min_mm,max_mm);
-	set->SetTH1(hmm_L_fom_noZ,"No Z cut","","");
-	hmm_bg_fom_noZ=new TH1F("hmm_bg_fom_noZ", "No Z cut",bin_mm,min_mm,max_mm);
-	set->SetTH1(hmm_bg_fom_noZ,"No Z cut","","");
-	hmm_wo_bg_fom_noZ=new TH1F("hmm_wo_bg_fom_noZ", "No Z cut",bin_mm,min_mm,max_mm);
-	set->SetTH1(hmm_wo_bg_fom_noZ,"No Z cut","","");
-	hmm_pi_fom_noZ=new TH1F("hmm_pi_fom_noZ", "No Z cut",bin_mm,min_mm,max_mm);
-	set->SetTH1(hmm_pi_fom_noZ,"No Z cut (Pion Selected)","","");
-	hmm_pibg_fom_noZ=new TH1F("hmm_pibg_fom_noZ", "No Z cut",bin_mm,min_mm,max_mm);
-	set->SetTH1(hmm_pibg_fom_noZ,"No Z cut","","");
-	hmm_pi_wobg_fom_noZ=new TH1F("hmm_pi_wobg_fom_noZ", "No Z cut",bin_mm,min_mm,max_mm);
-	set->SetTH1(hmm_pi_wobg_fom_noZ,"No Z cut","","");
+	hmm_L_fom_noAC1=new TH1F("hmm_L_fom_noAC1", "No AC1 cut",bin_mm,min_mm,max_mm);
+	set->SetTH1(hmm_L_fom_noAC1,"No AC1 cut","","");
+	hmm_bg_fom_noAC1=new TH1F("hmm_bg_fom_noAC1", "No AC1 cut",bin_mm,min_mm,max_mm);
+	set->SetTH1(hmm_bg_fom_noAC1,"No AC1 cut","","");
+	hmm_wo_bg_fom_noAC1=new TH1F("hmm_wo_bg_fom_noAC1", "No AC1 cut",bin_mm,min_mm,max_mm);
+	set->SetTH1(hmm_wo_bg_fom_noAC1,"No AC1 cut","","");
+    //-------No AC2 cut------------//
+	hcoin_k_fom_noAC2=new TH1F("hcoin_k_fom_noAC2", "No AC2 cut",bin_coin_c,min_coin_c,max_coin_c);
+	set->SetTH1(hcoin_k_fom_noAC2,"No AC2 cut","","");
+	hcoin_bg_fom_noAC2=new TH1F("hcoin_bg_fom_noAC2", "No AC2 cut", bin_coin_c,min_coin_c,max_coin_c);
+	set->SetTH1(hcoin_bg_fom_noAC2,"No AC2 cut","","");
+	hcoin_wo_bg_fom_noAC2=new TH1F("hcoin_wo_bg_fom_noAC2", "No AC2 cut", bin_coin_c,min_coin_c,max_coin_c);
+	set->SetTH1(hcoin_wo_bg_fom_noAC2,"No AC2 cut","","");
 
-    //-------Z vertex test------------//
-  h_zz1    = new TH2D("h_zz1"   ,"h_zz1"   ,bin_coin_c,min_coin_c,max_coin_c,bin_mm,min_mm,max_mm); 
-  h_zz2    = new TH2D("h_zz2"   ,"h_zz2"   ,bin_coin_c,min_coin_c,max_coin_c,bin_mm,min_mm,max_mm); 
-  h_zz3    = new TH2D("h_zz3"   ,"h_zz3"   ,bin_coin_c,min_coin_c,max_coin_c,bin_mm,min_mm,max_mm); 
-  h_zz4    = new TH2D("h_zz4"   ,"h_zz4"   ,bin_coin_c,min_coin_c,max_coin_c,bin_mm,min_mm,max_mm); 
-  h_z1        = new TH1D("h_z1"       ,"h_z1"       ,bin_coin_c,min_coin_c,max_coin_c);
-  h_z2        = new TH1D("h_z2"       ,"h_z2"       ,bin_coin_c,min_coin_c,max_coin_c);
-  h_z3        = new TH1D("h_z3"       ,"h_z3"       ,bin_coin_c,min_coin_c,max_coin_c);
-  h_z4        = new TH1D("h_z4"       ,"h_z4"       ,bin_coin_c,min_coin_c,max_coin_c);
+	hmm_L_fom_noAC2=new TH1F("hmm_L_fom_noAC2", "No AC2 cut",bin_mm,min_mm,max_mm);
+	set->SetTH1(hmm_L_fom_noAC2,"No AC2 cut","","");
+	hmm_bg_fom_noAC2=new TH1F("hmm_bg_fom_noAC2", "No AC2 cut",bin_mm,min_mm,max_mm);
+	set->SetTH1(hmm_bg_fom_noAC2,"No AC2 cut","","");
+	hmm_wo_bg_fom_noAC2=new TH1F("hmm_wo_bg_fom_noAC2", "No AC2 cut",bin_mm,min_mm,max_mm);
+	set->SetTH1(hmm_wo_bg_fom_noAC2,"No AC2 cut","","");
+    //-------No AC cut------------//
+	hcoin_k_fom_noAC=new TH1F("hcoin_k_fom_noAC", "No AC cut",bin_coin_c,min_coin_c,max_coin_c);
+	set->SetTH1(hcoin_k_fom_noAC,"No AC cut","","");
+	hcoin_bg_fom_noAC=new TH1F("hcoin_bg_fom_noAC", "No AC cut", bin_coin_c,min_coin_c,max_coin_c);
+	set->SetTH1(hcoin_bg_fom_noAC,"No AC cut","","");
+	hcoin_wo_bg_fom_noAC=new TH1F("hcoin_wo_bg_fom_noAC", "No AC cut", bin_coin_c,min_coin_c,max_coin_c);
+	set->SetTH1(hcoin_wo_bg_fom_noAC,"No AC cut","","");
+
+	hmm_L_fom_noAC=new TH1F("hmm_L_fom_noAC", "No AC cut",bin_mm,min_mm,max_mm);
+	set->SetTH1(hmm_L_fom_noAC,"No AC cut","","");
+	hmm_bg_fom_noAC=new TH1F("hmm_bg_fom_noAC", "No AC cut",bin_mm,min_mm,max_mm);
+	set->SetTH1(hmm_bg_fom_noAC,"No AC cut","","");
+	hmm_wo_bg_fom_noAC=new TH1F("hmm_wo_bg_fom_noAC", "No AC cut",bin_mm,min_mm,max_mm);
+	set->SetTH1(hmm_wo_bg_fom_noAC,"No AC cut","","");
+	hmm_pi_fom_noAC=new TH1F("hmm_pi_fom_noAC", "No AC cut",bin_mm,min_mm,max_mm);
+	set->SetTH1(hmm_pi_fom_noAC,"No AC cut (Pion Selected)","","");
+	hmm_pibg_fom_noAC=new TH1F("hmm_pibg_fom_noAC", "No AC cut",bin_mm,min_mm,max_mm);
+	set->SetTH1(hmm_pibg_fom_noAC,"No AC cut","","");
+	hmm_pi_wobg_fom_noAC=new TH1F("hmm_pi_wobg_fom_noAC", "No AC cut",bin_mm,min_mm,max_mm);
+	set->SetTH1(hmm_pi_wobg_fom_noAC,"No AC cut","","");
 
 	for (int i=0;i<nth;i++){
-//		for (int j=0;j<nth;j++){
+		for (int j=0;j<nth;j++){
 //			for (int l=0;l<nth;l++){
-				int j=0; int l=0;
-				hcoin_k_fom[i][j][l]=new TH1F(Form("hcoin_k_fom[%d][%d][%d]",i,j,l), Form("Cointime (Kaon) (zR+zL)/2<%lf  cut",coinvar[i]),bin_coin_c,min_coin_c,max_coin_c);
-				set->SetTH1(hcoin_k_fom[i][j][l],Form("Cointime (Kaon) (zR+zL)/2<%lf cut",coinvar[i]),"","");
+				int l=0;
+				hcoin_k_fom[i][j][l]=new TH1F(Form("hcoin_k_fom[%d][%d][%d]",i,j,l), Form("Cointime (Kaon) AC1<%lf, %lf<AC2<%lf  cut",ac1_adc[i],ac2l_adc[j],ac2u_adc[l]),bin_coin_c,min_coin_c,max_coin_c);
+				set->SetTH1(hcoin_k_fom[i][j][l],Form("Cointime (Kaon) AC1<%lf, %lf<AC2<%lf  cut",ac1_adc[i],ac2l_adc[j],ac2u_adc[l]),"","");
 				hcoin_bg_fom[i][j][l]=new TH1F(Form("hcoin_bg_fom[%d][%d][%d]",i,j,l), Form("Cointime (Kaon) AC1<%lf, %lf<AC2<%lf  cut",ac1_adc[i],ac2l_adc[j],ac2u_adc[l]),bin_coin_c,min_coin_c,max_coin_c);
 				set->SetTH1(hcoin_bg_fom[i][j][l],Form("Cointime (Kaon) AC1<%lf, %lf<AC2<%lf  cut",ac1_adc[i],ac2l_adc[j],ac2u_adc[l]),"","");
 				hcoin_wo_bg_fom[i][j][l]=new TH1F(Form("hcoin_wo_bg_fom[%d][%d][%d]",i,j,l), Form("Cointime (Kaon) AC1<%lf, %lf<AC2<%lf  cut",ac1_adc[i],ac2l_adc[j],ac2u_adc[l]),bin_coin_c,min_coin_c,max_coin_c);
@@ -2065,7 +2152,7 @@ for (int i=0;i<nth;i++){
 				hmm_pi_wobg_fom[i][j][l]=new TH1F(Form("hmm_pi_wobg_fom[%d][%d][%d]",i,j,l), Form("Missing Mass AC1<%lf, %lf<AC2<%lf  cut",ac1_adc[i],ac2l_adc[j],ac2u_adc[l]),bin_mm,min_mm,max_mm);
 				set->SetTH1(hmm_pi_wobg_fom[i][j][l],Form("Missing Mass AC1<%lf, %lf<AC2<%lf  cut",ac1_adc[i],ac2l_adc[j],ac2u_adc[l]),"","");
 //			}//for l
-//		}//for j
+		}//for j
 	}//for i
 
 
@@ -2138,118 +2225,118 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 //////////////
 //// LHRS ////
 //////////////
-//#ifdef F1TDC
-//      convertF1TDCL(param);
-//        L_s0_t = LS0_F1time[0];
-//      for(int i=0;i<16;i++){
-//        if(LS2_F1time[i]>-9999.)L_s2_t[i] =  LS2_F1time[i];
-//        else L_s2_t[i] = -99.;
-//      }
-//#endif
-//    
-//      int NLtr = (int)L_tr_n;  if(NLtr>MAX) NLtr = MAX;
-//      h_L_tr_n->Fill( L_tr_n );
-//      h_L_trig->Fill( L_evtype);
-//      tr.ntrack_l=NLtr;
-//
-//      for(int t=0;t<NLtr;t++){	
-//        L_Tr = L_FP = false;
-//        // FP and chi2 cuts
-//        if( L_tr_chi2[t]<0.01 ) L_Tr = true;
-//        if( L_tr_th[t]<0.17*L_tr_x[t]+0.025
-//         && L_tr_th[t]>0.17*L_tr_x[t]-0.035
-//         && L_tr_th[t]<0.4 *L_tr_x[t]+0.13 ) L_FP = true;
-//	
-//
-//    tr.LXFP=L_tr_x[0];
-//    tr.LXpFP=L_tr_th[0];
-//    tr.LYFP=L_tr_y[0];
-//    tr.LYpFP=L_tr_ph[0];
-//    tr.LXt=L_tr_vx[0];
-//    tr.LYt=L_tr_vy[0];
-//    tr.LXpt=L_tr_tg_th[0];
-//    tr.LYpt=L_tr_tg_ph[0];
-//
-//	int s2pad = (int)L_s2_trpad[t];
-//	tr.Ls2ra_p[s2pad]=L_s2_ra_p[s2pad];
-//	tr.Ls2la_p[s2pad]=L_s2_la_p[s2pad];
-//	tr.Ls2_pad[t]=(int)L_s2_trpad[t];
-////        double p    = L_tr_p[t];
-////        double path = L_s2_trpath[t] - L_s0_trpath[t];
-////        double beta = -99;
-//		//double m2 = -99;
-//        if( L_s2_t[s2pad]>0 && L_s0_t>0 && s2pad>=0 ){
-////          beta = path / ( L_s2_t[s2pad] - L_s0_t ) / c;
-////          m2 = ( 1./beta/beta - 1. ) * p * p;
-//        }
-////        double betae = p / sqrt(Me*Me + p*p);
-//
-//        h_L_tr_ch2   ->Fill( L_tr_chi2[t] );
-//      
-//        if( L_Tr && L_FP && s2pad>=0 ){
-//        } // if L_Tr && L_FP
-//      } // for NLtr
-//
-////////////////
-////// RHRS ////
-////////////////
-//#ifdef F1TDC
-//      convertF1TDCR(param);
-//      R_s0_t = RS0_F1time[0];
-//      for(int i=0;i<16;i++){
-//        if(RS2_F1time[i]>-9999.)R_s2_t[i] =  RS2_F1time[i];
-//        else R_s2_t[i] = -99.;
-//      }
-//#endif
-//
-//    if(RHRS){
-//      int NRtr = (int)R_tr_n;  if(NRtr>MAX) NRtr = MAX;
-//      h_R_trig->Fill( R_evtype);
-//      tr.ntrack_r=NRtr;
-//
-//
-//      h_R_tr_n->Fill( R_tr_n );
-//      for(int t=0;t<NRtr;t++){
-//        R_Tr = R_FP = false;
-//        // FP and chi2 cuts
-//        if( R_tr_chi2[t]<0.01 ) R_Tr = true;
-//        if( R_tr_th[t]<0.17*R_tr_x[t]+0.025
-//         && R_tr_th[t]>0.17*R_tr_x[t]-0.035
-//         && R_tr_th[t]<0.4 *R_tr_x[t]+0.13 ) R_FP = true;
-//	
-//        int s2pad = (int)R_s2_trpad[t];
-//	if(s2pad<0)break;
-//        tr.Rs2_pad[t] =(int)R_s2_trpad[t];
-////	    double p    = R_tr_p[t];
-////        double path = R_s2_trpath[t] - R_s0_trpath[t];
-////        double beta = 0;
-////		double m2 = 0;
-//
-//
-//	
-//    tr.Rs2ra_p[s2pad]=R_s2_ra_p[s2pad];
-//    tr.Rs2la_p[s2pad]=R_s2_la_p[s2pad];
-//    tr.Rs0ra_p=R_s0_ra_p[0];
-//    tr.Rs0la_p=R_s0_la_p[0];
-//    tr.RXFP=R_tr_x[0];
-//    tr.RXpFP=R_tr_th[0];
-//    tr.RYFP=R_tr_y[0];
-//    tr.RYpFP=R_tr_ph[0];
-//    tr.RXt=R_tr_vx[0];
-//    tr.RYt=R_tr_vy[0];
-//    tr.RXpt=R_tr_tg_th[0];
-//    tr.RYpt=R_tr_tg_ph[0];
-//        if( R_s2_t[s2pad]>0 && R_s0_t>0 && s2pad>=0 ){
-////          beta = path / ( R_s2_t[s2pad] - R_s0_t ) / c;
-////          m2 = ( 1./beta/beta - 1. ) * p * p;
-//        } 
-////        double betaK = p / sqrt(MK*MK + p*p);
-//	
-//        if( R_Tr && R_FP && s2pad>=0 ){
-//        } // if R_Tr && R_FP
-//      } // for NRtr
-//    } // if RHRS
-//
+#ifdef F1TDC
+      convertF1TDCL(param);
+        L_s0_t = LS0_F1time[0];
+      for(int i=0;i<16;i++){
+        if(LS2_F1time[i]>-9999.)L_s2_t[i] =  LS2_F1time[i];
+        else L_s2_t[i] = -99.;
+      }
+#endif
+    
+      int NLtr = (int)L_tr_n;  if(NLtr>MAX) NLtr = MAX;
+      h_L_tr_n->Fill( L_tr_n );
+      h_L_trig->Fill( L_evtype);
+      tr.ntrack_l=NLtr;
+
+      for(int t=0;t<NLtr;t++){	
+        L_Tr = L_FP = false;
+        // FP and chi2 cuts
+        if( L_tr_chi2[t]<0.01 ) L_Tr = true;
+        if( L_tr_th[t]<0.17*L_tr_x[t]+0.025
+         && L_tr_th[t]>0.17*L_tr_x[t]-0.035
+         && L_tr_th[t]<0.4 *L_tr_x[t]+0.13 ) L_FP = true;
+	
+
+    tr.LXFP=L_tr_x[0];
+    tr.LXpFP=L_tr_th[0];
+    tr.LYFP=L_tr_y[0];
+    tr.LYpFP=L_tr_ph[0];
+    tr.LXt=L_tr_vx[0];
+    tr.LYt=L_tr_vy[0];
+    tr.LXpt=L_tr_tg_th[0];
+    tr.LYpt=L_tr_tg_ph[0];
+
+	int s2pad = (int)L_s2_trpad[t];
+	tr.Ls2ra_p[s2pad]=L_s2_ra_p[s2pad];
+	tr.Ls2la_p[s2pad]=L_s2_la_p[s2pad];
+	tr.Ls2_pad[t]=(int)L_s2_trpad[t];
+//        double p    = L_tr_p[t];
+//        double path = L_s2_trpath[t] - L_s0_trpath[t];
+//        double beta = -99;
+		//double m2 = -99;
+        if( L_s2_t[s2pad]>0 && L_s0_t>0 && s2pad>=0 ){
+//          beta = path / ( L_s2_t[s2pad] - L_s0_t ) / c;
+//          m2 = ( 1./beta/beta - 1. ) * p * p;
+        }
+//        double betae = p / sqrt(Me*Me + p*p);
+
+        h_L_tr_ch2   ->Fill( L_tr_chi2[t] );
+      
+        if( L_Tr && L_FP && s2pad>=0 ){
+        } // if L_Tr && L_FP
+      } // for NLtr
+
+//////////////
+//// RHRS ////
+//////////////
+#ifdef F1TDC
+      convertF1TDCR(param);
+      R_s0_t = RS0_F1time[0];
+      for(int i=0;i<16;i++){
+        if(RS2_F1time[i]>-9999.)R_s2_t[i] =  RS2_F1time[i];
+        else R_s2_t[i] = -99.;
+      }
+#endif
+
+    if(RHRS){
+      int NRtr = (int)R_tr_n;  if(NRtr>MAX) NRtr = MAX;
+      h_R_trig->Fill( R_evtype);
+      tr.ntrack_r=NRtr;
+
+
+      h_R_tr_n->Fill( R_tr_n );
+      for(int t=0;t<NRtr;t++){
+        R_Tr = R_FP = false;
+        // FP and chi2 cuts
+        if( R_tr_chi2[t]<0.01 ) R_Tr = true;
+        if( R_tr_th[t]<0.17*R_tr_x[t]+0.025
+         && R_tr_th[t]>0.17*R_tr_x[t]-0.035
+         && R_tr_th[t]<0.4 *R_tr_x[t]+0.13 ) R_FP = true;
+	
+        int s2pad = (int)R_s2_trpad[t];
+	if(s2pad<0)break;
+        tr.Rs2_pad[t] =(int)R_s2_trpad[t];
+//	    double p    = R_tr_p[t];
+//        double path = R_s2_trpath[t] - R_s0_trpath[t];
+//        double beta = 0;
+//		double m2 = 0;
+
+
+	
+    tr.Rs2ra_p[s2pad]=R_s2_ra_p[s2pad];
+    tr.Rs2la_p[s2pad]=R_s2_la_p[s2pad];
+    tr.Rs0ra_p=R_s0_ra_p[0];
+    tr.Rs0la_p=R_s0_la_p[0];
+    tr.RXFP=R_tr_x[0];
+    tr.RXpFP=R_tr_th[0];
+    tr.RYFP=R_tr_y[0];
+    tr.RYpFP=R_tr_ph[0];
+    tr.RXt=R_tr_vx[0];
+    tr.RYt=R_tr_vy[0];
+    tr.RXpt=R_tr_tg_th[0];
+    tr.RYpt=R_tr_tg_ph[0];
+        if( R_s2_t[s2pad]>0 && R_s0_t>0 && s2pad>=0 ){
+//          beta = path / ( R_s2_t[s2pad] - R_s0_t ) / c;
+//          m2 = ( 1./beta/beta - 1. ) * p * p;
+        } 
+//        double betaK = p / sqrt(MK*MK + p*p);
+	
+        if( R_Tr && R_FP && s2pad>=0 ){
+        } // if R_Tr && R_FP
+      } // for NRtr
+    } // if RHRS
+
 /////////////////////
 //// Coincidence ////
 /////////////////////
@@ -2258,14 +2345,12 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 	   
 
 
-//	cout<<"R_evtype"<<R_evtype<<endl;
     if(LHRS && RHRS && R_evtype==5){
       int NLtr = (int)L_tr_n;  if(NLtr>MAX) NLtr = MAX;
       int NRtr = (int)R_tr_n;  if(NRtr>MAX) NRtr = MAX;
       
       for(int lt=0;lt<NLtr;lt++){
         L_Tr = L_FP = false;
-		L_Tr=true;
         if( L_tr_chi2[lt]<0.01 ) L_Tr = true;
         if( L_tr_th[lt]<0.17*L_tr_x[lt]+0.025
          && L_tr_th[lt]>0.17*L_tr_x[lt]-0.035
@@ -2273,7 +2358,6 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 	
         for(int rt=0;rt<NRtr;rt++){
         R_Tr = R_FP = false;
-		R_Tr=true;
         // FP and chi2 cuts
         if( R_tr_chi2[rt]<0.01 ) R_Tr = true;
         if( R_tr_th[rt]<0.17*R_tr_x[rt]+0.025
@@ -2289,6 +2373,7 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
       }
 //#endif
 	  Kaon = false; // Kaon cut 
+	  zcut = false; // z-vertex cut
 	  
   
 	    //---- Initialization ----//
@@ -2368,7 +2453,6 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 
 
 	    
-		zcut=false;
 	  if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1)zcut=true;
 
 	  
@@ -2655,67 +2739,96 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 
 
 
+////-------------------------------------------//
+////-------------AC tuning---------------------//
+////-------------------------------------------//
+
+
 
 //-------------------------------------------//
-//-------------No Z cut at all--------------//
+//-------------No AC cut at all--------------//
 //-------------------------------------------//
-//	zcut=true;
-	if(tr.AC1_npe_sum<3.75 && tr.AC2_npe_sum>3. && tr.AC2_npe_sum<20. && zcut){//no Z cut
-//	if(tr.AC1_npe_sum<3.75 && tr.AC2_npe_sum>3. && tr.AC2_npe_sum<20. && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1)//no Z cut,w/ diff cut
-
-	hcoin_k_fom_noZ->Fill(ct);
+	if(zcut){//no AC cut
+	hcoin_k_fom_noAC->Fill(ct);
 	h_m2_mm->Fill(m2,mm);
 	//h_m2_mm->Fill(tr.AC2_npe_sum,mm);
 	h_m2_ac->Fill(m2,tr.AC2_npe_sum);
-//--------------Z vertex---------------//
-	h_R_vz->Fill(R_tr_vz[rt]-L_tr_vz[lt]);
-	h_L_vz->Fill((R_tr_vz[rt]+L_tr_vz[lt])/2);
-	if(fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1)h_R_vz2->Fill(R_tr_vz[rt]-L_tr_vz[lt]);
-	if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025)h_L_vz2->Fill((R_tr_vz[rt]+L_tr_vz[lt])/2);
-	if(zcut){h_zz->Fill(R_tr_vz[rt],L_tr_vz[lt]);}
-	if(fabs(R_tr_vz[rt]-0.12)<0.02 && fabs(L_tr_vz[lt]+0.12)<0.02){h_zz1->Fill(ct,mm);h_z1->Fill(ct);}
-	if(fabs(R_tr_vz[rt]+0.12)<0.02 && fabs(L_tr_vz[lt]-0.12)<0.02){h_zz2->Fill(ct,mm);h_z2->Fill(ct);}
-	if(fabs(R_tr_vz[rt])<0.1 && fabs(L_tr_vz[lt]-0.12)<0.02){h_zz3->Fill(ct,mm);h_z3->Fill(ct);}
-	if(fabs(L_tr_vz[lt])<0.1 && fabs(R_tr_vz[rt]-0.12)<0.02){h_zz4->Fill(ct,mm);h_z4->Fill(ct);}
 				if((-100.<ct && ct <-20.) || (20.<ct && ct<100.)){
 					double ct_ = ct;
 				        while(1){
 					  if(-20.<ct && ct<20.){
-						 hcoin_bg_fom_noZ->Fill(ct);
-						 hmm_bg_fom_noZ->Fill(mm);
-						 hmm_pibg_fom_noZ->Fill(mm);
+						 hcoin_bg_fom_noAC->Fill(ct);
+						 hmm_bg_fom_noAC->Fill(mm);
+						 hmm_pibg_fom_noAC->Fill(mm);
 						 break;}
 					       else if(ct<-20.){ct=ct+40.;}
 					       else if(20.<ct){ct=ct-40.;}
 					 }
 					ct = ct_;
 					}//cointime
-					if(fabs(ct)<2.){
-						hmm_L_fom_noZ->Fill(mm);
+					if(fabs(ct)<1.){
+						hmm_L_fom_noAC->Fill(mm);
 				}
 					if(fabs(ct-3.05)<0.7){
-						hmm_pi_fom_noZ->Fill(mm);//MM if pion
+						hmm_pi_fom_noAC->Fill(mm);//MM if pion
 					}
-	}//No Z Cut, w/ AC Cut
-
-				cut_ac1=false;
-				cut_ac2=false;
-				if(tr.AC1_npe_sum<3.75)cut_ac1=true;
-		    	if(3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20.)cut_ac2=true;
-				//zcut=false;
-				//if(chi2cut && fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1)zcut=true;
-				
-    if(k%100000==0){
-	cout<<"R_tr_chi2[rt]="<<R_tr_chi2[rt]<<endl;
-	cout<<"L_tr_chi2[lt]="<<L_tr_chi2[lt]<<endl;
-	cout<<"R_tr_vz[rt]="<<R_tr_vz[rt]<<endl;
-	cout<<"L_tr_vz[lt]="<<L_tr_vz[lt]<<endl;
-	cout<<"zcut:"<<zcut<<endl;
-	cout<<"cut_ac1:"<<cut_ac1<<endl;
-	cout<<"cut_ac2:"<<cut_ac2<<endl;
 	}
 
 
+//-------------------------------------------//
+//-------------No AC1 cut--------------------//
+//-------------------------------------------//
+	cut_ac2=false;
+   	//if(ac2l_adc[30]<tr.AC2_npe_sum && tr.AC2_npe_sum < ac2u_adc[16])cut_ac2=true;
+   	if(3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20.)cut_ac2=true;
+	if(zcut && cut_ac2){//no AC1 cut
+	hcoin_k_fom_noAC1->Fill(ct);
+				if((-100.<ct && ct <-20.) || (20.<ct && ct<100.)){
+					double ct_ = ct;
+				        while(1){
+					  if(-20.<ct && ct<20.){
+						 hcoin_bg_fom_noAC1->Fill(ct);
+						 hmm_bg_fom_noAC1->Fill(mm);
+						 break;}
+					       else if(ct<-20.){ct=ct+40.;}
+					       else if(20.<ct){ct=ct-40.;}
+					 }
+					ct = ct_;
+					}//cointime
+					if(fabs(ct)<1.){
+						hmm_L_fom_noAC1->Fill(mm);
+				}
+	}
+//-------------------------------------------//
+//-------------No AC2 cut--------------------//
+//-------------------------------------------//
+
+				cut_ac1=false;
+		    	//if(tr.AC1_npe_sum < ac1_adc[16])cut_ac1=true;
+		    	if(tr.AC1_npe_sum < 3.75 && tr.AC2_npe_sum > 0.)cut_ac1=true;
+	if(zcut&&cut_ac1){//no AC2 cut
+	hcoin_k_fom_noAC2->Fill(ct);
+				if((-100.<ct && ct <-20.) || (20.<ct&&ct<100.)){
+					double ct_ = ct;
+				        while(1){
+					  if(-20.<ct && ct<20.){
+						 hcoin_bg_fom_noAC2->Fill(ct);
+						 hmm_bg_fom_noAC2->Fill(mm);
+						 break;}
+					       else if(ct<-20.){ct=ct+40.;}
+					       else if(20.<ct){ct=ct-40.;}
+					 }
+					ct = ct_;
+					}//cointime
+
+					if(fabs(ct)<1.){
+						hmm_L_fom_noAC2->Fill(mm);
+				}
+	}
+
+//--------------Z vertex---------------//
+	h_L_vz->Fill(R_tr_vz[rt]+L_tr_vz[lt]);
+	h_R_vz->Fill(R_tr_vz[rt]-L_tr_vz[lt]);
 
 
 
@@ -2723,28 +2836,29 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
 	for (int i=0;i<nth;i++){
-//		for (int j=0;j<nth;j++){
+		for (int j=0;j<nth;j++){
 //			for (int l=0;l<nth;l++){
-				int j=0; int l=0;
+				int l=0;
 //cout<<"j="<<j<<endl;
 
-if(i==50){
-    if(k%100000==0){
-	cout<<"i=50, k%100000"<<endl;
-	cout<<"R_tr_chi2[rt]="<<R_tr_chi2[rt]<<endl;
-	cout<<"L_tr_chi2[lt]="<<L_tr_chi2[lt]<<endl;
-	cout<<"R_tr_vz[rt]="<<R_tr_vz[rt]<<endl;
-	cout<<"L_tr_vz[lt]="<<L_tr_vz[lt]<<endl;
-	cout<<"zcut:"<<zcut<<endl;
-	cout<<"cut_ac1:"<<cut_ac1<<endl;
-	cout<<"cut_ac2:"<<cut_ac2<<endl;
-	}
-}
+//				ac1_adc[i]=3.75;//to be consistent with No AC2 cut
+//				ac2l_adc[j]=0.;//to be consistent with No AC1 cut
+//Slice
+				ac2u_adc[l]=20.;//to be consistent with No AC1 cut
 
 
-		
-	if(tr.AC1_npe_sum<3.75 && tr.AC2_npe_sum>3. && tr.AC2_npe_sum<20. && zcut){
-		//		if( zcut && cut_ac1 && cut_ac2)
+				cut_ac1=false;
+				cut_ac2=false;
+//Okuyama				//if(R_a1_asum_p<ac1_adc[i])cut_ac1=true;
+				if(tr.AC1_npe_sum<ac1_adc[i])cut_ac1=true;
+				//if(ac2l_adc[j]<R_a2_asum_p && R_a2_asum_p < 4000)cut_ac2=true;
+//Okuyama		    	//if(ac2l_adc[j]<R_a2_asum_p && R_a2_asum_p < ac2u_adc[l])cut_ac2=true;
+		    	if(ac2l_adc[j]<tr.AC2_npe_sum && tr.AC2_npe_sum < ac2u_adc[l])cut_ac2=true;
+//Changed			
+//				if(ac2l_adc[j]<tr.AC2_npe_sum && tr.AC2_npe_sum < ac2l_adc[j]+10.)cut_ac2=true;
+				//if( zcut && cut_ac1 && cut_ac2){
+				//}
+				if( zcut && cut_ac1 && cut_ac2){
 				hcoin_k_fom[i][j][l]->Fill(ct);
 			    //cout<<"hcoin_k_fom is filled" << endl;
 
@@ -2769,7 +2883,8 @@ if(i==50){
 
 
 
-					if(fabs(ct)<(coinvar[i]/1000.)){
+					if(fabs(ct)<1.){
+				if(l==30)npe_sum_a2->Fill(tr.AC2_npe_sum);
 					//if(fabs(ct-mean_k[i][j][l])<sig_k[i][j][l]){
 						hmm_L_fom[i][j][l]->Fill(mm);
 					}//cointime
@@ -2780,7 +2895,7 @@ if(i==50){
 					//}
 				}//if cut condition
 //			}//for l
-//		}//for j
+		}//for j
 	}//for i	
 //-------------------------------------------//
 //-------------------------------------------//
@@ -2933,7 +3048,6 @@ if(i==50){
 
 
 
-
 ////MISSING MASS w/o cut////////////
 	if(ct<1.0 && -1.0<ct) hmm->Fill(mm);
 
@@ -3042,10 +3156,6 @@ void tuning::ACtune(){
 
  def_sig_L=0.003; def_mean_L=0.0;
  def_sig_S=0.004; def_mean_S=MS0-ML;
- def_sig_p=0.852; def_mean_p=-8.0;
- def_sig_pi=0.443; def_mean_pi=3.0;
- def_sig_k=0.644; def_mean_k=0.0;
- def_acc=27.7;
 
 
 
@@ -3058,214 +3168,472 @@ void tuning::ACtune(){
  //h3_fom = new TH3D("h3_fom","",10,400.,580.,10,600.,1050.,10,1500.,4000.);
  
 
-//-----No AC Cut-----//
- hcoin_bg_fom_noZ->Scale(40./160.);
- hcoin_wo_bg_fom_noZ->Add(hcoin_k_fom_noZ,hcoin_bg_fom_noZ,1.0,-1.0);
- fp_noZ=new TF1("fp_noZ","gausn(0)",min_coin_c,max_coin_c);
- fp_noZ->SetNpx(2000);
- fpi_noZ =new TF1("fpi_noZ","gausn(0)",min_coin_c,max_coin_c);
- fpi_noZ->SetNpx(2000);
- fk_noZ=new TF1("fk_noZ","gausn(0)",min_coin_c,max_coin_c);
- fk_noZ->SetNpx(2000);
+ //-------------------------------------------------//
+ //----No AC1 cut---//
+ //Efficiency 100%//
+ 
+//cout<<"BG subtraction cointime"<<endl;
+ hcoin_bg_fom_noAC1->Scale(40./160.);
+ hcoin_wo_bg_fom_noAC1->Add(hcoin_k_fom_noAC1,hcoin_bg_fom_noAC1,1.0,-1.0);
+ fp_noAC1=new TF1("fp_noAC1","gausn(0)",min_coin_c,max_coin_c);
+ fp_noAC1->SetNpx(2000);
+ fpi_noAC1 =new TF1("fpi_noAC1","gausn(0)",min_coin_c,max_coin_c);
+ fpi_noAC1->SetNpx(2000);
+ fk_noAC1=new TF1("fk_noAC1","gausn(0)",min_coin_c,max_coin_c);
+ fk_noAC1->SetNpx(2000);
 //cout<<"fp fit start"<<endl;
- hcoin_wo_bg_fom_noZ->Fit("fp_noZ","Rq","0",def_mean_p-3*def_sig_p,def_mean_p+3*def_sig_p);
-// n_p_noZ=fp_noZ->GetParameter(0);
- mean_p_noZ=fp_noZ->GetParameter(1);
- sig_p_noZ=fp_noZ->GetParameter(2);
- center_p=mean_p_noZ;
- range_p=2*sig_p_noZ;
- n_p_noZ=hcoin_wo_bg_fom_noZ->Integral(hcoin_wo_bg_fom_noZ->FindBin(center_p-range_p),hcoin_wo_bg_fom_noZ->FindBin(center_p+range_p));
+ hcoin_wo_bg_fom_noAC1->Fit("fp_noAC1","Rq","0",def_mean_p-3*def_sig_p,def_mean_p+3*def_sig_p);
+// n_p_noAC1=fp_noAC1->GetParameter(0);
+ mean_p_noAC1=fp_noAC1->GetParameter(1);
+ sig_p_noAC1=fp_noAC1->GetParameter(2);
+ center_p=mean_p_noAC1;
+ range_p=1.435;
+ n_p_noAC1=hcoin_wo_bg_fom_noAC1->Integral(hcoin_wo_bg_fom_noAC1->FindBin(center_p-range_p),hcoin_wo_bg_fom_noAC1->FindBin(center_p+range_p));
 //cout<<"fpi fit start"<<endl;
- hcoin_wo_bg_fom_noZ->Fit("fpi_noZ","Rq","0",def_mean_pi-3*def_sig_pi,def_mean_pi+3*def_sig_pi);
-// n_pi_noZ=fpi_noZ->GetParameter(0);
- mean_pi_noZ=fpi_noZ->GetParameter(1);
- sig_pi_noZ=fpi_noZ->GetParameter(2);
- center_pi=mean_pi_noZ;
- range_pi=2*sig_pi_noZ;
- n_pi_noZ=hcoin_wo_bg_fom_noZ->Integral(hcoin_wo_bg_fom_noZ->FindBin(center_pi-range_pi),hcoin_wo_bg_fom_noZ->FindBin(center_pi+range_pi));
+ hcoin_wo_bg_fom_noAC1->Fit("fpi_noAC1","Rq","0",def_mean_pi-3*def_sig_pi,def_mean_pi+3*def_sig_pi);
+// n_pi_noAC1=fpi_noAC1->GetParameter(0);
+ mean_pi_noAC1=fpi_noAC1->GetParameter(1);
+ sig_pi_noAC1=fpi_noAC1->GetParameter(2);
+ center_pi=mean_pi_noAC1;
+ range_pi=0.7;
+ n_pi_noAC1=hcoin_wo_bg_fom_noAC1->Integral(hcoin_wo_bg_fom_noAC1->FindBin(center_pi-range_pi),hcoin_wo_bg_fom_noAC1->FindBin(center_pi+range_pi));
 //cout<<"fk fit start"<<endl;
- //hcoin_wo_bg_fom_noZ->Fit("fk_noZ","Rq","0",def_mean_k-3*def_sig_k,def_mean_k+3*def_sig_k);
- hcoin_wo_bg_fom_noZ->Fit("fk_noZ","Rq","0",-1,1);
- //n_k_noZ=fk_noZ->GetParameter(0);
- mean_k_noZ=fk_noZ->GetParameter(1);
-// mean_k_noZ=0;
- sig_k_noZ=fk_noZ->GetParameter(2);
- center_k=mean_k_noZ;
- range_k=2*sig_k_noZ;
+ //hcoin_wo_bg_fom_noAC1->Fit("fk_noAC1","Rq","0",def_mean_k-3*def_sig_k,def_mean_k+3*def_sig_k);
+ hcoin_wo_bg_fom_noAC1->Fit("fk_noAC1","Rq","0",-1,1);
+ //n_k_noAC1=fk_noAC1->GetParameter(0);
+ mean_k_noAC1=fk_noAC1->GetParameter(1);
+// mean_k_noAC1=0;
+ sig_k_noAC1=fk_noAC1->GetParameter(2);
 
- n_k_noZ=hcoin_k_fom_noZ->Integral(hcoin_wo_bg_fom_noZ->FindBin(center_k-range_k),hcoin_wo_bg_fom_noZ->FindBin(center_k+range_k));
-	cout<<"center_k(No Cut)="<<center_k<<endl;
-	cout<<"range_k(No Cut)="<<range_k<<endl;
-	
+ center_k=mean_k_noAC1;
+ range_k=1.;
+ n_k_noAC1=hcoin_wo_bg_fom_noAC1->Integral(hcoin_wo_bg_fom_noAC1->FindBin(center_k-range_k),hcoin_wo_bg_fom_noAC1->FindBin(center_k+range_k));
 
  //-----Fitting as a whole function---------//
 
- fcoin_noZ =new TF1("fcoin_noZ","gausn(0)+gausn(3)+gausn(6)",min_coin_c,max_coin_c);
- fcoin_noZ->SetNpx(2000);
- fcoin_noZ->SetTitle("Cointime w/o AC cut;Cointime [ns];Counts [1/56 ns]");
- fcoin_noZ->SetParameters(n_pi_noZ,mean_pi_noZ,sig_pi_noZ,n_k_noZ,mean_k_noZ,sig_k_noZ,n_p_noZ,mean_p_noZ,sig_p_noZ);
- //hcoin_wo_bg_fom_noZ->Fit("fcoin_woAC","Rq","0",min_coin_c,max_coin_c);
- //n_pi_noZ=fcoin_noZ->GetParameter(0);//Npi_nocut
- //mean_pi_noZ=fcoin_noZ->GetParameter(1);
- //sig_pi_noZ=fcoin_noZ->GetParameter(2);
- //n_k_noZ=fcoin_noZ->GetParameter(3);//Nk_nocut
- //mean_k_noZ=fcoin_noZ->GetParameter(4);
- //sig_k_noZ=fcoin_noZ->GetParameter(5);
- //n_p_noZ=fcoin_noZ->GetParameter(6);//Np_nocut
- //mean_p_noZ=fcoin_noZ->GetParameter(7);
- //sig_p_noZ=fcoin_noZ->GetParameter(8);
-cout<<"n_pi_noZ="<<n_pi_noZ<<"n_k_noZ="<<n_k_noZ<<"n_p_noZ="<<n_p_noZ
-<<"mean_pi_noZ="<<mean_pi_noZ<<"sig_pi_noZ="<<sig_pi_noZ<<"mean_k_noZ="<<mean_k_noZ<<"sig_k_noZ="<<sig_k_noZ<<"mean_p_noZ="<<mean_p_noZ<<"sig_p_noZ="<<sig_p_noZ<<endl;
+ fcoin_noAC1 =new TF1("fcoin_noAC1","gausn(0)+gausn(3)+gausn(6)",min_coin_c,max_coin_c);
+ fcoin_noAC1->SetNpx(2000);
+ fcoin_noAC1->SetTitle("Cointime w/o AC1 cut;Cointime [ns];Counts [1/56 ns]");
+ fcoin_noAC1->SetParameters(n_pi_noAC1,mean_pi_noAC1,sig_pi_noAC1,n_k_noAC1,mean_k_noAC1,sig_k_noAC1,n_p_noAC1,mean_p_noAC1,sig_p_noAC1);
+ //hcoin_wo_bg_fom_noAC1->Fit("fcoin_woAC1","Rq","0",min_coin_c,max_coin_c);
+ //n_pi_noAC1=fcoin_noAC1->GetParameter(0);//Npi_nocut
+ //mean_pi_noAC1=fcoin_noAC1->GetParameter(1);
+ //sig_pi_noAC1=fcoin_noAC1->GetParameter(2);
+ //n_k_noAC1=fcoin_noAC1->GetParameter(3);//Nk_nocut
+ //mean_k_noAC1=fcoin_noAC1->GetParameter(4);
+ //sig_k_noAC1=fcoin_noAC1->GetParameter(5);
+ //n_p_noAC1=fcoin_noAC1->GetParameter(6);//Np_nocut
+ //mean_p_noAC1=fcoin_noAC1->GetParameter(7);
+ //sig_p_noAC1=fcoin_noAC1->GetParameter(8);
+cout<<"n_pi_noAC1="<<n_pi_noAC1<<"n_k_noAC1="<<n_k_noAC1<<"n_p_noAC1="<<n_p_noAC1
+<<"mean_pi_noAC1="<<mean_pi_noAC1<<"sig_pi_noAC1="<<sig_pi_noAC1<<"mean_k_noAC1="<<mean_k_noAC1<<"sig_k_noAC1="<<sig_k_noAC1<<"mean_p_noAC1="<<mean_p_noAC1<<"sig_p_noAC1="<<sig_p_noAC1<<endl;
 
  //------- Get Error Paramters ---//
- n_pi_err_noZ=fpi_noZ->GetParError(0); 
- n_k_err_noZ=fk_noZ->GetParError(3); 
- n_p_err_noZ=fp_noZ->GetParError(6); 
+ n_pi_err_noAC1=fpi_noAC1->GetParError(0); 
+ n_k_err_noAC1=fk_noAC1->GetParError(3); 
+ n_p_err_noAC1=fp_noAC1->GetParError(6); 
+ 
+
+ hmm_bg_fom_noAC1->Scale(1./80.);
+ hmm_wo_bg_fom_noAC1->Add(hmm_L_fom_noAC1,hmm_bg_fom_noAC1,1.0,-1.0);
+
+
+// fmmbg_noAC1=new TF1("fmmbg_noAC1","pol3(0)",min_mm,max_mm);
+// fmmbg_noAC1->SetNpx(2000);
+ fL_noAC1=new TF1("fL_noAC1","gausn(0)",min_mm,max_mm);
+ fL_noAC1->SetNpx(2000);
+ fL_noAC1->SetParLimits(2,0.,0.01);
+ fS_noAC1=new TF1("fS_noAC1","gausn(0)",min_mm,max_mm);
+ fS_noAC1->SetNpx(2000);
+ fS_noAC1->SetParLimits(2,0.,0.01);//sigma limit in order not to mix with bg
+ 
+ fmm_noAC1=new TF1("fmm_noAC1","gausn(0)+gausn(3)",min_mm,max_mm);
+ fmm_noAC1->SetNpx(2000);
+ fmm_noAC1->SetTitle("Missing Mass w/o AC cut;Coin time [ns];Counts [1/56 ns]");
+
+
+
+ //------- Fitting ----------//
+
+//cout<<"fmmbg fit start"<<endl;
+// hmm_bg_fom_noAC1->Fit("fmmbg_noAC1","Rq","",min_mm,max_mm);
+// double d = fmmbg_noAC1->GetParameter(0);
+// double c = fmmbg_noAC1->GetParameter(1);
+// double b = fmmbg_noAC1->GetParameter(2);
+// double a = fmmbg_noAC1->GetParameter(3);
+
+//cout<<"fL fit start"<<endl;
+ hmm_wo_bg_fom_noAC1->Fit("fL_noAC1","Rq","",def_mean_L-3*def_sig_L,def_mean_L+3*def_sig_L);
+// n_L_noAC1=fL_noAC1->GetParameter(0);
+ mean_L_noAC1=fL_noAC1->GetParameter(1);
+ sig_L_noAC1=fL_noAC1->GetParameter(2);
+ mean_L_noAC1=def_mean_L;
+ sig_L_noAC1=def_sig_L;
+ center_L=mean_L_noAC1;
+ range_L=2*sig_L_noAC1;
+ n_L_noAC1=hmm_wo_bg_fom_noAC1->Integral(hmm_wo_bg_fom_noAC1->FindBin(center_L-range_L),hmm_wo_bg_fom_noAC1->FindBin(center_L+range_L));
+ cout<<"n_L"<<n_L_noAC1<<endl;
+
+//cout<<"fS fit start"<<endl;
+ hmm_wo_bg_fom_noAC1->Fit("fS_noAC1","Rq","",def_mean_S-3*def_sig_S,def_mean_S+3*def_sig_S);
+// n_S_noAC1=fS_noAC1->GetParameter(0);
+ mean_S_noAC1=fS_noAC1->GetParameter(1);
+ mean_S_noAC1=def_mean_S;
+ sig_S_noAC1=def_sig_S;
+ sig_S_noAC1=fS_noAC1->GetParameter(2);
+ center_S=mean_S_noAC1;
+ range_S=2*sig_S_noAC1;
+ n_S_noAC1=hmm_wo_bg_fom_noAC1->Integral(hmm_wo_bg_fom_noAC1->FindBin(center_S-range_S),hmm_wo_bg_fom_noAC1->FindBin(center_S+range_S));
+ cout<<"n_S"<<n_S_noAC1<<endl;
+//cout<<"mean_S"<<mean_S_noAC1<<endl;
+//cout<<"sig_S"<<sig_S_noAC1<<endl;
+
+
+ //--Fitting again as a total function--//
+// fmm_noAC1->SetParameters(n_L_noAC1,mean_L_noAC1,sig_L_noAC1,n_S_noAC1,mean_S_noAC1,sig_S_noAC1,d,c,b,a);
+//// hmm_L_fom_noAC1->Fit(Form("fmm[%d][%d][%d]",i,j,l),"Rq","",min_mm,max_mm);
+// n_L_noAC1=fmm_noAC1->GetParameter(0);
+// mean_L_noAC1=fmm_noAC1->GetParameter(1);
+// sig_L_noAC1=fmm_noAC1->GetParameter(2);
+// n_S_noAC1=fmm_noAC1->GetParameter(3);
+// mean_S_noAC1=fmm_noAC1->GetParameter(4);
+// sig_S_noAC1=fmm_noAC1->GetParameter(5);
+// //------- Get Error Paramters ---//
+// n_L_err_noAC1=fmm_noAC1->GetParError(0); 
+// n_S_err_noAC1=fmm_noAC1->GetParError(3); 
+//
+//
+//
+// signal_noAC1=noise_noAC1=0.;
+// d = fmm_noAC1->GetParError(6); 
+// c = fmm_noAC1->GetParError(7); 
+// b = fmm_noAC1->GetParError(8); 
+// a = fmm_noAC1->GetParError(9); 
+ //-------------------------------------------------//
+ //-------------------------------------------------//
+ //----No AC2 cut---//
+ 
+//cout<<"BG subtraction cointime"<<endl;
+ hcoin_bg_fom_noAC2->Scale(40./160.);
+ hcoin_wo_bg_fom_noAC2->Add(hcoin_k_fom_noAC2,hcoin_bg_fom_noAC2,1.0,-1.0);
+ fp_noAC2=new TF1("fp_noAC2","gausn(0)",min_coin_c,max_coin_c);
+ fp_noAC2->SetNpx(2000);
+ fpi_noAC2 =new TF1("fpi_noAC2","gausn(0)",min_coin_c,max_coin_c);
+ fpi_noAC2->SetNpx(2000);
+ fk_noAC2=new TF1("fk_noAC2","gausn(0)",min_coin_c,max_coin_c);
+ fk_noAC2->SetNpx(2000);
+//cout<<"fp fit start"<<endl;
+ hcoin_wo_bg_fom_noAC2->Fit("fp_noAC2","Rq","0",def_mean_p-3*def_sig_p,def_mean_p+3*def_sig_p);
+// n_p_noAC2=fp_noAC2->GetParameter(0);
+ mean_p_noAC2=fp_noAC2->GetParameter(1);
+ sig_p_noAC2=fp_noAC2->GetParameter(2);
+ n_p_noAC2=hcoin_wo_bg_fom_noAC2->Integral(hcoin_wo_bg_fom_noAC2->FindBin(center_p-range_p),hcoin_wo_bg_fom_noAC2->FindBin(center_p+range_p));
+//cout<<"fpi fit start"<<endl;
+ hcoin_wo_bg_fom_noAC2->Fit("fpi_noAC2","Rq","0",def_mean_pi-3*def_sig_pi,def_mean_pi+3*def_sig_pi);
+// n_pi_noAC2=fpi_noAC2->GetParameter(0);
+ mean_pi_noAC2=fpi_noAC2->GetParameter(1);
+ sig_pi_noAC2=fpi_noAC2->GetParameter(2);
+ n_pi_noAC2=hcoin_wo_bg_fom_noAC2->Integral(hcoin_wo_bg_fom_noAC2->FindBin(center_pi-range_pi),hcoin_wo_bg_fom_noAC2->FindBin(center_pi+range_pi));
+//cout<<"fk fit start"<<endl;
+ //hcoin_wo_bg_fom_noAC2->Fit("fk_noAC2","Rq","0",def_mean_k-3*def_sig_k,def_mean_k+3*def_sig_k);
+ hcoin_wo_bg_fom_noAC2->Fit("fk_noAC2","Rq","0",-1,1);
+ //n_k_noAC2=fk_noAC2->GetParameter(0);
+ mean_k_noAC2=fk_noAC2->GetParameter(1);
+ sig_k_noAC2=fk_noAC2->GetParameter(2);
+
+ n_k_noAC2=hcoin_wo_bg_fom_noAC2->Integral(hcoin_wo_bg_fom_noAC2->FindBin(center_k-range_k),hcoin_wo_bg_fom_noAC2->FindBin(center_k+range_k));
+
+ //----- Fitting as a whole function---------//
+
+ fcoin_noAC2 =new TF1("fcoin_noAC2","gausn(0)+gausn(3)+gausn(6)",min_coin_c,max_coin_c);
+ fcoin_noAC2->SetNpx(2000);
+ fcoin_noAC2->SetTitle("Cointime w/o AC2 cut;Cointime [ns];Counts [1/56 ns]");
+ fcoin_noAC2->SetParameters(n_pi_noAC2,mean_pi_noAC2,sig_pi_noAC2,n_k_noAC2,mean_k_noAC2,sig_k_noAC2,n_p_noAC2,mean_p_noAC2,sig_p_noAC2);
+ //hcoin_wo_bg_fom_noAC2->Fit("fcoin_woAC2","Rq","0",min_coin_c,max_coin_c);
+ //n_pi_noAC2=fcoin_noAC2->GetParameter(0);//Npi_nocut
+ //mean_pi_noAC2=fcoin_noAC2->GetParameter(1);
+ //sig_pi_noAC2=fcoin_noAC2->GetParameter(2);
+ //n_k_noAC2=fcoin_noAC2->GetParameter(3);//Nk_nocut
+ //mean_k_noAC2=fcoin_noAC2->GetParameter(4);
+ //sig_k_noAC2=fcoin_noAC2->GetParameter(5);
+ //n_p_noAC2=fcoin_noAC2->GetParameter(6);//Np_nocut
+ //mean_p_noAC2=fcoin_noAC2->GetParameter(7);
+ //sig_p_noAC2=fcoin_noAC2->GetParameter(8);
+cout<<"n_pi_noAC2="<<n_pi_noAC2<<"n_k_noAC2="<<n_k_noAC2<<"n_p_noAC2="<<n_p_noAC2
+<<"mean_pi_noAC2="<<mean_pi_noAC2<<"sig_pi_noAC2="<<sig_pi_noAC2<<"mean_k_noAC2="<<mean_k_noAC2<<"sig_k_noAC2="<<sig_k_noAC2<<"mean_p_noAC2="<<mean_p_noAC2<<"sig_p_noAC2="<<sig_p_noAC2<<endl;
+
+ //------- Get Error Paramters ---//
+ n_pi_err_noAC2=fpi_noAC2->GetParError(0); 
+ n_k_err_noAC2=fk_noAC2->GetParError(3); 
+ n_p_err_noAC2=fp_noAC2->GetParError(6); 
+cout << "after nth thing..." << endl;
+
+ hmm_bg_fom_noAC2->Scale(1./80.);
+ hmm_wo_bg_fom_noAC2->Add(hmm_L_fom_noAC2,hmm_bg_fom_noAC2,1.0,-1.0);
+
+
+// fmmbg_noAC2=new TF1("fmmbg_noAC2","pol3(0)",min_mm,max_mm);
+// fmmbg_noAC2->SetNpx(2000);
+ fL_noAC2=new TF1("fL_noAC2","gausn(0)",min_mm,max_mm);
+ fL_noAC2->SetNpx(2000);
+ fL_noAC2->SetParLimits(2,0.,0.01);
+ fS_noAC2=new TF1("fS_noAC2","gausn(0)",min_mm,max_mm);
+ fS_noAC2->SetNpx(2000);
+ fS_noAC2->SetParLimits(2,0.,0.01);//sigma limit in order not to mix with bg
+ 
+ fmm_noAC2=new TF1("fmm_noAC2","gausn(0)+gausn(3)",min_mm,max_mm);
+ fmm_noAC2->SetNpx(2000);
+ fmm_noAC2->SetTitle("Missing Mass w/o AC cut;Coin time [ns];Counts [1/56 ns]");
+
+
+
+ //------- Fitting ----------//
+
+//cout<<"fmmbg fit start"<<endl;
+// hmm_bg_fom_noAC2->Fit("fmmbg_noAC2","Rq","",min_mm,max_mm);
+// double d = fmmbg_noAC2->GetParameter(0);
+// double c = fmmbg_noAC2->GetParameter(1);
+// double b = fmmbg_noAC2->GetParameter(2);
+// double a = fmmbg_noAC2->GetParameter(3);
+
+//cout<<"fL fit start"<<endl;
+ hmm_wo_bg_fom_noAC2->Fit("fL_noAC2","Rq","",def_mean_L-3*def_sig_L,def_mean_L+3*def_sig_L);
+// n_L_noAC2=fL_noAC2->GetParameter(0);
+ mean_L_noAC2=fL_noAC2->GetParameter(1);
+ sig_L_noAC2=fL_noAC2->GetParameter(2);
+ mean_L_noAC2=def_mean_L;
+ sig_L_noAC2=def_sig_L;
+ n_L_noAC2=hmm_wo_bg_fom_noAC2->Integral(hmm_wo_bg_fom_noAC2->FindBin(center_L-range_L),hmm_wo_bg_fom_noAC2->FindBin(center_L+range_L));
+ cout<<"n_L"<<n_L_noAC2<<endl;
+
+//cout<<"fS fit start"<<endl;
+ hmm_wo_bg_fom_noAC2->Fit("fS_noAC2","Rq","",def_mean_S-3*def_sig_S,def_mean_S+3*def_sig_S);
+// n_S_noAC2=fS_noAC2->GetParameter(0);
+ mean_S_noAC2=fS_noAC2->GetParameter(1);
+ sig_S_noAC2=fS_noAC2->GetParameter(2);
+ mean_S_noAC2=def_mean_S;
+ sig_S_noAC2=def_sig_S;
+ n_S_noAC2=hmm_wo_bg_fom_noAC2->Integral(hmm_wo_bg_fom_noAC2->FindBin(center_S-range_S),hmm_wo_bg_fom_noAC2->FindBin(center_S+range_S));
+ cout<<"n_S"<<n_S_noAC2<<endl;
+//cout<<"mean_S"<<mean_S_noAC2<<endl;
+//cout<<"sig_S"<<sig_S_noAC2<<endl;
+
+
+ //--Fitting again as a total function--//
+// fmm_noAC2->SetParameters(n_L_noAC2,mean_L_noAC2,sig_L_noAC2,n_S_noAC2,mean_S_noAC2,sig_S_noAC2,d,c,b,a);
+//// hmm_L_fom_noAC2->Fit(Form("fmm[%d][%d][%d]",i,j,l),"Rq","",min_mm,max_mm);
+// n_L_noAC2=fmm_noAC2->GetParameter(0);
+// mean_L_noAC2=fmm_noAC2->GetParameter(1);
+// sig_L_noAC2=fmm_noAC2->GetParameter(2);
+// n_S_noAC2=fmm_noAC2->GetParameter(3);
+// mean_S_noAC2=fmm_noAC2->GetParameter(4);
+// sig_S_noAC2=fmm_noAC2->GetParameter(5);
+// //------- Get Error Paramters ---//
+// n_L_err_noAC2=fmm_noAC2->GetParError(0); 
+// n_S_err_noAC2=fmm_noAC2->GetParError(3); 
+//
+//
+//
+// signal_noAC2=noise_noAC2=0.;
+// d = fmm_noAC2->GetParError(6); 
+// c = fmm_noAC2->GetParError(7); 
+// b = fmm_noAC2->GetParError(8); 
+// a = fmm_noAC2->GetParError(9); 
+
+
+
+
+
+
+//-----No AC Cut-----//
+ hcoin_bg_fom_noAC->Scale(40./160.);
+ hcoin_wo_bg_fom_noAC->Add(hcoin_k_fom_noAC,hcoin_bg_fom_noAC,1.0,-1.0);
+ fp_noAC=new TF1("fp_noAC","gausn(0)",min_coin_c,max_coin_c);
+ fp_noAC->SetNpx(2000);
+ fpi_noAC =new TF1("fpi_noAC","gausn(0)",min_coin_c,max_coin_c);
+ fpi_noAC->SetNpx(2000);
+ fk_noAC=new TF1("fk_noAC","gausn(0)",min_coin_c,max_coin_c);
+ fk_noAC->SetNpx(2000);
+//cout<<"fp fit start"<<endl;
+ hcoin_wo_bg_fom_noAC->Fit("fp_noAC","Rq","0",def_mean_p-3*def_sig_p,def_mean_p+3*def_sig_p);
+// n_p_noAC=fp_noAC->GetParameter(0);
+ mean_p_noAC=fp_noAC->GetParameter(1);
+ sig_p_noAC=fp_noAC->GetParameter(2);
+ n_p_noAC=hcoin_wo_bg_fom_noAC->Integral(hcoin_wo_bg_fom_noAC->FindBin(center_p-range_p),hcoin_wo_bg_fom_noAC->FindBin(center_p+range_p));
+//cout<<"fpi fit start"<<endl;
+ hcoin_wo_bg_fom_noAC->Fit("fpi_noAC","Rq","0",def_mean_pi-3*def_sig_pi,def_mean_pi+3*def_sig_pi);
+// n_pi_noAC=fpi_noAC->GetParameter(0);
+ mean_pi_noAC=fpi_noAC->GetParameter(1);
+ sig_pi_noAC=fpi_noAC->GetParameter(2);
+ n_pi_noAC=hcoin_wo_bg_fom_noAC->Integral(hcoin_wo_bg_fom_noAC->FindBin(center_pi-range_pi),hcoin_wo_bg_fom_noAC->FindBin(center_pi+range_pi));
+//cout<<"fk fit start"<<endl;
+ //hcoin_wo_bg_fom_noAC->Fit("fk_noAC","Rq","0",def_mean_k-3*def_sig_k,def_mean_k+3*def_sig_k);
+ hcoin_wo_bg_fom_noAC->Fit("fk_noAC","Rq","0",-1,1);
+ //n_k_noAC=fk_noAC->GetParameter(0);
+ mean_k_noAC=fk_noAC->GetParameter(1);
+// mean_k_noAC=0;
+ sig_k_noAC=fk_noAC->GetParameter(2);
+
+ n_k_noAC=hcoin_wo_bg_fom_noAC->Integral(hcoin_wo_bg_fom_noAC->FindBin(center_k-range_k),hcoin_wo_bg_fom_noAC->FindBin(center_k+range_k));
+
+ //-----Fitting as a whole function---------//
+
+ fcoin_noAC =new TF1("fcoin_noAC","gausn(0)+gausn(3)+gausn(6)",min_coin_c,max_coin_c);
+ fcoin_noAC->SetNpx(2000);
+ fcoin_noAC->SetTitle("Cointime w/o AC cut;Cointime [ns];Counts [1/56 ns]");
+ fcoin_noAC->SetParameters(n_pi_noAC,mean_pi_noAC,sig_pi_noAC,n_k_noAC,mean_k_noAC,sig_k_noAC,n_p_noAC,mean_p_noAC,sig_p_noAC);
+ //hcoin_wo_bg_fom_noAC->Fit("fcoin_woAC","Rq","0",min_coin_c,max_coin_c);
+ //n_pi_noAC=fcoin_noAC->GetParameter(0);//Npi_nocut
+ //mean_pi_noAC=fcoin_noAC->GetParameter(1);
+ //sig_pi_noAC=fcoin_noAC->GetParameter(2);
+ //n_k_noAC=fcoin_noAC->GetParameter(3);//Nk_nocut
+ //mean_k_noAC=fcoin_noAC->GetParameter(4);
+ //sig_k_noAC=fcoin_noAC->GetParameter(5);
+ //n_p_noAC=fcoin_noAC->GetParameter(6);//Np_nocut
+ //mean_p_noAC=fcoin_noAC->GetParameter(7);
+ //sig_p_noAC=fcoin_noAC->GetParameter(8);
+cout<<"n_pi_noAC="<<n_pi_noAC<<"n_k_noAC="<<n_k_noAC<<"n_p_noAC="<<n_p_noAC
+<<"mean_pi_noAC="<<mean_pi_noAC<<"sig_pi_noAC="<<sig_pi_noAC<<"mean_k_noAC="<<mean_k_noAC<<"sig_k_noAC="<<sig_k_noAC<<"mean_p_noAC="<<mean_p_noAC<<"sig_p_noAC="<<sig_p_noAC<<endl;
+
+ //------- Get Error Paramters ---//
+ n_pi_err_noAC=fpi_noAC->GetParError(0); 
+ n_k_err_noAC=fk_noAC->GetParError(3); 
+ n_p_err_noAC=fp_noAC->GetParError(6); 
  
 
 //----------------------------------------------//
 //--	Missing Mass  Start     ----------------//
 //----------------------------------------------//
- hmm_bg_fom_noZ->Scale(1./80.);
- hmm_pibg_fom_noZ->Scale(0.7/80.);
- hmm_wo_bg_fom_noZ->Add(hmm_L_fom_noZ,hmm_bg_fom_noZ,1.0,-1.0);
- hmm_pi_wobg_fom_noZ->Add(hmm_pi_fom_noZ,hmm_pibg_fom_noZ,1.0,-1.0);
+ hmm_bg_fom_noAC->Scale(1./80.);
+ hmm_pibg_fom_noAC->Scale(0.7/80.);
+ hmm_wo_bg_fom_noAC->Add(hmm_L_fom_noAC,hmm_bg_fom_noAC,1.0,-1.0);
+ hmm_pi_wobg_fom_noAC->Add(hmm_pi_fom_noAC,hmm_pibg_fom_noAC,1.0,-1.0);
 
 
-// fmmbg_noZ=new TF1("fmmbg_noZ","gausn(0)+gausn(3)",min_mm,max_mm);
- //fmmbg_noZ=new TF1("fmmbg_noZ",F_Voigt,min_mm,max_mm,4);
- fmmbg_noZ=new TF1("fmmbg_noZ","pol4",-0.05,0.15);
-// fmmbg_noZ->SetParameters(5,0.05,0.05,0.01);
-// fmmbg_noZ->SetParLimits(0,0.,100000.);//positive
-// fmmbg_noZ->SetParLimits(3,0.,100.);//positive
- fmmbg_noZ->SetNpx(2000);
- //fmmbg_noZ->SetParameters(100,0.05,0.03,10,0.05,0.03);//test.list
-// fmmbg_noZ->SetParameters(300,0.05,1.2,30,0.1,0.02);//small.list
-// fmmbg_noZ->SetParameter(1,0.05);
-// fmmbg_noZ->SetParameter(2,0.03);
- fL_noZ=new TF1("fL_noZ","gausn(0)",min_mm,max_mm);
- fL_noZ->SetNpx(2000);
- fL_noZ->SetParLimits(2,0.,0.01);
- fS_noZ=new TF1("fS_noZ","gausn(0)",min_mm,max_mm);
- fS_noZ->SetNpx(2000);
- fS_noZ->SetParLimits(2,0.,0.01);//sigma limit in order not to mix with bg
+// fmmbg_noAC=new TF1("fmmbg_noAC","gausn(0)+gausn(3)",min_mm,max_mm);
+ //fmmbg_noAC=new TF1("fmmbg_noAC",F_Voigt,min_mm,max_mm,4);
+ fmmbg_noAC=new TF1("fmmbg_noAC","pol4",-0.05,0.15);
+// fmmbg_noAC->SetParameters(5,0.05,0.05,0.01);
+// fmmbg_noAC->SetParLimits(0,0.,100000.);//positive
+// fmmbg_noAC->SetParLimits(3,0.,100.);//positive
+ fmmbg_noAC->SetNpx(2000);
+ //fmmbg_noAC->SetParameters(100,0.05,0.03,10,0.05,0.03);//test.list
+// fmmbg_noAC->SetParameters(300,0.05,1.2,30,0.1,0.02);//small.list
+// fmmbg_noAC->SetParameter(1,0.05);
+// fmmbg_noAC->SetParameter(2,0.03);
+ fL_noAC=new TF1("fL_noAC","gausn(0)",min_mm,max_mm);
+ fL_noAC->SetNpx(2000);
+ fL_noAC->SetParLimits(2,0.,0.01);
+ fS_noAC=new TF1("fS_noAC","gausn(0)",min_mm,max_mm);
+ fS_noAC->SetNpx(2000);
+ fS_noAC->SetParLimits(2,0.,0.01);//sigma limit in order not to mix with bg
  
- fmm_noZ=new TF1("fmm_noZ","gausn(0)+gausn(3)+pol4(6)",-0.05,0.15);
- fmm_noZ->SetNpx(2000);
- fmm_noZ->SetTitle("Missing Mass w/o AC cut;Coin time [ns];Counts [1/56 ns]");
- fmm_noZ->SetParLimits(0,0.,1000000.);//positive
- fmm_noZ->SetParLimits(3,0.,1000000.);//positive
-// fmm_noZ->SetParLimits(3,0.,100.);//positive//Voigt
-// fmm_noZ->SetParLimits(4,0.,100000.);//positive//Voigt
-// fmm_noZ->SetParLimits(7,0.,100000.);//positive//Voigt
-// fmm_noZ->SetParameter(1,def_mean_L);
-// fmm_noZ->SetParameter(4,def_mean_S);
+ fmm_noAC=new TF1("fmm_noAC","gausn(0)+gausn(3)+pol4(6)",-0.05,0.15);
+// fmm_noAC=new TF1("fmm_noAC",F_mmnoAC,-0.1,0.15,10);
+ fmm_noAC->SetNpx(2000);
+ fmm_noAC->SetTitle("Missing Mass w/o AC cut;Coin time [ns];Counts [1/56 ns]");
+ fmm_noAC->SetParLimits(0,0.,1000000.);//positive
+ fmm_noAC->SetParLimits(3,0.,1000000.);//positive
+// fmm_noAC->SetParLimits(3,0.,100.);//positive//Voigt
+// fmm_noAC->SetParLimits(4,0.,100000.);//positive//Voigt
+// fmm_noAC->SetParLimits(7,0.,100000.);//positive//Voigt
+// fmm_noAC->SetParameter(1,def_mean_L);
+// fmm_noAC->SetParameter(4,def_mean_S);
 
- hmm_wo_bg_fom_noZ->Fit("fL_noZ","Rq","0",def_mean_L-3*def_sig_L,def_mean_L+3*def_sig_L);
- mean_L_noZ=fL_noZ->GetParameter(1);
- sig_L_noZ=fL_noZ->GetParameter(2);
- center_L=mean_L_noZ;
- range_L=2*sig_L_noZ;
-
- hmm_wo_bg_fom_noZ->Fit("fS_noZ","Rq","0",def_mean_S-3*def_sig_S,def_mean_S+3*def_sig_S);
- mean_S_noZ=fS_noZ->GetParameter(1);
- sig_S_noZ=fS_noZ->GetParameter(2);
- center_S=mean_S_noZ;
- range_S=2*sig_S_noZ;
 
 
  //------- Fitting ----------//
 
 cout<<"fmmbg fit start"<<endl;
-// hmm_bg_fom_noZ->Fit("fmmbg_noZ","Rq","",min_mm,max_mm);
-// hmm_pi_wobg_fom_noZ->Fit("fmmbg_noZ","Rq","",-0.05,0.15);
-//double fmmbga = fmmbg_noZ->GetParameter(0);
-//double fmmbgb = fmmbg_noZ->GetParameter(1);
-//double fmmbgc = fmmbg_noZ->GetParameter(2);
-//double fmmbgd = fmmbg_noZ->GetParameter(3);
+// hmm_bg_fom_noAC->Fit("fmmbg_noAC","Rq","",min_mm,max_mm);
+// hmm_pi_wobg_fom_noAC->Fit("fmmbg_noAC","Rq","",-0.05,0.15);
+//double fmmbga = fmmbg_noAC->GetParameter(0);
+//double fmmbgb = fmmbg_noAC->GetParameter(1);
+//double fmmbgc = fmmbg_noAC->GetParameter(2);
+//double fmmbgd = fmmbg_noAC->GetParameter(3);
 //cout<<"0:1:2:3:4:5="<<a<<"::"<<b<<"::"<<c<<"::"<<d<<endl;//"::"<<e<<"::"<<f<<endl;
-// fmm_noZ->FixParameter(1,b);//mean
-// fmm_noZ->FixParameter(2,c);//sigma
-// fmm_noZ->FixParameter(3,d);//lg
-//double e = fmmbg_noZ->GetParameter(4);
-//double f = fmmbg_noZ->GetParameter(5);
-// fmm_noZ->SetParameter(0,a);
-// fmm_noZ->SetParameter(1,b);
-// fmm_noZ->SetParameter(2,c);
-// fmm_noZ->SetParameter(3,d);
-// fmm_noZ->SetParameter(4,e);
-// fmm_noZ->SetParameter(5,f);
-// fmm_noZ->SetParameter(6,500);
- fmm_noZ->SetParameter(1,def_mean_L);
- fmm_noZ->SetParLimits(1,def_mean_L-def_sig_L,def_mean_L+def_sig_L);
- fmm_noZ->SetParameter(2,def_sig_L);
- fmm_noZ->SetParLimits(2,0.,2*def_sig_L);
-// fmm_noZ->SetParameters(9,100);
- fmm_noZ->SetParameter(4,def_mean_S);
- fmm_noZ->SetParLimits(4,def_mean_S-def_sig_S,def_mean_S+def_sig_S);
- fmm_noZ->SetParameter(5,def_sig_S);
- fmm_noZ->SetParLimits(5,0.,2*def_sig_S);
- hmm_wo_bg_fom_noZ->Fit("fmm_noZ","","",-0.05,0.15);
-double fmm_noZpar0 = fmm_noZ->GetParameter(0);cout<<"fmm_noZ[0]="<<fmm_noZpar0<<endl;//area(L)
-double fmm_noZpar1 = fmm_noZ->GetParameter(1);cout<<"fmm_noZ[1]="<<fmm_noZpar1<<endl;//mean(L)
-double fmm_noZpar2 = fmm_noZ->GetParameter(2);cout<<"fmm_noZ[2]="<<fmm_noZpar2<<endl;//sigma(L)
-double fmm_noZpar3 = fmm_noZ->GetParameter(3);cout<<"fmm_noZ[3]="<<fmm_noZpar3<<endl;//area(S)
-double fmm_noZpar4 = fmm_noZ->GetParameter(4);cout<<"fmm_noZ[4]="<<fmm_noZpar4<<endl;//mean(S)
-double fmm_noZpar5 = fmm_noZ->GetParameter(5);cout<<"fmm_noZ[5]="<<fmm_noZpar5<<endl;//sigma(S)
-double fmm_noZpar6 = fmm_noZ->GetParameter(6);cout<<"fmm_noZ[6]="<<fmm_noZpar6<<endl;//poly_const
-double fmm_noZpar7 = fmm_noZ->GetParameter(7);cout<<"fmm_noZ[7]="<<fmm_noZpar7<<endl;//poly_x
-double fmm_noZpar8 = fmm_noZ->GetParameter(8);cout<<"fmm_noZ[8]="<<fmm_noZpar8<<endl;//poly_x^2
-double fmm_noZpar9 = fmm_noZ->GetParameter(9);cout<<"fmm_noZ[9]="<<fmm_noZpar9<<endl;//poly_x^3
-double fmm_noZpar10 = fmm_noZ->GetParameter(10);cout<<"fmm_noZ[10]="<<fmm_noZpar10<<endl;//poly_x^4
- fmmbg_noZ->SetParameters(fmm_noZpar6,fmm_noZpar7,fmm_noZpar8,fmm_noZpar9,fmm_noZpar10);
+// fmm_noAC->FixParameter(1,b);//mean
+// fmm_noAC->FixParameter(2,c);//sigma
+// fmm_noAC->FixParameter(3,d);//lg
+//double e = fmmbg_noAC->GetParameter(4);
+//double f = fmmbg_noAC->GetParameter(5);
+// fmm_noAC->SetParameter(0,a);
+// fmm_noAC->SetParameter(1,b);
+// fmm_noAC->SetParameter(2,c);
+// fmm_noAC->SetParameter(3,d);
+// fmm_noAC->SetParameter(4,e);
+// fmm_noAC->SetParameter(5,f);
+// fmm_noAC->SetParameter(6,500);
+ fmm_noAC->SetParameter(1,def_mean_L);
+ fmm_noAC->SetParLimits(1,def_mean_L-def_sig_L,def_mean_L+def_sig_L);
+ fmm_noAC->SetParameter(2,def_sig_L);
+ fmm_noAC->SetParLimits(2,0.,2*def_sig_L);
+// fmm_noAC->SetParameters(9,100);
+ fmm_noAC->SetParameter(4,def_mean_S);
+ fmm_noAC->SetParLimits(4,def_mean_S-def_sig_S,def_mean_S+def_sig_S);
+ fmm_noAC->SetParameter(5,def_sig_S);
+ fmm_noAC->SetParLimits(5,0.,2*def_sig_S);
+ hmm_wo_bg_fom_noAC->Fit("fmm_noAC","","",-0.05,0.15);
+double fmm_noACpar0 = fmm_noAC->GetParameter(0);cout<<"fmm_noAC[0]="<<fmm_noACpar0<<endl;//area(L)
+double fmm_noACpar1 = fmm_noAC->GetParameter(1);cout<<"fmm_noAC[1]="<<fmm_noACpar1<<endl;//mean(L)
+double fmm_noACpar2 = fmm_noAC->GetParameter(2);cout<<"fmm_noAC[2]="<<fmm_noACpar2<<endl;//sigma(L)
+double fmm_noACpar3 = fmm_noAC->GetParameter(3);cout<<"fmm_noAC[3]="<<fmm_noACpar3<<endl;//area(S)
+double fmm_noACpar4 = fmm_noAC->GetParameter(4);cout<<"fmm_noAC[4]="<<fmm_noACpar4<<endl;//mean(S)
+double fmm_noACpar5 = fmm_noAC->GetParameter(5);cout<<"fmm_noAC[5]="<<fmm_noACpar5<<endl;//sigma(S)
+double fmm_noACpar6 = fmm_noAC->GetParameter(6);cout<<"fmm_noAC[6]="<<fmm_noACpar6<<endl;//poly_const
+double fmm_noACpar7 = fmm_noAC->GetParameter(7);cout<<"fmm_noAC[7]="<<fmm_noACpar7<<endl;//poly_x
+double fmm_noACpar8 = fmm_noAC->GetParameter(8);cout<<"fmm_noAC[8]="<<fmm_noACpar8<<endl;//poly_x^2
+double fmm_noACpar9 = fmm_noAC->GetParameter(9);cout<<"fmm_noAC[9]="<<fmm_noACpar9<<endl;//poly_x^3
+double fmm_noACpar10 = fmm_noAC->GetParameter(10);cout<<"fmm_noAC[10]="<<fmm_noACpar10<<endl;//poly_x^4
+ fmmbg_noAC->SetParameters(fmm_noACpar6,fmm_noACpar7,fmm_noACpar8,fmm_noACpar9,fmm_noACpar10);
 //cout<<"0:1:2:3:4:5(as a total func)="<<a<<"::"<<b<<"::"<<c<<"::"<<d<<"::"<<e<<"::"<<f<<endl;
 //
 //cout<<"fL fit start"<<endl;
-// hmm_wo_bg_fom_noZ->Fit("fL_noZ","Rq","",def_mean_L-3*def_sig_L,def_mean_L+3*def_sig_L);
-// n_L_noZ=fL_noZ->GetParameter(0);
-// mean_L_noZ=fL_noZ->GetParameter(1);
-// sig_L_noZ=fL_noZ->GetParameter(2);
- mean_L_noZ=def_mean_L;
- mean_S_noZ=def_mean_S;
- sig_L_noZ=def_sig_L;
- sig_S_noZ=def_sig_S;
- n_L_noZ=hmm_wo_bg_fom_noZ->Integral(hmm_wo_bg_fom_noZ->FindBin(center_L-range_L),hmm_wo_bg_fom_noZ->FindBin(center_L+range_L));
-cout<<"before(L):: "<<n_L_noZ<<endl;
- double integralL=fmmbg_noZ->Integral(center_L-range_L,center_L+range_L);
- if(integralL>0)n_L_noZ-=integralL;
-cout<<"after(L):: "<<n_L_noZ<<endl;
-//n_L_noZ-=(pow(mean_L_noZ+2*sig_L_noZ,5)-pow(mean_L_noZ-2*sig_L_noZ,5))*a/5;
-//n_L_noZ-=(pow(mean_L_noZ+2*sig_L_noZ,4)-pow(mean_L_noZ-2*sig_L_noZ,4))*b/4;
-//n_L_noZ-=(pow(mean_L_noZ+2*sig_L_noZ,3)-pow(mean_L_noZ-2*sig_L_noZ,3))*c/3;
-//n_L_noZ-=(pow(mean_L_noZ+2*sig_L_noZ,2)-pow(mean_L_noZ-2*sig_L_noZ,2))*d/2;
-//n_L_noZ-=(pow(mean_L_noZ+2*sig_L_noZ,1)-pow(mean_L_noZ-2*sig_L_noZ,1))*e;
+// hmm_wo_bg_fom_noAC->Fit("fL_noAC","Rq","",def_mean_L-3*def_sig_L,def_mean_L+3*def_sig_L);
+// n_L_noAC=fL_noAC->GetParameter(0);
+// mean_L_noAC=fL_noAC->GetParameter(1);
+// sig_L_noAC=fL_noAC->GetParameter(2);
+ mean_L_noAC=def_mean_L;
+ mean_S_noAC=def_mean_S;
+ sig_L_noAC=def_sig_L;
+ sig_S_noAC=def_sig_S;
+ n_L_noAC=hmm_wo_bg_fom_noAC->Integral(hmm_wo_bg_fom_noAC->FindBin(center_L-range_L),hmm_wo_bg_fom_noAC->FindBin(center_L+range_L));
+cout<<"before(L):: "<<n_L_noAC<<endl;
+ double integralL=fmmbg_noAC->Integral(center_L-range_L,center_L+range_L);
+ if(integralL>0)n_L_noAC-=integralL;
+cout<<"after(L):: "<<n_L_noAC<<endl;
+//n_L_noAC-=(pow(mean_L_noAC+2*sig_L_noAC,5)-pow(mean_L_noAC-2*sig_L_noAC,5))*a/5;
+//n_L_noAC-=(pow(mean_L_noAC+2*sig_L_noAC,4)-pow(mean_L_noAC-2*sig_L_noAC,4))*b/4;
+//n_L_noAC-=(pow(mean_L_noAC+2*sig_L_noAC,3)-pow(mean_L_noAC-2*sig_L_noAC,3))*c/3;
+//n_L_noAC-=(pow(mean_L_noAC+2*sig_L_noAC,2)-pow(mean_L_noAC-2*sig_L_noAC,2))*d/2;
+//n_L_noAC-=(pow(mean_L_noAC+2*sig_L_noAC,1)-pow(mean_L_noAC-2*sig_L_noAC,1))*e;
 //
- n_S_noZ=hmm_wo_bg_fom_noZ->Integral(hmm_wo_bg_fom_noZ->FindBin(center_S-range_S),hmm_wo_bg_fom_noZ->FindBin(center_S+range_S));
-cout<<"before(S):: "<<n_S_noZ<<endl;
- double integralS=fmmbg_noZ->Integral(center_S-range_S,center_S+range_S);
- if(integralS>0)n_S_noZ-=integralS;
-cout<<"after(S):: "<<n_S_noZ<<endl;
-//n_S_noZ-=(pow(mean_S_noZ+2*sig_S_noZ,5)-pow(mean_S_noZ-2*sig_S_noZ,5))*a/5;
-//n_S_noZ-=(pow(mean_S_noZ+2*sig_S_noZ,4)-pow(mean_S_noZ-2*sig_S_noZ,4))*b/4;
-//n_S_noZ-=(pow(mean_S_noZ+2*sig_S_noZ,3)-pow(mean_S_noZ-2*sig_S_noZ,3))*c/3;
-//n_S_noZ-=(pow(mean_S_noZ+2*sig_S_noZ,2)-pow(mean_S_noZ-2*sig_S_noZ,2))*d/2;
-//n_S_noZ-=(pow(mean_S_noZ+2*sig_S_noZ,1)-pow(mean_S_noZ-2*sig_S_noZ,1))*e;
+ n_S_noAC=hmm_wo_bg_fom_noAC->Integral(hmm_wo_bg_fom_noAC->FindBin(center_S-range_S),hmm_wo_bg_fom_noAC->FindBin(center_S+range_S));
+cout<<"before(S):: "<<n_S_noAC<<endl;
+ double integralS=fmmbg_noAC->Integral(center_S-range_S,center_S+range_S);
+ if(integralS>0)n_S_noAC-=integralS;
+cout<<"after(S):: "<<n_S_noAC<<endl;
+//n_S_noAC-=(pow(mean_S_noAC+2*sig_S_noAC,5)-pow(mean_S_noAC-2*sig_S_noAC,5))*a/5;
+//n_S_noAC-=(pow(mean_S_noAC+2*sig_S_noAC,4)-pow(mean_S_noAC-2*sig_S_noAC,4))*b/4;
+//n_S_noAC-=(pow(mean_S_noAC+2*sig_S_noAC,3)-pow(mean_S_noAC-2*sig_S_noAC,3))*c/3;
+//n_S_noAC-=(pow(mean_S_noAC+2*sig_S_noAC,2)-pow(mean_S_noAC-2*sig_S_noAC,2))*d/2;
+//n_S_noAC-=(pow(mean_S_noAC+2*sig_S_noAC,1)-pow(mean_S_noAC-2*sig_S_noAC,1))*e;
 
- cout<<"n_L"<<n_L_noZ<<endl;
-cout<<"mean_L"<<mean_L_noZ<<endl;
-cout<<"sig_L"<<sig_L_noZ<<endl;
+ cout<<"n_L"<<n_L_noAC<<endl;
+cout<<"mean_L"<<mean_L_noAC<<endl;
+cout<<"sig_L"<<sig_L_noAC<<endl;
 
 ////cout<<"fS fit start"<<endl;
-// hmm_wo_bg_fom_noZ->Fit("fS_noZ","Rq","",def_mean_S-3*def_sig_S,def_mean_S+3*def_sig_S);
-//// n_S_noZ=fS_noZ->GetParameter(0);
-// mean_S_noZ=fS_noZ->GetParameter(1);
-// mean_S_noZ=def_mean_S;
-// sig_S_noZ=def_sig_S;
-// sig_S_noZ=fS_noZ->GetParameter(2);
-// n_S_noZ=hmm_wo_bg_fom_noZ->Integral(hmm_wo_bg_fom_noZ->FindBin(mean_S_noZ-2*sig_S_noZ),hmm_wo_bg_fom_noZ->FindBin(mean_S_noZ+2*sig_S_noZ));
- cout<<"n_S"<<n_S_noZ<<endl;
-cout<<"mean_S"<<mean_S_noZ<<endl;
-cout<<"sig_S"<<sig_S_noZ<<endl;
+// hmm_wo_bg_fom_noAC->Fit("fS_noAC","Rq","",def_mean_S-3*def_sig_S,def_mean_S+3*def_sig_S);
+//// n_S_noAC=fS_noAC->GetParameter(0);
+// mean_S_noAC=fS_noAC->GetParameter(1);
+// mean_S_noAC=def_mean_S;
+// sig_S_noAC=def_sig_S;
+// sig_S_noAC=fS_noAC->GetParameter(2);
+// n_S_noAC=hmm_wo_bg_fom_noAC->Integral(hmm_wo_bg_fom_noAC->FindBin(mean_S_noAC-2*sig_S_noAC),hmm_wo_bg_fom_noAC->FindBin(mean_S_noAC+2*sig_S_noAC));
+ cout<<"n_S"<<n_S_noAC<<endl;
+cout<<"mean_S"<<mean_S_noAC<<endl;
+cout<<"sig_S"<<sig_S_noAC<<endl;
 //----------------------------------------------//
 //--	Missing Mass  End     ------------------//
 //----------------------------------------------//
@@ -3274,10 +3642,10 @@ cout<<"sig_S"<<sig_S_noZ<<endl;
  //----------------------------------------------------------------//
 
 	for(int i=0;i<nth;i++){
-//		for(int j=0;j<nth;j++){
+		for(int j=0;j<nth;j++){
 //			for(int l=0;l<nth;l++){
 
-			int j=0; int l=0;
+			int l=0;
 			
 //-----Background subtraction-----//
 //------------cointime------------//
@@ -3310,9 +3678,7 @@ n_pi[i][j][l]=hcoin_wo_bg_fom[i][j][l]->Integral(hcoin_wo_bg_fom[i][j][l]->FindB
 // n_k[i][j][l]=fk[i][j][l]->GetParameter(0);
  mean_k[i][j][l]=fk[i][j][l]->GetParameter(1);
  sig_k[i][j][l]=fk[i][j][l]->GetParameter(2);
- n_k[i][j][l]=hcoin_k_fom[i][j][l]->Integral(hcoin_wo_bg_fom[i][j][l]->FindBin(center_k-range_k),hcoin_wo_bg_fom[i][j][l]->FindBin(center_k+range_k));
-	cout<<"center_k="<<center_k<<endl;
-	cout<<"range_k="<<range_k<<endl;
+ n_k[i][j][l]=hcoin_wo_bg_fom[i][j][l]->Integral(hcoin_wo_bg_fom[i][j][l]->FindBin(center_k-range_k),hcoin_wo_bg_fom[i][j][l]->FindBin(center_k+range_k));
 
  // n_k[i][th1][1]=hcoin_k_fom[i][th1]->Integral(hcoin_k_fom[i][th1]->FindBin(-3*sig_k[i][th1][1]+mean_k[i][th1][1])
  //		     ,hcoin_k_fom[i][th1]->FindBin(+3*sig_k[i][th1][1]+mean_k[i][th1][1]));
@@ -3331,6 +3697,10 @@ n_pi[i][j][l]=hcoin_wo_bg_fom[i][j][l]->Integral(hcoin_wo_bg_fom[i][j][l]->FindB
  //mean_p[i][j][l]=fcoin[i][j][l]->GetParameter(7);
  //sig_p[i][j][l]=fcoin[i][j][l]->GetParameter(8);
 
+ //------- Get Error Paramters ---//
+ n_pi_err[i][j][l]=fcoin[i][j][l]->GetParError(0); 
+ n_k_err[i][j][l]=fcoin[i][j][l]->GetParError(3); 
+ n_p_err[i][j][l]=fcoin[i][j][l]->GetParError(6); 
 cout<<"n_pi["<<i<<"]["<<j<<"]["<<l<<"]="<<n_pi[i][j][l]<<endl;
 cout<<"n_k["<<i<<"]["<<j<<"]["<<l<<"]="<<n_k[i][j][l]<<endl;
 cout<<"n_p["<<i<<"]["<<j<<"]["<<l<<"]="<<n_p[i][j][l]<<endl;
@@ -3363,6 +3733,7 @@ cout<<"n_p["<<i<<"]["<<j<<"]["<<l<<"]="<<n_p[i][j][l]<<endl;
  fS[i][j][l]->SetParLimits(2,0.,0.01);//sigma limit in order not to mix with bg
  
  fmm[i][j][l]=new TF1("fmm[i][j][l]","gausn(0)+gausn(3)+pol4(6)",-0.05,0.15);
+// fmm[i][j][l]=new TF1("fmm[i][j][l]",F_mmnoAC,-0.1,0.15,10);
  fmm[i][j][l]->SetNpx(2000);
  fmm[i][j][l]->SetTitle("Missing Mass w/o AC cut;Coin time [ns];Counts [1/56 ns]");
  fmm[i][j][l]->SetParLimits(0,0.,1000000.);//positive
@@ -3475,71 +3846,272 @@ cout<<"sig_S"<<sig_S[i][j][l]<<endl;
 //----------------------------------------------//
 
 	
+	//----------------------------------------------//
+	//-----				DEBUG                  -----//
+	//----------------------------------------------//
+//	n_pi[i][j][l]=0.;n_pi_noAC1=0.;n_pi_noAC2=0.;//Pion ignoring
+//	n_k[i][j][l]=0.;n_k_noAC1=0.;n_k_noAC2=0.;//Kaon ignoring
+//	n_p[i][j][l]=0.;n_p_noAC1=0.;n_p_noAC2=0.;//Proton ingoring
+	//----------------------------------------------//
+	//-----				DEBUG                  -----//
+	//----------------------------------------------//
 	
+//Changed
+//	ac2l_adc[j]+=5.;	
+//	if(ac2l_adc[j]>20)break;
 	if(n_pi[i][j][l]>0.){}else{n_pi[i][j][l]=1.;}
 	if(n_k[i][j][l]>0.){}else{n_k[i][j][l]=1.;}
 	if(n_p[i][j][l]>0.){}else{n_p[i][j][l]=1.;}
 	if(n_L[i][j][l]>0.){}else{n_L[i][j][l]=1.;}
 	if(n_S[i][j][l]>0.){}else{n_S[i][j][l]=1.;}
 
+//With Weight
+	//h_pisr12l->Fill(ac1_adc[i],ac2l_adc[j],n_pi[i][j][l]/n_pi_noAC);
+	//h_ksr12l->Fill(ac1_adc[i],ac2l_adc[j],n_k[i][j][l]/n_k_noAC);
+	//h_psr12l->Fill(ac1_adc[i],ac2l_adc[j],n_p[i][j][l]/n_p_noAC);
+	//h_Lsr12l->Fill(ac1_adc[i],ac2l_adc[j],n_L[i][j][l]/n_L_noAC);
+	//h_Ssr12l->Fill(ac1_adc[i],ac2l_adc[j],n_S[i][j][l]/n_S_noAC);
+	for(int f=0;f<1000*n_pi[i][j][l]/n_pi_noAC;f++){h_pisr12l->Fill(ac1_adc[i],ac2l_adc[j]);}
+	for(int f=0;f<1000*n_k[i][j][l]/n_k_noAC;f++){h_ksr12l->Fill(ac1_adc[i],ac2l_adc[j]);}
+	for(int f=0;f<1000*n_p[i][j][l]/n_p_noAC;f++){h_psr12l->Fill(ac1_adc[i],ac2l_adc[j]);}
+	for(int f=0;f<1000*n_L[i][j][l]/n_L_noAC;f++){h_Lsr12l->Fill(ac1_adc[i],ac2l_adc[j]);}
+	for(int f=0;f<1000*n_S[i][j][l]/n_S_noAC;f++){h_Ssr12l->Fill(ac1_adc[i],ac2l_adc[j]);}
+//
+//	if(n_pi[i][j][l]>n_pi_noAC){
+//		if(j==0 && l==0){for(int fill=0;fill<n_pi_noAC;fill++){h_pisr1->Fill(ac1_adc[i]);}}
+//	}
+//	else {if(j==0 && l==0){for(int fill=0;fill<n_pi[i][j][l];fill++){h_pisr1->Fill(ac1_adc[i]);}}}
+//	if(n_pi[i][j][l]>n_pi_noAC){
+//		//if(i==0 && l==0){for(int fill=0;fill<n_pi_noAC;fill++){h_pisr2l->Fill(ac2l_adc[j]);}}
+//		if(l==0){for(int fill=0;fill<n_pi_noAC;fill++){h_pisr12l->Fill(ac1_adc[i],ac2l_adc[j]);h_pisr2l->Fill(ac2l_adc[j])}}
+//		if(i==0 && j==0){for(int fill=0;fill<n_pi_noAC;fill++){h_pisr2u->Fill(ac2u_adc[l]);}}
+//	}
+//	else {
+//		//if(i==0 && l==0){for(int fill=0;fill<n_pi[i][j][l];fill++){h_pisr2l->Fill(ac2l_adc[j]);}}
+//		if(l==0){for(int fill=0;fill<n_pi[i][j][l];fill++){h_pisr12l->Fill(ac1_adc[i],ac2l_adc[j]);h_pisr2l->Fill(ac2l_adc[j]);}}
+//		if(i==0 && j==0){for(int fill=0;fill<n_pi[i][j][l];fill++){h_pisr2u->Fill(ac2u_adc[l]);}}
+//	}
+//
+//	if(n_k[i][j][l]>n_k_noAC){
+//		if(j==0 && l==0){for(int fill=0;fill<n_k_noAC;fill++){h_ksr1->Fill(ac1_adc[i]);}}
+//	}
+//	else {if(j==0 && l==0){for(int fill=0;fill<n_k[i][j][l];fill++){h_ksr1->Fill(ac1_adc[i]);}}}
+//	if(n_k[i][j][l]>n_k_noAC){
+//		//if(i==0 && l==0){for(int fill=0;fill<n_k_noAC;fill++){h_ksr2l->Fill(ac2l_adc[j]);}}
+//		if(l==0){for(int fill=0;fill<n_k_noAC;fill++){h_ksr12l->Fill(ac1_adc[i],ac2l_adc[j]);h_ksr2l->Fill(ac2l_adc[j]);}}
+//		if(i==0 && j==0){for(int fill=0;fill<n_k_noAC;fill++){h_ksr2u->Fill(ac2u_adc[l]);}}
+//	}
+//	else {
+//		//if(i==0 && l==0){for(int fill=0;fill<n_k[i][j][l];fill++){h_ksr2l->Fill(ac2l_adc[j]);}}
+//		if(l==0){for(int fill=0;fill<n_k[i][j][l];fill++){h_ksr12l->Fill(ac1_adc[i],ac2l_adc[j]);h_ksr2l->Fill(ac2l_adc[j]);}}
+//		if(i==0 && j==0){for(int fill=0;fill<n_k[i][j][l];fill++){h_ksr2u->Fill(ac2u_adc[l]);}}
+//	}
+//
+//	if(n_p[i][j][l]>n_p_noAC){
+//		if(j==0 && l==0){for(int fill=0;fill<n_p_noAC;fill++){h_psr1->Fill(ac1_adc[i]);}}
+//	}
+//	else {if(j==0 && l==0){for(int fill=0;fill<n_p[i][j][l];fill++){h_psr1->Fill(ac1_adc[i]);}}}
+//	if(n_p[i][j][l]>n_p_noAC){
+//		//if(i==0 && l==0){for(int fill=0;fill<n_p_noAC;fill++){h_psr2l->Fill(ac2l_adc[j]);}}
+//		if(l==0){for(int fill=0;fill<n_p_noAC;fill++){h_psr12l->Fill(ac1_adc[i],ac2l_adc[j]);h_psr2l->Fill(ac2l_adc[j]);}}
+//		if(i==0 && j==0){for(int fill=0;fill<n_p_noAC;fill++){h_psr2u->Fill(ac2u_adc[l]);}}
+//	}
+//	else {
+//		//if(i==0 && l==0){for(int fill=0;fill<n_p[i][j][l];fill++){h_psr2l->Fill(ac2l_adc[j]);}}
+//		if(l==0){for(int fill=0;fill<n_p[i][j][l];fill++){h_psr12l->Fill(ac1_adc[i],ac2l_adc[j]);h_psr2l->Fill(ac2l_adc[j]);}}
+//		if(i==0 && j==0){for(int fill=0;fill<n_p[i][j][l];fill++){h_psr2u->Fill(ac2u_adc[l]);}}
+//	}
+//
+//	if(n_L[i][j][l]>n_L_noAC){
+//		if(j==0 && l==0){for(int fill=0;fill<n_L_noAC;fill++){h_Lsr1->Fill(ac1_adc[i]);}}
+//	}
+//	else {if(j==0 && l==0){for(int fill=0;fill<n_L[i][j][l];fill++){h_Lsr1->Fill(ac1_adc[i]);}}}
+//	if(n_L[i][j][l]>n_L_noAC){
+//		//if(i==0 && l==0){for(int fill=0;fill<n_L_noAC;fill++){h_Lsr2l->Fill(ac2l_adc[j]);}}
+//		if(l==0){for(int fill=0;fill<n_L_noAC;fill++){h_Lsr12l->Fill(ac1_adc[i],ac2l_adc[j]);h_Lsr2l->Fill(ac2l_adc[j]);}}
+//		if(i==0 && j==0){for(int fill=0;fill<n_L_noAC;fill++){h_Lsr2u->Fill(ac2u_adc[l]);}}
+//	}
+//	else {
+//		//if(i==0 && l==0){for(int fill=0;fill<n_L[i][j][l];fill++){h_Lsr2l->Fill(ac2l_adc[j]);}}
+//		if(l==0){for(int fill=0;fill<n_L[i][j][l];fill++){h_Lsr12l->Fill(ac1_adc[i],ac2l_adc[j]);h_Lsr2l->Fill(ac2l_adc[j]);}}
+//		if(i==0 && j==0){for(int fill=0;fill<n_L[i][j][l];fill++){h_Lsr2u->Fill(ac2u_adc[l]);}}
+//	}
+//
+//	if(n_S[i][j][l]>n_S_noAC){
+//		if(j==0 && l==0){for(int fill=0;fill<n_S_noAC;fill++){h_Ssr1->Fill(ac1_adc[i]);}}
+//	}
+//	else {if(j==0 && l==0){for(int fill=0;fill<n_S[i][j][l];fill++){h_Ssr1->Fill(ac1_adc[i]);}}}
+//	if(n_S[i][j][l]>n_S_noAC){
+//		//if(i==0 && l==0){for(int fill=0;fill<n_S_noAC;fill++){h_Ssr2l->Fill(ac2l_adc[j]);}}
+//		if(l==0){for(int fill=0;fill<n_S_noAC;fill++){h_Ssr12l->Fill(ac1_adc[i],ac2l_adc[j]);h_Ssr2l->Fill(ac2l_adc[j]);}}
+//		if(i==0 && j==0){for(int fill=0;fill<n_S_noAC;fill++){h_Ssr2u->Fill(ac2u_adc[l]);}}
+//	}
+//	else {
+//		//if(i==0 && l==0){for(int fill=0;fill<n_S[i][j][l];fill++){h_Ssr2l->Fill(ac2l_adc[j]);}}
+//		if(l==0){for(int fill=0;fill<n_S[i][j][l];fill++){h_Ssr12l->Fill(ac1_adc[i],ac2l_adc[j]);h_Ssr2l->Fill(ac2l_adc[j]);}}
+//		if(i==0 && j==0){for(int fill=0;fill<n_S[i][j][l];fill++){h_Ssr2u->Fill(ac2u_adc[l]);}}
+//	}
 
 
 
-	if(n_pi[i][j][l]>n_pi_noZ){
-		for(int fill=0;fill<n_pi_noZ;fill++){h_pisr1->Fill(coinvar[i]);}
+//------------06.06, 1D Effciency---------------//
+//	i==15 (ac1=3.75), j==15 (ac2l=3), l=0 (ac2u=20)
+	if(n_pi[i][j][l]>n_pi_noAC){
+		if(j==15 && l==0){for(int fill=0;fill<n_pi_noAC;fill++){h_pisr1->Fill(ac1_adc[i]);}}
 	}
-	else {for(int fill=0;fill<n_pi[i][j][l];fill++){h_pisr1->Fill(coinvar[i]);}}
-
-	if(n_k[i][j][l]>n_k_noZ){
-		for(int fill=0;fill<n_k_noZ;fill++){h_ksr1->Fill(coinvar[i]);}
+	else {if(j==15 && l==0){for(int fill=0;fill<n_pi[i][j][l];fill++){h_pisr1->Fill(ac1_adc[i]);}}}
+	if(n_pi[i][j][l]>n_pi_noAC){
+		if(i==15 && l==0){for(int fill=0;fill<n_pi_noAC;fill++){h_pisr2l->Fill(ac2l_adc[j]);}}
+		if(i==15 && j==15){for(int fill=0;fill<n_pi_noAC;fill++){h_pisr2u->Fill(ac2u_adc[l]);}}
 	}
-	else {for(int fill=0;fill<n_k[i][j][l];fill++){h_ksr1->Fill(coinvar[i]);}}
-	if(n_p[i][j][l]>n_p_noZ){
-		for(int fill=0;fill<n_p_noZ;fill++){h_psr1->Fill(coinvar[i]);}
+	else {
+		if(i==15 && l==0){for(int fill=0;fill<n_pi[i][j][l];fill++){h_pisr2l->Fill(ac2l_adc[j]);}}
+		if(i==15 && j==15){for(int fill=0;fill<n_pi[i][j][l];fill++){h_pisr2u->Fill(ac2u_adc[l]);}}
 	}
-	else {for(int fill=0;fill<n_p[i][j][l];fill++){h_psr1->Fill(coinvar[i]);}}
 
-	if(n_L[i][j][l]>n_L_noZ){
-		for(int fill=0;fill<n_L_noZ;fill++){h_Lsr1->Fill(coinvar[i]);}
+	if(n_k[i][j][l]>n_k_noAC){
+		if(j==15 && l==0){for(int fill=0;fill<n_k_noAC;fill++){h_ksr1->Fill(ac1_adc[i]);}}
 	}
-	else {for(int fill=0;fill<n_L[i][j][l];fill++){h_Lsr1->Fill(coinvar[i]);}}
-	if(n_S[i][j][l]>n_S_noZ){
-		for(int fill=0;fill<n_S_noZ;fill++){h_Ssr1->Fill(coinvar[i]);}
+	else {if(j==15 && l==0){for(int fill=0;fill<n_k[i][j][l];fill++){h_ksr1->Fill(ac1_adc[i]);}}}
+	if(n_k[i][j][l]>n_k_noAC){
+		if(i==15 && l==0){for(int fill=0;fill<n_k_noAC;fill++){h_ksr2l->Fill(ac2l_adc[j]);}}
+		if(i==15 && j==15){for(int fill=0;fill<n_k_noAC;fill++){h_ksr2u->Fill(ac2u_adc[l]);}}
 	}
-	else {for(int fill=0;fill<n_S[i][j][l];fill++){h_Ssr1->Fill(coinvar[i]);}}
+	else {
+		if(i==15 && l==0){for(int fill=0;fill<n_k[i][j][l];fill++){h_ksr2l->Fill(ac2l_adc[j]);}}
+		if(i==15 && j==15){for(int fill=0;fill<n_k[i][j][l];fill++){h_ksr2u->Fill(ac2u_adc[l]);}}
+	}
 
-	for(int fill=0;fill<n_pi_noZ;fill++) h_pitot1->Fill(coinvar[i]);
-	for(int fill=0;fill<n_k_noZ;fill++) h_ktot1->Fill(coinvar[i]);
-	for(int fill=0;fill<n_p_noZ;fill++) h_ptot1->Fill(coinvar[i]);
-	for(int fill=0;fill<n_L_noZ;fill++) h_Ltot1->Fill(coinvar[i]);
-	for(int fill=0;fill<n_S_noZ;fill++) h_Stot1->Fill(coinvar[i]);
+	if(n_p[i][j][l]>n_p_noAC){
+		if(j==15 && l==0){for(int fill=0;fill<n_p_noAC;fill++){h_psr1->Fill(ac1_adc[i]);}}
+	}
+	else {if(j==15 && l==0){for(int fill=0;fill<n_p[i][j][l];fill++){h_psr1->Fill(ac1_adc[i]);}}}
+	if(n_p[i][j][l]>n_p_noAC){
+		if(i==15 && l==0){for(int fill=0;fill<n_p_noAC;fill++){h_psr2l->Fill(ac2l_adc[j]);}}
+		if(i==15 && j==15){for(int fill=0;fill<n_p_noAC;fill++){h_psr2u->Fill(ac2u_adc[l]);}}
+	}
+	else {
+		if(i==15 && l==0){for(int fill=0;fill<n_p[i][j][l];fill++){h_psr2l->Fill(ac2l_adc[j]);}}
+		if(i==15 && j==15){for(int fill=0;fill<n_p[i][j][l];fill++){h_psr2u->Fill(ac2u_adc[l]);}}
+	}
 
-cout<<"coinvar: "<<coinvar[i]<<endl;
-cout<<"n_k_noZ: "<<n_k_noZ<<endl;
-cout<<"n_k[i][j][l]: "<<n_k[i][j][l]<<endl;
+	if(n_L[i][j][l]>n_L_noAC){
+		if(j==15 && l==0){for(int fill=0;fill<n_L_noAC;fill++){h_Lsr1->Fill(ac1_adc[i]);}}
+	}
+	else {if(j==15 && l==0){for(int fill=0;fill<n_L[i][j][l];fill++){h_Lsr1->Fill(ac1_adc[i]);}}}
+	if(n_L[i][j][l]>n_L_noAC){
+		if(i==15 && l==0){for(int fill=0;fill<n_L_noAC;fill++){h_Lsr2l->Fill(ac2l_adc[j]);}}
+		if(i==15 && j==15){for(int fill=0;fill<n_L_noAC;fill++){h_Lsr2u->Fill(ac2u_adc[l]);}}
+	}
+	else {
+		if(i==15 && l==0){for(int fill=0;fill<n_L[i][j][l];fill++){h_Lsr2l->Fill(ac2l_adc[j]);}}
+		if(i==15 && j==15){for(int fill=0;fill<n_L[i][j][l];fill++){h_Lsr2u->Fill(ac2u_adc[l]);}}
+	}
+
+	if(n_S[i][j][l]>n_S_noAC){
+		if(j==15 && l==0){for(int fill=0;fill<n_S_noAC;fill++){h_Ssr1->Fill(ac1_adc[i]);}}
+	}
+	else {if(j==15 && l==0){for(int fill=0;fill<n_S[i][j][l];fill++){h_Ssr1->Fill(ac1_adc[i]);}}}
+	if(n_S[i][j][l]>n_S_noAC){
+		if(i==15 && l==0){for(int fill=0;fill<n_S_noAC;fill++){h_Ssr2l->Fill(ac2l_adc[j]);}}
+		if(i==15 && j==15){for(int fill=0;fill<n_S_noAC;fill++){h_Ssr2u->Fill(ac2u_adc[l]);}}
+	}
+	else {
+		if(i==15 && l==0){for(int fill=0;fill<n_S[i][j][l];fill++){h_Ssr2l->Fill(ac2l_adc[j]);}}
+		if(i==15 && j==15){for(int fill=0;fill<n_S[i][j][l];fill++){h_Ssr2u->Fill(ac2u_adc[l]);}}
+	}
+//------------06.06, 1D Effciency---------------//
 
 
 
+
+
+
+//	if(n_pi[i][j][l]>n_pi_noAC2){
+//		for(int fill=0;fill<n_pi_noAC2;fill++){//Cutting Plane
+//		if(i==15 && l==40)h_pisr2l->Fill(ac2l_adc[j]);
+//		if(i==15 && j==15)h_pisr2u->Fill(ac2u_adc[l]);
+//		}
+//	}
+//	else for(int fill=0;fill<n_pi[i][j][l];fill++){//Cutting Plane
+//		 if(i==15 && l==40)h_pisr2l->Fill(ac2l_adc[j]);
+//		 if(i==15 && j==15)h_pisr2u->Fill(ac2u_adc[l]);
+//		 }
+//
+//	if(n_k[i][j][l]>n_k_noAC1){
+//	for(int fill=0;fill<n_k_noAC1;fill++){if(j==15 && l==40)h_ksr1->Fill(ac1_adc[i]);}
+//	}
+//	else for(int fill=0;fill<n_k[i][j][l];fill++){if(j==15 && l==40)h_ksr1->Fill(ac1_adc[i]);}
+//	if(n_k[i][j][l]>n_k_noAC2){
+//		for(int fill=0;fill<n_k_noAC2;fill++){//Cutting Plane
+//		if(i==15 && l==40)h_ksr2l->Fill(ac2l_adc[j]);
+//		if(i==15 && j==15)h_ksr2u->Fill(ac2u_adc[l]);
+//		}
+//	}
+//	else for(int fill=0;fill<n_k[i][j][l];fill++){//Cutting Plane
+//		 if(i==15 && l==40)h_ksr2l->Fill(ac2l_adc[j]);
+//		 if(i==15 && j==15)h_ksr2u->Fill(ac2u_adc[l]);
+//		 }
+//
+//	if(n_p[i][j][l]>n_p_noAC1){
+//	for(int fill=0;fill<n_p_noAC1;fill++){if(j==15 && l==40)h_psr1->Fill(ac1_adc[i]);}
+//	}
+//	else for(int fill=0;fill<n_p[i][j][l];fill++){if(j==15 && l==40)h_psr1->Fill(ac1_adc[i]);}
+//	if(n_p[i][j][l]>n_p_noAC2){
+//		for(int fill=0;fill<n_p_noAC2;fill++){//Cutting Plane
+//		if(i==15 && l==40)h_psr2l->Fill(ac2l_adc[j]);
+//		if(i==15 && j==15)h_psr2u->Fill(ac2u_adc[l]);
+//		}
+//	}
+//	else for(int fill=0;fill<n_p[i][j][l];fill++){//Cutting Plane
+//		 if(i==15 && l==40)h_psr2l->Fill(ac2l_adc[j]);
+//		 if(i==15 && j==15)h_psr2u->Fill(ac2u_adc[l]);
+//		 }
 	
+	if(j==15 && l==0){
+	for(int fill=0;fill<n_pi_noAC;fill++) h_pitot1->Fill(ac1_adc[i]);
+	for(int fill=0;fill<n_k_noAC;fill++) h_ktot1->Fill(ac1_adc[i]);
+	for(int fill=0;fill<n_p_noAC;fill++) h_ptot1->Fill(ac1_adc[i]);
+	for(int fill=0;fill<n_L_noAC;fill++) h_Ltot1->Fill(ac1_adc[i]);
+	for(int fill=0;fill<n_S_noAC;fill++) h_Stot1->Fill(ac1_adc[i]);
+			}//denominator
+	if(i==15 && l==0){
+	for(int fill=0;fill<n_pi_noAC;fill++) h_pitot2l->Fill(ac2l_adc[j]);
+	for(int fill=0;fill<n_k_noAC;fill++) h_ktot2l->Fill(ac2l_adc[j]);
+	for(int fill=0;fill<n_p_noAC;fill++) h_ptot2l->Fill(ac2l_adc[j]);
+	for(int fill=0;fill<n_L_noAC;fill++) h_Ltot2l->Fill(ac2l_adc[j]);
+	for(int fill=0;fill<n_S_noAC;fill++) h_Stot2l->Fill(ac2l_adc[j]);
+			}//denominator
+	if(i==15 && j==15){
+	for(int fill=0;fill<n_pi_noAC;fill++) h_pitot2u->Fill(ac2u_adc[l]);
+	for(int fill=0;fill<n_k_noAC;fill++) h_ktot2u->Fill(ac2u_adc[l]);
+	for(int fill=0;fill<n_p_noAC;fill++) h_ptot2u->Fill(ac2u_adc[l]);
+	for(int fill=0;fill<n_L_noAC;fill++) h_Ltot2u->Fill(ac2u_adc[l]);
+	for(int fill=0;fill<n_S_noAC;fill++) h_Stot2u->Fill(ac2u_adc[l]);
+			}//denominator
 
 //			}//for l
-//		}//for j
+		}//for j
 	}//for i
 
-//ofstream fout(Form("SR_chi2_%d.dat",(int)chi2[0]));
-ofstream fout("SR_coin.dat");
-cout<<"Coin Efficiency is filled."<<endl;
-//fout<<n_pi_noZ<<" "<<n_k_noZ<<" "<<n_p_noZ<<" "<<n_L_noZ<<" "<<n_S_noZ<<endl;
+ofstream fout(Form("SR_ac2u_%d.dat",(int)ac2u_adc[0]));
+cout<<"AC Efficiency is filled."<<endl;
+//fout<<n_pi_noAC<<" "<<n_k_noAC<<" "<<n_p_noAC<<" "<<n_L_noAC<<" "<<n_S_noAC<<endl;
+		double ac1th1,ac2th2l,ac2th2u;
 for(int i=0;i<nth;i++){
-//	for(int j=0;j<nth;j++){
-		int j=0;	int l=0;
-		fout<<n_pi[i][j][l]/n_pi_noZ<<" "<<n_k[i][j][l]/n_k_noZ<<" "<<n_p[i][j][l]/n_p_noZ<<" "<<n_L[i][j][l]/n_L_noZ<<" "<<n_S[i][j][l]/n_S_noZ<<" fabs(ct)<"<<coinvar[i]/1000 <<endl;
-//	}
+	for(int j=0;j<nth;j++){
+		int l=0;
+		ac1th1=ac1_adc[i];
+		ac2th2l=ac2l_adc[j];
+		ac2th2u=ac2u_adc[l];
+		fout<<n_pi[i][j][l]/n_pi_noAC<<" "<<n_k[i][j][l]/n_k_noAC<<" "<<n_p[i][j][l]/n_p_noAC<<" "<<n_L[i][j][l]/n_L_noAC<<" "<<n_S[i][j][l]/n_S_noAC<<" AC1<"<<ac1th1<<", "<<ac2th2l<<"<AC2<"<<ac2th2u<<endl;
+	}
 }
 		
 
 
 cout << "TEfficiency!" << endl;
+//-----------AC1-------------------//
 cout<<"pEff1:"<<endl;
 if(TEfficiency::CheckConsistency(*h_pisr1,*h_pitot1,"w")){
 pEff1 = new TEfficiency(*h_pisr1,*h_pitot1);
@@ -3555,19 +4127,71 @@ if(TEfficiency::CheckConsistency(*h_psr1,*h_ptot1,"w")){
 pEff3 = new TEfficiency(*h_psr1,*h_ptot1);
 //pEff3->Write();
 }
+//-----------AC2l-------------------//
+cout<<"pEff4:"<<endl;
+if(TEfficiency::CheckConsistency(*h_pisr2l,*h_pitot2l,"w")){
+pEff4 = new TEfficiency(*h_pisr2l,*h_pitot2l);
+//pEff4->Write();
+}
+cout<<"pEff5:"<<endl;
+if(TEfficiency::CheckConsistency(*h_ksr2l,*h_ktot2l,"w")){
+pEff5 = new TEfficiency(*h_ksr2l,*h_ktot2l);
+//pEff5->Write();
+}
+cout<<"pEff6:"<<endl;
+if(TEfficiency::CheckConsistency(*h_psr2l,*h_ptot2l,"w")){
+pEff6 = new TEfficiency(*h_psr2l,*h_ptot2l);
+//pEff6->Write();
+}
+//-----------AC2u-------------------//
+cout<<"pEff7:"<<endl;
+if(TEfficiency::CheckConsistency(*h_pisr2u,*h_pitot2u,"w")){
+pEff7 = new TEfficiency(*h_pisr2u,*h_pitot2u);
+//pEff7->Write();
+}
+cout<<"pEff8:"<<endl;
+if(TEfficiency::CheckConsistency(*h_ksr2u,*h_ktot2u,"w")){
+pEff8 = new TEfficiency(*h_ksr2u,*h_ktot2u);
+//pEff8->Write();
+}
+cout<<"pEff9:"<<endl;
+if(TEfficiency::CheckConsistency(*h_psr2u,*h_ptot2u,"w")){
+pEff9 = new TEfficiency(*h_psr2u,*h_ptot2u);
+//pEff9->Write();
+}
 
 //-----------Lambda-------------------//
-cout<<"pEff4:"<<endl;
+cout<<"pEff10:"<<endl;
 if(TEfficiency::CheckConsistency(*h_Lsr1,*h_Ltot1,"w")){
-pEff4 = new TEfficiency(*h_Lsr1,*h_Ltot1);
-//pEff4->Write();
+pEff10 = new TEfficiency(*h_Lsr1,*h_Ltot1);
+//pEff10->Write();
+}
+cout<<"pEff11:"<<endl;
+if(TEfficiency::CheckConsistency(*h_Lsr2l,*h_Ltot2l,"w")){
+pEff11 = new TEfficiency(*h_Lsr2l,*h_Ltot2l);
+//pEff11->Write();
+}
+cout<<"pEff12:"<<endl;
+if(TEfficiency::CheckConsistency(*h_Lsr2u,*h_Ltot2u,"w")){
+pEff12 = new TEfficiency(*h_Lsr2u,*h_Ltot2u);
+//pEff12->Write();
 }
 
 //-----------Sigma-------------------//
-cout<<"pEff5:"<<endl;
+cout<<"pEff13:"<<endl;
 if(TEfficiency::CheckConsistency(*h_Ssr1,*h_Stot1,"w")){
-pEff5 = new TEfficiency(*h_Ssr1,*h_Stot1);
-//pEff5->Write();
+pEff13 = new TEfficiency(*h_Ssr1,*h_Stot1);
+//pEff13->Write();
+}
+cout<<"pEff14:"<<endl;
+if(TEfficiency::CheckConsistency(*h_Ssr2l,*h_Stot2l,"w")){
+pEff14 = new TEfficiency(*h_Ssr2l,*h_Stot2l);
+//pEff14->Write();
+}
+cout<<"pEff15:"<<endl;
+if(TEfficiency::CheckConsistency(*h_Ssr2u,*h_Stot2u,"w")){
+pEff15 = new TEfficiency(*h_Ssr2u,*h_Stot2u);
+//pEff15->Write();
 }
 
 
@@ -3601,8 +4225,6 @@ gcoin_p_sr[0]->SetMarkerSize(1);
 
 
 cout << "After fill" << endl;
-
-	
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -3635,8 +4257,10 @@ c19 = new TCanvas("c19","c19",800.,800.);
 
 c1->Divide(3,2);
 //cout << "start hcoin_tc" << endl;
-c1->cd(3);hcoin_wo_bg_fom_noZ->Draw("");
-double ymax = (hcoin_wo_bg_fom_noZ->GetBinContent(hcoin_wo_bg_fom_noZ->GetMaximumBin()));
+c1->cd(1);hcoin_wo_bg_fom_noAC1->Draw("");
+c1->cd(2);hcoin_wo_bg_fom_noAC2->Draw("");
+c1->cd(3);hcoin_wo_bg_fom_noAC->Draw("");
+double ymax = (hcoin_wo_bg_fom_noAC->GetBinContent(hcoin_wo_bg_fom_noAC->GetMaximumBin()));
 TLine *tl1, *tl2, *tl3, *tl4, *tl5, *tl6;
 	tl1 = new TLine(center_pi-range_pi,-20,center_pi-range_pi,0.5*ymax);
 	tl1->SetLineWidth(1);
@@ -3662,8 +4286,10 @@ TLine *tl1, *tl2, *tl3, *tl4, *tl5, *tl6;
 	tl6->SetLineWidth(1);
 	tl6->SetLineColor(kGreen);
 	tl6->Draw("same");
-c1->cd(6);hmm_L_fom_noZ->Draw("");
-    ymax = (hmm_L_fom_noZ->GetBinContent(hmm_L_fom_noZ->GetMaximumBin()));
+c1->cd(4);hmm_L_fom_noAC1->Draw("");
+c1->cd(5);hmm_L_fom_noAC2->Draw("");
+c1->cd(6);hmm_L_fom_noAC->Draw("");
+    ymax = (hmm_L_fom_noAC->GetBinContent(hmm_L_fom_noAC->GetMaximumBin()));
 TLine *tl7, *tl8, *tl9, *tl10;
 	tl7 = new TLine(center_L-range_L,-20,center_L-range_L,0.5*ymax);
 	tl7->SetLineWidth(1);
@@ -3708,27 +4334,99 @@ TLine *tl7, *tl8, *tl9, *tl10;
 //c1->cd(i+3);hcoin_k_ac2[i-1]->Draw("");fkk[i-1]->SetLineColor(kRed);fkk[i-1]->Draw("same");
 //}
 
-c2->Divide(2,2);
+c2->Divide(3,2);
 cout<<"c2 start"<<endl;
 c2->cd(1);
-hmm_wo_bg_fom_noZ->Draw("");
+hmm_wo_bg_fom_noAC1->Draw("");
 c2->cd(2);
-hcoin_wo_bg_fom_noZ->Draw("");
+hmm_wo_bg_fom_noAC2->Draw("");
 c2->cd(3);
-hmm_wo_bg_fom[50][0][0]->Draw("");
-//hmm_wo_bg_fom_noZ->Draw("");
-//fmm_noZ->SetLineColor(kRed);
-//fmmbg_noZ->SetLineColor(kGreen);
-//fmm_noZ->Draw("same");
-//fmmbg_noZ->Draw("same");
+hmm_wo_bg_fom_noAC->Draw("");
+fmm_noAC->SetLineColor(kRed);
+fmmbg_noAC->SetLineColor(kGreen);
+fmm_noAC->Draw("same");
+fmmbg_noAC->Draw("same");
+//hmm_L_fom_noAC->Draw("");
+//hmm_pi_wobg_fom_noAC->SetLineColor(kRed);hmm_pi_wobg_fom_noAC->Draw("same");
 c2->cd(4);
-hcoin_wo_bg_fom[50][0][0]->Draw("");
+hmm_L_fom_noAC1->Draw("");hmm_bg_fom_noAC1->SetLineColor(kRed);hmm_bg_fom_noAC1->Draw("same");
+c2->cd(5);
+hmm_L_fom_noAC2->Draw("");hmm_bg_fom_noAC2->SetLineColor(kRed);hmm_bg_fom_noAC2->Draw("same");
+c2->cd(6);
+hmm_L_fom_noAC->Draw("");hmm_bg_fom_noAC->SetLineColor(kRed);hmm_bg_fom_noAC->Draw("same");
+//hmm_pi_wobg_fom_noAC->Draw("");
+//fmmbg_noAC->Draw("same");
+//c2->cd(1);
+//hcoin_k_fom[0][10][0]->Draw("");
+//c2->cd(2);
+//hcoin_wo_bg_fom[0][10][0]->Draw("");
+//c2->cd(3);
+//hcoin_k_fom[0][30][0]->Draw("");
+//c2->cd(4);
+//hcoin_wo_bg_fom[0][30][0]->Draw("");
+//c2->cd(1);
+//hmm_L_fom[0][10][0]->Draw("");
+//c2->cd(2);
+//hmm_wo_bg_fom[0][10][0]->Draw("");
+//c2->cd(3);
+//hmm_L_fom[0][30][0]->Draw("");
+//c2->cd(4);
+//hmm_wo_bg_fom[0][30][0]->Draw("");
+//c2->cd();
+//pEff1->Draw("");
+//gcoin_p_sr[0]->Draw("ap");
+//gcoin_pi_sr[0]->Draw("psame");
+//gcoin_k_sr[0]->Draw("psame");
+c3->Divide(3,2);
+cout<<"c3 start"<<endl;
+c3->cd(1);
+hmm_wo_bg_fom[0][10][0]->Draw("");
+fmm[0][10][0]->SetLineColor(kRed);
+fmmbg[0][10][0]->SetLineColor(kGreen);
+fmm[0][10][0]->Draw("same");
+fmmbg[0][10][0]->Draw("same");
+c3->cd(2);
+hmm_wo_bg_fom[0][30][0]->Draw("");
+fmm[0][30][0]->SetLineColor(kRed);
+fmmbg[0][30][0]->SetLineColor(kGreen);
+fmm[0][30][0]->Draw("same");
+fmmbg[0][30][0]->Draw("same");
+c3->cd(3);
+hmm_wo_bg_fom[0][99][0]->Draw("");
+fmm[0][99][0]->SetLineColor(kRed);
+fmmbg[0][99][0]->SetLineColor(kGreen);
+fmm[0][99][0]->Draw("same");
+fmmbg[0][99][0]->Draw("same");
+c3->cd(4);
+hmm_L_fom[0][10][0]->Draw("");hmm_bg_fom[0][10][0]->SetLineColor(kRed);hmm_bg_fom[0][10][0]->Draw("same");
+c3->cd(5);
+hmm_L_fom[0][30][0]->Draw("");hmm_bg_fom[0][30][0]->SetLineColor(kRed);hmm_bg_fom[0][30][0]->Draw("same");
+c3->cd(6);
+hmm_L_fom[0][99][0]->Draw("");hmm_bg_fom[0][99][0]->SetLineColor(kRed);hmm_bg_fom[0][99][0]->Draw("same");
+//c3->Divide(2,2);
+//cout<<"c3 start"<<endl;
+//c3->cd(1);
+//hcoin_k_fom[0][50][0]->Draw("");
+//c3->cd(2);
+//hcoin_wo_bg_fom[0][50][0]->Draw("");
+//c3->cd(3);
+//hcoin_k_fom[0][80][0]->Draw("");
+//c3->cd(4);
+//hcoin_wo_bg_fom[0][80][0]->Draw("");
+//c3->cd(1);
+//hmm_L_fom[0][50][0]->Draw("");
+//c3->cd(2);
+//hmm_wo_bg_fom[0][50][0]->Draw("");
+//c3->cd(3);
+//hmm_L_fom[0][80][0]->Draw("");
+//c3->cd(4);
+//hmm_wo_bg_fom[0][80][0]->Draw("");
+//pEff2->Draw("");
+//gcoin_pi_sr[0]->Draw("ap");
 c4->Divide(2,2);
 cout<<"c4 start"<<endl;
 c4->cd(1);
 h_R_vz->Draw("");
-h_R_vz2->SetLineColor(kAzure);
-h_R_vz2->Draw("same");
 double vzLmax = (h_R_vz->GetBinContent(h_R_vz->GetMaximumBin()));
 TLine *vz1, *vz2;
 	vz1 = new TLine(-0.025,0,-0.025,0.5*vzLmax);
@@ -3741,69 +4439,188 @@ TLine *vz1, *vz2;
 	vz2->Draw("same");
 c4->cd(2);
 h_L_vz->Draw("");
-h_L_vz2->SetLineColor(kAzure);
-h_L_vz2->Draw("same");
 double vzRmax = (h_L_vz->GetBinContent(h_L_vz->GetMaximumBin()));
 TLine *vz3, *vz4;
-	vz3 = new TLine(-0.1,0,-0.1,0.5*vzRmax);
+	vz3 = new TLine(-0.2,0,-0.2,0.5*vzRmax);
 	vz3->SetLineWidth(1);
 	vz3->SetLineColor(kRed);
 	vz3->Draw("same");
-	vz4 = new TLine(0.1,0,0.1,0.5*vzRmax);
+	vz4 = new TLine(0.2,0,0.2,0.5*vzRmax);
 	vz4->SetLineWidth(1);
 	vz4->SetLineColor(kRed);
 	vz4->Draw("same");
-c4->cd(3)->SetLogz(1);
-h_zz->Draw("colz");
+c4->cd(3);
+h_m2_mm->Draw("colz");
 c4->cd(4);
 h_m2_ac->Draw("colz");
+//pEff3->Draw("");
 //gcoin_p_sr[0]->Draw("ap");
 c5->cd();
 cout<<"c5 start"<<endl;
-pEff1->Draw("");
+pEff4->Draw("");
+//gcoin_k_sr[0]->Draw("ap");
+//c6->cd();
+//gcoin_pi_sr[0]->Draw("");
+//c7->cd();
+//gcoin_pi_sr[0]->Draw("");
+//c8->cd();
+//gcoin_pi_sr[0]->Draw("");
+//c9->cd();
+//gcoin_pi_sr[0]->Draw("");
+//c10->cd();
+//gcoin_pi_sr[0]->Draw("");
+//c11->cd();
+//gcoin_pi_sr[0]->Draw("");
 c6->cd();
 cout<<"c6 start"<<endl;
-pEff2->Draw("");
+pEff5->Draw("");
 //hcoin_wo_bg_fom[0][0][0]->Draw("");fcoin[0][0][0]->SetLineColor(kRed);fcoin[0][0][0]->Draw("same");
 c7->cd();
 cout<<"c7 start"<<endl;
-pEff3->Draw("");
-//c12->cd()->DrawFrame(0.,0.,0.25,1.2);//K,L,S vs th1//SUM
-c8->Divide(2,2);
-c8->cd(1);
-h_zz1->Draw("colz");
-c8->cd(2);
-h_zz2->Draw("colz");
-c8->cd(3);
-h_zz3->Draw("colz");
-c8->cd(4);
-h_zz4->Draw("colz");
-c9->Divide(2,2);
-c9->cd(1);
-h_z1->Draw("");
-c9->cd(2);
-h_z2->Draw("");
-c9->cd(3);
-h_z3->Draw("");
-c9->cd(4);
-h_z4->Draw("");
-c10->cd();
-pEff4->SetLineColor(kAzure);pEff4->Draw("");
-//h_ktot1->Draw("");h_ksr1->SetLineColor(kRed);h_ksr1->Draw("same");
-c11->cd();
-h_Lsr1->SetLineColor(kRed);h_Lsr1->Draw("");h_Ltot1->Draw("same");
-c12->cd()->DrawFrame(0.,0.,2000.,1.2);//K,L,S vs th1//Diff
-cout<<"c12 start"<<endl;
-pEff2->SetLineColor(kGreen);pEff2->Draw("same");
-pEff4->SetLineColor(kAzure);pEff4->Draw("same");
-pEff5->SetLineColor(kCyan);pEff5->Draw("same");
-c13->cd()->DrawFrame(0.,0.,2000.,1.2);//K,L,S vs th1//Diff
-pEff4->SetLineColor(kAzure);pEff4->Draw("same");
-pEff5->SetLineColor(kCyan);pEff5->Draw("same");
-c14->cd()->DrawFrame(0.,0.,2000.,1.2);//K,L,S vs th1//Diff
+pEff6->Draw("");
+//hcoin_wo_bg_fom[10][0][0]->Draw("");fcoin[10][0][0]->SetLineColor(kRed);fcoin[10][0][0]->Draw("same");
+c8->cd();
+cout<<"c8 start"<<endl;
+pEff7->Draw("");
+//hcoin_wo_bg_fom[20][0][0]->Draw("");fcoin[20][0][0]->SetLineColor(kRed);fcoin[20][0][0]->Draw("same");
+c9->cd();
+cout<<"c9 start"<<endl;
+pEff8->Draw("");
+//hcoin_wo_bg_fom[30][0][0]->Draw("");fcoin[30][0][0]->SetLineColor(kRed);fcoin[30][0][0]->Draw("same");
+
+//pEff1: pi vs th1
+//pEff2: k vs th1
+//pEff3: p vs th1
+//pEff4: pi vs th2l
+//pEff5: k vs th2l
+//pEff6: p vs th2l
+//pEff7: pi vs th2u
+//pEff8: k vs th2u
+//pEff9: p vs th2u
+//pEff10: L vs th1
+//pEff11: L vs th2l
+//pEff12: L vs th2u
+//pEff13: S vs th1
+//pEff14: S vs th2l
+//pEff15: S vs th2u
+c10->cd()->DrawFrame(0.,0.,27.,1.2);//pi,k,p vs th1
 pEff1->SetLineColor(kOrange);pEff1->Draw("same");
 pEff2->SetLineColor(kGreen);pEff2->Draw("same");
 pEff3->SetLineColor(kRed);pEff3->Draw("same");
+cout<<"c10 start"<<endl;
+c11->cd()->DrawFrame(0.,0.,27.,1.2);//L,S vs th1
+pEff10->SetLineColor(kAzure);pEff10->Draw("same");
+pEff13->SetLineColor(kCyan);pEff13->Draw("same");
+//h_pitot1->Draw("sh");h_pisr1->Draw("samesh");
+//hcoin_wo_bg_fom[30][0][0]->Draw("");fcoin[30][0][0]->SetLineColor(kRed);fcoin[30][0][0]->Draw("same");
+c12->cd()->DrawFrame(0.,0.,27.,1.2);//K,L,S vs th1
+pEff2->SetLineColor(kGreen);pEff2->Draw("same");
+pEff10->SetLineColor(kAzure);pEff10->Draw("same");
+pEff13->SetLineColor(kCyan);pEff13->Draw("same");
+//c12->cd()->DrawFrame(0.,0.,52.,1.2);//pi,k,p vs th2u
+//pEff7->SetLineColor(kOrange);pEff7->Draw("same");
+//pEff8->SetLineColor(kGreen);pEff8->Draw("same");
+//pEff9->SetLineColor(kRed);pEff9->Draw("same");
+c13->cd()->DrawFrame(0.,0.,22.,1.2);//pi,k,p vs th2l
+pEff4->SetLineColor(kOrange);pEff4->Draw("same");
+pEff5->SetLineColor(kGreen);pEff5->Draw("same");
+pEff6->SetLineColor(kRed);pEff6->Draw("same");
+//h_ktot1->Draw("sh");h_ksr1->Draw("samesh");
+//c12->cd()->SetLogy(1);
+c14->cd()->DrawFrame(0.,0.,22.,1.2);//L,S vs th2l
+pEff11->SetLineColor(kAzure);pEff11->Draw("same");
+pEff14->SetLineColor(kCyan);pEff14->Draw("same");
+//pEff12->SetLineColor(kAzure);pEff12->Draw("same");
+//pEff15->SetLineColor(kCyan);pEff15->Draw("same");
+c15->cd()->DrawFrame(0.,0.,22.,1.2);//K,L,S vs th2l
+pEff5->SetLineColor(kGreen);pEff5->Draw("same");
+pEff11->SetLineColor(kAzure);pEff11->Draw("same");
+pEff14->SetLineColor(kCyan);pEff14->Draw("same");
+c16->Divide(2,2);
+c16->cd(1);h_pisr12l->Draw("colz");
+c16->cd(2);h_ksr12l->Draw("colz");
+c16->cd(3);h_Lsr12l->Draw("colz");
+c16->cd(4);h_Ssr12l->Draw("colz");
+c17->Divide(2,2);
+c17->cd(1);h_pisr12l->Draw("surf3z");
+c17->cd(2);h_ksr12l->Draw("surf3z");
+c17->cd(3);h_Lsr12l->Draw("surf3z");
+c17->cd(4);h_Ssr12l->Draw("surf3z");
+c18->cd();
+h_Lsr12l->Draw("colz");
+//c19->cd();
+//h_Ssr12l->Draw("colz");
+c19->Divide(3,2);
+cout<<"c19 start"<<endl;
+c19->cd(1);
+hmm_wo_bg_fom[15][15][0]->Draw("");
+fmm[15][15][0]->SetLineColor(kRed);
+fmmbg[15][15][0]->SetLineColor(kGreen);
+fmm[15][15][0]->Draw("same");
+fmmbg[15][15][0]->Draw("same");
+c19->cd(2);
+hmm_wo_bg_fom[30][30][0]->Draw("");
+fmm[30][30][0]->SetLineColor(kRed);
+fmmbg[30][30][0]->SetLineColor(kGreen);
+fmm[30][30][0]->Draw("same");
+fmmbg[30][30][0]->Draw("same");
+c19->cd(3);
+hmm_wo_bg_fom[1][99][0]->Draw("");
+fmm[1][99][0]->SetLineColor(kRed);
+fmmbg[1][99][0]->SetLineColor(kGreen);
+fmm[1][99][0]->Draw("same");
+fmmbg[1][99][0]->Draw("same");
+c19->cd(4);
+hmm_L_fom[10][10][0]->Draw("");hmm_bg_fom[10][10][0]->SetLineColor(kRed);hmm_bg_fom[10][10][0]->Draw("same");
+c19->cd(5);
+hmm_L_fom[30][30][0]->Draw("");hmm_bg_fom[30][30][0]->SetLineColor(kRed);hmm_bg_fom[30][30][0]->Draw("same");
+c19->cd(6);
+hmm_L_fom[99][99][0]->Draw("");hmm_bg_fom[99][99][0]->SetLineColor(kRed);hmm_bg_fom[99][99][0]->Draw("same");
+//h_ptot1->Draw("sh");h_psr1->Draw("samesh");
+//npe_sum_a1->Draw("");
+//hcoin_wo_bg_fom[80][0][0]->Draw("");fcoin[80][0][0]->SetLineColor(kRed);fcoin[80][0][0]->Draw("same");
+//c13->cd()->SetLogy(1);
+//npe_sum_a2->Draw("");
+//hcoin_wo_bg_fom[nth][nth][nth]->Draw("");fcoin[nth][nth][nth]->SetLineColor(kRed);fcoin[nth][nth][nth]->Draw("same");
+//c2->Divide(3,3);
+//c3->Divide(3,3);
+//c4->Divide(3,3);
+//for(int i=0;i<3;i++){
+//	for(int j=0;j<3;j++){
+//		for(int l=0;l<3;l++){
+//			if(i==0)c2->cd(j*3+l+1);
+//			if(i==1)c3->cd(j*3+l+1);
+//			if(i==2)c4->cd(j*3+l+1);
+//			hcoin_wo_bg_fom[i][j][l]->Draw("");fcoin[i][j][l]->SetLineColor(kRed);fcoin[i][j][l]->Draw("same");
+//		}
+//	}
+//}
+//c5->Divide(9,3);
+//c6->Divide(9,3);
+//c7->Divide(9,3);
+//c8->Divide(9,3);
+//c9->Divide(9,3);
+//c10->Divide(9,3);
+//c11->Divide(9,3);
+//c12->Divide(9,3);
+//c13->Divide(9,3);
+//for(int i=0;i<9;i++){
+//	for(int j=0;j<3;j++){
+//		for(int l=0;l<9;l++){
+//			//c3->cd(i*9+j*3+l+1);
+//			if(i==0)c5->cd(j*9+l+1);
+//			if(i==1)c6->cd(j*9+l+1);
+//			if(i==2)c7->cd(j*9+l+1);
+//			if(i==3)c8->cd(j*9+l+1);
+//			if(i==4)c9->cd(j*9+l+1);
+//			if(i==5)c10->cd(j*9+l+1);
+//			if(i==6)c11->cd(j*9+l+1);
+//			if(i==7)c12->cd(j*9+l+1);
+//			if(i==8)c13->cd(j*9+l+1);
+//			hmm_L_fom[i][j][l]->Draw("");fmm[i][j][l]->SetLineColor(kRed);fmm[i][j][l]->Draw("same");
+//		}
+//	}
+//}
 
 }
 //////////////////////////////////////////////////////////
@@ -4019,15 +4836,21 @@ h_ktot2u->Write();
 h_ptot2u->Write();
 npe_sum_a1->Write();
 npe_sum_a2->Write();
-//for(int i=0;i<nth;i++){
-//	for(int j=0;j<nth;j++){
-//		for(int l=0;l<nth;l++){
-//			hcoin_k_fom[i][j][l]->Write();
-//			hcoin_bg_fom[i][j][l]->Write();
-//			hcoin_wo_bg_fom[i][j][l]->Write();
-//		}
-//	}
-// }
+hcoin_k_fom_noAC1->Write();
+hcoin_k_fom_noAC2->Write();
+hcoin_bg_fom_noAC1->Write();
+hcoin_bg_fom_noAC2->Write();
+hcoin_wo_bg_fom_noAC1->Write();
+hcoin_wo_bg_fom_noAC2->Write();
+for(int i=0;i<nth;i++){
+	for(int j=0;j<nth;j++){
+		for(int l=0;l<nth;l++){
+			hcoin_k_fom[i][j][l]->Write();
+			hcoin_bg_fom[i][j][l]->Write();
+			hcoin_wo_bg_fom[i][j][l]->Write();
+		}
+	}
+ }
 
 
 
@@ -4056,8 +4879,8 @@ int main(int argc, char** argv){
 //  int ch;
   //string ifname = "/adaqfs/home/a-onl/tritium_work/itabashi/nnL/HallA-Online-Tritium/replay/scripts/ita_scripts/run_list/Lambda_test.list";
   //string ofname = "/pdf/hydro1_AC_eff_test.pdf";
- string ifname = "../small.list";//Run111157~111220
-// string ifname = "../small2.list";//Run111157~111220 & Run111480~111542
+// string ifname = "../small.list";//Run111157~111220
+ string ifname = "../small2.list";//Run111157~111220 & Run111480~111542
 //  string ifname = "../test.list";//for debug
 //  string runlistname;
   string pname = "./Lambda_H1.param";

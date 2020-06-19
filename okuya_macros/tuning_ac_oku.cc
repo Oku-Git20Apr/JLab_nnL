@@ -812,6 +812,7 @@ void tuning::Calib(int rt, int lt ){
 }
 ////////////////////////////////////////////////////////////////
 
+/* class "tuning" */
 tuning::tuning(){
   set= new Setting();
   set->Initialize();
@@ -819,7 +820,6 @@ tuning::tuning(){
 
 tuning::~tuning(){}
 
-////////////////////////////////////////////////////////Copy from ana_Lambda
 void tuning::SetRoot(string ifname){
   tnew = new TChain("tree");
 	cout << "SetRoot" <<endl;
@@ -861,56 +861,7 @@ void tuning::SetRunList(string ifname){
   readtreeHRSR();
   readtreeHRSL();
 }
-////////////////////////////////////////////////////////////////////////////
-////////hrs_tuningAC.h
-/////////////////////////////////////////////////////////////////
-//void tuning::SetRunList(string ifname){
-//  cout<<"Set Run List "<<endl;
-//  
-//  T=new TChain("T");
-//
-//  ifstream ifp(Form("%s",ifname.c_str()),ios::in);
-//  if(!ifp){ cout<<"no input file "<<ifname<<endl; exit(1); }
-//  string buf, runname;
-//  while(1){
-//    getline(ifp,buf);
-//    if( buf[0]=='#' ){ continue; }
-//    if( ifp.eof() ) break;
-//    istringstream sbuf(buf);
-//    sbuf >> runname;
-//    T->Add(runname.c_str());
-//  }
-//  ENum=tree->GetEntries();
-////  ENum=T->GetEntries();
-//  cout<<"Events: "<<ENum<<endl; 
-//}
-//
-//
-//
-//
-//void tuning::SetRoot(string ofname){
-//
-//
-//  fnew = new TFile(Form("%s",ofname.c_str()),"recreate");
-//  tnew =new TTree("T",ofname.c_str());
-//  tnew = T->CloneTree(0);
-//    
-////  tnew->Branch("mm_c",&mm_c,"mm_c/D");
-////  tnew->Branch("ct_c",&ct_c,"ct_c/D");  
-//  /*
-//
-//  tnew->Branch("mm_ac1",mm_ac1,"mm_ac1[100][100]/D");
-//  tnew->Branch("mm_ac2",mm_ac2,"mm_ac2[100][100]/D");
-//  tnew->Branch("fom_ac1",fom_ac1,"fom_ac1[100]/D");
-//  tnew->Branch("fom_ac2",fom_ac2,"fom_ac2[100]/D");  
-//  tnew->Branch("th_ac1",th_ac1,"th_ac1[100]/D");
-//  tnew->Branch("th_ac2",th_ac2,"th_ac2[100]/D");  
-//  */
-//
-//  
-//}
 
-////////////////////////////////////////////////////////////////////////////
 void tuning::ReadParam(string name){
 
   param = new ParamMan(name.c_str());
@@ -1286,9 +1237,7 @@ double tuning::Eloss(double yp,double z,char const* arm){
   
 }
 
-/////////////////////////////////////////////////////////////////////////////
 #if 0
-//////////branch should be set in Tree.cc, under a name of "tree".
 void tuning::SetBranch(){
 
 	T->SetBranchStatus("*",0);
@@ -2029,6 +1978,7 @@ void tuning::MakeHist(){
   h_Lp     = new TH1D("h_Lp", "h_Lp",1000,1.8,2.8);
   h_Lp_c   = new TH1D("h_Lp_c", "h_Lp_c",1000,1.8,2.8);
   
+  h_theta_ee = new TH1D("h_theta_ee", "h_theta_ee",1000,-1.,1.);
 
   h_Lp_mm    = new TH2D("h_Lp_mm"   ,"h_Lp_mm"   , bin_mm,min_mm,max_mm,bin_Lp,min_Lp,max_Lp); 
   //h_mmall    = new TH1D("h_mmall"   ,"h_mmall"   , 100,-1,1); 
@@ -2724,6 +2674,11 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 		double m2=-99.;
 //        if( R_s2_t[s2pad]>0 && R_s0_t>0 && s2pad>=0 ){
 	    double p    = R_tr_p[rt];//GeV
+	    double pL    = L_tr_p[lt];//GeV
+		double theta = L_tr_tg_th[lt];
+		double phi = L_tr_tg_ph[lt];
+		double theta_ee = acos(1/sqrt(1+tan(theta)*tan(theta)+tan(phi)*tan(phi)));
+		h_theta_ee ->Fill(theta_ee);
         double path = R_s2_trpath[rt] - R_s0_trpath[rt];//m
         beta = path / ( R_s2_t[s2pad] - R_s0_t ) / c/2.;
 		//cout<<"p="<<p<<endl;
@@ -3957,147 +3912,6 @@ cout<<"sig_S"<<sig_S[i][j][l]<<endl;
 //--	Missing Mass  End     ------------------//
 //----------------------------------------------//
 
-//--------------------tabun iranai--------------
-// fmmbg[i][j][l]=new TF1(Form("fmmbg[%d][%d][%d]",i,j,l),"gausn(0)+gaus(3)",min_mm,max_mm);
-// fmmbg[i][j][l]->SetNpx(2000);
-// //fmmbg[i][j][l]->SetParameters(100,0.05,0.03,10,0.05,0.03);//test.list
-// fmmbg[i][j][l]->SetParameters(300,0.05,1.2,30,0.1,0.02);//small.list
-// fL[i][j][l]=new TF1(Form("fL[%d][%d][%d]",i,j,l),"gausn(0)",min_mm,max_mm);
-// fL[i][j][l]->SetNpx(2000);
-// fL[i][j][l]->SetParLimits(2,0.,0.01);
-// fS[i][j][l]=new TF1(Form("fS[%d][%d][%d]",i,j,l),"gausn(0)",min_mm,max_mm);
-// fS[i][j][l]->SetNpx(2000);
-// fS[i][j][l]->SetParLimits(2,0.,0.01);//sigma limit in order not to mix with bg
-// 
-// fmm[i][j][l]=new TF1(Form("fmm[%d][%d][%d]",i,j,l),"gausn(0)+gausn(3)+gausn(6)+gausn(9)",-0.02,0.15);
-// fmm[i][j][l]->SetNpx(2000);
-// fmm[i][j][l]->SetTitle(Form("Missing Mass w AC cut (AC1 Cut <%lf ch && %lf ch < AC2 Cut < %lf ch);Coin time [ns];Counts [1/56 ns]",ac1_adc[i],ac2l_adc[j],ac2u_adc[l]));
-// fmm[i][j][l]->SetParameter(1,def_mean_L);
-// fmm[i][j][l]->SetParameter(4,def_mean_S);
-//
-//
-//
-// //------- Fitting ----------//
-//// hmm_bg_fom[i][j][l]->Fit("fmmbg[i][j][l]","Rq","",min_mm,max_mm);
-//cout<<"fmmbg fit start"<<endl;
-// hmm_L_fom[i][j][l]->Fit("fmmbg[i][j][l]","Rq","",-0.1,0.15);
-//cout<<"fmm fit start"<<endl;
-//// hmm_bg_fom_noAC->Fit("fmmbg_noAC","Rq","",min_mm,max_mm);
-// hmm_pi_fom[i][j][l]->Fit("fmmbg[i][j][l]","Rq","",-0.1,0.15);
-//double a = fmmbg[i][j][l]->GetParameter(0);
-//double b = fmmbg[i][j][l]->GetParameter(1);
-//double c = fmmbg[i][j][l]->GetParameter(2);
-//double d = fmmbg[i][j][l]->GetParameter(3);
-//double e = fmmbg[i][j][l]->GetParameter(4);
-//double f = fmmbg[i][j][l]->GetParameter(5);
-////cout<<"0:1:2:3:4:5="<<a<<"::"<<b<<"::"<<c<<"::"<<d<<"::"<<e<<"::"<<f<<endl;
-// fmm[i][j][l]->SetParameters(0,a);
-// fmm[i][j][l]->SetParameters(1,b);
-// fmm[i][j][l]->SetParameters(2,c);
-// fmm[i][j][l]->SetParameters(3,d);
-// fmm[i][j][l]->SetParameters(4,e);
-// fmm[i][j][l]->SetParameters(5,f);
-// fmm[i][j][l]->SetParameters(6,500);
-// fmm[i][j][l]->SetParameters(7,def_mean_L);
-// fmm[i][j][l]->SetParameters(8,def_sig_L);
-// fmm[i][j][l]->SetParameters(9,100);
-// fmm[i][j][l]->SetParameters(10,def_mean_S);
-// fmm[i][j][l]->SetParameters(11,def_sig_S);
-// hmm_L_fom[i][j][l]->Fit("fmm[i][j][l]","Rq","",-0.1,0.15);
-//a = fmm[i][j][l]->GetParameter(0);
-//b = fmm[i][j][l]->GetParameter(1);
-//c = fmm[i][j][l]->GetParameter(2);
-//d = fmm[i][j][l]->GetParameter(3);
-//e = fmm[i][j][l]->GetParameter(4);
-//f = fmm[i][j][l]->GetParameter(5);
-// fmmbg[i][j][l]->SetParameters(a,b,c,d,e,f);
-////cout<<"0:1:2:3:4:5(as a total func)="<<a<<"::"<<b<<"::"<<c<<"::"<<d<<"::"<<e<<"::"<<f<<endl;
-//
-////cout<<"fL fit start"<<endl;
-//// hmm_wo_bg_fom[i][j][l]->Fit("fL[i][j][l]","Rq","",def_mean_L-3*def_sig_L,def_mean_L+3*def_sig_L);
-//// n_L[i][j][l]=fL[i][j][l]->GetParameter(0);
-//// mean_L[i][j][l]=fL[i][j][l]->GetParameter(1);
-//// sig_L[i][j][l]=fL[i][j][l]->GetParameter(2);
-// mean_L[i][j][l]=def_mean_L;
-// mean_S[i][j][l]=def_mean_S;
-// sig_L[i][j][l]=def_sig_L;
-// sig_S[i][j][l]=def_sig_S;
-// n_L[i][j][l]=hmm_wo_bg_fom[i][j][l]->Integral(hmm_wo_bg_fom[i][j][l]->FindBin(center_L-range_L),hmm_wo_bg_fom[i][j][l]->FindBin(center_L+range_L));
-// n_L[i][j][l]-=fmmbg[i][j][l]->Integral(center_L-range_L,center_L+range_L);
-////n_L[i][j][l]-=(pow(mean_L[i][j][l]+2*sig_L[i][j][l],5)-pow(mean_L[i][j][l]-2*sig_L[i][j][l],5))*a/5;
-////n_L[i][j][l]-=(pow(mean_L[i][j][l]+2*sig_L[i][j][l],4)-pow(mean_L[i][j][l]-2*sig_L[i][j][l],4))*b/4;
-////n_L[i][j][l]-=(pow(mean_L[i][j][l]+2*sig_L[i][j][l],3)-pow(mean_L[i][j][l]-2*sig_L[i][j][l],3))*c/3;
-////n_L[i][j][l]-=(pow(mean_L[i][j][l]+2*sig_L[i][j][l],2)-pow(mean_L[i][j][l]-2*sig_L[i][j][l],2))*d/2;
-////n_L[i][j][l]-=(pow(mean_L[i][j][l]+2*sig_L[i][j][l],1)-pow(mean_L[i][j][l]-2*sig_L[i][j][l],1))*e;
-//
-//n_S[i][j][l]=hmm_wo_bg_fom[i][j][l]->Integral(hmm_wo_bg_fom[i][j][l]->FindBin(center_S-range_S),hmm_wo_bg_fom[i][j][l]->FindBin(center_S+range_S));
-// n_S[i][j][l]-=fmmbg[i][j][l]->Integral(center_S-range_S,center_S+range_S);
-////n_S[i][j][l]-=(pow(mean_S[i][j][l]+2*sig_S[i][j][l],5)-pow(mean_S[i][j][l]-2*sig_S[i][j][l],5))*a/5;
-////n_S[i][j][l]-=(pow(mean_S[i][j][l]+2*sig_S[i][j][l],4)-pow(mean_S[i][j][l]-2*sig_S[i][j][l],4))*b/4;
-////n_S[i][j][l]-=(pow(mean_S[i][j][l]+2*sig_S[i][j][l],3)-pow(mean_S[i][j][l]-2*sig_S[i][j][l],3))*c/3;
-////n_S[i][j][l]-=(pow(mean_S[i][j][l]+2*sig_S[i][j][l],2)-pow(mean_S[i][j][l]-2*sig_S[i][j][l],2))*d/2;
-////n_S[i][j][l]-=(pow(mean_S[i][j][l]+2*sig_S[i][j][l],1)-pow(mean_S[i][j][l]-2*sig_S[i][j][l],1))*e;
-//
-// cout<<"n_L"<<n_L[i][j][l]<<endl;
-//cout<<"mean_L"<<mean_L[i][j][l]<<endl;
-//cout<<"sig_L"<<sig_L[i][j][l]<<endl;
-// cout<<"n_S"<<n_S[i][j][l]<<endl;
-//cout<<"mean_S"<<mean_S[i][j][l]<<endl;
-//cout<<"sig_S"<<sig_S[i][j][l]<<endl;
-
-// hmm_wo_bg_fom[i][j][l]->Fit(Form("fL[%d][%d][%d]",i,j,l),"Rq","",def_mean_L-3*def_sig_L,def_mean_L+3*def_sig_L);
-// //n_L[i][j][l]=fL[i][j][l]->GetParameter(0);
-// mean_L[i][j][l]=fL[i][j][l]->GetParameter(1);
-// sig_L[i][j][l]=fL[i][j][l]->GetParameter(2);
-// n_L[i][j][l]=hmm_wo_bg_fom[i][j][l]->Integral(hmm_wo_bg_fom[i][j][l]->FindBin(mean_L_noAC2-2*sig_L_noAC2),hmm_wo_bg_fom[i][j][l]->FindBin(mean_L_noAC2+2*sig_L_noAC2));
-// cout<<"n_L"<<n_L[i][j][l]<<endl;
-//
-////cout<<"fS fit start"<<endl;
-// hmm_wo_bg_fom[i][j][l]->Fit(Form("fS[%d][%d][%d]",i,j,l),"Rq","",def_mean_S-3*def_sig_S,def_mean_S+3*def_sig_S);
-//// n_S[i][j][l]=fS[i][j][l]->GetParameter(0);
-// mean_S[i][j][l]=fS[i][j][l]->GetParameter(1);
-// sig_S[i][j][l]=fS[i][j][l]->GetParameter(2);
-// n_S[i][j][l]=hmm_wo_bg_fom[i][j][l]->Integral(hmm_wo_bg_fom[i][j][l]->FindBin(mean_S_noAC2-2*sig_S_noAC2),hmm_wo_bg_fom[i][j][l]->FindBin(mean_S_noAC2+2*sig_S_noAC2));
-// cout<<"n_S"<<n_S[i][j][l]<<endl;
-//cout<<"mean_S"<<mean_S[i][j][l]<<endl;
-//cout<<"sig_S"<<sig_S[i][j][l]<<endl;
-
-
- //--Fitting again as a total function--//
-// fmm[i][j][l]->SetParameters(n_L[i][j][l],mean_L[i][j][l],sig_L[i][j][l],n_S[i][j][l],mean_S[i][j][l],sig_S[i][j][l],d,c,b,a);
-//// hmm_L_fom[i][j][l]->Fit(Form("fmm[%d][%d][%d]",i,j,l),"Rq","",min_mm,max_mm);
-// n_L[i][j][l]=fmm[i][j][l]->GetParameter(0);
-// mean_L[i][j][l]=fmm[i][j][l]->GetParameter(1);
-// sig_L[i][j][l]=fmm[i][j][l]->GetParameter(2);
-// n_S[i][j][l]=fmm[i][j][l]->GetParameter(3);
-// mean_S[i][j][l]=fmm[i][j][l]->GetParameter(4);
-// sig_S[i][j][l]=fmm[i][j][l]->GetParameter(5);
-// //------- Get Error Paramters ---//
-// n_L_err[i][j][l]=fmm[i][j][l]->GetParError(0); 
-// n_S_err[i][j][l]=fmm[i][j][l]->GetParError(3); 
-//
-//
-//
-// signal[i][j][l]=noise[i][j][l]=0.;
-// d = fmm[i][j][l]->GetParError(6); 
-// c = fmm[i][j][l]->GetParError(7); 
-// b = fmm[i][j][l]->GetParError(8); 
-// a = fmm[i][j][l]->GetParError(9); 
-// double range = 6*sig_L[i][j][l];//(meanL-3sigmaL, meanL+3sigmaL)
-// double upp = mean_L[i][j][l]+3*sig_L[i][j][l];
-// double low = mean_L[i][j][l]-3*sig_L[i][j][l];
-// //noise[i][j][l] = a*range*range*range*range/4+b*range*range*range/3+c*range*range/2+d*range;//polynominal integral 
-// noise[i][j][l] = a*(pow(upp,4)-pow(low,4))/4+b*(pow(upp,3)-pow(low,3))/3+c*(pow(upp,2)-pow(low,2))/2+d*(upp-low);//polynominal integral 
-//	if(noise[i][j][l]==0)noise[i][j][l]=1;
-// signal[i][j][l] = n_L[i][j][l];
-////FOM old // fom_L[i][j][l] = sqrt(signal[i][j][l]*signal[i][j][l]/noise[i][j][l]);
-//// fom_L[i][j][l] = (signal[i][j][l])/(sqrt(signal[i][j][l]+noise[i][j][l]));//peak significance
-//fom_pi1[i] = n_pi[i][j][l]/n_pi[nth][nth][nth]; 
-//fom_k1[i] = n_k[i][j][l]/n_k[nth][nth][nth]; 
-//fom_p1[i] = n_p[i][j][l]/n_p[nth][nth][nth]; 
-//err_fom_pi1[i] = n_pi_err[i][j][l]/(n_pi[nth][nth][nth]); 
-//err_fom_k1[i] = n_k_err[i][j][l]/(n_k[nth][nth][nth]); 
-//err_fom_p1[i] = n_p_err[i][j][l]/(n_p[nth][nth][nth]); 
 
 
 //-------Originally commented out---------//
@@ -5111,9 +4925,22 @@ c4->cd(4);
 h_m2_ac->Draw("colz");
 //pEff3->Draw("");
 //gcoin_p_sr[0]->Draw("ap");
-c5->cd();
+c5->Divide(2,3);
 cout<<"c5 start"<<endl;
-pEff4->Draw("");
+c5->cd(1);
+h_Lp_c->Draw("");
+c5->cd(2);
+h_Rp_c->Draw("");
+c5->cd(3);
+h_Lth_c->Draw("");
+c5->cd(4);
+h_Rth_c->Draw("");
+c5->cd(5);
+h_Lph_c->Draw("");
+c5->cd(6);
+h_Rph_c->Draw("");
+
+
 //gcoin_k_sr[0]->Draw("ap");
 //c6->cd();
 //gcoin_pi_sr[0]->Draw("");
@@ -5129,7 +4956,7 @@ pEff4->Draw("");
 //gcoin_pi_sr[0]->Draw("");
 c6->cd();
 cout<<"c6 start"<<endl;
-pEff5->Draw("");
+h_theta_ee->Draw("");
 //hcoin_wo_bg_fom[0][0][0]->Draw("");fcoin[0][0][0]->SetLineColor(kRed);fcoin[0][0][0]->Draw("same");
 c7->cd();
 cout<<"c7 start"<<endl;
@@ -5535,8 +5362,8 @@ int main(int argc, char** argv){
 //  int ch;
   //string ifname = "/adaqfs/home/a-onl/tritium_work/itabashi/nnL/HallA-Online-Tritium/replay/scripts/ita_scripts/run_list/Lambda_test.list";
   //string ofname = "/pdf/hydro1_AC_eff_test.pdf";
-// string ifname = "../small.list";//Run111157~111220
- string ifname = "../small2.list";//Run111157~111220 & Run111480~111542
+ string ifname = "../small.list";//Run111157~111220
+// string ifname = "../small2.list";//Run111157~111220 & Run111480~111542
 //  string ifname = "../test.list";//for debug
 //  string runlistname;
   string pname = "./Lambda_H1.param";

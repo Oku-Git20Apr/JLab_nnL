@@ -653,8 +653,6 @@ double Rs2trpad[100],Ls2trpad[100];
     TH1D*h_Lth_c;
     TH1D*h_Lph_c;
     TH1D*h_Lp_c;    
-    /// Added by Okuyama ///
-    TH1D* h_theta_ee;
 
     TF1* fAl_R;
 

@@ -54,6 +54,8 @@ TARGET17= eff_z2d
 OBJS17=   eff_z2d.o Setting.o Tree.o ParamMan.o
 TARGET18= eff_coin
 OBJS18=   eff_coin.o Setting.o Tree.o ParamMan.o
+TARGET18= eff_ac
+OBJS18=   eff_ac.o Setting.o Tree.o ParamMan.o
 #TARGET14= okuyana 
 #OBJS14=   okuyana.o Setting.o Tree.o ParamMan.o
 
@@ -63,7 +65,8 @@ all:$(TARGET13)\
      $(TARGET15)\
      $(TARGET16)\
      $(TARGET17)\
-     $(TARGET18)
+     $(TARGET18)\
+     $(TARGET19)
 #     $(TARGET11)
 #$(TARGET1)\
 #     $(TARGET2)\
@@ -117,6 +120,8 @@ $(TARGET16): $(patsubst %,$(LIBDIR)/%,$(OBJS16))
 $(TARGET17): $(patsubst %,$(LIBDIR)/%,$(OBJS17))
 	$(CXX) $(CFLAGS) -o $(BINDIR)/$@ $^ $(CXXLIBS) $(CXXFLAGS)
 $(TARGET18): $(patsubst %,$(LIBDIR)/%,$(OBJS18))
+	$(CXX) $(CFLAGS) -o $(BINDIR)/$@ $^ $(CXXLIBS) $(CXXFLAGS)
+$(TARGET19): $(patsubst %,$(LIBDIR)/%,$(OBJS19))
 	$(CXX) $(CFLAGS) -o $(BINDIR)/$@ $^ $(CXXLIBS) $(CXXFLAGS)
 .PHONY: clean
 clean:

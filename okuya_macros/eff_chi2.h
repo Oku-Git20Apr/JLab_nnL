@@ -337,6 +337,7 @@ double Rs2trpad[100],Ls2trpad[100];
  TH1F* hmm_pi_wobg_fom_noZ;
  TH1D  *h_L_vz2, *h_R_vz2;
  TH2D* h_zz;
+ TH2D* h_zz_test;
  TH2D  *h_zz1,*h_zz2,*h_zz3,*h_zz4;
  TH1D  *h_z1,*h_z2,*h_z3,*h_z4;
  TH2D* h_m2_mm;
