@@ -1,7 +1,28 @@
 *tuning_ac_oku.cc
-Macrofile for tuning AC counters.
+Macrofile for tuning AC counters & development.
 This concept is based on hrs_tuningAC.h (by Itabashi-san),
 but the analysis inside is taken over from ana_Lambda.cc
+
+*eff_z.cc
+For development
+"tuning_ac_oku.cc" can be used for optimization of 2D scanning,
+but "eff_z.cc" can be used for 1D.
+
+Efficiency Study
+*eff_ac.cc
+-sr_test*.pdf
+
+*eff_z2d.cc
+-zsr*.pdf
+
+*eff_fp.cc
+-fpcut.pdf
+
+*eff_chi2.cc
+-chi2sr*.pdf
+
+*eff_coin.cc
+-coinsr*.pdf
 
 --0531th1.copy 
 Backup of tuning_ac_oku.cc. When I make graphs of Survival Ratio vs th1

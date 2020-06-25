@@ -54,8 +54,8 @@ TARGET17= eff_z2d
 OBJS17=   eff_z2d.o Setting.o Tree.o ParamMan.o
 TARGET18= eff_coin
 OBJS18=   eff_coin.o Setting.o Tree.o ParamMan.o
-TARGET18= eff_ac
-OBJS18=   eff_ac.o Setting.o Tree.o ParamMan.o
+TARGET19= eff_ac
+OBJS19=   eff_ac.o Setting.o Tree.o ParamMan.o
 #TARGET14= okuyana 
 #OBJS14=   okuyana.o Setting.o Tree.o ParamMan.o
 

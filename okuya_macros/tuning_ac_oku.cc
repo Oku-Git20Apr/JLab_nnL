@@ -1978,7 +1978,7 @@ void tuning::MakeHist(){
   h_Lp     = new TH1D("h_Lp", "h_Lp",1000,1.8,2.8);
   h_Lp_c   = new TH1D("h_Lp_c", "h_Lp_c",1000,1.8,2.8);
   
-  h_theta_ee = new TH1D("h_theta_ee", "h_theta_ee",1000,-1.,1.);
+  h_theta_ee = new TH1D("h_theta_ee", "h_theta_ee",1000,0.,0.3);
 
   h_Lp_mm    = new TH2D("h_Lp_mm"   ,"h_Lp_mm"   , bin_mm,min_mm,max_mm,bin_Lp,min_Lp,max_Lp); 
   //h_mmall    = new TH1D("h_mmall"   ,"h_mmall"   , 100,-1,1); 
@@ -2778,7 +2778,7 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 	h_m2_mm->Fill(m2,mm);
 	//h_m2_mm->Fill(tr.AC2_npe_sum,mm);
 	h_m2_ac->Fill(m2,tr.AC2_npe_sum);
-				if((-100.<ct && ct <-20.) || (20.<ct && ct<100.)){
+				if(20.<ct && ct<100.){
 					double ct_ = ct;
 				        while(1){
 					  if(-20.<ct && ct<20.){
@@ -2808,7 +2808,7 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
    	if(3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20.)cut_ac2=true;
 	if(zcut && cut_ac2){//no AC1 cut
 	hcoin_k_fom_noAC1->Fill(ct);
-				if((-100.<ct && ct <-20.) || (20.<ct && ct<100.)){
+				if(20.<ct && ct<100.){
 					double ct_ = ct;
 				        while(1){
 					  if(-20.<ct && ct<20.){
@@ -2833,7 +2833,7 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 		    	if(tr.AC1_npe_sum < 3.75 && tr.AC2_npe_sum > 0.)cut_ac1=true;
 	if(zcut&&cut_ac1){//no AC2 cut
 	hcoin_k_fom_noAC2->Fill(ct);
-				if((-100.<ct && ct <-20.) || (20.<ct&&ct<100.)){
+				if(20.<ct&&ct<100.){
 					double ct_ = ct;
 				        while(1){
 					  if(-20.<ct && ct<20.){
@@ -2891,7 +2891,7 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 		//-------------------------------------------//
 		//---------Accidental B.G.-------------------//
 		//-------------------------------------------//
-				if((-100.<ct && ct <-20.) || (20.<ct&&ct<100.)){
+				if(20.<ct&&ct<100.){
 					double ct_ = ct;
 				        while(1){
 					  if(-20.<ct && ct<20.){
@@ -3240,7 +3240,7 @@ void tuning::ACtune(){
  //Efficiency 100%//
  
 //cout<<"BG subtraction cointime"<<endl;
- hcoin_bg_fom_noAC1->Scale(40./160.);
+ hcoin_bg_fom_noAC1->Scale(40./80.);
  hcoin_wo_bg_fom_noAC1->Add(hcoin_k_fom_noAC1,hcoin_bg_fom_noAC1,1.0,-1.0);
  fp_noAC1=new TF1("fp_noAC1","gausn(0)",min_coin_c,max_coin_c);
  fp_noAC1->SetNpx(2000);
@@ -3253,16 +3253,18 @@ void tuning::ACtune(){
 // n_p_noAC1=fp_noAC1->GetParameter(0);
  mean_p_noAC1=fp_noAC1->GetParameter(1);
  sig_p_noAC1=fp_noAC1->GetParameter(2);
- center_p=mean_p_noAC1;
- range_p=1.435;
+ center_p=def_mean_p;
+ //range_p=1.435;
+ range_p=2*def_sig_p;
  n_p_noAC1=hcoin_wo_bg_fom_noAC1->Integral(hcoin_wo_bg_fom_noAC1->FindBin(center_p-range_p),hcoin_wo_bg_fom_noAC1->FindBin(center_p+range_p));
 //cout<<"fpi fit start"<<endl;
  hcoin_wo_bg_fom_noAC1->Fit("fpi_noAC1","Rq","0",def_mean_pi-3*def_sig_pi,def_mean_pi+3*def_sig_pi);
 // n_pi_noAC1=fpi_noAC1->GetParameter(0);
  mean_pi_noAC1=fpi_noAC1->GetParameter(1);
  sig_pi_noAC1=fpi_noAC1->GetParameter(2);
- center_pi=mean_pi_noAC1;
- range_pi=0.7;
+ center_pi=def_mean_pi;
+ //range_pi=0.7;
+ range_pi=2*def_sig_pi;
  n_pi_noAC1=hcoin_wo_bg_fom_noAC1->Integral(hcoin_wo_bg_fom_noAC1->FindBin(center_pi-range_pi),hcoin_wo_bg_fom_noAC1->FindBin(center_pi+range_pi));
 //cout<<"fk fit start"<<endl;
  //hcoin_wo_bg_fom_noAC1->Fit("fk_noAC1","Rq","0",def_mean_k-3*def_sig_k,def_mean_k+3*def_sig_k);
@@ -3272,7 +3274,7 @@ void tuning::ACtune(){
 // mean_k_noAC1=0;
  sig_k_noAC1=fk_noAC1->GetParameter(2);
 
- center_k=mean_k_noAC1;
+ center_k=0.;
  range_k=1.;
  n_k_noAC1=hcoin_wo_bg_fom_noAC1->Integral(hcoin_wo_bg_fom_noAC1->FindBin(center_k-range_k),hcoin_wo_bg_fom_noAC1->FindBin(center_k+range_k));
 
@@ -3301,7 +3303,7 @@ cout<<"n_pi_noAC1="<<n_pi_noAC1<<"n_k_noAC1="<<n_k_noAC1<<"n_p_noAC1="<<n_p_noAC
  n_p_err_noAC1=fp_noAC1->GetParError(6); 
  
 
- hmm_bg_fom_noAC1->Scale(1./80.);
+ hmm_bg_fom_noAC1->Scale(2./80.);
  hmm_wo_bg_fom_noAC1->Add(hmm_L_fom_noAC1,hmm_bg_fom_noAC1,1.0,-1.0);
 
 
@@ -3334,10 +3336,8 @@ cout<<"n_pi_noAC1="<<n_pi_noAC1<<"n_k_noAC1="<<n_k_noAC1<<"n_p_noAC1="<<n_p_noAC
 // n_L_noAC1=fL_noAC1->GetParameter(0);
  mean_L_noAC1=fL_noAC1->GetParameter(1);
  sig_L_noAC1=fL_noAC1->GetParameter(2);
- mean_L_noAC1=def_mean_L;
- sig_L_noAC1=def_sig_L;
- center_L=mean_L_noAC1;
- range_L=2*sig_L_noAC1;
+ center_L=def_mean_L;
+ range_L=2*def_sig_L;
  n_L_noAC1=hmm_wo_bg_fom_noAC1->Integral(hmm_wo_bg_fom_noAC1->FindBin(center_L-range_L),hmm_wo_bg_fom_noAC1->FindBin(center_L+range_L));
  cout<<"n_L"<<n_L_noAC1<<endl;
 
@@ -3345,11 +3345,9 @@ cout<<"n_pi_noAC1="<<n_pi_noAC1<<"n_k_noAC1="<<n_k_noAC1<<"n_p_noAC1="<<n_p_noAC
  hmm_wo_bg_fom_noAC1->Fit("fS_noAC1","Rq","",def_mean_S-3*def_sig_S,def_mean_S+3*def_sig_S);
 // n_S_noAC1=fS_noAC1->GetParameter(0);
  mean_S_noAC1=fS_noAC1->GetParameter(1);
- mean_S_noAC1=def_mean_S;
- sig_S_noAC1=def_sig_S;
  sig_S_noAC1=fS_noAC1->GetParameter(2);
- center_S=mean_S_noAC1;
- range_S=2*sig_S_noAC1;
+ center_S=def_mean_S;
+ range_S=2*def_sig_S;
  n_S_noAC1=hmm_wo_bg_fom_noAC1->Integral(hmm_wo_bg_fom_noAC1->FindBin(center_S-range_S),hmm_wo_bg_fom_noAC1->FindBin(center_S+range_S));
  cout<<"n_S"<<n_S_noAC1<<endl;
 //cout<<"mean_S"<<mean_S_noAC1<<endl;
@@ -3381,7 +3379,7 @@ cout<<"n_pi_noAC1="<<n_pi_noAC1<<"n_k_noAC1="<<n_k_noAC1<<"n_p_noAC1="<<n_p_noAC
  //----No AC2 cut---//
  
 //cout<<"BG subtraction cointime"<<endl;
- hcoin_bg_fom_noAC2->Scale(40./160.);
+ hcoin_bg_fom_noAC2->Scale(40./80.);
  hcoin_wo_bg_fom_noAC2->Add(hcoin_k_fom_noAC2,hcoin_bg_fom_noAC2,1.0,-1.0);
  fp_noAC2=new TF1("fp_noAC2","gausn(0)",min_coin_c,max_coin_c);
  fp_noAC2->SetNpx(2000);
@@ -3435,7 +3433,7 @@ cout<<"n_pi_noAC2="<<n_pi_noAC2<<"n_k_noAC2="<<n_k_noAC2<<"n_p_noAC2="<<n_p_noAC
  n_p_err_noAC2=fp_noAC2->GetParError(6); 
 cout << "after nth thing..." << endl;
 
- hmm_bg_fom_noAC2->Scale(1./80.);
+ hmm_bg_fom_noAC2->Scale(2./80.);
  hmm_wo_bg_fom_noAC2->Add(hmm_L_fom_noAC2,hmm_bg_fom_noAC2,1.0,-1.0);
 
 
@@ -3513,7 +3511,7 @@ cout << "after nth thing..." << endl;
 
 
 //-----No AC Cut-----//
- hcoin_bg_fom_noAC->Scale(40./160.);
+ hcoin_bg_fom_noAC->Scale(40./80.);
  hcoin_wo_bg_fom_noAC->Add(hcoin_k_fom_noAC,hcoin_bg_fom_noAC,1.0,-1.0);
  fp_noAC=new TF1("fp_noAC","gausn(0)",min_coin_c,max_coin_c);
  fp_noAC->SetNpx(2000);
@@ -3571,7 +3569,7 @@ cout<<"n_pi_noAC="<<n_pi_noAC<<"n_k_noAC="<<n_k_noAC<<"n_p_noAC="<<n_p_noAC
 //----------------------------------------------//
 //--	Missing Mass  Start     ----------------//
 //----------------------------------------------//
- hmm_bg_fom_noAC->Scale(1./80.);
+ hmm_bg_fom_noAC->Scale(2./80.);
  hmm_pibg_fom_noAC->Scale(0.7/80.);
  hmm_wo_bg_fom_noAC->Add(hmm_L_fom_noAC,hmm_bg_fom_noAC,1.0,-1.0);
  hmm_pi_wobg_fom_noAC->Add(hmm_pi_fom_noAC,hmm_pibg_fom_noAC,1.0,-1.0);
@@ -3667,6 +3665,7 @@ double fmm_noACpar10 = fmm_noAC->GetParameter(10);cout<<"fmm_noAC[10]="<<fmm_noA
  n_L_noAC=hmm_wo_bg_fom_noAC->Integral(hmm_wo_bg_fom_noAC->FindBin(center_L-range_L),hmm_wo_bg_fom_noAC->FindBin(center_L+range_L));
 cout<<"before(L):: "<<n_L_noAC<<endl;
  double integralL=fmmbg_noAC->Integral(center_L-range_L,center_L+range_L);
+ integralL=integralL/(2*range_L/(hmm_wo_bg_fom_noAC->FindBin(center_L+range_L)-hmm_wo_bg_fom_noAC->FindBin(center_L-range_L)));
  if(integralL>0)n_L_noAC-=integralL;
 cout<<"after(L):: "<<n_L_noAC<<endl;
 //n_L_noAC-=(pow(mean_L_noAC+2*sig_L_noAC,5)-pow(mean_L_noAC-2*sig_L_noAC,5))*a/5;
@@ -3678,6 +3677,7 @@ cout<<"after(L):: "<<n_L_noAC<<endl;
  n_S_noAC=hmm_wo_bg_fom_noAC->Integral(hmm_wo_bg_fom_noAC->FindBin(center_S-range_S),hmm_wo_bg_fom_noAC->FindBin(center_S+range_S));
 cout<<"before(S):: "<<n_S_noAC<<endl;
  double integralS=fmmbg_noAC->Integral(center_S-range_S,center_S+range_S);
+ integralS=integralS/(2*range_S/(hmm_wo_bg_fom_noAC->FindBin(center_S+range_S)-hmm_wo_bg_fom_noAC->FindBin(center_S-range_S)));
  if(integralS>0)n_S_noAC-=integralS;
 cout<<"after(S):: "<<n_S_noAC<<endl;
 //n_S_noAC-=(pow(mean_S_noAC+2*sig_S_noAC,5)-pow(mean_S_noAC-2*sig_S_noAC,5))*a/5;
@@ -3717,7 +3717,7 @@ cout<<"sig_S"<<sig_S_noAC<<endl;
 //-----Background subtraction-----//
 //------------cointime------------//
 //cout<<"BG subtraction cointime"<<endl;
- hcoin_bg_fom[i][j][l]->Scale(40./160.);
+ hcoin_bg_fom[i][j][l]->Scale(40./80.);
  hcoin_wo_bg_fom[i][j][l]->Add(hcoin_k_fom[i][j][l],hcoin_bg_fom[i][j][l],1.0,-1.0);
 
  fp[i][j][l]=new TF1(Form("fp[%d][%d][%d]",i,j,l),"gausn(0)",min_coin_c,max_coin_c);
@@ -3775,7 +3775,7 @@ cout<<"n_p["<<i<<"]["<<j<<"]["<<l<<"]="<<n_p[i][j][l]<<endl;
 //----------------------------------------------//
 //--	Missing Mass  Start     ----------------//
 //----------------------------------------------//
- hmm_bg_fom[i][j][l]->Scale(1./80.);
+ hmm_bg_fom[i][j][l]->Scale(2./80.);
  hmm_pibg_fom[i][j][l]->Scale(0.7/80.);
  hmm_wo_bg_fom[i][j][l]->Add(hmm_L_fom[i][j][l],hmm_bg_fom[i][j][l],1.0,-1.0);
  hmm_pi_wobg_fom[i][j][l]->Add(hmm_pi_fom[i][j][l],hmm_pibg_fom[i][j][l],1.0,-1.0);
@@ -3871,6 +3871,7 @@ double fmmpar10 = fmm[i][j][l]->GetParameter(10);//cout<<"fmm[10]="<<fmmpar10<<e
  n_L[i][j][l]=hmm_wo_bg_fom[i][j][l]->Integral(hmm_wo_bg_fom[i][j][l]->FindBin(center_L-range_L),hmm_wo_bg_fom[i][j][l]->FindBin(center_L+range_L));
 cout<<"before(L):: "<<n_L[i][j][l]<<endl;
  double integralL=fmmbg[i][j][l]->Integral(center_L-range_L,center_L+range_L);
+ integralL=integralL/(2*range_L/(hmm_wo_bg_fom[i][j][l]->FindBin(center_L+range_L)-hmm_wo_bg_fom[i][j][l]->FindBin(center_L-range_L)));
  if(integralL>0)n_L[i][j][l]-=integralL;
 else cout<<"negative BG: ("<<i<<","<<j<<","<<l<<")"<<endl;
  n_L[i][j][l]-=fmmbg[i][j][l]->Integral(center_L-range_L,center_L+range_L);
@@ -3884,6 +3885,7 @@ cout<<"after(L):: "<<n_L[i][j][l]<<endl;
  n_S[i][j][l]=hmm_wo_bg_fom[i][j][l]->Integral(hmm_wo_bg_fom[i][j][l]->FindBin(center_S-range_S),hmm_wo_bg_fom[i][j][l]->FindBin(center_S+range_S));
 cout<<"before(S):: "<<n_S[i][j][l]<<endl;
  double integralS=fmmbg[i][j][l]->Integral(center_S-range_S,center_S+range_S);
+ integralS=integralS/(2*range_S/(hmm_wo_bg_fom[i][j][l]->FindBin(center_S+range_S)-hmm_wo_bg_fom[i][j][l]->FindBin(center_S-range_S)));
  if(integralS>0)n_S[i][j][l]-=integralS;
 else cout<<"negative BG: ("<<i<<","<<j<<","<<l<<")"<<endl;
 cout<<"after(S):: "<<n_S[i][j][l]<<endl;

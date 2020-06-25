@@ -173,7 +173,7 @@ class tuning : public Tree
     void CoinCalc(int RS2_seg, int LS2_seg, int rhit, int lhit);
     double CoinCalc_gogami(int RS2_seg, int LS2_seg, int rhit, int lhit);
   //    double CoinCalc(int RS2_seg, int LS2_seg, int rhit, int lhit);
-  //double CoinCalc_c(int RS2_seg, int LS2_seg, int rhit, int lhit);
+    double CoinCalc_c(int RS2_seg, int LS2_seg, int rhit, int lhit);
  private:
   TFile* fnew;
   Setting* set;
@@ -332,13 +332,28 @@ double Rs2trpad[100],Ls2trpad[100];
  TH1F* hmm_L_fom_noZ;
  TH1F* hmm_pibg_fom_noZ;
  TH1F* hmm_wo_bg_fom_noZ;
+ TH1F* hmm_L_fom_Zdiff;
+ TH1F* hmm_bg_fom_Zdiff;
+ TH1F* hmm_wo_bg_fom_Zdiff;
+ TH1F* hcoin_k_fom_Zdiff;
+ TH1F* hcoin_bg_fom_Zdiff;
+ TH1F* hcoin_wo_bg_fom_Zdiff;
+ TH1F* hmm_L_fom_Zsum;
+ TH1F* hmm_bg_fom_Zsum;
+ TH1F* hmm_wo_bg_fom_Zsum;
+ TH1F* hcoin_k_fom_Zsum;
+ TH1F* hcoin_bg_fom_Zsum;
+ TH1F* hcoin_wo_bg_fom_Zsum;
  TH1F* hmm_pi_fom_noZ;//MM if pion
  TH1F* hmm_bg_fom_noZ;
  TH1F* hmm_pi_wobg_fom_noZ;
+ TH1F* hct_test;
+ TH2F* h_ctct;
  TH1D  *h_L_vz2, *h_R_vz2;
  TH2D* h_zz;
  TH2D  *h_zz1,*h_zz2,*h_zz3,*h_zz4;
  TH1D  *h_z1,*h_z2,*h_z3,*h_z4;
+ TH1D  *h_z11,*h_z22,*h_z33,*h_z44;
  TH2D* h_m2_mm;
  TH2D* h_m2_ac;
 
@@ -365,7 +380,8 @@ double Rs2trpad[100],Ls2trpad[100];
 // TH1F* hcoin_acc_ac2[100];
 // TH2F* ha1_a2;
  TH1F* hcoin_k;
- TH1F* hcoin_pi;
+ TH1F* hcoin_pi[100][100][100];
+ TH1F* hcoin_pi_noZ;
  TH1F* hcoin_p;
 // TH2F* hcoin_ac1_all;
 // TH2F* hcoin_ac2_all;
@@ -525,6 +541,7 @@ double Rs2trpad[100],Ls2trpad[100];
     TH1D *h_L_vx, *h_L_vy, *h_L_vz;
     TH2D *h_L_y_x, *h_L_th_x, *h_L_ph_y;
     TH2D *h_L_tgph_tgth;
+    TH2D *h_L_tgph_tgth2;
 
     TH1D *h_L_beta, *h_L_m2;
     TH2D *h_L_beta_p , *h_L_beta_m2;
@@ -629,6 +646,8 @@ double Rs2trpad[100],Ls2trpad[100];
     TH1D*h_Lth_c;
     TH1D*h_Lph_c;
     TH1D*h_Lp_c;    
+    /// Added by Okuyama ///
+    TH1D* h_theta_ee;
 
     TF1* fAl_R;
 
@@ -677,7 +696,7 @@ public:
   double ac1_off[24],ac1_1pe[24],ac2_off[26],ac2_1pe[26];
   double R_pathl,L_pathl;
   double R_pathl_c, L_pathl_c;
-  double ct;
+  double ct, ct_test;
   double coin_shift;
   double R_pz,R_px,R_py;
   double L_pz,L_px,L_py;
