@@ -329,6 +329,7 @@ double Rs2trpad[100],Ls2trpad[100];
  TH1F* hcoin_k_fom_noZ;
  TH1F* hcoin_bg_fom_noZ;
  TH1F* hcoin_wo_bg_fom_noZ;//SR(No AC Cut, neither 1 nor 2)
+ TH1F* hcoin_wo_bg_fom_noZ2;//Pion Subtracted
  TH1F* hmm_L_fom_noZ;
  TH1F* hmm_pibg_fom_noZ;
  TH1F* hmm_wo_bg_fom_noZ;
@@ -348,14 +349,34 @@ double Rs2trpad[100],Ls2trpad[100];
  TH1F* hmm_bg_fom_noZ;
  TH1F* hmm_pi_wobg_fom_noZ;
  TH1F* hct_test;
+ TH1F* hct_test2;
+ TH1F* hct_test3;
  TH2F* h_ctct;
  TH1D  *h_L_vz2, *h_R_vz2;
  TH2D* h_zz;
  TH2D  *h_zz1,*h_zz2,*h_zz3,*h_zz4;
  TH1D  *h_z1,*h_z2,*h_z3,*h_z4;
+ TF1   *fpi_z1,*fpi_z2,*fpi_z3,*fpi_z4;
  TH1D  *h_z11,*h_z22,*h_z33,*h_z44;
  TH2D* h_m2_mm;
  TH2D* h_m2_ac;
+
+ TH1D *h_gbetaR;
+ TH1D *h_gbetaL;
+ TH1D *h_gLenR;
+ TH1D *h_gLenL;
+ TH1D *h_gpR;
+ TH1D *h_gpL; 
+ TH1D *h_gcorR;
+ TH1D *h_gcorL;
+ TH2D *h_gcorLR;
+ TH1D *h_gtref_R; 
+ TH1D *h_gtimeR_R;
+ TH1D *h_gtimeL_R;
+ TH1D *h_gmeantime;
+ TH1D *h_gctcorR; 
+ TH1D *h_gctcorL; 
+double beta_R, beta_L, tref_R, LenL, LenR, cor_L, cor_R, timeL_R, timeR_R, meantime_R, ctimecorL, ctimecorR;
 
  TF1* fcoin_noZ;
  TF1* fpi_noZ;
@@ -493,6 +514,14 @@ double Rs2trpad[100],Ls2trpad[100];
  TF1* fk_kc;
  TF1* fpi_pic;
  TF1* fp_pc;
+ TF1* facc_kc2;
+ TF1* fk_kc2;
+ TF1* fpi_pic2;
+ TF1* fp_pc2;
+ TF1* facc_kc3;
+ TF1* fk_kc3;
+ TF1* fpi_pic3;
+ TF1* fp_pc3;
  TF1* fac[100];
  TF1* fkk[100];
 //
@@ -542,6 +571,49 @@ double Rs2trpad[100],Ls2trpad[100];
     TH2D *h_L_y_x, *h_L_th_x, *h_L_ph_y;
     TH2D *h_L_tgph_tgth;
     TH2D *h_L_tgph_tgth2;
+    TH2D *h_L_tgph_tgth3;
+    TH2D *h_L_tgph_tgth4;
+    TH2D *h_L_tgph_tgth5;
+    TH2D *h_L_tgph_tgth6;
+    TH2D *h_L_tgph_tgth7;
+    TH2D *h_L_tgph_tgth8;
+    TH2D *h_L_tgph_tgth9;
+    TH2D *h_L_tgph_tgth10;
+    TH2D *h_L_tgph_tgth11;
+    TH2D *h_L_z_x;
+    TH2D *h_L_z_y;
+    TH2D *h_L_th_y;
+    TH2D *h_L_ph_x;
+    TH2D *h_L_th_z;
+    TH2D *h_L_ph_z;
+    TH2D *h_L_tgth_y;
+    TH2D *h_L_tgph_x;
+    TH2D *h_L_tgth_z;
+    TH2D *h_L_tgph_z;
+    TH2D *h_L_tgph_y;
+    TH2D *h_L_tgth_x;
+	TH2D *h_L_corR_tgth;
+	TH2D *h_L_corR_tgph;
+	TH2D *h_L_corR_th;
+	TH2D *h_L_corR_ph;
+	TH2D *h_L_corR_x;
+	TH2D *h_L_corR_y;
+	TH2D *h_L_corR_z;
+	TH2D *h_L_corR_zdiff;
+	TH2D *h_L_corL_tgth;
+	TH2D *h_L_corL_tgph;
+	TH2D *h_L_corL_th;
+	TH2D *h_L_corL_ph;
+	TH2D *h_L_corL_x;
+	TH2D *h_L_corL_y;
+	TH2D *h_L_corL_z;
+	TH2D *h_L_corL_zdiff;
+
+	TH2D *h_L_ct_zdiff;
+	TH2D *h_L_corsum_zdiff;
+	TH2D *h_L_cordiff_zdiff;
+	TH2D *h_L_corL_corR;
+	bool bestcut=false;
 
     TH1D *h_L_beta, *h_L_m2;
     TH2D *h_L_beta_p , *h_L_beta_m2;
@@ -648,6 +720,9 @@ double Rs2trpad[100],Ls2trpad[100];
     TH1D*h_Lp_c;    
     /// Added by Okuyama ///
     TH1D* h_theta_ee;
+    TH1D* h_theta_ee2;
+    TH2D* h_theta_ee_p;
+    TH2D* h_theta_ee_p2;
 
     TF1* fAl_R;
 
@@ -868,21 +943,26 @@ double center_S=0., range_S=0.;
  TCanvas* c17;
  TCanvas* c18;
  TCanvas* c19;
-// TCanvas* c20;
-// TCanvas* c21;
-// TCanvas* c22;
-// TCanvas* c23;
-// TCanvas* c24;
-// TCanvas* c25; 
-// TCanvas* c30;
-// TCanvas* c31;
-// TCanvas* c32;
-// TCanvas* c33;
-// TCanvas* c34;
-//
-//
-//   
-// 
+ TCanvas* c20;
+ TCanvas* c21;
+ TCanvas* c22;
+ TCanvas* c23;
+ TCanvas* c24;
+ TCanvas* c25; 
+ TCanvas* c26; 
+ TCanvas* c27; 
+ TCanvas* c28; 
+ TCanvas* c29; 
+ TCanvas* c30;
+ TCanvas* c31;
+ TCanvas* c32;
+ TCanvas* c33;
+ TCanvas* c34;
+ TCanvas* c35; 
+ TCanvas* c36; 
+ TCanvas* c37; 
+ TCanvas* c38; 
+ TCanvas* c39; 
 };
 
 
