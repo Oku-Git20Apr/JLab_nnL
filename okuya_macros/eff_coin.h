@@ -573,6 +573,7 @@ double Rs2trpad[100],Ls2trpad[100];
 
 //// Coin ////
     TH1D *h_ct;
+    TH1D *h_ct_wide;
     TH1D *h_ct_wK, *h_ct_wK_z;
     TH2D* h_ct_Rp;
     TH1D *h_ct_wK_acc, *h_ct_wK_z_acc;

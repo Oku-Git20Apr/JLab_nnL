@@ -6,6 +6,7 @@ using namespace std;
 #include "Param.h"
 #include "Tree.h"
 #include "TMath.h"
+#include "TROOT.h"//FitSlice, gROOT->FindObject
 
 #define F1TDC
 double s2f1_off(int i,char const* ARM,char const* MODE, int KINE);
@@ -681,10 +682,10 @@ void tuning::MTParam_G(){
 //  int nParamT_3=3;
   char name_MctimeL[100];
   char name_MctimeR[100];
-//  sprintf(name_MctimeL,"../goga_mac/Rootfiles/matrices/ctimeL.dat"); 
-//  sprintf(name_MctimeR,"../goga_mac/Rootfiles/matrices/ctimeR.dat"); 
-  sprintf(name_MctimeL,"../ctimeL.dat"); 
-  sprintf(name_MctimeR,"../ctimeR.dat"); 
+  sprintf(name_MctimeL,"../goga_mac/Rootfiles/matrices/ctimeL.dat"); 
+  sprintf(name_MctimeR,"../goga_mac/Rootfiles/matrices/ctimeR.dat"); 
+//  sprintf(name_MctimeL,"../ctimeL.dat"); 
+//  sprintf(name_MctimeR,"../ctimeR.dat"); 
   ifstream MctimeL(name_MctimeL);
   ifstream MctimeR(name_MctimeR);
   //  double PctimeL[nParamT_3];
@@ -817,21 +818,21 @@ tuning::~tuning(){}
 void tuning::SetRoot(string ifname){
   tnew = new TChain("tree");
 	cout << "SetRoot" <<endl;
-//  fnew = new TFile(Form("%s",ifname.c_str()),"recreate");
-//	cout << "SetRoot" <<endl;
+  fnew = new TFile(Form("%s",ifname.c_str()),"recreate");
+	cout << "SetRoot" <<endl;
 //  tnew =new TTree("tnew",ifname.c_str());
 //	cout << "SetRoot" <<endl;
 //  tnew = tree->CloneTree(0);
-
-	cout << "SetRoot" <<endl;
-  add_tree(ifname);
-	cout << "SetRoot" <<endl;
-  pack_tree();
-	cout << "SetRoot" <<endl;
-  readtreeHRSR();
-	cout << "SetRoot" <<endl;
-  readtreeHRSL();
-
+//
+//	cout << "SetRoot" <<endl;
+//  add_tree(ifname);
+//	cout << "SetRoot" <<endl;
+//  pack_tree();
+//	cout << "SetRoot" <<endl;
+//  readtreeHRSR();
+//	cout << "SetRoot" <<endl;
+//  readtreeHRSL();
+//
 }
 /////////////////////////////
 void tuning::SetRunList(string ifname){
@@ -1001,6 +1002,7 @@ double tuning::CoinCalc_gogami(int RS2_seg, int LS2_seg,int rhit, int lhit){
 
 //beta
   double beta_R  = R_tr_p[rhit]/sqrt(R_tr_p[rhit]*R_tr_p[rhit]+Mpi*Mpi);
+  //double beta_R  = R_tr_p[rhit]/sqrt(R_tr_p[rhit]*R_tr_p[rhit]+MK*MK);
   double beta_L  = L_tr_p[lhit]/sqrt(L_tr_p[lhit]*L_tr_p[lhit]+Me*Me);  
 
 //length
@@ -1073,7 +1075,6 @@ double tuning::CoinCalc_gogami(int RS2_seg, int LS2_seg,int rhit, int lhit){
  double ctimecorR = calcf2t_3rd(PctimeR, R_tr_x[rhit],R_tr_th[rhit],R_tr_y[rhit],R_tr_ph[rhit],R_tr_vz[rhit]);
  double ctimecorL = calcf2t_3rd(PctimeL, L_tr_x[lhit],L_tr_th[lhit],L_tr_y[lhit],L_tr_ph[lhit],L_tr_vz[lhit]);
 
-//kazuki
 
     //========== Scaled at FP ==================//
     R_tr_x[rhit]  = R_tr_x[rhit]  * XFPr + XFPm;
@@ -1667,6 +1668,22 @@ void tuning::MakeHist(){
   bin_mm=(max_mm-min_mm)/0.002; //Counts/2 MeV
   bin_mm=(int)bin_mm;
 	iter_ac1=30;//iteration number
+ min_s2=-10;
+ max_s2=5000;
+ bin_s2=max_s2-min_s2;
+        bin_coin=(int)(max_coin-min_coin)/tdc_time;
+        bin_coin_c=(int)((max_coin_c-min_coin_c)/tdc_time);
+cout<<"tdc"<<tdc_time<<endl;
+cout<<"max coin"<<max_coin_c<<endl;
+cout<<"min coin"<<min_coin_c<<endl;
+cout<<"bin coin"<<bin_coin_c<<endl;
+//        bin_coin_c=(int)(max_coin_c-min_coin_c)/tdc_time;
+//        bin_coin_c=(int)750;
+//////////////////////////////////////////////////////////////should be changed
+//        bin_beta=6000;
+//	bin_adc=(int)max_adc-min_adc;
+//	bin_ac1=(int)(max_ac1-min_ac1)*3; 
+//	bin_ac2=(int)(max_ac2-min_ac2)*3; 
 
 /////////////
 //// Z  /////
@@ -1721,6 +1738,7 @@ void tuning::MakeHist(){
 //////////////
 //// LHRS ////
 //////////////
+cout<<"LHRS Set TH"<<endl;
   h_L_trig = new TH1D("h_L_trig","h_L_trig",10,0,10);
   set->SetTH1(h_L_trig,"Trigger Flag","Trig No.","Counts");
 
@@ -1741,8 +1759,9 @@ void tuning::MakeHist(){
   h_L_y_x       = new TH2D("h_L_y_x"      ,"h_L_y_x"      ,200,   -1,  1 ,200,-0.1,0.1);
   h_L_th_x      = new TH2D("h_L_th_x"     ,"h_L_th_x"     ,200,   -1,  1 ,200,-0.2,0.2);
   h_L_ph_y      = new TH2D("h_L_ph_y"     ,"h_L_ph_y"     ,200, -0.1, 0.1,200,-0.1,0.1);
-  h_L_tgph_tgth = new TH2D("h_L_tgph_tgth","h_L_tgph_tgth",200, -0.1, 0.1,200,-0.06,0.06);
-  h_L_tgph_tgth2 = new TH2D("h_L_tgph_tgth2","L_th : L_ph (w/ Z, AC, Kaon(ct) Cut)",200, -0.1, 0.1,200,-0.06,0.06);
+  h_L_tgph_tgth = new TH2D("h_L_tgph_tgth","L_th : L_ph (w/ theta_ee Cut)",200, -0.1, 0.1,200,-0.06,0.06);
+//  h_L_tgph_tgth2 = new TH2D("h_L_tgph_tgth2","L_th : L_ph (w/ Z, AC, Kaon(ct) Cut)",200, -0.1, 0.1,200,-0.06,0.06);
+  h_L_tgph_tgth2 = new TH2D("h_L_tgph_tgth2","L_th : L_ph (w/ VP Flux Cut)",200, -0.1, 0.1,200,-0.06,0.06);
   h_L_tgph_tgth3 = new TH2D("h_L_tgph_tgth3","L_th : L_ph (w/ Z Cut)",200, -0.1, 0.1,200,-0.06,0.06);
   h_L_tgph_tgth4 = new TH2D("h_L_tgph_tgth4","L_th : L_ph (w/ AC Cut)",200, -0.1, 0.1,200,-0.06,0.06);
   h_L_tgph_tgth5 = new TH2D("h_L_tgph_tgth5","L_th : L_ph (w/ Z, AC Cut)",200, -0.1, 0.1,200,-0.06,0.06);
@@ -1752,6 +1771,19 @@ void tuning::MakeHist(){
   h_L_tgph_tgth9 = new TH2D("h_L_tgph_tgth9","L_th : L_ph (w/ ZZ_zone4 Cut)",200, -0.1, 0.1,200,-0.06,0.06);
   h_L_tgph_tgth10 = new TH2D("h_L_tgph_tgth10","L_th : L_ph (Al front)",200, -0.1, 0.1,200,-0.06,0.06);
   h_L_tgph_tgth11 = new TH2D("h_L_tgph_tgth11","L_th : L_ph (Al back)",200, -0.1, 0.1,200,-0.06,0.06);
+  h_L_tgph_tgth12 = new TH2D("h_L_tgph_tgth12","L_th : L_ph (No Cut)",200, -0.1, 0.1,200,-0.06,0.06);
+  h_LHRS_phth = new TH2D("h_LHRS_phth","L_th : L_ph (LHRS frame), No Cut",200, 0., 0.1,200,0.,2*PI);
+  h_LHRS_phth2 = new TH2D("h_LHRS_phth2","L_th : L_ph (LHRS frame), w/ Z, AC",200, 0., 0.1,200,0.,2*PI);
+  h_original_phth = new TH2D("h_original_phth","L_th : L_ph (original frame), No Cut",200, 0.1, 0.35,200,1.,2.);
+  h_original_phth2 = new TH2D("h_original_phth2","L_th : L_ph (original frame), w/ Z, AC Cut",200, 0.1, 0.35,200,1.,2.);
+  h_original_phth3 = new TH2D("h_original_phth3","L_th : L_ph (original frame), top quality",200, 0.1, 0.35,200,1.,2.);
+  h_original_phth4 = new TH2D("h_original_phth4","L_th : L_ph (original frame), w/ Z Cut",200, 0.1, 0.35,200,1.,2.);
+  h_original_phth5 = new TH2D("h_original_phth5","L_th : L_ph (original frame), w/ Z Cut, p>2.18",200, 0.1, 0.35,200,1.,2.);
+  h_original_phth6 = new TH2D("h_original_phth6","L_th : L_ph (original frame), w/ Z Cut, 2.1<p<2.16",200, 0.1, 0.35,200,1.,2.);
+  h_original_phth7 = new TH2D("h_original_phth7","L_th : L_ph (original frame), w/ Z Cut, 2.10<p<2.12",200, 0.1, 0.35,200,1.,2.);
+  h_original_phth8 = new TH2D("h_original_phth8","L_th : L_ph (original frame), w/ Z Cut, 2.12<p<2.14",200, 0.1, 0.35,200,1.,2.);
+  h_original_phth9 = new TH2D("h_original_phth9","L_th : L_ph (original frame), w/ Z Cut, 2.18<p<2.2",200, 0.1, 0.35,200,1.,2.);
+  h_original_phth10 = new TH2D("h_original_phth10","L_th : L_ph (original frame), w/ Z Cut, 2.2<p<2.22",200, 0.1, 0.35,200,1.,2.);
   h_L_z_x       = new TH2D("h_L_z_x"      ,"h_L_z_x"      ,200,   -1.,1.,  200,-0.25,0.25);
   h_L_z_y       = new TH2D("h_L_z_y"      ,"h_L_z_y"      ,200,   -0.1,0.1,  200,-0.25,0.25);
   h_L_th_y      = new TH2D("h_L_th_y"     ,"h_L_th_y"     ,200,   -0.1,  0.1 ,200,-0.1,0.1);
@@ -1809,7 +1841,7 @@ void tuning::MakeHist(){
   set->SetTH2(h_L_ph_x     ,"Focal Plane #phi v.s X"  ,"X (m)"           ,"#phi (rad)");
   set->SetTH2(h_L_th_z     ,"Focal Plane #theta v.s Z","Z (m)"           ,"#theta (rad)");
   set->SetTH2(h_L_ph_z     ,"Focal Plane #phi v.s Z"  ,"Z (m)"           ,"#phi (rad)");
-  set->SetTH2(h_L_tgph_tgth,"Target #phi v.s #theta"  ,"#theta_{t} (rad)","#phi_{t} (rad)");
+  set->SetTH2(h_L_tgph_tgth,"Target #phi v.s #theta (w/ theta_ee Cut)"  ,"#theta_{t} (rad)","#phi_{t} (rad)");
 
   h_L_beta        = new TH1D("h_L_beta"       ,"h_L_beta"       ,400,   0,  2); 
   //h_L_m2          = new TH1D("h_L_m2"         ,"h_L_m2"         ,400,-0.5,2.5); 
@@ -1867,6 +1899,7 @@ void tuning::MakeHist(){
 //////////////
 //// RHRS ////
 //////////////
+cout<<"RHRS Set TH"<<endl;
   h_R_trig = new TH1D("h_R_trig","h_R_trig",10,0,10);
   set->SetTH1(h_R_trig,"Trigger Flag","Trig No.","Counts");
 
@@ -1975,6 +2008,7 @@ void tuning::MakeHist(){
 /////////////////////
 //// Coincidence ////
 /////////////////////
+cout<<"Coin Set TH"<<endl;
   h_ct       = new TH1D("h_ct"      ,"h_ct"      ,1000, -20, 20);//to adjust offset
   h_Rs2      = new TH1D("h_Rs2"      ,"h_Rs2"      ,4000, -100, 100);
   h_Ls2      = new TH1D("h_Ls2"      ,"h_Ls2"      ,4000, -100, 100);
@@ -2022,9 +2056,11 @@ void tuning::MakeHist(){
 
 
   h_Rz     = new TH1D("h_Rz", "h_Rz",1000,-0.2,0.2);
+  h_Rz2     = new TH1D("h_Rz2", "h_Rz2",1000,-0.2,0.2);
   h_Rz_c   = new TH1D("h_Rz_c", "h_Rz_c",1000,-0.2,0.2);
   h_Rz_cut   = new TH1D("h_Rz_cut", "h_Rz_cut",1000,-0.2,0.2);
   h_Lz     = new TH1D("h_Lz", "h_Lz",1000,-0.2,0.2);
+  h_Lz2     = new TH1D("h_Lz2", "h_Lz2",1000,-0.2,0.2);
   h_Lz_c   = new TH1D("h_Lz_c", "h_Lz_c",1000,-0.2,0.2);
 
   h_Rth     = new TH1D("h_Rth", "h_Rth",1000,-0.1,0.1);
@@ -2041,11 +2077,40 @@ void tuning::MakeHist(){
   h_Rp_c   = new TH1D("h_Rp_c", "h_Rp_c",1000,1.5,2.5);
   h_Lp     = new TH1D("h_Lp", "h_Lp",1000,1.8,2.8);
   h_Lp_c   = new TH1D("h_Lp_c", "h_Lp_c",1000,1.8,2.8);
+  h_Lp_top   = new TH1D("h_Lp_top", "mom_L (w/ Lambda Cut)",1000,1.9,2.3);
   
   h_theta_ee = new TH1D("h_theta_ee", "theta_ee",1000,0.1,0.35);
   h_theta_ee2 = new TH1D("h_theta_ee2", "theta_ee (w/ Z_Diff Cut)",1000,0.1,0.35);
-  h_theta_ee_p = new TH2D("h_theta_ee_p", "theta_ee:mom",1000,0.1,0.35,1000,2.0,2.2);
-  h_theta_ee_p2 = new TH2D("h_theta_ee_p2", "theta_ee:mom (w/ Z_Diff Cut)",1000,0.1,0.35,1000,2.0,2.2);
+  h_theta_ee3 = new TH1D("h_theta_ee3", "theta_ee (w/ Z Cut)",1000,0.1,0.35);
+  h_theta_ee4 = new TH1D("h_theta_ee4", "theta_ee (w/ Z, AC Cut)",1000,0.1,0.35);
+  h_phi_ee = new TH1D("h_phi_ee", "phi_ee",1000,0.,2*PI);
+  h_phi_ee2 = new TH1D("h_phi_ee2", "phi_ee (w/ Z_Diff Cut)",1000,0.,2*PI);
+  h_phi_ee3 = new TH1D("h_phi_ee3", "phi_ee (w/ Z Cut)",1000,0.,2*PI);
+  h_phi_ee4 = new TH1D("h_phi_ee4", "phi_ee (w/ Z, AC Cut)",1000,0.,2*PI);
+  h_theta_ek = new TH1D("h_theta_ek", "theta_ek",1000,0.1,0.35);
+  h_phi_ek = new TH1D("h_phi_ek", "phi_ek",1000,3*PI/2-1.,3*PI/2+1.);
+  h_theta_g = new TH1D("h_theta_g", "theta_g",1000,0.1,0.35);
+  h_phi_g = new TH1D("h_phi_g", "phi_g",1000,3*PI/2-1.,3*PI/2+1.);
+  h_theta_gk_lab = new TH1D("h_theta_gk_lab", "theta_gk_lab",1000,0.,0.2);
+  h_theta_gk_cm = new TH1D("h_theta_gk_cm", "theta_gk_cm",1000,0.,0.3);
+  h_cos_gk_lab = new TH1D("h_cos_gk_lab", "cos_gk_lab",1000,0.97,1.0);
+  h_cos_gk_cm = new TH1D("h_cos_gk_cm", "cos_gk_cm",1000,0.8,1.0);
+  h_mom_g = new TH1D("h_mom_g", "mom_g",1000,1.8,2.5);
+  h_pL_pR = new TH2D("h_pL_pR", "pR:pL",30,1.73,1.93,30,1.95,2.25);
+  h_pL_pR2 = new TH2D("h_pL_pR2", "pR:pL (bestcut)",30,1.73,1.93,30,1.95,2.25);
+  h_pL_pR3 = new TH2D("h_pL_pR3", "pR:pL (top-quality)",30,1.73,1.93,30,1.95,2.25);
+  h_thph_ek = new TH2D("h_thph_ek", "theta_ek:phi_ek" ,1000,0.1,0.35,1000,3*PI/2-1.,3*PI/2+1.);
+  h_thph_g = new TH2D("h_thph_g", "theta_g:phi_g" ,1000,0.1,0.35,1000,3*PI/2-1.,3*PI/2+1.);
+  h_theta_ee_p = new TH2D("h_theta_ee_p", "theta_ee:mom (w/ theta_ee Cut)",1000,0.1,0.35,1000,2.0,2.25);
+  h_theta_ee_p2 = new TH2D("h_theta_ee_p2", "theta_ee:mom (w/ VP Flux Cut)",1000,0.1,0.35,1000,2.0,2.25);
+  //h_theta_ee_p2 = new TH2D("h_theta_ee_p2", "theta_ee:mom (w/ Z_Diff Cut)",1000,0.1,0.35,1000,2.0,2.25);
+  h_theta_ee_p3 = new TH2D("h_theta_ee_p3", "theta_ee:mom (w/ Z Cut)",1000,0.1,0.35,1000,2.0,2.25);
+  h_theta_ee_p4 = new TH2D("h_theta_ee_p4", "theta_ee:mom (w/ Z, AC Cut)",1000,0.1,0.35,1000,2.0,2.25);
+  h_phi_ee_p = new TH2D("h_phi_ee_p", "phi_ee:mom (w/ Z Cut)",1000,1.0,2.0,1000,2.0,2.25);
+  h_vpflux = new TH1D("h_vpflux", "VP Flux [/GeV/sr] (top quality)",1000,0.001,0.006);
+  h_vpflux2 = new TH1D("h_vpflux2", "VP Flux [/GeV/sr] (acceptance)",1000,0.001,0.006);
+  h_vpflux3 = new TH1D("h_vpflux3", "VP Flux [/GeV/sr] (w/ Z Cut)",1000,0.001,0.006);
+  h_vpflux4 = new TH1D("h_vpflux4", "VP Flux [/GeV/sr] (w/ Z, AC Cut)",1000,0.001,0.006);
 
   h_Lp_mm    = new TH2D("h_Lp_mm"   ,"h_Lp_mm"   , bin_mm,min_mm,max_mm,bin_Lp,min_Lp,max_Lp); 
   //h_mmall    = new TH1D("h_mmall"   ,"h_mmall"   , 100,-1,1); 
@@ -2120,23 +2185,8 @@ void tuning::MakeHist(){
 // bin_s0=int(max_s0-min_s0);
 //
 //
- min_s2=-10;
- max_s2=5000;
- bin_s2=max_s2-min_s2;
-        bin_coin=(int)(max_coin-min_coin)/tdc_time;
-        bin_coin_c=(int)((max_coin_c-min_coin_c)/tdc_time);
-cout<<"tdc"<<tdc_time<<endl;
-cout<<"max coin"<<max_coin_c<<endl;
-cout<<"min coin"<<min_coin_c<<endl;
-cout<<"bin coin"<<bin_coin_c<<endl;
-//        bin_coin_c=(int)(max_coin_c-min_coin_c)/tdc_time;
-//        bin_coin_c=(int)750;
-//////////////////////////////////////////////////////////////should be changed
-//        bin_beta=6000;
-//	bin_adc=(int)max_adc-min_adc;
-//	bin_ac1=(int)(max_ac1-min_ac1)*3; 
-//	bin_ac2=(int)(max_ac2-min_ac2)*3; 
 
+cout<<"Others Set TH"<<endl;
  hcoin_tc=new TH1F("hcoin_tc","Coincidence time w/ Path Length Correction  S2R-S2L[ns] ",bin_coin_c,min_coin_c,max_coin_c);
 for (int i=0;i<nth;i++){
  hcoin_t2[i]=new TH1F(Form("hcoin_t2[%d]",i), Form("Coincidence %lf<AC2<%lf  cut",ac1_adc[i],th2_max),bin_coin_c,min_coin_c,max_coin_c);
@@ -2199,8 +2249,23 @@ for (int i=0;i<nth;i++){
   hct_test3=new TH1F("hct_test3", "Itabashi_Cointime",bin_coin_c,min_coin_c,max_coin_c);
   set->SetTH1(hct_test3,"Itabashi_Cointime","","");
   h_ctct    = new TH2F("h_ctct"   ,"ct(w/o corr.):ct(w/ corr.)"  ,7145 ,-200.,200.,7145,-200.,200.); 
+  h_ct_x    = new TH2F("h_ct_x"   ,"Cointime vs X"  ,bin_coin_c,min_coin_c,max_coin_c,200,-1.,1.); 
+  h_ct_y    = new TH2F("h_ct_y"   ,"Cointime vs Y"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.1,0.1); 
+  h_ct_th    = new TH2F("h_ct_th"   ,"Cointime vs theta"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.1,0.1); 
+  h_ct_ph    = new TH2F("h_ct_ph"   ,"Cointime vs phi"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.1,0.1); 
+  h_ct_xy    = new TH2F("h_ct_xy"   ,"Cointime vs XY"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.05,0.05); 
+  h_ct_xth    = new TH2F("h_ct_xth"   ,"Cointime vs X*theta"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.01,0.05); 
+  h_ct_yth    = new TH2F("h_ct_yth"   ,"Cointime vs Y*theta"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.002,0.002); 
+  h_ct_xph    = new TH2F("h_ct_xph"   ,"Cointime vs X*phi"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.02,0.02); 
+  h_ct_yph    = new TH2F("h_ct_yph"   ,"Cointime vs Y*phi"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.002,0.002); 
+  h_ct_thph    = new TH2F("h_ct_thph"   ,"Cointime vs theta*phi"  ,bin_coin_c,min_coin_c,max_coin_c,20,-0.002,0.002); 
+  h_ct_tgth    = new TH2F("h_ct_tgth"   ,"Cointime vs theta_t"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.1,0.1); 
+  h_ct_tgph    = new TH2F("h_ct_tgph"   ,"Cointime vs phi_t"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.1,0.1); 
+  h_ct_vz    = new TH2F("h_ct_vz"   ,"Cointime vs vertex_z"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.15,0.15); 
+  h_ct_tgthtgph    = new TH2F("h_ct_tgthtgph"   ,"Cointime vs theta_t*phi_t"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.005,0.005); 
+  h_ct_tgthz    = new TH2F("h_ct_tgthz"   ,"Cointime vs theta_t*vertex_z"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.015,0.015); 
+  h_ct_tgphz    = new TH2F("h_ct_tgphz"   ,"Cointime vs phi_t*vertex_z"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.015,0.005); 
 
-//kazuki
 		h_gbetaR = new TH1D("h_gbetaR", "h_gbetaR", 1000, 0.995,1.0);
 		h_gbetaL = new TH1D("h_gbetaL", "h_gbetaL", 1000, 0.998,1.003);
 		h_gLenR = new TH1D("h_gLenR", "LenR [m]", 1000, 24., 28.);
@@ -2640,12 +2705,10 @@ if(tr.AC1_npe_sum<3.75 && 3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20. && fabs(R_tr
             h_a1sum_ct->Fill( ct, R_a1_asum_p );
             h_a2sum_ct->Fill( ct, R_a2_asum_p );
 
-	    h_Rz->Fill(R_tr_vz[rt]);
 	    
 	    h_Rth->Fill(R_tr_tg_th[rt]);
 	    h_Rph->Fill(R_tr_tg_ph[rt]);
 	    h_Rp->Fill(R_p);
-	    h_Lz->Fill(L_tr_vz[lt]);
 	    h_Lth->Fill(L_tr_tg_th[lt]);	    	    
 	    h_Lph->Fill(L_tr_tg_ph[lt]);	    	    
 	    h_Lp->Fill(L_p);	    
@@ -2767,6 +2830,10 @@ if(tr.AC1_npe_sum<3.75 && 3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20. && fabs(R_tr
                               - (B_v - L_v - R_v)*(B_v - L_v - R_v) );
 
 //Changed
+	    h_Rz->Fill(R_tr_vz[rt]);
+	    if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025)h_Lz->Fill((L_tr_vz[lt]+R_tr_vz[rt])/2.);
+
+
         int s2pad = (int)R_s2_trpad[rt];
         double beta = -99.;
 		double m2=-99.;
@@ -2782,24 +2849,180 @@ if(tr.AC1_npe_sum<3.75 && 3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20. && fabs(R_tr
 //		cout<<"beta="<<beta<<endl;
         //double beta=R_tr_p[rt]/sqrt(R_tr_p[rt]*R_tr_p[rt]+MK*MK);
 	    double pL    = L_tr_p[lt];//GeV
+	    double pR    = R_tr_p[lt];//GeV
 		double theta = L_tr_tg_th[lt];
+		double theta_R = R_tr_tg_th[lt];
 		double phi = L_tr_tg_ph[lt];
-		//double theta_ee = acos(1/sqrt(1+tan(theta)*tan(theta)+tan(phi+13.2*PI/180.)*tan(phi*13.2*PI/180)));
-		double phi0=13.2*PI/180;
-		//double theta_ee = acos((-tan(phi)*sin(phi0)+cos(phi0))/(sqrt(1+tan(theta)*tan(theta)+tan(phi)*tan(phi))));
-		double theta_ee = acos((phi*sin(phi0)+cos(phi0))/(sqrt(1+theta*theta+phi*phi)));
+		double phi_R = R_tr_tg_ph[lt];
+		double phi0=13.2*PI/180;//rad
+		//double theta_L = acos((-tan(phi)*sin(phi0)+cos(phi0))/(sqrt(1+tan(theta)*tan(theta)+tan(phi)*tan(phi))));//LHRS frame
+		double theta_L = acos(1./(sqrt(1+theta*theta+phi*phi)));//LHRS frame
+		double theta_ee = acos((-phi*sin(phi0)+cos(phi0))/(sqrt(1+theta*theta+phi*phi)));//original frame
+		double theta_ek = acos((phi_R*sin(phi0)+cos(phi0))/(sqrt(1+theta*theta+phi*phi)));//original frame
+		//double phi_L = atan((phi*cos(phi0)+sin(phi0))/theta);//LHRS frame
+		double phi_L = 0.;//LHRS frame
+		double phi_RHRS = 0.;//RHRS frame
+		double phi_ee = 0.;//original frame
+		double phi_ek = 0.;//original frame
+
+		double Escat = sqrt(pL*pL+Me*Me); 
+		double Einc = 4.3; 
+		double omega = Einc - Escat;
+		if(theta>0.&&phi>0.){phi_L = atan(phi/theta);}//LHRS frame
+		if(theta<0.&&phi>0.){phi_L = atan(phi/theta)+PI;}
+		if(theta<0.&&phi<0.){phi_L = atan(phi/theta)+PI;}
+		if(theta>0.&&phi<0.){phi_L = atan(phi/theta)+2*PI;}
+		if((theta/(-phi*sin(phi0)+cos(phi0)))>0.&&((phi*cos(phi0)+sin(phi0))/(-phi*sin(phi0)+cos(phi0)))>0.){phi_ee = atan((phi*cos(phi0)+sin(phi0))/theta);}//original frame
+		if((theta/(-phi*sin(phi0)+cos(phi0)))<0.&&((phi*cos(phi0)+sin(phi0))/(-phi*sin(phi0)+cos(phi0)))>0.){phi_ee = atan((phi*cos(phi0)+sin(phi0))/theta)+PI;}
+		if((theta/(-phi*sin(phi0)+cos(phi0)))<0.&&((phi*cos(phi0)+sin(phi0))/(-phi*sin(phi0)+cos(phi0)))<0.){phi_ee = atan((phi*cos(phi0)+sin(phi0))/theta)+PI;}
+		if((theta/(-phi*sin(phi0)+cos(phi0)))>0.&&((phi*cos(phi0)+sin(phi0))/(-phi*sin(phi0)+cos(phi0)))<0.){phi_ee = atan((phi*cos(phi0)+sin(phi0))/theta)+2*PI;}
+		//if((theta/(-phi*sin(phi0)+cos(phi0)))>0.&&(theta/(phi*cos(phi0)+sin(phi0)))>0.){phi_ee = atan((phi*cos(phi0)+sin(phi0))/theta);}//original frame
+		//if((theta/(-phi*sin(phi0)+cos(phi0)))<0.&&(theta/(phi*cos(phi0)+sin(phi0)))>0.){phi_ee = atan((phi*cos(phi0)+sin(phi0))/theta)+PI;}
+		//if((theta/(-phi*sin(phi0)+cos(phi0)))<0.&&(theta/(phi*cos(phi0)+sin(phi0)))<0.){phi_ee = atan((phi*cos(phi0)+sin(phi0))/theta)+PI;}
+		//if((theta/(-phi*sin(phi0)+cos(phi0)))>0.&&(theta/(phi*cos(phi0)+sin(phi0)))<0.){phi_ee = atan((phi*cos(phi0)+sin(phi0))/theta)+2*PI;}
+		
+		if(theta_R>0.&&phi_R>0.){phi_RHRS = atan(phi_R/theta_R);}//RHRS frame
+		if(theta_R<0.&&phi_R>0.){phi_RHRS = atan(phi_R/theta_R)+PI;}
+		if(theta_R<0.&&phi_R<0.){phi_RHRS = atan(phi_R/theta_R)+PI;}
+		if(theta_R>0.&&phi_R<0.){phi_RHRS = atan(phi_R/theta_R)+2*PI;}
+		if((theta_R/(phi_R*sin(phi0)+cos(phi0)))>0.&&(theta_R/(phi_R*cos(phi0)-sin(phi0)))>0.){phi_ek = atan((phi_R*cos(phi0)-sin(phi0))/theta_R);}//original frame
+		if((theta_R/(phi_R*sin(phi0)+cos(phi0)))<0.&&(theta_R/(phi_R*cos(phi0)-sin(phi0)))>0.){phi_ek = atan((phi_R*cos(phi0)-sin(phi0))/theta_R)+PI;}
+		if((theta_R/(phi_R*sin(phi0)+cos(phi0)))<0.&&(theta_R/(phi_R*cos(phi0)-sin(phi0)))<0.){phi_ek = atan((phi_R*cos(phi0)-sin(phi0))/theta_R)+PI;}
+		if((theta_R/(phi_R*sin(phi0)+cos(phi0)))>0.&&(theta_R/(phi_R*cos(phi0)-sin(phi0)))<0.){phi_ek = atan((phi_R*cos(phi0)-sin(phi0))/theta_R)+2*PI;}
+
+		double mom_g=sqrt(pL*pL*sin(theta_ee)*sin(theta_ee)+(4.3-pL*cos(theta_ee))*(4.3-pL*cos(theta_ee)));
+		double phi_g = 0.; 
+		if((theta/(-phi*sin(phi0)+cos(phi0)))<0.&&((phi*cos(phi0)+sin(phi0))/(-phi*sin(phi0)+cos(phi0)))<0.){phi_g=atan(pL*(phi*cos(phi0)+sin(phi0)/theta)/mom_g);}//original frame
+		if((theta/(-phi*sin(phi0)+cos(phi0)))>0.&&((phi*cos(phi0)+sin(phi0))/(-phi*sin(phi0)+cos(phi0)))<0.){phi_g=atan(pL*(phi*cos(phi0)+sin(phi0)/theta)/mom_g)+PI;}
+		if((theta/(-phi*sin(phi0)+cos(phi0)))>0.&&((phi*cos(phi0)+sin(phi0))/(-phi*sin(phi0)+cos(phi0)))>0.){phi_g=atan(pL*(phi*cos(phi0)+sin(phi0)/theta)/mom_g)+PI;}
+		if((theta/(-phi*sin(phi0)+cos(phi0)))<0.&&((phi*cos(phi0)+sin(phi0))/(-phi*sin(phi0)+cos(phi0)))>0.){phi_g=atan(pL*(phi*cos(phi0)+sin(phi0)/theta)/mom_g)+2*PI;}
+		//if((theta/(-phi*sin(phi0)+cos(phi0)))<0.&&(theta/(phi*cos(phi0)+sin(phi0)))<0.){phi_g=atan(pL*(phi*cos(phi0)+sin(phi0)/theta)/mom_g);}//original frame
+		//if((theta/(-phi*sin(phi0)+cos(phi0)))>0.&&(theta/(phi*cos(phi0)+sin(phi0)))<0.){phi_g=atan(pL*(phi*cos(phi0)+sin(phi0)/theta)/mom_g)+PI;}
+		//if((theta/(-phi*sin(phi0)+cos(phi0)))>0.&&(theta/(phi*cos(phi0)+sin(phi0)))>0.){phi_g=atan(pL*(phi*cos(phi0)+sin(phi0)/theta)/mom_g)+PI;}
+		//if((theta/(-phi*sin(phi0)+cos(phi0)))<0.&&(theta/(phi*cos(phi0)+sin(phi0)))>0.){phi_g=atan(pL*(phi*cos(phi0)+sin(phi0)/theta)/mom_g)+2*PI;}
+		double theta_g = asin(pL*sin(theta_ee)/mom_g);
+		//double theta_g = acos((4.3-pL*cos(theta_ee))/mom_g);
+		double pgpR=mom_g*sin(theta_g)*cos(phi_g)*pR*sin(theta_ek)*cos(phi_ek)+mom_g*sin(theta_g)*sin(phi_g)*pR*sin(theta_ek)*sin(phi_ek)+mom_g*cos(theta_g)*pR*cos(theta_ek);
+		double theta_gk_lab=acos(pgpR/mom_g/pR);
+	
+		//--Rotation & Lorentz--//
+		//double ekl=sqrt(pR*pR+MK*MK);
+		//double pkx=pR*sin(theta_ek)*cos(phi_ek);
+		//double pky=pR*sin(theta_ek)*sin(phi_ek)*cos(theta_g)+pR*cos(theta_ek)*sin(theta_g);
+		//double pkz=-pR*sin(theta_ek)*sin(phi_ek)*sin(theta_g)+pR*cos(theta_ek)*cos(theta_g);
+		double beta_cm=mom_g/(omega+Mp);
+		double gamma_cm=1./(sqrt(1-beta_cm*beta_cm));
+		//double ekcm=gamma_cm*ekl-gamma_cm*beta_cm*pkz;
+		//double pkxcm=pkx;
+		//double pkycm=pky;
+		//double pkzcm=-gamma_cm*beta_cm*ekl+gamma_cm*pkz;
+		//double theta_gk_cm=acos(pkzcm/(sqrt(pkxcm*pkxcm+pkycm*pkycm+pkzcm*pkzcm)));
+		//--Lorentz Transformation in another frame--//
+		double theta_gk_cm=atan(pR*sin(theta_gk_lab)/(-gamma_cm*beta_cm*sqrt(pR*pR+MK*MK)+gamma_cm*pR*cos(theta_gk_lab)));
+
+		double A=Me*Me*omega*omega/(4*Einc*Einc*Escat*Escat);
+		double sinterm=sin(theta_ee/2)*sin(theta_ee/2);
+		double a1=((Einc*Einc+Escat*Escat)/(2*Einc*Einc))/(A+sinterm);
+		double a2=(Escat/Einc)*A/((A+sinterm)*(A+sinterm));
+		double a3=((Einc+Escat)*(Einc+Escat)/(4*Einc*Einc))/(omega*omega/(4*Einc*Escat)+sinterm);
+		double vpflux=(a1-a2-a3)/(137*4*PI*PI*omega);
+		Ng_det+=vpflux;
+		if(k%100000==0){
+		cout<<"Me="<<Me<<endl;
+		cout<<"Einc="<<Einc<<endl;
+		cout<<"Escat="<<Escat<<endl;
+		cout<<"omega="<<omega<<endl;
+		cout<<"theta="<<theta_ee*180/PI<<endl;
+		cout<<"A="<<A<<endl;
+		cout<<"sinterm="<<sinterm<<endl;
+		cout<<"a1="<<a1<<endl;
+		cout<<"a2="<<a2<<endl;
+		cout<<"a3="<<a3<<endl;
+		cout<<"vpflux="<<vpflux<<endl;
+		}
+		h_L_tgph_tgth12->Fill(theta,phi);//No Cut
+		h_original_phth->Fill(theta_ee,phi_ee);//No Cut
+		h_LHRS_phth->Fill(theta_L,phi_L);//No Cut
+		if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1){
 		h_theta_ee ->Fill(theta_ee);
-		h_theta_ee_p ->Fill(theta_ee,pL);
+		h_phi_ee ->Fill(phi_ee);
+		h_theta_ek ->Fill(theta_ek);
+		h_phi_ek ->Fill(phi_ek);
+		h_theta_g ->Fill(theta_g);
+		h_phi_g ->Fill(phi_g);
+		h_thph_ek->Fill(theta_ek,phi_ek);
+		h_thph_g->Fill(theta_g,phi_g);
+		h_mom_g->Fill(mom_g);
+		if(fabs(ct)<1.)h_pL_pR->Fill(pR,pL);
+		if(bestcut&&fabs(ct)<1.)h_pL_pR2->Fill(pR,pL);
+		h_theta_gk_lab->Fill(theta_gk_lab);
+		h_theta_gk_cm->Fill(theta_gk_cm);
+		h_cos_gk_lab->Fill(cos(theta_gk_lab));
+		h_cos_gk_cm->Fill(cos(theta_gk_cm));
+		}
+		//h_theta_ee_p ->Fill(theta_ee,pL);
+		//h_theta_ee_p ->SetBinContent(theta_ee,pL,vpflux*100000);
+		//h_vpflux ->Fill(vpflux);
 		if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025){//Z_Diff
-		h_theta_ee2 ->Fill(theta_ee);
-		h_theta_ee_p2 ->Fill(theta_ee,pL);
+		//h_theta_ee2 ->Fill(theta_ee);
+		h_phi_ee2 ->Fill(phi_ee);
+		//h_theta_ee_p2 ->Fill(theta_ee,pL);
+		//h_theta_ee_p2 ->SetBinContent(theta_ee,pL,vpflux*100000);
+		//h_vpflux2 ->Fill(vpflux);
+		}
+		if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1){//Z Cut
+		h_theta_ee3 ->Fill(theta_ee);
+		h_phi_ee3 ->Fill(phi_ee);
+		h_theta_ee_p3 ->Fill(theta_ee,pL);
+		h_phi_ee_p ->Fill(phi_ee,pL);
+		//h_theta_ee_p3 ->SetBinContent(theta_ee,pL,vpflux*100000);
+		h_vpflux3 ->Fill(vpflux);
+		}
+		if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1 && tr.AC1_npe_sum<3.75 && 3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20.){//Z, AC Cut
+		h_theta_ee4 ->Fill(theta_ee);
+		h_phi_ee4 ->Fill(phi_ee);
+		//h_theta_ee_p4 ->Fill(theta_ee,pL);
+		h_theta_ee_p4 ->SetBinContent(theta_ee,pL,vpflux*100000);
+		h_vpflux4 ->Fill(vpflux);
+		}
+		if(fabs(theta_ee-0.2475)<0.0075&&bestcut){//theta_ee Cut
 		h_L_tgph_tgth->Fill(theta,phi);
+		h_theta_ee_p ->Fill(theta_ee,pL);
+		}
+		if(fabs(vpflux-0.0028)<0.0002&&bestcut){//VP Flux Cut
+		h_L_tgph_tgth2->Fill(theta,phi);
+		h_theta_ee_p2 ->Fill(theta_ee,pL);
+		}
+		bool top_quality = false;
+		bool acceptance = false;//6msr & 0.2452GeV/c
+		if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1&&fabs(theta_ee-0.225)<0.0125&&fabs(phi_ee-1.6)<0.125&&fabs(pL-2.125)<0.025)top_quality=true;//Âç¶ã¾ú
+		if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1&&fabs(theta_ee-0.225)<0.025&&fabs(phi_ee-1.6)<0.25&&fabs(pL-2.1)<0.1226)acceptance=true;//
+		if(fabs(theta_ee-0.225)<0.0125&&fabs(phi_ee-1.6)<0.125&&fabs(pL-2.1)<0.05&&fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025){h_Lz2->Fill((L_tr_vz[lt]+R_tr_vz[rt])/2.);h_Rz2->Fill(R_tr_vz[rt]);}
+		if(top_quality&&fabs(ct)<1.)h_pL_pR3->Fill(pR,pL);
+		if(acceptance){
+		Ng_det_acc+=vpflux;
+		h_vpflux2 ->Fill(vpflux);
+		}
+		if(top_quality){
+		h_vpflux ->Fill(vpflux);
+		h_original_phth3->Fill(theta_ee,phi_ee);
+		Ng_det_top+=vpflux;
+		}
+		if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1){
+		h_original_phth4->Fill(theta_ee,phi_ee);
+		if(L_tr_p[lt]>2.18)h_original_phth5->Fill(theta_ee,phi_ee);
+		if(L_tr_p[lt]>2.1&&L_tr_p[lt]<2.16)h_original_phth6->Fill(theta_ee,phi_ee);
+		if(L_tr_p[lt]>2.1&&L_tr_p[lt]<2.12)h_original_phth7->Fill(theta_ee,phi_ee);
+		if(L_tr_p[lt]>2.12&&L_tr_p[lt]<2.14)h_original_phth8->Fill(theta_ee,phi_ee);
+		if(L_tr_p[lt]>2.18&&L_tr_p[lt]<2.2)h_original_phth9->Fill(theta_ee,phi_ee);
+		if(L_tr_p[lt]>2.2&&L_tr_p[lt]<2.22)h_original_phth10->Fill(theta_ee,phi_ee);
+
 		}
 
-		if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1 && tr.AC1_npe_sum<3.75 && 3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20.&& fabs(ct)<1.)h_L_tgph_tgth2->Fill(theta,phi);
+		//if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1 && tr.AC1_npe_sum<3.75 && 3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20.&& fabs(ct)<1.)h_L_tgph_tgth2->Fill(theta,phi);
 		if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1)h_L_tgph_tgth3->Fill(theta,phi);
 		if(tr.AC1_npe_sum<3.75 && 3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20.)h_L_tgph_tgth4->Fill(theta,phi);
-		if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1 && tr.AC1_npe_sum<3.75 && 3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20.)h_L_tgph_tgth5->Fill(theta,phi);
+		if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1 && tr.AC1_npe_sum<3.75 && 3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20.){h_L_tgph_tgth5->Fill(theta,phi);h_original_phth2->Fill(theta_ee,phi_ee);h_LHRS_phth2->Fill(theta_L,phi_L);}//bestcut
 
 		if(fabs(R_tr_vz[rt]-0.12)<0.02 && fabs(L_tr_vz[lt]+0.12)<0.02){h_L_tgph_tgth6->Fill(theta,phi);}
 		if(fabs(R_tr_vz[rt]+0.12)<0.02 && fabs(L_tr_vz[lt]-0.12)<0.02){h_L_tgph_tgth7->Fill(theta,phi);}
@@ -2885,6 +3108,27 @@ if(tr.AC1_npe_sum<3.75 && 3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20. && fabs(R_tr
 //-------------------------------------------//
 //-------------------------------------------//
 
+
+		//if(bestcut){
+		h_ct_x->Fill(ct,L_tr_x[lt]);	
+		h_ct_y->Fill(ct,L_tr_y[lt]);	
+		h_ct_th->Fill(ct,L_tr_th[lt]);	
+		h_ct_ph->Fill(ct,L_tr_ph[lt]);	
+		h_ct_xy->Fill(ct,L_tr_x[lt]*L_tr_y[lt]);	
+		h_ct_thph->Fill(ct,L_tr_th[lt]*L_tr_ph[lt]);	
+		h_ct_xth->Fill(ct,L_tr_x[lt]*L_tr_th[lt]);	
+		h_ct_yth->Fill(ct,L_tr_y[lt]*L_tr_th[lt]);	
+		h_ct_xph->Fill(ct,L_tr_x[lt]*L_tr_ph[lt]);	
+		h_ct_yph->Fill(ct,L_tr_y[lt]*L_tr_ph[lt]);	
+		h_ct_tgth->Fill(ct,L_tr_tg_th[lt]);	
+		h_ct_tgph->Fill(ct,L_tr_tg_ph[lt]);	
+		h_ct_vz->Fill(ct,L_tr_vz[lt]);	
+		h_ct_tgthtgph->Fill(ct,L_tr_tg_th[lt]*L_tr_tg_ph[lt]);	
+		h_ct_tgthz->Fill(ct,L_tr_tg_th[lt]*L_tr_vz[lt]);	
+		h_ct_tgphz->Fill(ct,L_tr_tg_ph[lt]*L_tr_vz[lt]);	
+		//}
+
+
  double ctimecorR = calcf2t_3rd(PctimeR, R_tr_x[rt],R_tr_th[rt],R_tr_y[rt],R_tr_ph[rt],R_tr_vz[rt]);
  double ctimecorL = calcf2t_3rd(PctimeL, L_tr_x[lt],L_tr_th[lt],L_tr_y[lt],L_tr_ph[lt],L_tr_vz[lt]);
 		//if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1)//gas region
@@ -2931,6 +3175,9 @@ if(tr.AC1_npe_sum<3.75 && 3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20. && fabs(R_tr
 		h_L_corL_corR->Fill(ctimecorR,ctimecorL);
 		}
 
+		if(fabs(mm-ML)<0.008){
+		h_Lp_top->Fill(pL);
+		}
 
 //-------------------------------------------//
 //-------------No Z cut at all--------------//
@@ -3008,8 +3255,10 @@ if(tr.AC1_npe_sum<3.75 && 3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20. && fabs(R_tr
 			//	if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<zver[i]/1000 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1)zcut=true;
 				//if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.2 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<zver[i]/1000.)zcut=true;
 				//if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025)zcut=true;
-				if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<zver[i])zcut=true;
-		
+				if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1 && pL<2.12  &&i==10)zcut=true;
+				if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1&&fabs(theta_ee-0.225)<0.025&&fabs(phi_ee-1.6)<0.25&&fabs(pL-2.125)<0.025&&i==20)zcut=true;//Âç¶ã¾ú
+				//if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1&&fabs(theta_ee-0.225)<0.0125&&fabs(phi_ee-1.6)<0.125&&fabs(pL-2.125)<0.025&&i==30)zcut=true;//LambdaÂç¶ã¾ú
+				if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1&&fabs(theta_ee-0.225)<0.025&&fabs(phi_ee-1.6)<0.25&&fabs(pL-2.075)<0.025&&i==30)zcut=true;//SigmaÂç¶ã¾ú
 				if( zcut && cut_ac1 && cut_ac2){
 				hcoin_k_fom[i][j][l]->Fill(ct);
 			    //cout<<"hcoin_k_fom is filled" << endl;
@@ -3022,6 +3271,7 @@ if(tr.AC1_npe_sum<3.75 && 3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20. && fabs(R_tr
 				//}
 				if(20.<ct&&ct<100.){
 					double ct_ = ct;
+//kazuki
 				        while(1){
 					  if(-20.<ct && ct<20.){
 						 hcoin_bg_fom[i][j][l]->Fill(ct);
@@ -3199,6 +3449,7 @@ if(tr.AC1_npe_sum<3.75 && 3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20. && fabs(R_tr
 	       h_mm_acc->Fill( mm ); //No Kaon Cut
 	       tr.missing_mass_acc=mm;
 	     }
+	    	     tree_out->Fill();
 
 
 
@@ -3805,169 +4056,6 @@ cout<<"sig_S"<<sig_S[i][j][l]<<endl;
 //--	Missing Mass  End     ------------------//
 //----------------------------------------------//
 
-//--------------------tabun iranai--------------
-// fmmbg[i][j][l]=new TF1(Form("fmmbg[%d][%d][%d]",i,j,l),"gausn(0)+gaus(3)",min_mm,max_mm);
-// fmmbg[i][j][l]->SetNpx(2000);
-// //fmmbg[i][j][l]->SetParameters(100,0.05,0.03,10,0.05,0.03);//test.list
-// fmmbg[i][j][l]->SetParameters(300,0.05,1.2,30,0.1,0.02);//small.list
-// fL[i][j][l]=new TF1(Form("fL[%d][%d][%d]",i,j,l),"gausn(0)",min_mm,max_mm);
-// fL[i][j][l]->SetNpx(2000);
-// fL[i][j][l]->SetParLimits(2,0.,0.01);
-// fS[i][j][l]=new TF1(Form("fS[%d][%d][%d]",i,j,l),"gausn(0)",min_mm,max_mm);
-// fS[i][j][l]->SetNpx(2000);
-// fS[i][j][l]->SetParLimits(2,0.,0.01);//sigma limit in order not to mix with bg
-// 
-// fmm[i][j][l]=new TF1(Form("fmm[%d][%d][%d]",i,j,l),"gausn(0)+gausn(3)+gausn(6)+gausn(9)",-0.02,0.15);
-// fmm[i][j][l]->SetNpx(2000);
-// fmm[i][j][l]->SetTitle(Form("Missing Mass w AC cut (AC1 Cut <%lf ch && %lf ch < AC2 Cut < %lf ch);Coin time [ns];Counts [1/56 ns]",ac1_adc[i],ac2l_adc[j],ac2u_adc[l]));
-// fmm[i][j][l]->SetParameter(1,def_mean_L);
-// fmm[i][j][l]->SetParameter(4,def_mean_S);
-//
-//
-//
-// //------- Fitting ----------//
-//// hmm_bg_fom[i][j][l]->Fit("fmmbg[i][j][l]","Rq0","",min_mm,max_mm);
-//cout<<"fmmbg fit start"<<endl;
-// hmm_L_fom[i][j][l]->Fit("fmmbg[i][j][l]","Rq0","",-0.1,0.15);
-//cout<<"fmm fit start"<<endl;
-//// hmm_bg_fom_noAC->Fit("fmmbg_noAC","Rq0","",min_mm,max_mm);
-// hmm_pi_fom[i][j][l]->Fit("fmmbg[i][j][l]","Rq0","",-0.1,0.15);
-//double a = fmmbg[i][j][l]->GetParameter(0);
-//double b = fmmbg[i][j][l]->GetParameter(1);
-//double c = fmmbg[i][j][l]->GetParameter(2);
-//double d = fmmbg[i][j][l]->GetParameter(3);
-//double e = fmmbg[i][j][l]->GetParameter(4);
-//double f = fmmbg[i][j][l]->GetParameter(5);
-////cout<<"0:1:2:3:4:5="<<a<<"::"<<b<<"::"<<c<<"::"<<d<<"::"<<e<<"::"<<f<<endl;
-// fmm[i][j][l]->SetParameters(0,a);
-// fmm[i][j][l]->SetParameters(1,b);
-// fmm[i][j][l]->SetParameters(2,c);
-// fmm[i][j][l]->SetParameters(3,d);
-// fmm[i][j][l]->SetParameters(4,e);
-// fmm[i][j][l]->SetParameters(5,f);
-// fmm[i][j][l]->SetParameters(6,500);
-// fmm[i][j][l]->SetParameters(7,def_mean_L);
-// fmm[i][j][l]->SetParameters(8,def_sig_L);
-// fmm[i][j][l]->SetParameters(9,100);
-// fmm[i][j][l]->SetParameters(10,def_mean_S);
-// fmm[i][j][l]->SetParameters(11,def_sig_S);
-// hmm_L_fom[i][j][l]->Fit("fmm[i][j][l]","Rq0","",-0.1,0.15);
-//a = fmm[i][j][l]->GetParameter(0);
-//b = fmm[i][j][l]->GetParameter(1);
-//c = fmm[i][j][l]->GetParameter(2);
-//d = fmm[i][j][l]->GetParameter(3);
-//e = fmm[i][j][l]->GetParameter(4);
-//f = fmm[i][j][l]->GetParameter(5);
-// fmmbg[i][j][l]->SetParameters(a,b,c,d,e,f);
-////cout<<"0:1:2:3:4:5(as a total func)="<<a<<"::"<<b<<"::"<<c<<"::"<<d<<"::"<<e<<"::"<<f<<endl;
-//
-////cout<<"fL fit start"<<endl;
-//// hmm_wo_bg_fom[i][j][l]->Fit("fL[i][j][l]","Rq0","",def_mean_L-3*def_sig_L,def_mean_L+3*def_sig_L);
-//// n_L[i][j][l]=fL[i][j][l]->GetParameter(0);
-//// mean_L[i][j][l]=fL[i][j][l]->GetParameter(1);
-//// sig_L[i][j][l]=fL[i][j][l]->GetParameter(2);
-// mean_L[i][j][l]=def_mean_L;
-// mean_S[i][j][l]=def_mean_S;
-// sig_L[i][j][l]=def_sig_L;
-// sig_S[i][j][l]=def_sig_S;
-// n_L[i][j][l]=hmm_wo_bg_fom[i][j][l]->Integral(hmm_wo_bg_fom[i][j][l]->FindBin(center_L-range_L),hmm_wo_bg_fom[i][j][l]->FindBin(center_L+range_L));
-// n_L[i][j][l]-=fmmbg[i][j][l]->Integral(center_L-range_L,center_L+range_L);
-////n_L[i][j][l]-=(pow(mean_L[i][j][l]+2*sig_L[i][j][l],5)-pow(mean_L[i][j][l]-2*sig_L[i][j][l],5))*a/5;
-////n_L[i][j][l]-=(pow(mean_L[i][j][l]+2*sig_L[i][j][l],4)-pow(mean_L[i][j][l]-2*sig_L[i][j][l],4))*b/4;
-////n_L[i][j][l]-=(pow(mean_L[i][j][l]+2*sig_L[i][j][l],3)-pow(mean_L[i][j][l]-2*sig_L[i][j][l],3))*c/3;
-////n_L[i][j][l]-=(pow(mean_L[i][j][l]+2*sig_L[i][j][l],2)-pow(mean_L[i][j][l]-2*sig_L[i][j][l],2))*d/2;
-////n_L[i][j][l]-=(pow(mean_L[i][j][l]+2*sig_L[i][j][l],1)-pow(mean_L[i][j][l]-2*sig_L[i][j][l],1))*e;
-//
-//n_S[i][j][l]=hmm_wo_bg_fom[i][j][l]->Integral(hmm_wo_bg_fom[i][j][l]->FindBin(center_S-range_S),hmm_wo_bg_fom[i][j][l]->FindBin(center_S+range_S));
-// n_S[i][j][l]-=fmmbg[i][j][l]->Integral(center_S-range_S,center_S+range_S);
-////n_S[i][j][l]-=(pow(mean_S[i][j][l]+2*sig_S[i][j][l],5)-pow(mean_S[i][j][l]-2*sig_S[i][j][l],5))*a/5;
-////n_S[i][j][l]-=(pow(mean_S[i][j][l]+2*sig_S[i][j][l],4)-pow(mean_S[i][j][l]-2*sig_S[i][j][l],4))*b/4;
-////n_S[i][j][l]-=(pow(mean_S[i][j][l]+2*sig_S[i][j][l],3)-pow(mean_S[i][j][l]-2*sig_S[i][j][l],3))*c/3;
-////n_S[i][j][l]-=(pow(mean_S[i][j][l]+2*sig_S[i][j][l],2)-pow(mean_S[i][j][l]-2*sig_S[i][j][l],2))*d/2;
-////n_S[i][j][l]-=(pow(mean_S[i][j][l]+2*sig_S[i][j][l],1)-pow(mean_S[i][j][l]-2*sig_S[i][j][l],1))*e;
-//
-// cout<<"n_L"<<n_L[i][j][l]<<endl;
-//cout<<"mean_L"<<mean_L[i][j][l]<<endl;
-//cout<<"sig_L"<<sig_L[i][j][l]<<endl;
-// cout<<"n_S"<<n_S[i][j][l]<<endl;
-//cout<<"mean_S"<<mean_S[i][j][l]<<endl;
-//cout<<"sig_S"<<sig_S[i][j][l]<<endl;
-
-// hmm_wo_bg_fom[i][j][l]->Fit(Form("fL[%d][%d][%d]",i,j,l),"Rq0","",def_mean_L-3*def_sig_L,def_mean_L+3*def_sig_L);
-// //n_L[i][j][l]=fL[i][j][l]->GetParameter(0);
-// mean_L[i][j][l]=fL[i][j][l]->GetParameter(1);
-// sig_L[i][j][l]=fL[i][j][l]->GetParameter(2);
-// n_L[i][j][l]=hmm_wo_bg_fom[i][j][l]->Integral(hmm_wo_bg_fom[i][j][l]->FindBin(mean_L_noAC2-2*sig_L_noAC2),hmm_wo_bg_fom[i][j][l]->FindBin(mean_L_noAC2+2*sig_L_noAC2));
-// cout<<"n_L"<<n_L[i][j][l]<<endl;
-//
-////cout<<"fS fit start"<<endl;
-// hmm_wo_bg_fom[i][j][l]->Fit(Form("fS[%d][%d][%d]",i,j,l),"Rq0","",def_mean_S-3*def_sig_S,def_mean_S+3*def_sig_S);
-//// n_S[i][j][l]=fS[i][j][l]->GetParameter(0);
-// mean_S[i][j][l]=fS[i][j][l]->GetParameter(1);
-// sig_S[i][j][l]=fS[i][j][l]->GetParameter(2);
-// n_S[i][j][l]=hmm_wo_bg_fom[i][j][l]->Integral(hmm_wo_bg_fom[i][j][l]->FindBin(mean_S_noAC2-2*sig_S_noAC2),hmm_wo_bg_fom[i][j][l]->FindBin(mean_S_noAC2+2*sig_S_noAC2));
-// cout<<"n_S"<<n_S[i][j][l]<<endl;
-//cout<<"mean_S"<<mean_S[i][j][l]<<endl;
-//cout<<"sig_S"<<sig_S[i][j][l]<<endl;
-
-
- //--Fitting again as a total function--//
-// fmm[i][j][l]->SetParameters(n_L[i][j][l],mean_L[i][j][l],sig_L[i][j][l],n_S[i][j][l],mean_S[i][j][l],sig_S[i][j][l],d,c,b,a);
-//// hmm_L_fom[i][j][l]->Fit(Form("fmm[%d][%d][%d]",i,j,l),"Rq0","",min_mm,max_mm);
-// n_L[i][j][l]=fmm[i][j][l]->GetParameter(0);
-// mean_L[i][j][l]=fmm[i][j][l]->GetParameter(1);
-// sig_L[i][j][l]=fmm[i][j][l]->GetParameter(2);
-// n_S[i][j][l]=fmm[i][j][l]->GetParameter(3);
-// mean_S[i][j][l]=fmm[i][j][l]->GetParameter(4);
-// sig_S[i][j][l]=fmm[i][j][l]->GetParameter(5);
-// //------- Get Error Paramters ---//
-// n_L_err[i][j][l]=fmm[i][j][l]->GetParError(0); 
-// n_S_err[i][j][l]=fmm[i][j][l]->GetParError(3); 
-//
-//
-//
-// signal[i][j][l]=noise[i][j][l]=0.;
-// d = fmm[i][j][l]->GetParError(6); 
-// c = fmm[i][j][l]->GetParError(7); 
-// b = fmm[i][j][l]->GetParError(8); 
-// a = fmm[i][j][l]->GetParError(9); 
-// double range = 6*sig_L[i][j][l];//(meanL-3sigmaL, meanL+3sigmaL)
-// double upp = mean_L[i][j][l]+3*sig_L[i][j][l];
-// double low = mean_L[i][j][l]-3*sig_L[i][j][l];
-// //noise[i][j][l] = a*range*range*range*range/4+b*range*range*range/3+c*range*range/2+d*range;//polynominal integral 
-// noise[i][j][l] = a*(pow(upp,4)-pow(low,4))/4+b*(pow(upp,3)-pow(low,3))/3+c*(pow(upp,2)-pow(low,2))/2+d*(upp-low);//polynominal integral 
-//	if(noise[i][j][l]==0)noise[i][j][l]=1;
-// signal[i][j][l] = n_L[i][j][l];
-////FOM old // fom_L[i][j][l] = sqrt(signal[i][j][l]*signal[i][j][l]/noise[i][j][l]);
-//// fom_L[i][j][l] = (signal[i][j][l])/(sqrt(signal[i][j][l]+noise[i][j][l]));//peak significance
-//fom_pi1[i] = n_pi[i][j][l]/n_pi[nth][nth][nth]; 
-//fom_k1[i] = n_k[i][j][l]/n_k[nth][nth][nth]; 
-//fom_p1[i] = n_p[i][j][l]/n_p[nth][nth][nth]; 
-//err_fom_pi1[i] = n_pi_err[i][j][l]/(n_pi[nth][nth][nth]); 
-//err_fom_k1[i] = n_k_err[i][j][l]/(n_k[nth][nth][nth]); 
-//err_fom_p1[i] = n_p_err[i][j][l]/(n_p[nth][nth][nth]); 
-
-
-//-------Originally commented out---------//
-//err_fom_pi1[i] = sqrt(pow(n_pi_err[i][j][l],2)/pow(n_pi[nth][nth][nth],2)+pow(n_pi[i][j][l]*n_pi_err[nth][nth][nth],2)/pow(n_pi[nth][nth][nth],4)); 
-//err_fom_k1[i] = sqrt(pow(n_k_err[i][j][l],2)/pow(n_k[nth][nth][nth],2)+pow(n_k[i][j][l]*n_k_err[nth][nth][nth],2)/pow(n_k[nth][nth][nth],4)); 
-//err_fom_p1[i] = sqrt(pow(n_p_err[i][j][l],2)/pow(n_p[nth][nth][nth],2)+pow(n_p[i][j][l]*n_p_err[nth][nth][nth],2)/pow(n_p[nth][nth][nth],4)); 
-//if(fom_pi1[i]<0){fom_pi1[i]=0.;err_fom_pi1[i]=0.;} 
-//if(fom_pi1[i]+err_fom_pi1[i]>1){err_fom_pi1[i]=1-fom_pi1[i];} 
-//if(fom_k1[i]<0){fom_k1[i]=0.;err_fom_k1[i]=0.;} 
-//if(fom_p1[i]<0){fom_p1[i]=0.;err_fom_p1[i]=0.;}
-// if(i==3&&l==3) fom_pi2l[j] = n_pi[i][j][l]/n_pi[nth][nth][nth]; 
-// if(i==3&&j==3) fom_pi2u[l] = n_pi[i][j][l]/n_pi[nth][nth][nth]; 
-// fom_k[i] = n_k[i][j][l]/n_k[nth][nth][nth]; 
-// fom_p[i] = n_p[i][j][l]/n_p[nth][nth][nth]; 
-//cout << "i,j,l= " << i <<", "<<j<<", "<<l<<endl;
-//cout << "fom_pi[i][j][l] =" << fom_pi[i][j][l] << endl;
-
-//	if(fom_L[i][j][l]>100)fom_L[i][j][l]=0;
-//	if(signal[i][j][l]>100)fom_L[i][j][l]=0;
-//	if(fom_L[i][j][l]<0)fom_L[i][j][l]=0;
-//cout <<  "S = " << signal[i][j][l] << "/ N = " << noise[i][j][l] << "... sqrt(S*S/N) = " << fom_L[i][j][l] << endl;
-// h3_fom->Fill(ac1_adc[i],ac2l_adc[j],ac2u_adc[l],fom_L[i][j][l]);
 	
 	
 	if(n_pi[i][j][l]>0.){}else{n_pi[i][j][l]=1.;}
@@ -4021,11 +4109,15 @@ cout<<"sig_S"<<sig_S[i][j][l]<<endl;
 //ofstream fout(Form("SR_z_%d.dat",(int)zver[0]));
 ofstream fout("SR_z.dat");
 cout<<"AC Efficiency is filled."<<endl;
-//fout<<n_pi_noZ<<" "<<n_k_noZ<<" "<<n_p_noZ<<" "<<n_L_noZ<<" "<<n_S_noZ<<endl;
+fout<<"i=10: pL<2.12, Full Range (Sigma)"<<endl;
+fout<<"i=20: 2.1<pL<2.15, 6msr cut, Top(Lambda)"<<endl;
+fout<<"i=30: 2.05<pL<2.1, 6msr cut, Top(Sigma)"<<endl;
+fout<<n_pi_noZ<<" "<<n_k_noZ<<" "<<n_p_noZ<<" "<<n_L_noZ<<" "<<n_S_noZ<<endl;
 for(int i=0;i<nth;i++){
 //	for(int j=0;j<nth;j++){
 		int j=0;	int l=0;
-		fout<<n_pi[i][j][l]/n_pi_noZ<<" "<<n_k[i][j][l]/n_k_noZ<<" "<<n_p[i][j][l]/n_p_noZ<<" "<<n_L[i][j][l]/n_L_noZ<<" "<<n_S[i][j][l]/n_S_noZ<<"|Ave(z)|<"<<zver[i] <<endl;
+		//fout<<n_pi[i][j][l]/n_pi_noZ<<" "<<n_k[i][j][l]/n_k_noZ<<" "<<n_p[i][j][l]/n_p_noZ<<" "<<n_L[i][j][l]/n_L_noZ<<" "<<n_S[i][j][l]/n_S_noZ<<"|Ave(z)|<"<<zver[i] <<endl;
+		fout<<n_pi[i][j][l]<<" "<<n_k[i][j][l]<<" "<<n_p[i][j][l]<<" "<<n_L[i][j][l]<<" "<<n_S[i][j][l]<<"|Ave(z)|<"<<zver[i] <<endl;
 //	}
 }
 		
@@ -4586,47 +4678,21 @@ TLine *tl7, *tl8, *tl9, *tl10;
 	tl10->SetLineWidth(1);
 	tl10->SetLineColor(kCyan);
 	tl10->Draw("same");
-//c1->cd(1);h_ct->Draw("");
-//c1->cd(2);hcoin_wo_bg_fom[nth][nth][nth]->Draw("");fcoin[nth][nth][nth]->Draw("same");
-//c1->cd(3);h_ct_wK->Draw("");fk_kc->SetLineColor(kRed);fk_kc->Draw("same");
-//c1->cd(4);h_mmall->Draw("");
-////c1->cd(5);h_mmfoil->Draw("");
-////c1->cd(6);h_mm->Draw("");
-////c1->cd(4);hmm_bg_fom[0][0][0]->Draw("");
-//c1->cd(4);hcoin_wo_bg_fom[8][8][8]->Draw("");fcoin[8][8][8]->SetLineColor(kRed);fcoin[8][8][8]->Draw("same");
-////c1->cd(5);hmm_wo_bg_fom[0][0][0]->Draw("");
-//c1->cd(5);hmm_L_fom[8][8][8]->Draw("");fmm[8][8][8]->SetLineColor(kRed);fmm[8][8][8]->Draw("same");
-//c1->cd(6);h3_fom->Draw("box2 z");
-////h3_fom->GetXaxis()->SetRange(ac1_adc[0],ac1_adc[9]);
-//TH2D *hProjectionyz = (TH2D*) h3_fom->Project3D("yz");
-////h3_fom->GetYaxis()->SetRange(ac2l_adc[0],ac2l_adc[9]);
-//TH2D *hProjectionxz = (TH2D*) h3_fom->Project3D("xz");
-////h3_fom->GetZaxis()->SetRange(ac2u_adc[0],ac2u_adc[9]);
-//TH2D *hProjectionxy = (TH2D*) h3_fom->Project3D("xy");
-//c1->cd(7);hProjectionyz->Draw("colz");
-//c1->cd(8);hProjectionxz->Draw("colz");
-//c1->cd(9);hProjectionxy->Draw("colz");
-//c1->cd(1);hcoin_pi->Draw("");fpi_pic->SetLineColor(kRed);fpi_pic->Draw("same");
-//c1->cd(2);hcoin_k->Draw("");fk_kc->SetLineColor(kRed);fk_kc->Draw("same");
-//c1->cd(3);hcoin_p->Draw("");fp_pc->SetLineColor(kRed);fp_pc->Draw("same");
-//for(int i=1;i<=3;i++){
-//c1->cd(i+3);hcoin_k_ac2[i-1]->Draw("");fkk[i-1]->SetLineColor(kRed);fkk[i-1]->Draw("same");
-//}
 
 c2->Divide(2,2);
 cout<<"c2 start"<<endl;
 c2->cd(1);
 hmm_wo_bg_fom_noZ->Draw("");
-hmm_wo_bg_fom[20][0][0]->SetLineColor(kRed);
-hmm_wo_bg_fom[20][0][0]->Draw("same");
+//hmm_wo_bg_fom[20][0][0]->SetLineColor(kRed);
+//hmm_wo_bg_fom[20][0][0]->Draw("same");
 c2->cd(2);
 hcoin_wo_bg_fom_noZ->Draw("");
-hcoin_wo_bg_fom[20][0][0]->SetLineColor(kRed);
-hcoin_wo_bg_fom[20][0][0]->Draw("same");
+//hcoin_wo_bg_fom[20][0][0]->SetLineColor(kRed);
+//hcoin_wo_bg_fom[20][0][0]->Draw("same");
 c2->cd(3);
 hmm_wo_bg_fom_noZ->Draw("");
-hmm_wo_bg_fom[20][0][0]->SetLineColor(kRed);
-hmm_wo_bg_fom[20][0][0]->Draw("same");
+//hmm_wo_bg_fom[20][0][0]->SetLineColor(kRed);
+//hmm_wo_bg_fom[20][0][0]->Draw("same");
 hmm_wo_bg_fom[99][0][0]->SetLineColor(kGreen);
 hmm_wo_bg_fom[99][0][0]->Draw("same");
 c2->cd(4);
@@ -4650,39 +4716,10 @@ hmm_L_fom_Zdiff->SetLineColor(kAzure);hmm_L_fom_Zdiff->Draw("same");
 hmm_L_fom_Zsum->SetLineColor(kRed);hmm_L_fom_Zsum->Draw("same");
 c4->Divide(2,2);
 cout<<"c4 start"<<endl;
-//c4->cd(1);
-//h_R_vz->Draw("");
-//h_R_vz2->SetLineColor(kAzure);
-//h_R_vz2->Draw("same");
-//double vzLmax = (h_R_vz->GetBinContent(h_R_vz->GetMaximumBin()));
-//TLine *vz1, *vz2;
-//	vz1 = new TLine(-0.025,0,-0.025,0.5*vzLmax);
-//	vz1->SetLineWidth(1);
-//	vz1->SetLineColor(kRed);
-//	vz1->Draw("same");
-//	vz2 = new TLine(0.025,0,0.025,0.5*vzLmax);
-//	vz2->SetLineWidth(1);
-//	vz2->SetLineColor(kRed);
-//	vz2->Draw("same");
-//c4->cd(2);
-//h_L_vz->Draw("");
-//h_L_vz2->SetLineColor(kAzure);
-//h_L_vz2->Draw("same");
-//double vzRmax = (h_L_vz->GetBinContent(h_L_vz->GetMaximumBin()));
-//TLine *vz3, *vz4;
-//	vz3 = new TLine(-0.1,0,-0.1,0.5*vzRmax);
-//	vz3->SetLineWidth(1);
-//	vz3->SetLineColor(kRed);
-//	vz3->Draw("same");
-//	vz4 = new TLine(0.1,0,0.1,0.5*vzRmax);
-//	vz4->SetLineWidth(1);
-//	vz4->SetLineColor(kRed);
-//	vz4->Draw("same");
 c4->cd(3)->SetLogz(1);
 h_zz->Draw("colz");
 c4->cd(4);
 h_m2_ac->Draw("colz");
-//gcoin_p_sr[0]->Draw("ap");
 c5->Divide(2,2);
 c5->cd(1);
 hct_test2->Draw("");
@@ -4692,19 +4729,7 @@ c5->cd(3);
 h_ctct->Draw("colz");
 c5->cd(4)->SetLogz(1);
 h_ctct->Draw("colz");
-//c5->cd()->DrawFrame(0.,0.,510,1.2);//K,L,S vs th1//Diff
-//cout<<"c5 start"<<endl;
-//pEff1->SetLineColor(kOrange);pEff1->Draw("same");
-//pEff2->SetLineColor(kGreen);pEff2->Draw("same");
-//pEff3->SetLineColor(kRed);pEff3->Draw("same");
-c6->cd();
-cout<<"c6 start"<<endl;
-pEff2->Draw("");
-//hcoin_wo_bg_fom[0][0][0]->Draw("");fcoin[0][0][0]->SetLineColor(kRed);fcoin[0][0][0]->Draw("same");
-c7->cd();
-cout<<"c7 start"<<endl;
-pEff3->Draw("");
-//c12->cd()->DrawFrame(0.,0.,0.25,1.2);//K,L,S vs th1//SUM
+
 c8->Divide(2,2);
 c8->cd(1);
 h_zz1->Draw("colz");
@@ -4732,20 +4757,6 @@ c10->cd(3);
 h_z33->Draw("");
 c10->cd(4);
 h_z44->Draw("");
-//c10->Divide(2,3);
-//cout<<"c10 start"<<endl;
-//c10->cd(1);
-//h_Lp_c->Draw("");
-//c10->cd(2);
-//h_Rp_c->Draw("");
-//c10->cd(3);
-//h_Lth_c->Draw("");
-//c10->cd(4);
-//h_Rth_c->Draw("");
-//c10->cd(5);
-//h_Lph_c->Draw("");
-//c10->cd(6);
-//h_Rph_c->Draw("");
 c11->cd()->DrawFrame(0.,0.,0.5,1.2);//K,L,S vs th1//Diff
 cout<<"c11 start"<<endl;
 pEff4->SetLineColor(kAzure);pEff4->Draw("same");
@@ -4755,306 +4766,605 @@ cout<<"c12 start"<<endl;
 pEff2->SetLineColor(kGreen);pEff2->Draw("same");
 pEff4->SetLineColor(kAzure);pEff4->Draw("same");
 pEff5->SetLineColor(kCyan);pEff5->Draw("same");
+
 c13->Divide(2,2);
 c13->cd(1);
-h_theta_ee->Draw("");
+//h_theta_ee->Draw("");
+h_L_tgph_tgth->Draw("colz");
 c13->cd(2);
-h_theta_ee2->Draw("");
+//h_theta_ee2->Draw("");
+h_L_tgph_tgth2->Draw("colz");
 c13->cd(3);
 h_theta_ee_p->Draw("colz");
 c13->cd(4);
 h_theta_ee_p2->Draw("colz");
 
+//c14->Divide(2,2);
+//c14->cd(1);
+//h_theta_ee3->Draw("");
+//c14->cd(2);
+//h_theta_ee4->Draw("");
+//c14->cd(3);
+//h_theta_ee_p3->Draw("colz");
+//c14->cd(4);
+//h_theta_ee_p4->Draw("colz");
 
-c14->cd();
-h_R_m2->Draw("");
-c15->cd();
-h_L_tgph_tgth->Draw("colz");
-c17->cd()->DrawFrame(-2.,0.,2.,500.);
-hcoin_wo_bg_fom_noZ->Draw("same");
-hcoin_wo_bg_fom[20][0][0]->SetLineColor(kRed);
-hcoin_wo_bg_fom[20][0][0]->Draw("same");
-hcoin_wo_bg_fom[99][0][0]->SetLineColor(kGreen);
-hcoin_wo_bg_fom[99][0][0]->Draw("same");
+c15->Divide(2,2);
+c15->cd(1);
+h_phi_ee->Draw("");
+c15->cd(2);
+h_phi_ee2->Draw("");
+c15->cd(3);
+h_phi_ee3->Draw("");
+c15->cd(4);
+h_phi_ee4->Draw("");
 
-c18->cd()->DrawFrame(-0.03,0.,0.03,500.);
-hmm_wo_bg_fom_noZ->Draw("same");
-hmm_wo_bg_fom[20][0][0]->SetLineColor(kRed);
-hmm_wo_bg_fom[20][0][0]->Draw("same");
-hmm_wo_bg_fom[99][0][0]->SetLineColor(kGreen);
-hmm_wo_bg_fom[99][0][0]->Draw("same");
+c16->Divide(3,2);
+c16->cd(1);
+h_theta_ek->Draw("");
+c16->cd(2);
+h_phi_ek->Draw("");
+c16->cd(3);
+h_theta_g->Draw("");
+c16->cd(4);
+h_phi_g->Draw("");
+c16->cd(5);
+h_thph_ek->Draw("colz");
+c16->cd(6);
+h_thph_g->Draw("colz");
+
+c17->Divide(2,2);
+c17->cd(1);
+h_theta_gk_lab->Draw("");
+c17->cd(2);
+h_theta_gk_cm->Draw("");
+c17->cd(3);
+h_cos_gk_lab->Draw("");
+c17->cd(4);
+h_cos_gk_cm->Draw("");
+
+c18->Divide(2,2);
+c18->cd(1);
+h_mom_g->Draw("");
+c18->cd(2);
+h_pL_pR->Draw("colz");
+c18->cd(3);
+h_pL_pR2->Draw("colz");
+c18->cd(4);
+h_pL_pR3->Draw("colz");
+
 
 c19->Divide(2,2);
 c19->cd(1);
-hmm_wo_bg_fom[0][0][0]->Draw("");
-fmmbg[0][0][0]->SetLineColor(kGreen);
-fmmbg[0][0][0]->Draw("same");
+h_Lz2->Draw("");
 c19->cd(2);
-hmm_wo_bg_fom[20][0][0]->Draw("");
-fmmbg[20][0][0]->SetLineColor(kGreen);
-fmmbg[20][0][0]->Draw("same");
-c19->cd(3);
-hmm_wo_bg_fom[50][0][0]->Draw("");
-fmmbg[50][0][0]->SetLineColor(kGreen);
-fmmbg[50][0][0]->Draw("same");
-c19->cd(4);
-hmm_wo_bg_fom[99][0][0]->Draw("");
-fmmbg[99][0][0]->SetLineColor(kGreen);
-fmmbg[99][0][0]->Draw("same");
+h_Rz2->Draw("");
+c19->cd(3)->SetLogy(1);
+h_Lz->Scale(1./10.);
+h_Lz->Draw("");
+h_Lz2->SetLineColor(kAzure);
+h_Lz2->Draw("same");
+c19->cd(4)->SetLogy(1);
+h_Rz->Scale(1./10.);
+h_Rz->Draw("");
+h_Rz2->SetLineColor(kAzure);
+h_Rz2->Draw("same");
 
-c20->Divide(2,3);
+
+c20->Divide(2,2);
 c20->cd(1);
-h_gbetaL->Draw("");
+hmm_wo_bg_fom_noZ->Draw("");
+fmm_noZ->SetLineColor(kRed);
+fmm_noZ->Draw("same");
 c20->cd(2);
-h_gbetaR->Draw("");
+hmm_wo_bg_fom[20][0][0]->Draw("");
+fmm[20][0][0]->SetLineColor(kRed);
+fmm[20][0][0]->Draw("same");
 c20->cd(3);
-h_gLenL->Draw("");
+hmm_wo_bg_fom[10][0][0]->Draw("");
+fmm[10][0][0]->SetLineColor(kRed);
+fmm[10][0][0]->Draw("same");
 c20->cd(4);
-h_gLenR->Draw("");
-c20->cd(5);
-h_gpL->Draw("");
-c20->cd(6);
-h_gpR->Draw("");
+hmm_wo_bg_fom[30][0][0]->Draw("");
+fmm[30][0][0]->SetLineColor(kRed);
+fmm[30][0][0]->Draw("same");
+//c16->Divide(2,2);
+//c16->cd(1);
+//h_vpflux->SetStats(1);
+//h_vpflux->Draw("");
+//cout<<"h_vpflux mean"<<endl;
+//cout<<"Mean(x)="<<h_vpflux->GetMean(1)<<endl;
+////cout<<"Mean(y)="<<h_vpflux->GetMean(2)<<endl;
+//c16->cd(2);
+//cout<<"h_vpflux2 mean"<<endl;
+//cout<<"Mean(x)="<<h_vpflux2->GetMean(1)<<endl;
+////cout<<"Mean(y)="<<h_vpflux2->GetMean(2)<<endl;
+//h_vpflux2->SetStats(1);
+//h_vpflux2->Draw("");
+//c16->cd(3);
+//cout<<"h_vpflux3 mean"<<endl;
+//cout<<"Mean(x)="<<h_vpflux3->GetMean(1)<<endl;
+////cout<<"Mean(y)="<<h_vpflux3->GetMean(2)<<endl;
+//h_vpflux3->SetStats(1);
+//h_vpflux3->Draw("");
+//c16->cd(4);
+//cout<<"h_vpflux4 mean"<<endl;
+//cout<<"Mean(x)="<<h_vpflux4->GetMean(1)<<endl;
+////cout<<"Mean(y)="<<h_vpflux4->GetMean(2)<<endl;
+//h_vpflux4->SetStats(1);
+//h_vpflux4->Draw("");
 
+//c17->Divide(2,2);
+//c17->cd(1)->SetLogz(1);
+//TProfile *pfx = h_ct_x->ProfileX();
+////h_ct_x->Draw("colz");
+//pfx->Draw("");
+//c17->cd(2)->SetLogz(1);
+//TProfile *pfy = h_ct_y->ProfileX();
+//pfy->Draw("");
+////h_ct_y->Draw("colz");
+//c17->cd(3)->SetLogz(1);
+//TProfile *pfth = h_ct_th->ProfileX();
+//pfth->Draw("");
+////h_ct_th->Draw("colz");
+//c17->cd(4)->SetLogz(1);
+//TProfile *pfph = h_ct_ph->ProfileX();
+////h_ct_ph->Draw("colz");
+//pfph->Draw("");
+//
+//c18->Divide(2,3);
+//c18->cd(1);
+////h_ct_xy->Draw("colz");
+//TProfile *pfxy = h_ct_xy->ProfileY();
+//pfxy->Draw("");
+//c18->cd(2);
+//cout<<"4845 line here"<<endl;
+////h_ct_thph->Draw("colz");
+//h_ct_thph->FitSlicesX();
+////h_ct_thph->Draw("");
+//c18->cd(3);
+////h_ct_xth->Draw("colz");
+//h_ct_xth->FitSlicesX();
+////TH1F *h_ct_xth_1=(TH1F*)gDirectory->Get("h_ct_xth_1");
+//h_ct_xth->Draw("");
+////h_ct_xth_1->Draw("same");
+//c18->cd(4);
+////h_ct_yph->Draw("colz");
+//TProfile *pfyph = h_ct_yph->ProfileY();
+//pfyph->Draw("");
+//c18->cd(5);
+////h_ct_xph->Draw("colz");
+//TProfile *pfxph = h_ct_xph->ProfileY();
+//pfxph->Draw("");
+//c18->cd(6);
+////h_ct_yth->Draw("colz");
+//TProfile *pfyth = h_ct_yth->ProfileY();
+//pfyth->Draw("");
+//
+//c19->Divide(2,3);
+//c19->cd(1)->SetLogz(1);
+//h_ct_xy->Draw("colz");
+//c19->cd(2)->SetLogz(1);
+//h_ct_thph->Draw("colz");
+//c19->cd(3)->SetLogz(1);
+//h_ct_xth->Draw("colz");
+//c19->cd(4)->SetLogz(1);
+//h_ct_yph->Draw("colz");
+//c19->cd(5)->SetLogz(1);
+//h_ct_xph->Draw("colz");
+//c19->cd(6)->SetLogz(1);
+//h_ct_yth->Draw("colz");
+//
+//c20->Divide(2,3);
+//c20->cd(1)->SetLogz(1);
+//h_ct_tgth->Draw("colz");
+//c20->cd(2)->SetLogz(1);
+//h_ct_tgph->Draw("colz");
+//c20->cd(3)->SetLogz(1);
+//h_ct_vz->Draw("colz");
+//c20->cd(4)->SetLogz(1);
+//h_ct_tgthtgph->Draw("colz");
+//c20->cd(5)->SetLogz(1);
+//h_ct_tgthz->Draw("colz");
+//c20->cd(6)->SetLogz(1);
+//h_ct_tgphz->Draw("colz");
+//
+//
 c21->Divide(2,2);
 c21->cd(1);
-h_gcorL->Draw("");
+h_ct_thph->Draw("colz");
 c21->cd(2);
-h_gcorR->Draw("");
+fpi_slice = new TF1("fpi_slice","gausn(0)+pol0(3)",def_mean_pi-3*def_sig_pi,def_mean_pi+3*def_sig_pi);
+fpi_slice->SetNpx(2000);
+fpi_slice->SetParameters(1000.,def_mean_pi,def_sig_pi,20.);
+//h_ct_thph->FitSlicesY(0,h_ct_thph->FindBin(def_mean_pi-3*def_sig_pi),h_ct_thph->FindBin(def_mean_pi+3*def_sig_pi),20);//more than 20 bins
+h_ct_thph->FitSlicesX(fpi_slice);
+TH1F *h_ct_thph_0=(TH1F*)gDirectory->Get("h_ct_thph_0");
+TH1F *h_ct_thph_1=(TH1F*)gDirectory->Get("h_ct_thph_1");
+TH1F *h_ct_thph_2=(TH1F*)gDirectory->Get("h_ct_thph_2");
+//h_ct_thph_1->GetYaxis()->SetRangeUser(-0.5,0.5);
+h_ct_thph_0->Draw("");
 c21->cd(3);
-h_gcorLR->Draw("colz");
+h_ct_thph_1->Draw("");
+c21->cd(4);
+h_ct_thph_2->Draw("");
 
-c22->Divide(2,3);
+
+
+c22->Divide(2,2);
 c22->cd(1);
-h_gtref_R->Draw("");
+h_theta_ee_p3->Draw("colz");
 c22->cd(2);
-h_gmeantime->Draw("");
+h_phi_ee_p->Draw("colz");
 c22->cd(3);
-h_gtimeL_R->Draw("");
+h_original_phth5->Draw("colz");
 c22->cd(4);
-h_gtimeR_R->Draw("");
-c22->cd(5);
-h_gctcorL->Draw("");
-c22->cd(6);
-h_gctcorR->Draw("");
+h_original_phth6->Draw("colz");
+
+c23->Divide(2,2);
+c23->cd(1);
+h_original_phth7->Draw("colz");
+c23->cd(2);
+h_original_phth8->Draw("colz");
+c23->cd(3);
+h_original_phth9->Draw("colz");
+c23->cd(4);
+h_original_phth10->Draw("colz");
+//
+//c22->cd();
+//h_ct_thph->Draw("");
+//h_ct_thph_1->Draw("same");
+//c14->cd();
+//h_R_m2->Draw("");
+//c15->cd();
+//h_L_tgph_tgth->Draw("colz");
+//c17->cd()->DrawFrame(-2.,0.,2.,500.);
+//hcoin_wo_bg_fom_noZ->Draw("same");
+//hcoin_wo_bg_fom[20][0][0]->SetLineColor(kRed);
+//hcoin_wo_bg_fom[20][0][0]->Draw("same");
+//hcoin_wo_bg_fom[99][0][0]->SetLineColor(kGreen);
+//hcoin_wo_bg_fom[99][0][0]->Draw("same");
+//
+//c18->cd()->DrawFrame(-0.03,0.,0.03,500.);
+//hmm_wo_bg_fom_noZ->Draw("same");
+//hmm_wo_bg_fom[20][0][0]->SetLineColor(kRed);
+//hmm_wo_bg_fom[20][0][0]->Draw("same");
+//hmm_wo_bg_fom[99][0][0]->SetLineColor(kGreen);
+//hmm_wo_bg_fom[99][0][0]->Draw("same");
+//
+//c19->Divide(2,2);
+//c19->cd(1);
+//hmm_wo_bg_fom[0][0][0]->Draw("");
+//fmmbg[0][0][0]->SetLineColor(kGreen);
+//fmmbg[0][0][0]->Draw("same");
+//c19->cd(2);
+//hmm_wo_bg_fom[20][0][0]->Draw("");
+//fmmbg[20][0][0]->SetLineColor(kGreen);
+//fmmbg[20][0][0]->Draw("same");
+//c19->cd(3);
+//hmm_wo_bg_fom[50][0][0]->Draw("");
+//fmmbg[50][0][0]->SetLineColor(kGreen);
+//fmmbg[50][0][0]->Draw("same");
+//c19->cd(4);
+//hmm_wo_bg_fom[99][0][0]->Draw("");
+//fmmbg[99][0][0]->SetLineColor(kGreen);
+//fmmbg[99][0][0]->Draw("same");
+
+//c20->Divide(2,3);
+//c20->cd(1);
+//h_gbetaL->Draw("");
+//c20->cd(2);
+//h_gbetaR->Draw("");
+//c20->cd(3);
+//h_gLenL->Draw("");
+//c20->cd(4);
+//h_gLenR->Draw("");
+//c20->cd(5);
+//h_gpL->Draw("");
+//c20->cd(6);
+//h_gpR->Draw("");
+//
+//c21->Divide(2,2);
+//c21->cd(1);
+//h_gcorL->Draw("");
+//c21->cd(2);
+//h_gcorR->Draw("");
+//c21->cd(3);
+//h_gcorLR->Draw("colz");
+//
+//c22->Divide(2,3);
+//c22->cd(1);
+//h_gtref_R->Draw("");
+//c22->cd(2);
+//h_gmeantime->Draw("");
+//c22->cd(3);
+//h_gtimeL_R->Draw("");
+//c22->cd(4);
+//h_gtimeR_R->Draw("");
+//c22->cd(5);
+//h_gctcorL->Draw("");
+//c22->cd(6);
+//h_gctcorR->Draw("");
+//
+//
+//c23->Divide(2,3);
+//c23->cd(1)->SetLogy(1);
+//h_gtref_R->Draw("");
+//c23->cd(2)->SetLogy(1);
+//h_gmeantime->Draw("");
+//c23->cd(3)->SetLogy(1);
+//h_gtimeL_R->Draw("");
+//c23->cd(4)->SetLogy(1);
+//h_gtimeR_R->Draw("");
+//c23->cd(5)->SetLogy(1);
+//h_gctcorL->Draw("");
+//c23->cd(6)->SetLogy(1);
+//h_gctcorR->Draw("");
+//
+//c24->Divide(2,2);
+//c24->cd(1);
+//h_L_tgph_tgth12->Draw("colz");//No Cut
+//c24->cd(2);
+//h_L_tgph_tgth5->Draw("colz");//bestcut
+//c24->cd(3);
+//h_LHRS_phth->Draw("colz");
+//c24->cd(4);
+//h_LHRS_phth2->Draw("colz");
+//
+//c25->Divide(2,2);
+//c25->cd(1);
+//h_original_phth->Draw("colz");
+//c25->cd(2);
+//h_original_phth2->Draw("colz");
+//c25->cd(3);
+//h_LHRS_phth->Draw("colz");
+//c25->cd(4);
+//h_LHRS_phth2->Draw("colz");
 
 
-c23->Divide(2,3);
-c23->cd(1)->SetLogy(1);
-h_gtref_R->Draw("");
-c23->cd(2)->SetLogy(1);
-h_gmeantime->Draw("");
-c23->cd(3)->SetLogy(1);
-h_gtimeL_R->Draw("");
-c23->cd(4)->SetLogy(1);
-h_gtimeR_R->Draw("");
-c23->cd(5)->SetLogy(1);
-h_gctcorL->Draw("");
-c23->cd(6)->SetLogy(1);
-h_gctcorR->Draw("");
 
-c24->Divide(2,2);
-c24->cd(1);
-h_L_tgph_tgth3->Draw("colz");
-c24->cd(2);
-h_L_tgph_tgth4->Draw("colz");
-c24->cd(3);
-h_L_tgph_tgth5->Draw("colz");
-c24->cd(4);
-h_L_tgph_tgth2->Draw("colz");
+c26->cd();
+hmm_wo_bg_fom[20][0][0]->Draw("");//top_quality
+cout<<"N(Lambda)_top"<<n_L[20][0][0]<<endl;
+cout<<"N(Sigma)_top"<<n_S[20][0][0]<<endl;
 
-c25->Divide(2,2);
-c25->cd(1);
-h_L_tgph_tgth6->Draw("colz");
-c25->cd(2);
-h_L_tgph_tgth7->Draw("colz");
-c25->cd(3);
-h_L_tgph_tgth8->Draw("colz");
-c25->cd(4);
-h_L_tgph_tgth9->Draw("colz");
-
-c26->Divide(2,2);
-c26->cd(1);
-h_L_tgph_tgth10->Draw("colz");
-c26->cd(2);
-h_L_tgph_tgth11->Draw("colz");
-c26->cd(3);
-h_L_y_x->Draw("colz");
-
-
-c27->Divide(2,2);
-c27->cd(1);
-h_L_z_x->Draw("colz");
-c27->cd(2);
-h_L_z_y->Draw("colz");
-c27->cd(3);
-h_L_th_y->Draw("colz");
-c27->cd(4);
-h_L_ph_y->Draw("colz");
-
+c27->cd();
+hmm_wo_bg_fom_noZ->Draw("");//acceptance
+cout<<"N(Lambda)"<<n_L_noZ<<endl;
+cout<<"N(Sigma)"<<n_S_noZ<<endl;
 
 c28->Divide(2,2);
 c28->cd(1);
-h_L_th_x->Draw("colz");
+h_vpflux->Draw("");//top
 c28->cd(2);
-h_L_ph_x->Draw("colz");
+h_original_phth3->Draw("colz");//top	
 c28->cd(3);
-h_L_th_z->Draw("colz");
+h_Lp_top->Draw("");//Z
 c28->cd(4);
-h_L_ph_z->Draw("colz");
+h_original_phth4->Draw("colz");
 
-cout<<"n_pi_noZ="<<n_pi_noZ<<endl;
-cout<<"n_pi[20][0][0]="<<n_pi[20][0][0]<<endl;
-cout<<"n_pi[99][0][0]="<<n_pi[99][0][0]<<endl;
-cout<<"n_k_noZ="<<n_k_noZ<<endl;
-cout<<"n_k[20][0][0]="<<n_k[20][0][0]<<endl;
-cout<<"n_k[99][0][0]="<<n_k[99][0][0]<<endl;
-cout<<"n_L_noZ="<<n_L_noZ<<endl;
-cout<<"n_L[20][0][0]="<<n_L[20][0][0]<<endl;
-cout<<"n_L[99][0][0]="<<n_L[99][0][0]<<endl;
-cout<<"n_S_noZ="<<n_S_noZ<<endl;
-cout<<"n_S[20][0][0]="<<n_S[20][0][0]<<endl;
-cout<<"n_S[99][0][0]="<<n_S[99][0][0]<<endl;
+c29->cd();
+hmm_wo_bg_fom[20][0][0]->Draw("");//top_quality
+fmm[20][0][0]->SetLineColor(kRed);//top_quality
+fmm[20][0][0]->Draw("same");//top_quality
 
-cout<<"Results in the case of Best Cut"<<endl;
-cout<<"n_pi:mean_pi:sig_pi"<<n_pi[20][0][0]<<" : "<<mean_pi[20][0][0]<<" : "<<sig_pi[20][0][0]<<endl;
-cout<<"n_k:mean_k:sig_k"<<n_k[20][0][0]<<" : "<<mean_k[20][0][0]<<" : "<<sig_k[20][0][0]<<endl;
-cout<<"n_p:mean_p:sig_p"<<n_p[20][0][0]<<" : "<<mean_p[20][0][0]<<" : "<<sig_p[20][0][0]<<endl;
-cout<<"n_L:mean_L:sig_L"<<n_L[20][0][0]<<" : "<<mean_L[20][0][0]<<" : "<<sig_L[20][0][0]<<endl;
-cout<<"n_S:mean_S:sig_S"<<n_S[20][0][0]<<" : "<<mean_S[20][0][0]<<" : "<<sig_S[20][0][0]<<endl;
+c30->cd();
+//hmm_wo_bg_fom_noZ->Draw("");//acceptance
+//fmm_noZ->SetLineColor(kRed);
+//fmm_noZ->Draw("same");
+hmm_L_fom_noZ->Draw("");//acceptance
+hmm_bg_fom_noZ->SetLineColor(kGreen);
+hmm_bg_fom_noZ->Draw("same");//acceptance
 
-cout<<"Al front evNum (L) = "<<h_L_vz->Integral(h_L_vz->FindBin(-0.14),h_L_vz->FindBin(-0.1))<<endl;
-cout<<"Al front evNum (R) = "<<h_R_vz->Integral(h_R_vz->FindBin(-0.14),h_R_vz->FindBin(-0.1))<<endl;
-cout<<"Al back evNum (L) = "<<h_L_vz->Integral(h_L_vz->FindBin(0.1),h_L_vz->FindBin(0.14))<<endl;
-cout<<"Al back evNum (R) = "<<h_R_vz->Integral(h_R_vz->FindBin(0.1),h_R_vz->FindBin(0.14))<<endl;
-cout<<"H2 evNum (L) = "<<h_L_vz->Integral(h_L_vz->FindBin(-0.1),h_L_vz->FindBin(0.1))<<endl;
-cout<<"H2 evNum (R) = "<<h_R_vz->Integral(h_R_vz->FindBin(-0.1),h_R_vz->FindBin(0.1))<<endl;
-
-c29->Divide(2,2);
-c29->cd(1);
-fpi_z1 = new TF1("fpi_z1","gausn(0)+pol0(3)",min_coin_c,max_coin_c);
-fpi_z2 = new TF1("fpi_z2","gausn(0)+pol0(3)",min_coin_c,max_coin_c);
-fpi_z3 = new TF1("fpi_z3","gausn(0)+pol0(3)",min_coin_c,max_coin_c);
-fpi_z4 = new TF1("fpi_z4","gausn(0)+pol0(3)",min_coin_c,max_coin_c);
-fpi_z1->SetNpx(2000);
-fpi_z2->SetNpx(2000);
-fpi_z3->SetNpx(2000);
-fpi_z4->SetNpx(2000);
-fpi_z1->SetParameters(1000.,6,def_sig_pi,20.);
-fpi_z2->SetParameters(1000.,0,def_sig_pi,20.);
-fpi_z3->SetParameters(1000.,def_mean_pi,def_sig_pi,20.);
-fpi_z4->SetParameters(1000.,def_mean_pi,def_sig_pi,20.);
-h_z1->Fit("fpi_z1","","",min_coin_c,max_coin_c);
-h_z2->Fit("fpi_z2","","",min_coin_c,max_coin_c);
-h_z3->Fit("fpi_z3","","",min_coin_c,max_coin_c);
-h_z4->Fit("fpi_z4","","",min_coin_c,max_coin_c);
-double fitpar,fitpar2,fitpar3;
-fitpar=fpi_z1->GetParameter(0);//N
-fitpar2=fpi_z1->GetParameter(2);//sig
-fitpar3=fpi_z1->GetParameter(3);//const
-cout<<"S_1="<<fitpar/0.056<<", N_1="<<fitpar3*6*fitpar2/0.056<<endl;
-fitpar=fpi_z2->GetParameter(0);//N
-fitpar2=fpi_z2->GetParameter(2);//sig
-fitpar3=fpi_z2->GetParameter(3);//const
-cout<<"S_2="<<fitpar/0.056<<", N_2="<<fitpar3*6*fitpar2/0.056<<endl;
-fitpar=fpi_z3->GetParameter(0);//N
-fitpar2=fpi_z3->GetParameter(2);//sig
-fitpar3=fpi_z3->GetParameter(3);//const
-cout<<"S_3="<<fitpar/0.056<<", N_3="<<fitpar3*6*fitpar2/0.056<<endl;
-fitpar=fpi_z4->GetParameter(0);//N
-fitpar2=fpi_z4->GetParameter(2);//sig
-fitpar3=fpi_z4->GetParameter(3);//const
-cout<<"S_4="<<fitpar/0.056<<", N_4="<<fitpar3*6*fitpar2/0.056<<endl;
-c29->cd(1);
-h_z1->Draw("");
-fpi_z1->SetLineColor(kRed);
-fpi_z1->Draw("same");
-c29->cd(2);
-h_z2->Draw("");
-fpi_z2->SetLineColor(kRed);
-fpi_z2->Draw("same");
-c29->cd(3);
-h_z3->Draw("");
-fpi_z3->SetLineColor(kRed);
-fpi_z3->Draw("same");
-c29->cd(4);
-h_z4->Draw("");
-fpi_z4->SetLineColor(kRed);
-fpi_z4->Draw("same");
-
-c30->Divide(2,2);
-c30->cd(1);
-h_L_corL_tgth->Draw("colz");
-c30->cd(2);
-h_L_corR_tgth->Draw("colz");
-c30->cd(3);
-h_L_corL_tgph->Draw("colz");
-c30->cd(4);
-h_L_corR_tgph->Draw("colz");
 c31->Divide(2,2);
 c31->cd(1);
-h_L_corL_th->Draw("colz");
+h_vpflux->Draw("");//top
 c31->cd(2);
-h_L_corR_th->Draw("colz");
+h_vpflux2->Draw("");//acc
 c31->cd(3);
-h_L_corL_ph->Draw("colz");
-c31->cd(4);
-h_L_corR_ph->Draw("colz");
-c32->Divide(2,3);
-c32->cd(1);
-h_L_corL_x->Draw("colz");
-c32->cd(2);
-h_L_corR_x->Draw("colz");
-c32->cd(3);
-h_L_corL_y->Draw("colz");
-c32->cd(4);
-h_L_corR_y->Draw("colz");
-c32->cd(5);
-h_L_corL_z->Draw("colz");
-c32->cd(6);
-h_L_corR_z->Draw("colz");
+h_vpflux3->Draw("");//all (Z Only)
+cout<<"Ne(det,top)(Entry)"<<h_vpflux->GetEntries()<<endl;
+cout<<"Ne(det,top)(Integral)"<<h_vpflux->Integral()<<endl;
+cout<<"Ne(det,acc)(Entry)"<<h_vpflux2->GetEntries()<<endl;
+cout<<"Ne(det,acc)(Integral)"<<h_vpflux2->Integral()<<endl;
+cout<<"Ne(det,all)(Entry)"<<h_vpflux3->GetEntries()<<endl;
+cout<<"Ne(det,all)(Integral)"<<h_vpflux3->Integral()<<endl;
+cout<<"Ng(det,top)"<<Ng_det_top<<endl;
+cout<<"Ng(det,acc)"<<Ng_det_acc<<endl;
+cout<<"Ng(det,all)"<<Ng_det<<endl;
 
+//c25->Divide(2,2);
+//c25->cd(1);
+//h_L_tgph_tgth6->Draw("colz");
+//c25->cd(2);
+//h_L_tgph_tgth7->Draw("colz");
+//c25->cd(3);
+//h_L_tgph_tgth8->Draw("colz");
+//c25->cd(4);
+//h_L_tgph_tgth9->Draw("colz");
+//
+//c26->Divide(2,2);
+//c26->cd(1);
+//h_L_tgph_tgth10->Draw("colz");
+//c26->cd(2);
+//h_L_tgph_tgth11->Draw("colz");
+//c26->cd(3);
+//h_L_y_x->Draw("colz");
+//
+//
+//c27->Divide(2,2);
+//c27->cd(1);
+//h_L_z_x->Draw("colz");
+//c27->cd(2);
+//h_L_z_y->Draw("colz");
+//c27->cd(3);
+//h_L_th_y->Draw("colz");
+//c27->cd(4);
+//h_L_ph_y->Draw("colz");
+//
+//
+//c28->Divide(2,2);
+//c28->cd(1);
+//h_L_th_x->Draw("colz");
+//c28->cd(2);
+//h_L_ph_x->Draw("colz");
+//c28->cd(3);
+//h_L_th_z->Draw("colz");
+//c28->cd(4);
+//h_L_ph_z->Draw("colz");
 
-c34->Divide(2,2);
-c34->cd(1);
-h_L_corL_zdiff->Draw("colz");
-c34->cd(2);
-h_L_corR_zdiff->Draw("colz");
-c34->cd(3);
-h_L_tgth_x->Draw("colz");
-c34->cd(4);
-h_L_tgph_y->Draw("colz");
+//cout<<"n_pi_noZ="<<n_pi_noZ<<endl;
+//cout<<"n_pi[20][0][0]="<<n_pi[20][0][0]<<endl;
+//cout<<"n_pi[99][0][0]="<<n_pi[99][0][0]<<endl;
+//cout<<"n_k_noZ="<<n_k_noZ<<endl;
+//cout<<"n_k[20][0][0]="<<n_k[20][0][0]<<endl;
+//cout<<"n_k[99][0][0]="<<n_k[99][0][0]<<endl;
+//cout<<"n_L_noZ="<<n_L_noZ<<endl;
+//cout<<"n_L[20][0][0]="<<n_L[20][0][0]<<endl;
+//cout<<"n_L[99][0][0]="<<n_L[99][0][0]<<endl;
+//cout<<"n_S_noZ="<<n_S_noZ<<endl;
+//cout<<"n_S[20][0][0]="<<n_S[20][0][0]<<endl;
+//cout<<"n_S[99][0][0]="<<n_S[99][0][0]<<endl;
+//
+//cout<<"Results in the case of Best Cut"<<endl;
+//cout<<"n_pi:mean_pi:sig_pi"<<n_pi[20][0][0]<<" : "<<mean_pi[20][0][0]<<" : "<<sig_pi[20][0][0]<<endl;
+//cout<<"n_k:mean_k:sig_k"<<n_k[20][0][0]<<" : "<<mean_k[20][0][0]<<" : "<<sig_k[20][0][0]<<endl;
+//cout<<"n_p:mean_p:sig_p"<<n_p[20][0][0]<<" : "<<mean_p[20][0][0]<<" : "<<sig_p[20][0][0]<<endl;
+//cout<<"n_L:mean_L:sig_L"<<n_L[20][0][0]<<" : "<<mean_L[20][0][0]<<" : "<<sig_L[20][0][0]<<endl;
+//cout<<"n_S:mean_S:sig_S"<<n_S[20][0][0]<<" : "<<mean_S[20][0][0]<<" : "<<sig_S[20][0][0]<<endl;
+//
+//cout<<"Al front evNum (L) = "<<h_L_vz->Integral(h_L_vz->FindBin(-0.14),h_L_vz->FindBin(-0.1))<<endl;
+//cout<<"Al front evNum (R) = "<<h_R_vz->Integral(h_R_vz->FindBin(-0.14),h_R_vz->FindBin(-0.1))<<endl;
+//cout<<"Al back evNum (L) = "<<h_L_vz->Integral(h_L_vz->FindBin(0.1),h_L_vz->FindBin(0.14))<<endl;
+//cout<<"Al back evNum (R) = "<<h_R_vz->Integral(h_R_vz->FindBin(0.1),h_R_vz->FindBin(0.14))<<endl;
+//cout<<"H2 evNum (L) = "<<h_L_vz->Integral(h_L_vz->FindBin(-0.1),h_L_vz->FindBin(0.1))<<endl;
+//cout<<"H2 evNum (R) = "<<h_R_vz->Integral(h_R_vz->FindBin(-0.1),h_R_vz->FindBin(0.1))<<endl;
+//
+//c29->Divide(2,2);
+//c29->cd(1);
+//fpi_z1 = new TF1("fpi_z1","gausn(0)+pol0(3)",min_coin_c,max_coin_c);
+//fpi_z2 = new TF1("fpi_z2","gausn(0)+pol0(3)",min_coin_c,max_coin_c);
+//fpi_z3 = new TF1("fpi_z3","gausn(0)+pol0(3)",min_coin_c,max_coin_c);
+//fpi_z4 = new TF1("fpi_z4","gausn(0)+pol0(3)",min_coin_c,max_coin_c);
+//fpi_z1->SetNpx(2000);
+//fpi_z2->SetNpx(2000);
+//fpi_z3->SetNpx(2000);
+//fpi_z4->SetNpx(2000);
+//fpi_z1->SetParameters(1000.,6,def_sig_pi,20.);
+//fpi_z2->SetParameters(1000.,0,def_sig_pi,20.);
+//fpi_z3->SetParameters(1000.,def_mean_pi,def_sig_pi,20.);
+//fpi_z4->SetParameters(1000.,def_mean_pi,def_sig_pi,20.);
+//h_z1->Fit("fpi_z1","","",min_coin_c,max_coin_c);
+//h_z2->Fit("fpi_z2","","",min_coin_c,max_coin_c);
+//h_z3->Fit("fpi_z3","","",min_coin_c,max_coin_c);
+//h_z4->Fit("fpi_z4","","",min_coin_c,max_coin_c);
+//double fitpar,fitpar2,fitpar3;
+//fitpar=fpi_z1->GetParameter(0);//N
+//fitpar2=fpi_z1->GetParameter(2);//sig
+//fitpar3=fpi_z1->GetParameter(3);//const
+//cout<<"S_1="<<fitpar/0.056<<", N_1="<<fitpar3*6*fitpar2/0.056<<endl;
+//fitpar=fpi_z2->GetParameter(0);//N
+//fitpar2=fpi_z2->GetParameter(2);//sig
+//fitpar3=fpi_z2->GetParameter(3);//const
+//cout<<"S_2="<<fitpar/0.056<<", N_2="<<fitpar3*6*fitpar2/0.056<<endl;
+//fitpar=fpi_z3->GetParameter(0);//N
+//fitpar2=fpi_z3->GetParameter(2);//sig
+//fitpar3=fpi_z3->GetParameter(3);//const
+//cout<<"S_3="<<fitpar/0.056<<", N_3="<<fitpar3*6*fitpar2/0.056<<endl;
+//fitpar=fpi_z4->GetParameter(0);//N
+//fitpar2=fpi_z4->GetParameter(2);//sig
+//fitpar3=fpi_z4->GetParameter(3);//const
+//cout<<"S_4="<<fitpar/0.056<<", N_4="<<fitpar3*6*fitpar2/0.056<<endl;
+//c29->cd(1);
+//h_z1->Draw("");
+//fpi_z1->SetLineColor(kRed);
+//fpi_z1->Draw("same");
+//c29->cd(2);
+//h_z2->Draw("");
+//fpi_z2->SetLineColor(kRed);
+//fpi_z2->Draw("same");
+//c29->cd(3);
+//h_z3->Draw("");
+//fpi_z3->SetLineColor(kRed);
+//fpi_z3->Draw("same");
+//c29->cd(4);
+//h_z4->Draw("");
+//fpi_z4->SetLineColor(kRed);
+//fpi_z4->Draw("same");
 
-
-c35->Divide(2,2);
-c35->cd(1);
-h_L_tgth_y->Draw("colz");
-c35->cd(2);
-h_L_tgph_x->Draw("colz");
-c35->cd(3);
-h_L_tgth_z->Draw("colz");
-c35->cd(4);
-h_L_tgph_z->Draw("colz");
-
-c36->Divide(2,2);
-c36->cd(1);
-h_L_ct_zdiff->Draw("colz");
-c36->cd(2);
-h_L_corsum_zdiff->Draw("colz");
-c36->cd(3);
-h_L_cordiff_zdiff->Draw("colz");
-c36->cd(4);
-h_L_corL_corR->Draw("colz");
-
-c37->Divide(2,2);
-c37->cd(1)->SetLogz(1);
-h_L_ct_zdiff->Draw("colz");
-c37->cd(2)->SetLogz(1);
-h_L_corsum_zdiff->Draw("colz");
-c37->cd(3)->SetLogz(1);
-h_L_cordiff_zdiff->Draw("colz");
-c37->cd(4)->SetLogz(1);
-h_L_corL_corR->Draw("colz");
+//c30->Divide(2,2);
+//c30->cd(1);
+//h_L_corL_tgth->Draw("colz");
+//c30->cd(2);
+//h_L_corR_tgth->Draw("colz");
+//c30->cd(3);
+//h_L_corL_tgph->Draw("colz");
+//c30->cd(4);
+//h_L_corR_tgph->Draw("colz");
+//c31->Divide(2,2);
+//c31->cd(1);
+//h_L_corL_th->Draw("colz");
+//c31->cd(2);
+//h_L_corR_th->Draw("colz");
+//c31->cd(3);
+//h_L_corL_ph->Draw("colz");
+//c31->cd(4);
+//h_L_corR_ph->Draw("colz");
+//c32->Divide(2,3);
+//c32->cd(1);
+//h_L_corL_x->Draw("colz");
+//c32->cd(2);
+//h_L_corR_x->Draw("colz");
+//c32->cd(3);
+//h_L_corL_y->Draw("colz");
+//c32->cd(4);
+//h_L_corR_y->Draw("colz");
+//c32->cd(5);
+//h_L_corL_z->Draw("colz");
+//c32->cd(6);
+//h_L_corR_z->Draw("colz");
+//
+//
+//c34->Divide(2,2);
+//c34->cd(1);
+//h_L_corL_zdiff->Draw("colz");
+//c34->cd(2);
+//h_L_corR_zdiff->Draw("colz");
+//c34->cd(3);
+//h_L_tgth_x->Draw("colz");
+//c34->cd(4);
+//h_L_tgph_y->Draw("colz");
+//
+//
+//c35->Divide(2,2);
+//c35->cd(1);
+//h_L_tgth_y->Draw("colz");
+//c35->cd(2);
+//h_L_tgph_x->Draw("colz");
+//c35->cd(3);
+//h_L_tgth_z->Draw("colz");
+//c35->cd(4);
+//h_L_tgph_z->Draw("colz");
+//
+//c36->Divide(2,2);
+//c36->cd(1);
+//h_L_ct_zdiff->Draw("colz");
+//c36->cd(2);
+//h_L_corsum_zdiff->Draw("colz");
+//c36->cd(3);
+//h_L_cordiff_zdiff->Draw("colz");
+//c36->cd(4);
+//h_L_corL_corR->Draw("colz");
+//
+//c37->Divide(2,2);
+//c37->cd(1)->SetLogz(1);
+//h_L_ct_zdiff->Draw("colz");
+//c37->cd(2)->SetLogz(1);
+//h_L_corsum_zdiff->Draw("colz");
+//c37->cd(3)->SetLogz(1);
+//h_L_cordiff_zdiff->Draw("colz");
+//c37->cd(4)->SetLogz(1);
+//h_L_corL_corR->Draw("colz");
 
 c38->Divide(2,2);
 c38->cd(1);
@@ -5363,36 +5673,37 @@ void tuning::Write(){
 // fSig_p->Write(); 
 // fk_fom->Write();
 // 
- tnew->Write();
-pEff1->Write();
-pEff2->Write();
-pEff3->Write();
-pEff4->Write();
-pEff5->Write();
-pEff6->Write();
-pEff7->Write();
-pEff8->Write();
-pEff9->Write();
-h_pisr1->Write();
-h_ksr1->Write();
-h_psr1->Write();
-h_pisr2l->Write();
-h_ksr2l->Write();
-h_psr2l->Write();
-h_pisr2u->Write();
-h_ksr2u->Write();
-h_psr2u->Write();
-h_pitot1->Write();
-h_ktot1->Write();
-h_ptot1->Write();
-h_pitot2l->Write();
-h_ktot2l->Write();
-h_ptot2l->Write();
-h_pitot2u->Write();
-h_ktot2u->Write();
-h_ptot2u->Write();
-npe_sum_a1->Write();
-npe_sum_a2->Write();
+// tnew->Write();
+ tree_out->Write();
+//pEff1->Write();
+//pEff2->Write();
+//pEff3->Write();
+//pEff4->Write();
+//pEff5->Write();
+//pEff6->Write();
+//pEff7->Write();
+//pEff8->Write();
+//pEff9->Write();
+//h_pisr1->Write();
+//h_ksr1->Write();
+//h_psr1->Write();
+//h_pisr2l->Write();
+//h_ksr2l->Write();
+//h_psr2l->Write();
+//h_pisr2u->Write();
+//h_ksr2u->Write();
+//h_psr2u->Write();
+//h_pitot1->Write();
+//h_ktot1->Write();
+//h_ptot1->Write();
+//h_pitot2l->Write();
+//h_ktot2l->Write();
+//h_ptot2l->Write();
+//h_pitot2u->Write();
+//h_ktot2u->Write();
+//h_ptot2u->Write();
+//npe_sum_a1->Write();
+//npe_sum_a2->Write();
 //for(int i=0;i<nth;i++){
 //	for(int j=0;j<nth;j++){
 //		for(int l=0;l<nth;l++){
@@ -5413,7 +5724,7 @@ npe_sum_a2->Write();
 // hRu1_time_c->Write();
 //
 // 
- //fnew->Close();
+fnew->Close();
 }
 
 
@@ -5430,8 +5741,8 @@ int main(int argc, char** argv){
 //  int ch;
   //string ifname = "/adaqfs/home/a-onl/tritium_work/itabashi/nnL/HallA-Online-Tritium/replay/scripts/ita_scripts/run_list/Lambda_test.list";
   //string ofname = "/pdf/hydro1_AC_eff_test.pdf";
- string ifname = "../small.list";//Run111157~111220
-// string ifname = "../small2.list";//Run111157~111220 & Run111480~111542
+// string ifname = "../small.list";//Run111157~111220
+ string ifname = "../small2.list";//Run111157~111220 & Run111480~111542
 //  string ifname = "../test.list";//for debug
 //  string runlistname;
   string pname = "./Lambda_H1.param";
@@ -5557,10 +5868,10 @@ int main(int argc, char** argv){
 
   
   tuning* AC=new tuning();
-//  TApplication theApp("App", &argc, argv);
+  //TApplication theApp("App", &argc, argv);
 cout << "Start SetRunList" << endl;
   AC->matrix(mtparam);
-  if(root_flag)AC->SetRoot(ifname);//root_name?
+  if(root_flag)AC->SetRoot(root_name);//root_name?
 //cout << "Start SetBranch" << endl;
 //  AC->SetBranch();
   AC->GetACParam();
@@ -5574,7 +5885,6 @@ cout << "Start SetParam" << endl;
 cout << "Start Fill" << endl;
   AC->Filling();
 	cout << "AC->Fill() is done" << endl;
-	cout << "fabs(-1)= " << fabs(-1) << endl;
   AC->Fitting();
 	cout << "AC->Fitting() is done" << endl;
   AC->ACtune();
@@ -5589,10 +5899,9 @@ cout << "Start Fill" << endl;
   
   
 	
-//  TApplication *theApp =new TApplication("App",&argc,argv);
 // if(draw_flag==0)gROOT->SetBatch(1);
 // if(draw_flag==0)gSystem->Exit(1);
-// theApp->Run();
+// if(root_flag)theApp.Run();
  return 0;
 
 

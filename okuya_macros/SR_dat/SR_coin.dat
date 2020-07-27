@@ -1,0 +1,200 @@
+1 1 1 0.00148116 0.00438262 fabs(ct)<0
+n_L=1, integralL=406.105, n_S=1, integralS=756.826
+1 1 1 0.0470053 0.0724885 fabs(ct)<0.02
+n_L=31.7354, integralL=406.105, n_S=16.54, integralS=756.826
+1 1 1 0.0954918 0.123064 fabs(ct)<0.04
+n_L=64.4708, integralL=406.105, n_S=28.08, integralS=756.826
+1 1 1 0.141016 0.182404 fabs(ct)<0.06
+n_L=95.2062, integralL=406.105, n_S=41.62, integralS=756.826
+1 1 1 0.189502 0.228597 fabs(ct)<0.08
+n_L=127.941, integralL=406.105, n_S=52.16, integralS=756.826
+1 1 1 0.224658 0.27479 fabs(ct)<0.1
+n_L=151.677, integralL=406.105, n_S=62.7, integralS=756.826
+1 1 1 0.265739 0.312218 fabs(ct)<0.12
+n_L=179.412, integralL=406.105, n_S=71.24, integralS=756.826
+1 1 1 0.311263 0.367176 fabs(ct)<0.14
+n_L=210.147, integralL=406.105, n_S=83.78, integralS=756.826
+1 1 1 0.355306 0.435281 fabs(ct)<0.16
+n_L=239.883, integralL=406.105, n_S=99.32, integralS=756.826
+1 1 1 0.387498 0.499005 fabs(ct)<0.18
+n_L=261.617, integralL=406.105, n_S=113.86, integralS=756.826
+1 1 1 0.440428 0.523284 fabs(ct)<0.2
+n_L=297.352, integralL=406.105, n_S=119.4, integralS=756.826
+1 1 1 0.475583 0.543181 fabs(ct)<0.22
+n_L=321.087, integralL=406.105, n_S=123.94, integralS=756.826
+1 1 1 0.509256 0.593757 fabs(ct)<0.24
+n_L=343.822, integralL=406.105, n_S=135.48, integralS=756.826
+1 1 1 0.544411 0.639949 fabs(ct)<0.26
+n_L=367.556, integralL=406.105, n_S=146.02, integralS=756.826
+1 1 1 0.581048 0.672435 fabs(ct)<0.28
+n_L=392.291, integralL=406.105, n_S=153.432, integralS=756.826
+1 1 1 0.610278 0.702623 fabs(ct)<0.3
+n_L=412.026, integralL=406.105, n_S=160.32, integralS=756.826
+1 1 1 0.642471 0.707846 fabs(ct)<0.32
+n_L=433.761, integralL=406.105, n_S=161.512, integralS=756.826
+1 1 1 0.670222 0.745833 fabs(ct)<0.34
+n_L=452.497, integralL=406.105, n_S=170.18, integralS=756.826
+1 1 1 0.699451 0.779203 fabs(ct)<0.36
+n_L=472.231, integralL=406.105, n_S=177.794, integralS=756.826
+1 1 1 0.724238 0.791601 fabs(ct)<0.38
+n_L=488.965, integralL=406.105, n_S=180.623, integralS=756.826
+1 1 1 0.757749 0.795753 fabs(ct)<0.4
+n_L=511.59, integralL=406.105, n_S=181.57, integralS=756.826
+1 1 1 0.774612 0.812201 fabs(ct)<0.42
+n_L=522.975, integralL=406.105, n_S=185.323, integralS=756.826
+1 1 1 0.800503 0.837408 fabs(ct)<0.44
+n_L=540.455, integralL=406.105, n_S=191.075, integralS=756.826
+1 1 1 0.819057 0.84788 fabs(ct)<0.46
+n_L=552.982, integralL=406.105, n_S=193.464, integralS=756.826
+1 1 1 0.83607 0.847502 fabs(ct)<0.48
+n_L=564.468, integralL=406.105, n_S=193.378, integralS=756.826
+1 1 1 0.853915 0.873601 fabs(ct)<0.5
+n_L=576.516, integralL=406.105, n_S=199.333, integralS=756.826
+1 1 1 0.865372 0.888712 fabs(ct)<0.52
+n_L=584.252, integralL=406.105, n_S=202.781, integralS=756.826
+1 1 1 0.882448 0.901321 fabs(ct)<0.54
+n_L=595.78, integralL=406.105, n_S=205.658, integralS=756.826
+1 1 1 0.894381 0.91857 fabs(ct)<0.56
+n_L=603.837, integralL=406.105, n_S=209.594, integralS=756.826
+1 1 1 0.902465 0.926074 fabs(ct)<0.58
+n_L=609.294, integralL=406.105, n_S=211.306, integralS=756.826
+1 1 1 0.910339 0.940758 fabs(ct)<0.6
+n_L=614.611, integralL=406.105, n_S=214.657, integralS=756.826
+1 1 1 0.915692 0.93937 fabs(ct)<0.62
+n_L=618.224, integralL=406.105, n_S=214.34, integralS=756.826
+1 1 1 0.925412 0.939178 fabs(ct)<0.64
+n_L=624.787, integralL=406.105, n_S=214.296, integralS=756.826
+1 1 1 0.930331 0.93651 fabs(ct)<0.66
+n_L=628.108, integralL=406.105, n_S=213.687, integralS=756.826
+1 1 1 0.935542 0.940226 fabs(ct)<0.68
+n_L=631.626, integralL=406.105, n_S=214.535, integralS=756.826
+1 1 1 0.942542 0.948978 fabs(ct)<0.7
+n_L=636.353, integralL=406.105, n_S=216.532, integralS=756.826
+1 1 1 0.946699 0.932183 fabs(ct)<0.72
+n_L=639.159, integralL=406.105, n_S=212.7, integralS=756.826
+1 1 1 0.95933 0.936487 fabs(ct)<0.74
+n_L=647.686, integralL=406.105, n_S=213.682, integralS=756.826
+1 1 1 0.96294 0.944247 fabs(ct)<0.76
+n_L=650.124, integralL=406.105, n_S=215.453, integralS=756.826
+1 1 1 0.967269 0.946997 fabs(ct)<0.78
+n_L=653.047, integralL=406.105, n_S=216.08, integralS=756.826
+1 1 1 0.969546 0.92509 fabs(ct)<0.8
+n_L=654.584, integralL=406.105, n_S=211.082, integralS=756.826
+1 1 1 0.974417 0.93157 fabs(ct)<0.82
+n_L=657.872, integralL=406.105, n_S=212.56, integralS=756.826
+1 1 1 0.9767 0.944395 fabs(ct)<0.84
+n_L=659.414, integralL=406.105, n_S=215.487, integralS=756.826
+1 1 1 0.980622 0.949495 fabs(ct)<0.86
+n_L=662.062, integralL=406.105, n_S=216.65, integralS=756.826
+1 1 1 0.986123 0.946664 fabs(ct)<0.88
+n_L=665.776, integralL=406.105, n_S=216.004, integralS=756.826
+1 1 1 0.98861 0.952243 fabs(ct)<0.9
+n_L=667.455, integralL=406.105, n_S=217.277, integralS=756.826
+1 1 1 0.992655 0.93657 fabs(ct)<0.92
+n_L=670.186, integralL=406.105, n_S=213.701, integralS=756.826
+1 1 1 0.996611 0.933108 fabs(ct)<0.94
+n_L=672.857, integralL=406.105, n_S=212.911, integralS=756.826
+1 1 1 0.99713 0.940183 fabs(ct)<0.96
+n_L=673.207, integralL=406.105, n_S=214.526, integralS=756.826
+1 1 1 0.999407 0.944449 fabs(ct)<0.98
+n_L=674.745, integralL=406.105, n_S=215.499, integralS=756.826
+1 1 1 1.00507 0.94319 fabs(ct)<1
+n_L=678.569, integralL=406.105, n_S=215.212, integralS=756.826
+1 1 1 1.00605 0.939787 fabs(ct)<1.02
+n_L=679.231, integralL=406.105, n_S=214.435, integralS=756.826
+1 1 1 1.01255 0.934556 fabs(ct)<1.04
+n_L=683.621, integralL=406.105, n_S=213.242, integralS=756.826
+1 1 1 1.01487 0.943339 fabs(ct)<1.06
+n_L=685.184, integralL=406.105, n_S=215.246, integralS=756.826
+1 1 1 1.01695 0.937652 fabs(ct)<1.08
+n_L=686.588, integralL=406.105, n_S=213.948, integralS=756.826
+1 1 1 1.01634 0.938571 fabs(ct)<1.1
+n_L=686.178, integralL=406.105, n_S=214.158, integralS=756.826
+1 1 1 1.02399 0.932003 fabs(ct)<1.12
+n_L=691.341, integralL=406.105, n_S=212.659, integralS=756.826
+1 1 1 1.02625 0.932086 fabs(ct)<1.14
+n_L=692.871, integralL=406.105, n_S=212.678, integralS=756.826
+1 1 1 1.02849 0.931478 fabs(ct)<1.16
+n_L=694.382, integralL=406.105, n_S=212.539, integralS=756.826
+1 1 1 1.03137 0.93074 fabs(ct)<1.18
+n_L=696.324, integralL=406.105, n_S=212.371, integralS=756.826
+1 1 1 1.0309 0.922041 fabs(ct)<1.2
+n_L=696.008, integralL=406.105, n_S=210.386, integralS=756.826
+1 1 1 1.02993 0.915079 fabs(ct)<1.22
+n_L=695.349, integralL=406.105, n_S=208.797, integralS=756.826
+1 1 1 1.03213 0.91461 fabs(ct)<1.24
+n_L=696.836, integralL=406.105, n_S=208.691, integralS=756.826
+1 1 1 1.03336 0.917668 fabs(ct)<1.26
+n_L=697.667, integralL=406.105, n_S=209.388, integralS=756.826
+1 1 1 1.03847 0.915831 fabs(ct)<1.28
+n_L=701.118, integralL=406.105, n_S=208.969, integralS=756.826
+1 1 1 1.03792 0.920803 fabs(ct)<1.3
+n_L=700.747, integralL=406.105, n_S=210.104, integralS=756.826
+1 1 1 1.0368 0.913967 fabs(ct)<1.32
+n_L=699.988, integralL=406.105, n_S=208.544, integralS=756.826
+1 1 1 1.03943 0.92495 fabs(ct)<1.34
+n_L=701.767, integralL=406.105, n_S=211.05, integralS=756.826
+1 1 1 1.04157 0.919726 fabs(ct)<1.36
+n_L=703.213, integralL=406.105, n_S=209.858, integralS=756.826
+1 1 1 1.04105 0.916506 fabs(ct)<1.38
+n_L=702.862, integralL=406.105, n_S=209.123, integralS=756.826
+1 1 1 1.02632 0.891973 fabs(ct)<1.4
+n_L=692.916, integralL=406.105, n_S=203.525, integralS=756.826
+1 1 1 1.03018 0.905894 fabs(ct)<1.42
+n_L=695.517, integralL=406.105, n_S=206.702, integralS=756.826
+1 1 1 1.028 0.894947 fabs(ct)<1.44
+n_L=694.046, integralL=406.105, n_S=204.204, integralS=756.826
+1 1 1 1.02934 0.902684 fabs(ct)<1.46
+n_L=694.955, integralL=406.105, n_S=205.969, integralS=756.826
+1 1 1 1.04585 1.01762 fabs(ct)<1.48
+n_L=706.101, integralL=406.105, n_S=232.194, integralS=756.826
+1 1 1 1.03193 0.895935 fabs(ct)<1.5
+n_L=696.703, integralL=406.105, n_S=204.429, integralS=756.826
+1 1 1 1.0323 0.892749 fabs(ct)<1.52
+n_L=696.955, integralL=406.105, n_S=203.702, integralS=756.826
+1 1 1 1.03209 0.891713 fabs(ct)<1.54
+n_L=696.808, integralL=406.105, n_S=203.466, integralS=756.826
+1 1 1 1.03319 0.883288 fabs(ct)<1.56
+n_L=697.553, integralL=406.105, n_S=201.544, integralS=756.826
+1 1 1 1.04812 0.992411 fabs(ct)<1.58
+n_L=707.634, integralL=406.105, n_S=226.443, integralS=756.826
+1 1 1 1.03295 0.890592 fabs(ct)<1.6
+n_L=697.393, integralL=406.105, n_S=203.21, integralS=756.826
+1 1 1 1.03223 0.892186 fabs(ct)<1.62
+n_L=696.902, integralL=406.105, n_S=203.574, integralS=756.826
+1 1 1 1.033 0.889864 fabs(ct)<1.64
+n_L=697.426, integralL=406.105, n_S=203.044, integralS=756.826
+1 1 1 1.0348 0.883562 fabs(ct)<1.66
+n_L=698.641, integralL=406.105, n_S=201.606, integralS=756.826
+1 1 1 1.0308 0.885612 fabs(ct)<1.68
+n_L=695.939, integralL=406.105, n_S=202.074, integralS=756.826
+1 1 1 1.03138 0.877886 fabs(ct)<1.7
+n_L=696.328, integralL=406.105, n_S=200.311, integralS=756.826
+1 1 1 1.03238 0.87594 fabs(ct)<1.72
+n_L=697.008, integralL=406.105, n_S=199.867, integralS=756.826
+1 1 1 1.03385 0.871989 fabs(ct)<1.74
+n_L=698, integralL=406.105, n_S=198.965, integralS=756.826
+1 1 1 1.03614 0.869298 fabs(ct)<1.76
+n_L=699.547, integralL=406.105, n_S=198.351, integralS=756.826
+1 1 1 1.03687 0.867056 fabs(ct)<1.78
+n_L=700.037, integralL=406.105, n_S=197.84, integralS=756.826
+1 1 1 1.03565 0.867363 fabs(ct)<1.8
+n_L=699.213, integralL=406.105, n_S=197.91, integralS=756.826
+1 1 1 1.03586 0.86604 fabs(ct)<1.82
+n_L=699.355, integralL=406.105, n_S=197.608, integralS=756.826
+1 1 1 1.03675 0.868149 fabs(ct)<1.84
+n_L=699.959, integralL=406.105, n_S=198.089, integralS=756.826
+1 1 1 1.03382 0.859746 fabs(ct)<1.86
+n_L=697.976, integralL=406.105, n_S=196.172, integralS=756.826
+1 1 1 1.03334 0.862321 fabs(ct)<1.88
+n_L=697.655, integralL=406.105, n_S=196.759, integralS=756.826
+1 1 1 1.03494 0.86448 fabs(ct)<1.9
+n_L=698.734, integralL=406.105, n_S=197.252, integralS=756.826
+1 1 1 1.03643 0.860208 fabs(ct)<1.92
+n_L=699.74, integralL=406.105, n_S=196.277, integralS=756.826
+1 1 1 1.03821 0.841832 fabs(ct)<1.94
+n_L=700.942, integralL=406.105, n_S=192.084, integralS=756.826
+1 1 1 1.04011 0.850092 fabs(ct)<1.96
+n_L=702.222, integralL=406.105, n_S=193.969, integralS=756.826
+1 1 1 1.03883 0.84127 fabs(ct)<1.98
+n_L=701.362, integralL=406.105, n_S=191.956, integralS=756.826

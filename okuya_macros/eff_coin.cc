@@ -1841,6 +1841,7 @@ void tuning::MakeHist(){
 //// Coincidence ////
 /////////////////////
   h_ct       = new TH1D("h_ct"      ,"h_ct"      ,1000, -20, 20);//to adjust offset
+  h_ct_wide       = new TH1D("h_ct_wide"      ,"h_ct_wide"      ,1000, -40., 55.);//wide
   h_Rs2      = new TH1D("h_Rs2"      ,"h_Rs2"      ,4000, -100, 100);
   h_Ls2      = new TH1D("h_Ls2"      ,"h_Ls2"      ,4000, -100, 100);
   h_ct_acc       = new TH1D("h_ct_acc"  ,"h_ct_acc"   ,4000, -80, 80);//to adjust offset 
@@ -2428,6 +2429,7 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 	    if(zcut)tr.z_cut=1;
 
             h_ct   ->Fill( ct );
+            h_ct_wide   ->Fill( ct );
 	    h_Rs2  ->Fill(R_tgt);
 	    h_Ls2  ->Fill(L_tgt);
 	    
@@ -2655,11 +2657,10 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 
 
 //-------------------------------------------//
-//-------------No Z cut at all--------------//
+//-------------No Coin cut at all--------------//
 //-------------------------------------------//
 //	zcut=true;
-	if(tr.AC1_npe_sum<3.75 && tr.AC2_npe_sum>3. && tr.AC2_npe_sum<20. && zcut){//no Z cut
-//	if(tr.AC1_npe_sum<3.75 && tr.AC2_npe_sum>3. && tr.AC2_npe_sum<20. && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1)//no Z cut,w/ diff cut
+	if(tr.AC1_npe_sum<3.75 && tr.AC2_npe_sum>3. && tr.AC2_npe_sum<20. && zcut){//no Coin cut
 
 	hcoin_k_fom_noZ->Fill(ct);
 	h_m2_mm->Fill(m2,mm);
@@ -2675,20 +2676,20 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 	if(fabs(R_tr_vz[rt]+0.12)<0.02 && fabs(L_tr_vz[lt]-0.12)<0.02){h_zz2->Fill(ct,mm);h_z2->Fill(ct);}
 	if(fabs(R_tr_vz[rt])<0.1 && fabs(L_tr_vz[lt]-0.12)<0.02){h_zz3->Fill(ct,mm);h_z3->Fill(ct);}
 	if(fabs(L_tr_vz[lt])<0.1 && fabs(R_tr_vz[rt]-0.12)<0.02){h_zz4->Fill(ct,mm);h_z4->Fill(ct);}
-				if(20.<ct && ct<100.){
+				if((-30.<ct && ct<-10.) || (10.<ct && ct<30.)){
 					double ct_ = ct;
 				        while(1){
-					  if(-20.<ct && ct<20.){
+					  if(-10.<ct && ct<10.){
 						 hcoin_bg_fom_noZ->Fill(ct);
 						 hmm_bg_fom_noZ->Fill(mm);
 						 hmm_pibg_fom_noZ->Fill(mm);
 						 break;}
-					       else if(ct<-20.){ct=ct+40.;}
-					       else if(20.<ct){ct=ct-40.;}
+					       else if(ct<-10.){ct=ct+20.;}
+					       else if(10.<ct){ct=ct-20.;}
 					 }
 					ct = ct_;
 					}//cointime
-					if(fabs(ct)<2.){
+					if(fabs(ct)<3.){
 						hmm_L_fom_noZ->Fill(mm);
 				}
 					if(fabs(ct-3.05)<0.7){
@@ -2750,16 +2751,16 @@ if(i==50){
 		//-------------------------------------------//
 		//---------Accidental B.G.-------------------//
 		//-------------------------------------------//
-				if(20.<ct&&ct<100.){
+				if((-30.<ct && ct<-10.) || (10.<ct && ct<30.)){
 					double ct_ = ct;
 				        while(1){
-					  if(-20.<ct && ct<20.){
+					  if(-10.<ct && ct<10.){
 						 hcoin_bg_fom[i][j][l]->Fill(ct);
 						 hmm_bg_fom[i][j][l]->Fill(mm);
 						 hmm_pibg_fom[i][j][l]->Fill(mm);//MM if pion
 						 break;}
-					       else if(ct<-20.){ct=ct+40.;}
-					       else if(20.<ct){ct=ct-40.;}
+					       else if(ct<-10.){ct=ct+20.;}
+					       else if(10.<ct){ct=ct-20.;}
 					 }
 						  ct = ct_;
 				}
@@ -3057,7 +3058,7 @@ void tuning::ACtune(){
  
 
 //-----No AC Cut-----//
- hcoin_bg_fom_noZ->Scale(40./80.);
+ hcoin_bg_fom_noZ->Scale(20./40.);
  hcoin_wo_bg_fom_noZ->Add(hcoin_k_fom_noZ,hcoin_bg_fom_noZ,1.0,-1.0);
  fp_noZ=new TF1("fp_noZ","gausn(0)",min_coin_c,max_coin_c);
  fp_noZ->SetNpx(2000);
@@ -3124,8 +3125,8 @@ cout<<"n_pi_noZ="<<n_pi_noZ<<"n_k_noZ="<<n_k_noZ<<"n_p_noZ="<<n_p_noZ
 //----------------------------------------------//
 //--	Missing Mass  Start     ----------------//
 //----------------------------------------------//
- hmm_bg_fom_noZ->Scale(4./80.);
- hmm_pibg_fom_noZ->Scale(0.7/80.);
+ hmm_bg_fom_noZ->Scale(6./40.);
+ hmm_pibg_fom_noZ->Scale(0.7/40.);
  hmm_wo_bg_fom_noZ->Add(hmm_L_fom_noZ,hmm_bg_fom_noZ,1.0,-1.0);
  hmm_pi_wobg_fom_noZ->Add(hmm_pi_fom_noZ,hmm_pibg_fom_noZ,1.0,-1.0);
 
@@ -3282,7 +3283,7 @@ cout<<"sig_S"<<sig_S_noZ<<endl;
 //-----Background subtraction-----//
 //------------cointime------------//
 //cout<<"BG subtraction cointime"<<endl;
- hcoin_bg_fom[i][j][l]->Scale(40./80.);
+ hcoin_bg_fom[i][j][l]->Scale(20./40.);
  hcoin_wo_bg_fom[i][j][l]->Add(hcoin_k_fom[i][j][l],hcoin_bg_fom[i][j][l],1.0,-1.0);
 
  fp[i][j][l]=new TF1(Form("fp[%d][%d][%d]",i,j,l),"gausn(0)",min_coin_c,max_coin_c);
@@ -3338,8 +3339,8 @@ cout<<"n_p["<<i<<"]["<<j<<"]["<<l<<"]="<<n_p[i][j][l]<<endl;
 //----------------------------------------------//
 //--	Missing Mass  Start     ----------------//
 //----------------------------------------------//
- hmm_bg_fom[i][j][l]->Scale(2.*coinvar[i]/80.);
- hmm_pibg_fom[i][j][l]->Scale(0.7/80.);
+ hmm_bg_fom[i][j][l]->Scale(2.*coinvar[i]/40.);
+ hmm_pibg_fom[i][j][l]->Scale(0.7/40.);
  hmm_wo_bg_fom[i][j][l]->Add(hmm_L_fom[i][j][l],hmm_bg_fom[i][j][l],1.0,-1.0);
  hmm_pi_wobg_fom[i][j][l]->Add(hmm_pi_fom[i][j][l],hmm_pibg_fom[i][j][l],1.0,-1.0);
 
@@ -3536,6 +3537,7 @@ for(int i=0;i<nth;i++){
 //	for(int j=0;j<nth;j++){
 		int j=0;	int l=0;
 		fout<<n_pi[i][j][l]/n_pi_noZ<<" "<<n_k[i][j][l]/n_k_noZ<<" "<<n_p[i][j][l]/n_p_noZ<<" "<<n_L[i][j][l]/n_L_noZ<<" "<<n_S[i][j][l]/n_S_noZ<<" fabs(ct)<"<<coinvar[i] <<endl;
+		fout<<"n_L="<<n_L[i][j][l]<<", integralL="<<integralL<<", n_S="<<n_S[i][j][l]<<", integralS="<<integralS <<endl;
 //	}
 }
 		
@@ -3725,6 +3727,12 @@ hmm_wo_bg_fom[50][0][0]->Draw("");
 //fmmbg_noZ->Draw("same");
 c2->cd(4);
 hcoin_wo_bg_fom[50][0][0]->Draw("");
+
+
+c3->cd()->SetLogy(1);
+h_ct_wide->Draw();
+
+
 c4->Divide(2,2);
 cout<<"c4 start"<<endl;
 c4->cd(1);
@@ -4064,8 +4072,8 @@ int main(int argc, char** argv){
 //  int ch;
   //string ifname = "/adaqfs/home/a-onl/tritium_work/itabashi/nnL/HallA-Online-Tritium/replay/scripts/ita_scripts/run_list/Lambda_test.list";
   //string ofname = "/pdf/hydro1_AC_eff_test.pdf";
-// string ifname = "../small.list";//Run111157~111220
- string ifname = "../small2.list";//Run111157~111220 & Run111480~111542
+ string ifname = "../small.list";//Run111157~111220
+// string ifname = "../small2.list";//Run111157~111220 & Run111480~111542
 //  string ifname = "../test.list";//for debug
 //  string runlistname;
   string pname = "./Lambda_H1.param";
