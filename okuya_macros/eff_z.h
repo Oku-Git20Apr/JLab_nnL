@@ -602,6 +602,8 @@ double beta_R, beta_L, tref_R, LenL, LenR, cor_L, cor_R, timeL_R, timeR_R, meant
     TH2D *h_LHRS_phth;
     TH2D *h_LHRS_phth2;
     TH2D *h_original_phth;
+    TH2D *h_original_phcosth;
+    TH2D *h_original_phcosth2;
     TH2D *h_original_phth2;
     TH2D *h_original_phth3;
     TH2D *h_original_phth4;
@@ -785,6 +787,8 @@ double beta_R, beta_L, tref_R, LenL, LenR, cor_L, cor_R, timeL_R, timeR_R, meant
     TH1D* h_cos_gk_lab;
     TH1D* h_cos_gk_cm;
     TH1D* h_mom_g;
+    TH1D* h_qsq;
+    TH1D* h_w;
     TH2D* h_thph_ek;
     TH2D* h_thph_g;
 

@@ -1775,6 +1775,8 @@ cout<<"LHRS Set TH"<<endl;
   h_LHRS_phth = new TH2D("h_LHRS_phth","L_th : L_ph (LHRS frame), No Cut",200, 0., 0.1,200,0.,2*PI);
   h_LHRS_phth2 = new TH2D("h_LHRS_phth2","L_th : L_ph (LHRS frame), w/ Z, AC",200, 0., 0.1,200,0.,2*PI);
   h_original_phth = new TH2D("h_original_phth","L_th : L_ph (original frame), No Cut",200, 0.1, 0.35,200,1.,2.);
+  h_original_phcosth = new TH2D("h_original_phcosth","L_th : L_ph (original frame), 2.1<pL<2.15",200, 0.95, 1.,200,1.,2.);
+  h_original_phcosth2 = new TH2D("h_original_phcosth2","L_th : L_ph (original frame), pL>2.16",200, 0.95, 1.,200,1.,2.);
   h_original_phth2 = new TH2D("h_original_phth2","L_th : L_ph (original frame), w/ Z, AC Cut",200, 0.1, 0.35,200,1.,2.);
   h_original_phth3 = new TH2D("h_original_phth3","L_th : L_ph (original frame), top quality",200, 0.1, 0.35,200,1.,2.);
   h_original_phth4 = new TH2D("h_original_phth4","L_th : L_ph (original frame), w/ Z Cut",200, 0.1, 0.35,200,1.,2.);
@@ -2096,6 +2098,8 @@ cout<<"Coin Set TH"<<endl;
   h_cos_gk_lab = new TH1D("h_cos_gk_lab", "cos_gk_lab",1000,0.97,1.0);
   h_cos_gk_cm = new TH1D("h_cos_gk_cm", "cos_gk_cm",1000,0.8,1.0);
   h_mom_g = new TH1D("h_mom_g", "mom_g",1000,1.8,2.5);
+  h_qsq = new TH1D("h_qsq", "Q^2",1000,0.,0.8);
+  h_w = new TH1D("h_w", "W",1000,0.,0.8);
   h_pL_pR = new TH2D("h_pL_pR", "pR:pL",30,1.73,1.93,30,1.95,2.25);
   h_pL_pR2 = new TH2D("h_pL_pR2", "pR:pL (bestcut)",30,1.73,1.93,30,1.95,2.25);
   h_pL_pR3 = new TH2D("h_pL_pR3", "pR:pL (top-quality)",30,1.73,1.93,30,1.95,2.25);
@@ -2849,11 +2853,11 @@ if(tr.AC1_npe_sum<3.75 && 3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20. && fabs(R_tr
 //		cout<<"beta="<<beta<<endl;
         //double beta=R_tr_p[rt]/sqrt(R_tr_p[rt]*R_tr_p[rt]+MK*MK);
 	    double pL    = L_tr_p[lt];//GeV
-	    double pR    = R_tr_p[lt];//GeV
+	    double pR    = R_tr_p[rt];//GeV
 		double theta = L_tr_tg_th[lt];
-		double theta_R = R_tr_tg_th[lt];
+		double theta_R = R_tr_tg_th[rt];
 		double phi = L_tr_tg_ph[lt];
-		double phi_R = R_tr_tg_ph[lt];
+		double phi_R = R_tr_tg_ph[rt];
 		double phi0=13.2*PI/180;//rad
 		//double theta_L = acos((-tan(phi)*sin(phi0)+cos(phi0))/(sqrt(1+tan(theta)*tan(theta)+tan(phi)*tan(phi))));//LHRS frame
 		double theta_L = acos(1./(sqrt(1+theta*theta+phi*phi)));//LHRS frame
@@ -2891,17 +2895,18 @@ if(tr.AC1_npe_sum<3.75 && 3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20. && fabs(R_tr
 		if((theta_R/(phi_R*sin(phi0)+cos(phi0)))>0.&&(theta_R/(phi_R*cos(phi0)-sin(phi0)))<0.){phi_ek = atan((phi_R*cos(phi0)-sin(phi0))/theta_R)+2*PI;}
 
 		double mom_g=sqrt(pL*pL*sin(theta_ee)*sin(theta_ee)+(4.3-pL*cos(theta_ee))*(4.3-pL*cos(theta_ee)));
+		double Qsq=mom_g*mom_g-omega*omega;
 		double phi_g = 0.; 
-		if((theta/(-phi*sin(phi0)+cos(phi0)))<0.&&((phi*cos(phi0)+sin(phi0))/(-phi*sin(phi0)+cos(phi0)))<0.){phi_g=atan(pL*(phi*cos(phi0)+sin(phi0)/theta)/mom_g);}//original frame
-		if((theta/(-phi*sin(phi0)+cos(phi0)))>0.&&((phi*cos(phi0)+sin(phi0))/(-phi*sin(phi0)+cos(phi0)))<0.){phi_g=atan(pL*(phi*cos(phi0)+sin(phi0)/theta)/mom_g)+PI;}
-		if((theta/(-phi*sin(phi0)+cos(phi0)))>0.&&((phi*cos(phi0)+sin(phi0))/(-phi*sin(phi0)+cos(phi0)))>0.){phi_g=atan(pL*(phi*cos(phi0)+sin(phi0)/theta)/mom_g)+PI;}
-		if((theta/(-phi*sin(phi0)+cos(phi0)))<0.&&((phi*cos(phi0)+sin(phi0))/(-phi*sin(phi0)+cos(phi0)))>0.){phi_g=atan(pL*(phi*cos(phi0)+sin(phi0)/theta)/mom_g)+2*PI;}
+		if((theta/(-phi*sin(phi0)+cos(phi0)))<0.&&((phi*cos(phi0)+sin(phi0))/(-phi*sin(phi0)+cos(phi0)))<0.){phi_g=atan(phi*cos(phi0)+sin(phi0)/theta);}//original frame
+		if((theta/(-phi*sin(phi0)+cos(phi0)))>0.&&((phi*cos(phi0)+sin(phi0))/(-phi*sin(phi0)+cos(phi0)))<0.){phi_g=atan(phi*cos(phi0)+sin(phi0)/theta)+PI;}
+		if((theta/(-phi*sin(phi0)+cos(phi0)))>0.&&((phi*cos(phi0)+sin(phi0))/(-phi*sin(phi0)+cos(phi0)))>0.){phi_g=atan(phi*cos(phi0)+sin(phi0)/theta)+PI;}
+		if((theta/(-phi*sin(phi0)+cos(phi0)))<0.&&((phi*cos(phi0)+sin(phi0))/(-phi*sin(phi0)+cos(phi0)))>0.){phi_g=atan(phi*cos(phi0)+sin(phi0)/theta)+2*PI;}
 		//if((theta/(-phi*sin(phi0)+cos(phi0)))<0.&&(theta/(phi*cos(phi0)+sin(phi0)))<0.){phi_g=atan(pL*(phi*cos(phi0)+sin(phi0)/theta)/mom_g);}//original frame
 		//if((theta/(-phi*sin(phi0)+cos(phi0)))>0.&&(theta/(phi*cos(phi0)+sin(phi0)))<0.){phi_g=atan(pL*(phi*cos(phi0)+sin(phi0)/theta)/mom_g)+PI;}
 		//if((theta/(-phi*sin(phi0)+cos(phi0)))>0.&&(theta/(phi*cos(phi0)+sin(phi0)))>0.){phi_g=atan(pL*(phi*cos(phi0)+sin(phi0)/theta)/mom_g)+PI;}
 		//if((theta/(-phi*sin(phi0)+cos(phi0)))<0.&&(theta/(phi*cos(phi0)+sin(phi0)))>0.){phi_g=atan(pL*(phi*cos(phi0)+sin(phi0)/theta)/mom_g)+2*PI;}
-		double theta_g = asin(pL*sin(theta_ee)/mom_g);
-		//double theta_g = acos((4.3-pL*cos(theta_ee))/mom_g);
+		//double theta_g = asin(pL*sin(theta_ee)/mom_g);
+		double theta_g = acos((4.3-pL*cos(theta_ee))/mom_g);
 		double pgpR=mom_g*sin(theta_g)*cos(phi_g)*pR*sin(theta_ek)*cos(phi_ek)+mom_g*sin(theta_g)*sin(phi_g)*pR*sin(theta_ek)*sin(phi_ek)+mom_g*cos(theta_g)*pR*cos(theta_ek);
 		double theta_gk_lab=acos(pgpR/mom_g/pR);
 	
@@ -2953,6 +2958,7 @@ if(tr.AC1_npe_sum<3.75 && 3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20. && fabs(R_tr
 		h_thph_ek->Fill(theta_ek,phi_ek);
 		h_thph_g->Fill(theta_g,phi_g);
 		h_mom_g->Fill(mom_g);
+		h_qsq->Fill(Qsq);
 		if(fabs(ct)<1.)h_pL_pR->Fill(pR,pL);
 		if(bestcut&&fabs(ct)<1.)h_pL_pR2->Fill(pR,pL);
 		h_theta_gk_lab->Fill(theta_gk_lab);
@@ -3011,6 +3017,8 @@ if(tr.AC1_npe_sum<3.75 && 3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20. && fabs(R_tr
 		if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1){
 		h_original_phth4->Fill(theta_ee,phi_ee);
 		if(L_tr_p[lt]>2.18)h_original_phth5->Fill(theta_ee,phi_ee);
+		if(L_tr_p[lt]>2.1&&L_tr_p[lt]<2.15)h_original_phcosth->Fill(cos(theta_ee),phi_ee);
+		if(L_tr_p[lt]>2.16)h_original_phcosth2->Fill(cos(theta_ee),phi_ee);
 		if(L_tr_p[lt]>2.1&&L_tr_p[lt]<2.16)h_original_phth6->Fill(theta_ee,phi_ee);
 		if(L_tr_p[lt]>2.1&&L_tr_p[lt]<2.12)h_original_phth7->Fill(theta_ee,phi_ee);
 		if(L_tr_p[lt]>2.12&&L_tr_p[lt]<2.14)h_original_phth8->Fill(theta_ee,phi_ee);
@@ -3175,7 +3183,7 @@ if(tr.AC1_npe_sum<3.75 && 3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20. && fabs(R_tr
 		h_L_corL_corR->Fill(ctimecorR,ctimecorL);
 		}
 
-		if(fabs(mm-ML)<0.008){
+		if(fabs(mm)<0.008){
 		h_Lp_top->Fill(pL);
 		}
 
@@ -3259,6 +3267,25 @@ if(tr.AC1_npe_sum<3.75 && 3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20. && fabs(R_tr
 				if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1&&fabs(theta_ee-0.225)<0.025&&fabs(phi_ee-1.6)<0.25&&fabs(pL-2.125)<0.025&&i==20)zcut=true;//Âç¶ã¾ú
 				//if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1&&fabs(theta_ee-0.225)<0.0125&&fabs(phi_ee-1.6)<0.125&&fabs(pL-2.125)<0.025&&i==30)zcut=true;//LambdaÂç¶ã¾ú
 				if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1&&fabs(theta_ee-0.225)<0.025&&fabs(phi_ee-1.6)<0.25&&fabs(pL-2.075)<0.025&&i==30)zcut=true;//SigmaÂç¶ã¾ú
+				if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1 && pL>2.1 && pL<2.15  &&i==31)zcut=true;
+				if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1 && pL>2.15 && pL<2.25  &&i==32)zcut=true;
+				if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1 && pL>2.1 && pL<2.125  &&i==33)zcut=true;
+				if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1 && pL>2.125 && pL<2.15  &&i==34)zcut=true;
+				if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1 && pL>2.15 && pL<2.175  &&i==35)zcut=true;
+				if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1 && pL>2.175 && pL<2.2  &&i==36)zcut=true;
+				if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1 && pL>2.1 && pL<2.12  &&i==37)zcut=true;
+				if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1 && pL>2.12 && pL<2.14  &&i==38)zcut=true;
+				if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1 && pL>2.14 && pL<2.16  &&i==39)zcut=true;
+				if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1 && pL>2.16 && pL<2.18  &&i==40)zcut=true;
+				if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1 && pL>2.18 && pL<2.2  &&i==41)zcut=true;
+				if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1&&fabs(theta_ee-0.225)<0.0125&&fabs(phi_ee-1.6)<0.125&&fabs(pL-2.125)<0.025&&i==51)zcut=true;//Âç¶ã¾ú
+				if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1&&fabs(theta_ee-0.25)<0.0125&&fabs(phi_ee-1.6)<0.125&&fabs(pL-2.125)<0.025&&i==52)zcut=true;//Âç¶ã¾ú
+				if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1&&fabs(theta_ee-0.25)<0.0125&&fabs(phi_ee-1.85)<0.125&&fabs(pL-2.125)<0.025&&i==53)zcut=true;//Âç¶ã¾ú
+				if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1&&fabs(theta_ee-0.225)<0.0125&&fabs(phi_ee-1.85)<0.125&&fabs(pL-2.125)<0.025&&i==54)zcut=true;//Âç¶ã¾ú
+				if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1&&fabs(cos(theta_ee)-0.9748)<0.003&&fabs(phi_ee-1.6)<0.125&&fabs(pL-2.125)<0.025&&i==56)zcut=true;//Âç¶ã¾ú
+				if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1&&fabs(cos(theta_ee)-0.9808)<0.003&&fabs(phi_ee-1.6)<0.125&&fabs(pL-2.125)<0.025&&i==57)zcut=true;//Âç¶ã¾ú
+				if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1&&fabs(cos(theta_ee)-0.9808)<0.003&&fabs(phi_ee-1.85)<0.125&&fabs(pL-2.125)<0.025&&i==58)zcut=true;//Âç¶ã¾ú
+				if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1&&fabs(cos(theta_ee)-0.9748)<0.003&&fabs(phi_ee-1.85)<0.125&&fabs(pL-2.125)<0.025&&i==59)zcut=true;//Âç¶ã¾ú
 				if( zcut && cut_ac1 && cut_ac2){
 				hcoin_k_fom[i][j][l]->Fill(ct);
 			    //cout<<"hcoin_k_fom is filled" << endl;
@@ -4112,6 +4139,11 @@ cout<<"AC Efficiency is filled."<<endl;
 fout<<"i=10: pL<2.12, Full Range (Sigma)"<<endl;
 fout<<"i=20: 2.1<pL<2.15, 6msr cut, Top(Lambda)"<<endl;
 fout<<"i=30: 2.05<pL<2.1, 6msr cut, Top(Sigma)"<<endl;
+fout<<"i=31,32: pL is divide into 2, (w/o theta_ee,phi_ee cut)"<<endl;
+fout<<"i=33,34,35,36: pL is divide into 4, (w/o theta_ee,phi_ee cut)"<<endl;
+fout<<"i=37,38,39,40,41: pL is divide into 5, (w/o theta_ee,phi_ee cut)"<<endl;
+fout<<"i=51,52,53,54: (theta,phi) center shift, (2.1<pL<2.5)"<<endl;
+
 fout<<n_pi_noZ<<" "<<n_k_noZ<<" "<<n_p_noZ<<" "<<n_L_noZ<<" "<<n_S_noZ<<endl;
 for(int i=0;i<nth;i++){
 //	for(int j=0;j<nth;j++){
@@ -4789,6 +4821,9 @@ h_theta_ee_p2->Draw("colz");
 //c14->cd(4);
 //h_theta_ee_p4->Draw("colz");
 
+c14->cd();
+h_qsq->Draw("");
+
 c15->Divide(2,2);
 c15->cd(1);
 h_phi_ee->Draw("");
@@ -5010,6 +5045,12 @@ c23->cd(3);
 h_original_phth9->Draw("colz");
 c23->cd(4);
 h_original_phth10->Draw("colz");
+
+c24->Divide(2,2);
+c24->cd(1);
+h_original_phcosth->Draw("colz");
+c24->cd(2);
+h_original_phcosth2->Draw("colz");
 //
 //c22->cd();
 //h_ct_thph->Draw("");
