@@ -1,8 +1,32 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%These files should be under this directry.%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+*Tree.h
+for Tree, Branch
+
+*Tree.cc
+
+*ParamMan.h
+TDC offset, etc.
+
+*ParamMan.cc
+
+*define.h
+physics constant
+
+*Param.h
+offset parameters are defined.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 *tuning_ac_oku.cc
 Macrofile for tuning AC counters & development.
 This concept is based on hrs_tuningAC.h (by Itabashi-san),
 but the analysis inside is taken over from ana_Lambda.cc
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%Survival Ratio Study vs Cut parameters (AC, Z, FP, Chi2, Cointime)%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 *eff_z.cc
 For development
 "tuning_ac_oku.cc" can be used for optimization of 2D scanning,
@@ -23,12 +47,22 @@ Efficiency Study
 
 *eff_coin.cc
 -coinsr*.pdf
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
---0531th1.copy 
-Backup of tuning_ac_oku.cc. When I make graphs of Survival Ratio vs th1
---0531th2u.copy 
-Backup of tuning_ac_oku.cc. When I make graphs of Survival Ratio vs th2u
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%Systematic Error Study%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+*z_analyzer.cc
+-taken over from eff_z.cc
+This can create rootfile including "Cointime" and "Missing Mass" with each cut conditions (Z Cut).
+If you want to study in detail for each cut conditon, you can just use this rootfile.
+That means you don't have to re-analyze all runs (run111157~111220) anymore. (only if you didn't change other cut conditions)
+
+
+%%%%%%%%%%%%%%%%%
+%%AC Gain Study%%
+%%%%%%%%%%%%%%%%%
 *gain_all_segment.cc
 This can fit all AC segments' ADC distribution and get 1p.e. position, run by run.
 This information is stored in "gain_run111???.dat"
@@ -36,22 +70,13 @@ This information is stored in "gain_run111???.dat"
 *each_graph.cc
 This shows all AC segments' run dependences from "gain_run111???.dat"
 2 x 2 display
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-These files should be under this directry.
-
-*Tree.h
-for Tree, Branch
-
-*Tree.cc
-
-*ParamMan.h
-TDC offset, etc.
-
-*ParamMan.cc
-
-*define.h
-physics constant
-
-*Param.h
-offset parameters are defined.
+%%%%%%%%%%
+%%Backup%%
+%%%%%%%%%%
+--0531th1.copy 
+Backup of tuning_ac_oku.cc. When I make graphs of Survival Ratio vs th1
+--0531th2u.copy 
+Backup of tuning_ac_oku.cc. When I make graphs of Survival Ratio vs th2u
