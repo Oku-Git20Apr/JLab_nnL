@@ -7,19 +7,20 @@ cout << " output file name is " << ofname << endl;
 cout << " output pdf file name is " << pdfname << endl;
   
   //TFile *file = new TFile("zeff.root");
-  TFile *file = new TFile("test.root");
-  TH1F *hcoin_k_fom_noZ=(TH1F*) file->Get("ct_den");
-  TH1F *hcoin_bg_fom_noZ=(TH1F*) file->Get("ctbg_den");
-  TH1F *hmm_L_fom_noZ=(TH1F*) file->Get("mm_den");
-  TH1F *hmm_bg_fom_noZ=(TH1F*) file->Get("mmbg_den");
+  TFile *file = new TFile("fout.root");
+  TTree *tree = tree_out->CloneTree(); 
+//  TH1F *hcoin_k_fom_noZ=(TH1F*) file->Get("ct_den");
+//  TH1F *hcoin_bg_fom_noZ=(TH1F*) file->Get("ctbg_den");
+//  TH1F *hmm_L_fom_noZ=(TH1F*) file->Get("mm_den");
+//  TH1F *hmm_bg_fom_noZ=(TH1F*) file->Get("mmbg_den");
   TH1F hcoin_k_fom[100];
   TH1F hmm_L_fom[100];
   TH1F hmm_bg_fom[100];
-  for(int i=0;i<100;i++){
-  hcoin_k_fom[i]=(TH1F*) file->Get(Form("ct_eff[%d]",i));
-  hmm_L_fom[i]=(TH1F*) file->Get("mm_eff[i]");
-  hmm_bg_fom[i]=(TH1F*) file->Get("mmbg_eff[i]");
-  }
+//  for(int i=0;i<100;i++){
+//  hcoin_k_fom[i]=(TH1F*) file->Get(Form("ct_eff[%d]",i));
+//  hmm_L_fom[i]=(TH1F*) file->Get("mm_eff[i]");
+//  hmm_bg_fom[i]=(TH1F*) file->Get("mmbg_eff[i]");
+//  }
  const double ML = 1.115683;            // Lambda       mass (GeV/c2)
  const double MS0 = 1.192642;           // Sigma Zero   mass (GeV/c2)
  const double def_sig_L=0.003; 

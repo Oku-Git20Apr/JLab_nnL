@@ -6,8 +6,12 @@ void z_fitting_test(){
 cout << " output file name is " << ofname << endl;
 cout << " output pdf file name is " << pdfname << endl;
   
-  TFile *file = new TFile("zeff.root","read");
-  TTree *tree = (TTree*)file->Get("tree");
+  TFile *file = new TFile("fout.root","read");
+  TFile *file_new = new TFile("fout_new.root","recreate");
+  TTree *tree = ((TTree*)file->Get("tree_out"))->CloneTree();
+  file->Write();
+ // TTree *tree = tree_out->CloneTree(); 
+//  TTree *tree = (TTree*)file->Get("tree");
 
   //TChain *tree_new = new TChain("tree_new");
   //TChain *tree = new TChain("tree");

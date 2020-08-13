@@ -2,7 +2,7 @@
 #include <fstream>
 using namespace std;
 #include "TApplication.h"
-#include "z_analyzer.h"
+#include "h2all.h"
 #include "Param.h"
 #include "Tree.h"
 #include "TMath.h"
@@ -987,6 +987,7 @@ void tuning::CoinCalc(int RS2_seg, int LS2_seg, int rhit, int lhit){
 
   tr.ct_g=-1000.;
   tr.ct_gb=-1000.;
+  tr.ct_orig[lhit][rhit]=-1000.;
   ct_test=ct;
   //tr.ct_g=CoinCalc_gogami(RS2_seg,LS2_seg,rhit,lhit);
   ct=CoinCalc_gogami(RS2_seg,LS2_seg,rhit,lhit);
@@ -1125,27 +1126,7 @@ double tuning::CoinCalc_gogami(int RS2_seg, int LS2_seg,int rhit, int lhit){
 
  ctime=-ctime;
  ctime_before=-ctime_before;
-//kazuki
-	  if(bestcut){
-		hct_test3->Fill(ct_test);
-		hct_test2->Fill(ctime);
-		hct_test->Fill(ctime_before);
-		}
-		h_ctct->Fill(ctime,ctime_before);
-		h_gbetaR->Fill(beta_R);
-		h_gbetaL->Fill(beta_L);
-		h_gLenR->Fill(LenR);
-		h_gLenL->Fill(LenL);
-		h_gcorR->Fill(cor_R);
-		h_gcorL->Fill(cor_L);
-		h_gcorLR->Fill(cor_L,cor_R);
-		//time reference?
-		h_gtref_R->Fill(tref_R);
-		h_gtimeR_R->Fill(timeR_R);
-		h_gtimeL_R->Fill(timeL_R);
-		h_gmeantime->Fill(meantime_R);
-		h_gctcorR->Fill(ctimecorR);
-		h_gctcorL->Fill(ctimecorL);
+tr.ct_orig[lhit][rhit]=ctime;
 
  return ctime;
 
@@ -1564,7 +1545,7 @@ cout << "mt = " << mt << endl;
 
 void tuning::MakeHist(){
   cout<<"Make Hist "<<endl;
-  file_out = new TFile("fout.root","recreate");
+  file_out = new TFile("h2all.root","recreate");
   tree_out = new TTree("tree_out","tree_out");
   //`tree_out ->Branch("branch name",variable ,"branch name/type");
 
@@ -1573,8 +1554,8 @@ void tuning::MakeHist(){
   tree_out ->Branch("z_cut"        ,&tr.z_cut      ,"z_cut/I"     );
   tree_out ->Branch("nrun"        ,&tr.nrun      ,"nrun/I"     );
   tree_out ->Branch("nev"        ,&tr.nev      ,"nev/I"     );
-  tree_out ->Branch("ntr_r",&tr.ntrack_r ,"ntr_r/I");
-  tree_out ->Branch("ntr_l",&tr.ntrack_l ,"ntr_l/I");
+//  tree_out ->Branch("ntr_r",&tr.ntrack_r ,"ntr_r/I");
+//  tree_out ->Branch("ntr_l",&tr.ntrack_l ,"ntr_l/I");
   tree_out ->Branch("mm",&tr.missing_mass ,"missing_mass/D");
   tree_out ->Branch("mm_b",&tr.missing_mass_b ,"missing_mass_b/D");
   tree_out ->Branch("mm_L",&tr.missing_mass_L ,"missing_mass_L/D");
@@ -1668,6 +1649,30 @@ void tuning::MakeHist(){
   tree_out->Branch("ctbg_eff"     ,tr.ctbg_eff   ,"ctbg_eff[100]/D"  );//Cointime
   tree_out->Branch("mm_eff"     ,tr.mm_eff   ,"mm_eff[100]/D"  );//Missing Mass
   tree_out->Branch("mmbg_eff"     ,tr.mmbg_eff   ,"mmbg_eff[100]/D"  );//Missing Mass BG
+  tree_out->Branch("ct_orig"     ,tr.ct_orig   ,"ct_orig[100][100]/D"  );//Missing Mass BG
+  tree_out->Branch("tr.ntrack_l"  ,&tr.ntrack_l   ,"tr.ntrack_l/I"  );
+  tree_out->Branch("tr.ntrack_r"  ,&tr.ntrack_r   ,"tr.ntrack_r/I"  );
+
+//ADD 2020/8/12
+  tree_out->Branch("L.tr.chi2"  ,tr.chi2_l   ,"L.tr.chi2[100]/D"  );
+  tree_out->Branch("L.tr.x"  ,tr.x_l   ,"L.tr.x[100]/D"  );
+  tree_out->Branch("L.tr.y"  ,tr.y_l   ,"L.tr.y[100]/D"  );
+  tree_out->Branch("L.tr.th"  ,tr.th_l   ,"L.tr.th[100]/D"  );
+  tree_out->Branch("L.tr.ph"  ,tr.ph_l   ,"L.tr.ph[100]/D"  );
+  tree_out->Branch("L.tr.p"  ,tr.mom_l   ,"L.tr.p[100]/D"  );
+  tree_out->Branch("L.tr.tg_th"  ,tr.tg_th_l   ,"L.tr.tg_th[100]/D"  );
+  tree_out->Branch("L.tr.tg_ph"  ,tr.tg_ph_l   ,"L.tr.tg_ph[100]/D"  );
+  tree_out->Branch("L.tr.vz"  ,tr.vz_l   ,"L.tr.vz[100]/D"  );
+
+  tree_out->Branch("R.tr.chi2"  ,tr.chi2_r   ,"R.tr.chi2[100]/D"  );
+  tree_out->Branch("R.tr.x"  ,tr.x_r   ,"R.tr.x[100]/D"  );
+  tree_out->Branch("R.tr.y"  ,tr.y_r   ,"R.tr.y[100]/D"  );
+  tree_out->Branch("R.tr.th"  ,tr.th_r   ,"R.tr.th[100]/D"  );
+  tree_out->Branch("R.tr.ph"  ,tr.ph_r   ,"R.tr.ph[100]/D"  );
+  tree_out->Branch("R.tr.p"  ,tr.mom_r   ,"R.tr.p[100]/D"  );
+  tree_out->Branch("R.tr.tg_th"  ,tr.tg_th_r   ,"R.tr.tg_th[100]/D"  );
+  tree_out->Branch("R.tr.tg_ph"  ,tr.tg_ph_r   ,"R.tr.tg_ph[100]/D"  );
+  tree_out->Branch("R.tr.vz"  ,tr.vz_r   ,"R.tr.vz[100]/D"  );
 
 //////////////
 //Parameters//
@@ -1703,37 +1708,6 @@ cout<<"bin coin"<<bin_coin_c<<endl;
 //	  npe_sum_a2 = new TH1F("npe_sum_a2","NPE SUM A2",4000,0.,80.);
 	  npe_sum_a2 = new TH1F("npe_sum_a2","NPE SUM A2 (Kaon)",300,0.,30.);
 ////--------------------------------------------//
-	  h_pisr1 = new TH1F("h_pisr1","Pion Survival Ratio",nth-1,zver[0],zver[nth-1]);
-	  h_ksr1 = new TH1F("h_ksr1","Kaon Survival Ratio",nth-1,zver[0],zver[nth-1]);
-	  h_psr1 = new TH1F("h_psr1","Proton Survival Ratio",nth-1,zver[0],zver[nth-1]);
-	  h_Lsr1 = new TH1F("h_Lsr1","Lambda Survival Ratio",nth-1,zver[0],zver[nth-1]);
-	  h_Ssr1 = new TH1F("h_Ssr1","Signa Survival Ratio",nth-1,zver[0],zver[nth-1]);
-	  h_pitot1 = new TH1F("h_pitot1","Pion Survival Ratio",nth-1,zver[0],zver[nth-1]);
-	  h_ktot1 = new TH1F("h_ktot1","Kaon Survival Ratio",nth-1,zver[0],zver[nth-1]);
-	  h_ptot1 = new TH1F("h_ptot1","Proton Survival Ratio",nth-1,zver[0],zver[nth-1]);
-	  h_Ltot1 = new TH1F("h_Ltot1","Lambda Survival Ratio",nth-1,zver[0],zver[nth-1]);
-	  h_Stot1 = new TH1F("h_Stot1","Sigma Survival Ratio",nth-1,zver[0],zver[nth-1]);
-//--------------------------------------------//
-	  h_pisr1->Sumw2();
-	  h_pisr1->SetLineColor(kRed);
-	  h_ksr1->Sumw2();
-	  h_ksr1->SetLineColor(kRed);
-	  h_psr1->Sumw2();
-	  h_psr1->SetLineColor(kRed);
-	  h_Lsr1->Sumw2();
-	  h_Lsr1->SetLineColor(kAzure);
-	  h_Ssr1->Sumw2();
-	  h_Ssr1->SetLineColor(kCyan);
-	  h_pitot1->Sumw2();
-	  h_pitot1->SetLineColor(kBlack);
-	  h_ktot1->Sumw2();
-	  h_ktot1->SetLineColor(kBlack);
-	  h_ptot1->Sumw2();
-	  h_ptot1->SetLineColor(kBlack);
-	  h_Ltot1->Sumw2();
-	  h_Ltot1->SetLineColor(kAzure);
-	  h_Stot1->Sumw2();
-	  h_Stot1->SetLineColor(kCyan);
   
 /////////////
 //// BPM ////
@@ -2611,6 +2585,25 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 		tr.ct_eff[i]=-1000.;
 		tr.mm_eff[i]=-1000.;
 		tr.mmbg_eff[i]=-1000.;
+	  //==== tree_out for mixed event analysis =======//
+		tr.chi2_l[i] = -1000.;
+		tr.x_l[i]    = -1000.;
+		tr.y_l[i]    = -1000.;
+		tr.th_l[i]   = -1000.;
+		tr.ph_l[i]   = -1000.;
+		tr.mom_l[i]  = -1000.;
+		tr.tg_th_l[i]= -1000.;
+		tr.tg_ph_l[i]= -1000.;
+		tr.vz_l[i]   = -1000.;
+		tr.chi2_r[i] = -1000.;
+		tr.x_r[i]    = -1000.;
+		tr.y_r[i]    = -1000.;
+		tr.th_r[i]   = -1000.;
+		tr.ph_r[i]   = -1000.;
+		tr.mom_r[i]  = -1000.;
+		tr.tg_th_r[i]= -1000.;
+		tr.tg_ph_r[i]= -1000.;
+		tr.vz_r[i]   = -1000.;
 		}
 
 	    tr.AC1_npe_sum=0.0;
@@ -2637,8 +2630,27 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 	  npe_sum_a1->Fill(tr.AC1_npe_sum);
 	  //npe_sum_a2->Fill(tr.AC2_npe_sum);
 
+	
+	  //==== tree_out for mixed event analysis =======//
+		tr.chi2_l[lt] = L_tr_chi2[lt];
+		tr.x_l[lt]    = L_tr_x[lt];
+		tr.y_l[lt]    = L_tr_y[lt];
+		tr.th_l[lt]   = L_tr_th[lt];
+		tr.ph_l[lt]   = L_tr_ph[lt];
+		tr.mom_l[lt]  = L_tr_p[lt];
+		tr.tg_th_l[lt]= L_tr_tg_th[lt];
+		tr.tg_ph_l[lt]= L_tr_tg_ph[lt];
+		tr.vz_l[lt]   = L_tr_vz[lt];
 
-
+		tr.chi2_r[rt] = R_tr_chi2[rt];
+		tr.x_r[rt]    = R_tr_x[rt];
+		tr.y_r[rt]    = R_tr_y[rt];
+		tr.th_r[rt]   = R_tr_th[rt];
+		tr.ph_r[rt]   = R_tr_ph[rt];
+		tr.mom_r[rt]  = R_tr_p[rt];
+		tr.tg_th_r[rt]= R_tr_tg_th[rt];
+		tr.tg_ph_r[rt]= R_tr_tg_ph[rt];
+		tr.vz_r[rt]   = R_tr_vz[rt];
 
           //Kaon = true; // Without AC CUT
 //2020 Okuyama	  	  if( R_a1_asum_p<200 && R_a2_asum_p>1000 && R_a2_asum_p<4000) Kaon = true;
@@ -2796,6 +2808,27 @@ if(tr.AC1_npe_sum<3.75 && 3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20. && fabs(R_tr
 	    tr.Rp_c[rt] = R_p;
 	    tr.Bp_c     = B_p;
 	    
+	  //==== tree_out for mixed event analysis =======//
+	  //Fill again after event selection
+		tr.chi2_l[lt] = L_tr_chi2[lt];
+		tr.x_l[lt]    = L_tr_x[lt];
+		tr.y_l[lt]    = L_tr_y[lt];
+		tr.th_l[lt]   = L_tr_th[lt];
+		tr.ph_l[lt]   = L_tr_ph[lt];
+		tr.mom_l[lt]  = L_tr_p[lt];
+		tr.tg_th_l[lt]= L_tr_tg_th[lt];
+		tr.tg_ph_l[lt]= L_tr_tg_ph[lt];
+		tr.vz_l[lt]   = L_tr_vz[lt];
+
+		tr.chi2_r[rt] = R_tr_chi2[rt];
+		tr.x_r[rt]    = R_tr_x[rt];
+		tr.y_r[rt]    = R_tr_y[rt];
+		tr.th_r[rt]   = R_tr_th[rt];
+		tr.ph_r[rt]   = R_tr_ph[rt];
+		tr.mom_r[rt]  = R_tr_p[rt];
+		tr.tg_th_r[rt]= R_tr_tg_th[rt];
+		tr.tg_ph_r[rt]= R_tr_tg_ph[rt];
+		tr.vz_r[rt]   = R_tr_vz[rt];
 
 
 
@@ -3503,7 +3536,7 @@ if(tr.AC1_npe_sum<3.75 && 3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20. && fabs(R_tr
 	       h_mm_acc->Fill( mm ); //No Kaon Cut
 	       tr.missing_mass_acc=mm;
 	     }
-	    	     //tree_out->Fill();
+	    	     tree_out->Fill();
 
 
 
@@ -3558,7 +3591,7 @@ if(tr.AC1_npe_sum<3.75 && 3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20. && fabs(R_tr
           } // if L_Tr && L_FP && R_Tr && R_FP
         } // for NRtr
       } // for NLtr
-	  tree_out->Fill();
+	  //tree_out->Fill();
     } // if LHRS && RHRS
     if(k%100000==0){
       end = time(NULL);
@@ -4121,34 +4154,6 @@ cout<<"sig_S"<<sig_S[i][j][l]<<endl;
 
 
 
-	if(n_pi[i][j][l]>n_pi_noZ){
-		for(int fill=0;fill<n_pi_noZ;fill++){h_pisr1->Fill(zver[i]+0.0025);}
-	}
-	else {for(int fill=0;fill<n_pi[i][j][l];fill++){h_pisr1->Fill(zver[i]+0.0025);}}
-
-	if(n_k[i][j][l]>n_k_noZ){
-		for(int fill=0;fill<n_k_noZ;fill++){h_ksr1->Fill(zver[i]+0.0025);}
-	}
-	else {for(int fill=0;fill<n_k[i][j][l];fill++){h_ksr1->Fill(zver[i]+0.0025);}}
-	if(n_p[i][j][l]>n_p_noZ){
-		for(int fill=0;fill<n_p_noZ;fill++){h_psr1->Fill(zver[i]+0.0025);}
-	}
-	else {for(int fill=0;fill<n_p[i][j][l];fill++){h_psr1->Fill(zver[i]+0.0025);}}
-
-	if(n_L[i][j][l]>n_L_noZ){
-		for(int fill=0;fill<n_L_noZ;fill++){h_Lsr1->Fill(zver[i]+0.0025);}
-	}
-	else {for(int fill=0;fill<n_L[i][j][l];fill++){h_Lsr1->Fill(zver[i]+0.0025);}}
-	if(n_S[i][j][l]>n_S_noZ){
-		for(int fill=0;fill<n_S_noZ;fill++){h_Ssr1->Fill(zver[i]+0.0025);}
-	}
-	else {for(int fill=0;fill<n_S[i][j][l];fill++){h_Ssr1->Fill(zver[i]+0.0025);}}
-
-	for(int fill=0;fill<n_pi_noZ;fill++) h_pitot1->Fill(zver[i]+0.0025);
-	for(int fill=0;fill<n_k_noZ;fill++) h_ktot1->Fill(zver[i]+0.0025);
-	for(int fill=0;fill<n_p_noZ;fill++) h_ptot1->Fill(zver[i]+0.0025);
-	for(int fill=0;fill<n_L_noZ;fill++) h_Ltot1->Fill(zver[i]+0.0025);
-	for(int fill=0;fill<n_S_noZ;fill++) h_Stot1->Fill(zver[i]+0.0025);
 
 
 
@@ -4182,449 +4187,8 @@ for(int i=0;i<nth;i++){
 		
 
 
-cout << "TEfficiency!" << endl;
-cout<<"pEff1:"<<endl;
-if(TEfficiency::CheckConsistency(*h_pisr1,*h_pitot1,"w")){
-pEff1 = new TEfficiency(*h_pisr1,*h_pitot1);
-//pEff1->Write();
-}
-cout<<"pEff2:"<<endl;
-if(TEfficiency::CheckConsistency(*h_ksr1,*h_ktot1,"w")){
-pEff2 = new TEfficiency(*h_ksr1,*h_ktot1);
-//pEff2->Write();
-}
-cout<<"pEff3:"<<endl;
-if(TEfficiency::CheckConsistency(*h_psr1,*h_ptot1,"w")){
-pEff3 = new TEfficiency(*h_psr1,*h_ptot1);
-//pEff3->Write();
-}
-
-//-----------Lambda-------------------//
-cout<<"pEff4:"<<endl;
-if(TEfficiency::CheckConsistency(*h_Lsr1,*h_Ltot1,"w")){
-pEff4 = new TEfficiency(*h_Lsr1,*h_Ltot1);
-//pEff4->Write();
-}
-
-//-----------Sigma-------------------//
-cout<<"pEff5:"<<endl;
-if(TEfficiency::CheckConsistency(*h_Ssr1,*h_Stot1,"w")){
-pEff5 = new TEfficiency(*h_Ssr1,*h_Stot1);
-//pEff5->Write();
-}
 
 
-cout << "TGraphErrors!" << endl;
-//gcoin_pi_sr[0] = new TGraphErrors(99, ac1_adc, fom_pi1, 0, err_fom_pi1);
-gcoin_pi_sr[0] = new TGraphErrors(nth-1, ac1_adc, fom_pi1, 0, 0);
-gcoin_pi_sr[0]->SetMarkerColor(kOrange);
-gcoin_pi_sr[0]->SetMarkerStyle(22);
-gcoin_pi_sr[0]->SetMarkerSize(1);
-//gcoin_k_sr[0] = new TGraphErrors(99, ac1_adc, fom_k1, 0, err_fom_k1);
-gcoin_k_sr[0] = new TGraphErrors(nth-1, ac1_adc, fom_k1, 0, 0);
-gcoin_k_sr[0]->SetMarkerColor(kGreen);
-gcoin_k_sr[0]->SetMarkerStyle(22);
-gcoin_k_sr[0]->SetMarkerSize(1);
-//gcoin_p_sr[0] = new TGraphErrors(99, ac1_adc, fom_p1, 0, err_fom_p1);
-gcoin_p_sr[0] = new TGraphErrors(nth-1, ac1_adc, fom_p1, 0, 0);
-gcoin_p_sr[0]->SetMarkerColor(kRed);
-gcoin_p_sr[0]->SetMarkerStyle(22);
-gcoin_p_sr[0]->SetMarkerSize(1);
-//gcoin_pi_sr[1] = new TGraphErrors(100, ac2l_adc, fom_pi2l, 0, 0);
-//gcoin_pi_sr[2] = new TGraphErrors(100, ac2u_adc, fom_pi2u, 0, 0);
-//gcoin_pi_sr[3] = new TGraphErrors(10, ac2u_adc, fom_pi1, 0, 0);
-//gcoin_pi_sr[4] = new TGraphErrors(10, ac2u_adc, fom_pi1, 0, 0);
-//gcoin_pi_sr[5] = new TGraphErrors(10, ac2u_adc, fom_pi1, 0, 0);
-//gcoin_pi_sr[6] = new TGraphErrors(10, ac2u_adc, fom_pi1, 0, 0);
-//gcoin_pi_sr[7] = new TGraphErrors(10, ac2u_adc, fom_pi1, 0, 0);
-//gcoin_pi_sr[8] = new TGraphErrors(10, ac2u_adc, fom_pi1, 0, 0);
-//gcoin_pi_sr[9] = new TGraphErrors(10, ac2u_adc, fom_pi1, 0, 0);
-
-
-//#if 0
-//	//=========== FOMANA ========================//
-//
-//	ac2_up=false;
-//    ac2_down=false;
-//	bool coin_flag=false;
-//   if(ac2_min)ac2_up=true;//tuning_ac_oku.cc
-//   if(ac2_min==0)ac2_down=true;
-//	ev=0;
-//
-//	bool mass_flag;
-//	bool z_cut;
-//	for(int k=0;k<ENum;k++){
-//	  tree->GetEntry(k);
-//
-//
-//	  if(k==ev*100000){
-//     cout<<"Fill Event: "<<k<<"/"<<ENum<<endl; 
-//     ev=ev+1;
-//   }
-//
-//   mm_c=-100.0; //Initialization
-//   ct_c=-100;
-//   ac2_flag = false;
-//   coin_flag = false;
-//   z_cut=false;
-//
-//      int NLtr = (int)L_tr_n;  if(NLtr>MAX) NLtr = MAX;
-//      int NRtr = (int)R_tr_n;  if(NRtr>MAX) NRtr = MAX;
-//  bool L_Tr = false; // LHRS Tracking Chi2 cut
-//  bool L_FP = false; // LHRS FP plane cut
-//  bool R_Tr = false; // RHRS Tracking Chi2 cut
-//  bool R_FP = false; // RHRS FP plane cut
-//  bool Kaon = false; // Kaon cut
-//      
-//      for(int lt=0;lt<NLtr;lt++){
-//        L_Tr = L_FP = false;
-//        if( L_tr_chi2[lt]<0.01 ) L_Tr = true;
-//        if( L_tr_th[lt]<0.17*L_tr_x[lt]+0.025
-//         && L_tr_th[lt]>0.17*L_tr_x[lt]-0.035
-//         && L_tr_th[lt]<0.40*L_tr_x[lt]+0.130 ) L_FP = true;
-//	
-//        for(int rt=0;rt<NRtr;rt++){
-//        R_Tr = R_FP = false;
-//        // FP and chi2 cuts
-//        if( R_tr_chi2[rt]<0.01 ) R_Tr = true;
-//        if( R_tr_th[rt]<0.17*R_tr_x[rt]+0.025
-//         && R_tr_th[rt]>0.17*R_tr_x[rt]-0.035
-//         && R_tr_th[rt]<0.40*R_tr_x[rt]+0.130 ) R_FP = true;
-//
-//
-//////If you do something against gain
-////	    tr.AC1_npe_sum=0.0;
-////	    tr.AC2_npe_sum=0.0;
-////	    for(int seg=0;seg<24;seg++)
-////	      tr.AC1_npe[seg]=0.0;
-////	    for(int seg=0;seg<26;seg++)
-////	      tr.AC2_npe[seg]=0.0;	  
-////
-////	    
-////	  //==== AC ADC convert ch to npe =======//
-////	  //	  tr.AC1_npe_sum=R_a1_asum_p/400.;
-////	  //	  tr.AC2_npe_sum=R_a2_asum_p/400.;
-////
-////	  for(int seg=0;seg<24;seg++){
-////	    tr.AC1_npe[seg]=AC_npe(1,seg,R_a1_a_p[seg]);
-////	    tr.AC1_npe_sum+=tr.AC1_npe[seg];
-////	  }
-////	  for(int seg=0;seg<26;seg++){
-////	    tr.AC2_npe[seg]=AC_npe(2,seg,R_a2_a_p[seg]);
-////	    tr.AC2_npe_sum+=tr.AC2_npe[seg];
-////	  }    
-////
-//
-//
-//
-//          //Kaon = true; // Without AC CUT
-//	  	  if( R_a1_asum_p<200 && R_a2_asum_p>1000 && R_a2_asum_p<4000) Kaon = true;
-//	  // if( R_a1_asum_p<a1_th && R_a2_asum_p>a2_th) Kaon = true;
-//	  //	  if( R_a1_asum_p<1.0 && R_a2_asum_p>3.0 && R_a2_asum_p<7.0) Kaon = true;	  
-////	  if( tr.AC1_npe_sum < a1_th && tr.AC2_npe_sum > a2_th_min) Kaon = true;
-//	  //	  if(fabs(R_tr_vz[rt])<0.1
-//	  //         && fabs(L_tr_vz[lt])<0.1 && fabs(R_tr_vz[rt] - L_tr_vz[lt])<0.03)zcut=true;
-//
-//
-//
-//
-//	    
-//            int L_s2pad = (int)L_s2_trpad[lt];
-//            int R_s2pad    = (int)R_s2_trpad[rt];
-//			CoinCalc(R_s2pad,L_s2pad,rt,lt);
-//   
-//  if(-RF1[43]+RF1[46]>0 && -RF1[44]+RF1[46]>0 && -LF1[27]+LF1[30]>0 && -LF1[28]+LF1[30]>0)cut_s0=true;
-//  if(RF1[48+Rs2pads]>0 && RF1[16+Rs2pads]>0)cut_Rs2=true;
-//  if(LF1[Ls2pads]>0 && LF1[Ls2pads+48]>0)cut_Ls2=true;
-//  if(cut_Rs2 && cut_Ls2 && cut_s0)coin_trig=true;  
-//
-//   
-////     coin_tc=ctime[0];
-//     Rz=Rvz[0];
-//     Lz=Lvz[0];
-////     if(coin_tc>-100)coin_trig=true;
-//
-//   
-////cout << " Rz:Lz" << Rz << ":" << Lz << endl;
-//   if(Rvz_cutmin<Rz && Rz<Rvz_cutmax && Lvz_cutmin<Lz && Lz<Lvz_cutmax)z_cut=true;
-//   
-////cout << " fom_th1:fom_th2" << fom_th1 << ":" << fom_th2 << endl;
-////change  
-////  th_ac2_t=10000.; // FIll Cut of hmm_ac1 (Upper cut)
-//   if(ac2_up && z_cut && R_a2_asum_p<th_ac2_t)ac2_flag=true;
-//
-////cout << " R_a2_asum_p===" << R_a2_asum_p << endl;
-//   if(ac2_down && z_cut && R_a2_asum_p>th_ac2_b)ac2_flag=true;
-////   if(ac2_up && z_cut
-////      && R_a1_asum_p<th_ac1[fom_th1] &&th_ac2[fom_th2]<R_a2_asum_p && R_a2_asum_p<th_ac2_t)ac2_flag=true;
-////
-////   if(ac2_down && z_cut
-////       && R_a1_asum_p<th_ac1[fom_th1] &&th_ac2[fom_th2]>R_a2_asum_p && R_a2_asum_p>th_ac2_b)ac2_flag=true;
-//
-//   
-//   if(z_cut && coin_trig)ct_c=coin_tc;
-////   if(z_cut || ac2_flag){
-////cout << "ac2_flag" << ac2_flag <<endl;
-////cout << "z_cut" << z_cut <<endl;
-////cout << "coin_trig" << coin_trig <<endl;
-////   }
-//   if(ac2_flag && z_cut && coin_trig){
-//cout << "befor hcoin_fom" <<endl;
-//	    hcoin_fom->Fill(ct);
-//cout << "after hcoin_fom" <<endl;
-//   	    if(-1.0<ct && ct<1.0){
-//	      hmm_fom->Fill(mm);
-//	      mm_c=mm;
-//	    }
-//    //----------------------------------------------------------------------------//	
-//   }
-////cout << " kkk===" << k << endl;
-//}//for NRtr
-//}//for NLtr
-//   
-////   tnew->Fill();
-//
-//   
-//	}
-//#endif
-
-
-cout << "After fill" << endl;
-
-	
-//#if 0
-//	//========== w/o AC tuning hist =============//
-//	
-//	hmm_acc->Scale(20./100.);
-//	hmm_p->Add(hmm,hmm_acc,1.0,-1.0);
-//
-//cout << "w/o AC" << endl;
-//	
-//  //======== Lambda B.G. ============//
-//  fbg_L=new TF1("fbg_L","pol1(0)",1.02,1.3);  
-//  //  fbg_L->FixParameter(0,-1137.13); 
-//  //  fbg_L->FixParameter(1,1071.8);
-//  fbg_L->SetParameter(0,-1137.13); 
-//  fbg_L->SetParameter(1,1071.8);
-//
-//  hmm_p->Fit("fbg_L","","",1.09,1.13);
-//  pbg[0]=fbg_L->GetParameter(0);
-//  pbg[1]=fbg_L->GetParameter(1);
-//
-//
-//cout << "Lambda BG" << endl;
-//  //======== Sigma B.G. ==============//
-//  fbg_S=new TF1("fbg_S","pol1(0)",1.17,1.26);  
-//  //  fbg_S->FixParameter(0,448.634); 
-//  //  fbg_S->FixParameter(1,-352.65);
-//  fbg_S->SetParameter(0,448.634); 
-//  fbg_S->SetParameter(1,-352.65);
-//  hmm_p->Fit("fbg_S","","",1.17,1.26);
-//  pbg_S[0]=fbg_S->GetParameter(0);
-//  pbg_S[1]=fbg_S->GetParameter(1);
-//
-//  
-//cout << "Sigma BG" << endl;
-//
-//
-//  //======== Lambda Peak ============//
-//  double min_L=1.105;
-//  double max_L=1.13;
-//
-//  fL_p->SetParameter(0,3.07090e+00); 
-//  fL_p->SetParameter(1,1.11546e+00);
-//  fL_p->SetParameter(2,3.6814e-03);
-//  hmm_p->Fit("fL_p","","",min_L,max_L);
-//  pL[0]=fL_p->GetParameter(0);
-//  pL[1]=fL_p->GetParameter(1); 
-//  pL[2]=fL_p->GetParameter(2);  
-//
-//  pL_err[0]=fL_p->GetParError(0);
-//  pL_err[1]=fL_p->GetParError(1); 
-//  pL_err[2]=fL_p->GetParError(2);  
-//
-//cout << "Lambda peak" << endl;
-//  //======== Sigma Peak ============//
-//  double min_S=1.19;
-//  double max_S=1.21;
-//
-//
-//  fS_p->SetParameter(0,1.06770); 
-//  fS_p->SetParameter(1,1.19941);
-//  fS_p->SetParameter(2,4.9135e-3);
-//  hmm_p->Fit("fS_p","","",min_S,max_S);
-//
-//  pS[0]=fS_p->GetParameter(0);
-//  pS[1]=fS_p->GetParameter(1); 
-//  pS[2]=fS_p->GetParameter(2);  
-//
-//  pS_err[0]=fS_p->GetParError(0);
-//  pS_err[1]=fS_p->GetParError(1); 
-//  pS_err[2]=fS_p->GetParError(2);  
-//
-//
-//cout << "Lambda peak" << endl;
-//  //======== Lambda Peak + B.G. =============//
-//
-//
-//  fL_all=new TF1("fL_all","pol1(0)+gausn(2)",min_L,max_L);
-//  fL_all->SetParameter(0,fbg_L->GetParameter(0)); 
-//  fL_all->SetParameter(1,fbg_L->GetParameter(1));
-//  fL_all->SetParameter(2,pL[0]); 
-//  fL_all->SetParameter(3,pL[1]);
-//  fL_all->SetParameter(4,pL[2]);
-//
-//  hmm_p->Fit("fL_all","","",min_L,max_L);
-//  pbg[0]=fL_all->GetParameter(0);
-//  pbg[1]=fL_all->GetParameter(1);
-//  pL[0]=fL_all->GetParameter(2);
-//  pL[1]=fL_all->GetParameter(3); 
-//  pL[2]=fL_all->GetParameter(4);  
-//  pL_err[0]=fL_all->GetParError(2);
-//  pL_err[1]=fL_all->GetParError(3); 
-//  pL_err[2]=fL_all->GetParError(4);
-//
-//
-// 
-//  fL_p->SetParameters(pL[0],pL[1],pL[2]);
-//  fbg_L->SetParameters(pbg[0],pbg[1]);
-//
-//
-//  
-//  //======== Sigma Peak + B.G. =============//
-//  fS_all=new TF1("fS_all","pol1(0)+gausn(2)",min_S,max_S);
-//  fS_all->SetParameter(0,fbg_S->GetParameter(0)); 
-//  fS_all->SetParameter(1,fbg_S->GetParameter(1));
-//  fS_all->SetParameter(2,pS[0]); 
-//  fS_all->SetParameter(3,pS[1]);
-//  fS_all->SetParameter(4,pS[2]);
-//
-//  hmm_p->Fit("fS_all","","",min_S,max_S);
-//  pbg_S[0]=fS_all->GetParameter(0);
-//  pbg_S[1]=fS_all->GetParameter(1);
-//  pS[0]=fS_all->GetParameter(2);
-//  pS[1]=fS_all->GetParameter(3); 
-//  pS[2]=fS_all->GetParameter(4);  
-//  pS_err[0]=fS_all->GetParError(2);
-//  pS_err[1]=fS_all->GetParError(3); 
-//  pS_err[2]=fS_all->GetParError(4);
-//
-//
-// 
-//  fS_p->SetParameters(pS[0],pS[1],pS[2]);
-//  fbg_S->SetParameters(pbg_S[0],pbg_S[1]);
-//
-//
-//
-//  double bin_min_mmL,bin_max_mmL;
-//  bin_min_mmL=hmm->GetXaxis()->FindBin(pL[1]-3*pL[2]);
-//  bin_max_mmL=hmm->GetXaxis()->FindBin(pL[1]+3*pL[2]);
-//  sum_L=hmm->Integral(bin_min_mmL,bin_max_mmL);
-//
-//  double bin_min_mmS,bin_max_mmS;
-//  bin_min_mmS=hmm->GetXaxis()->FindBin(pS[1]-3*pS[2]);
-//  bin_max_mmS=hmm->GetXaxis()->FindBin(pS[1]+3*pS[2]);
-//  sum_S=hmm->Integral(bin_min_mmS,bin_max_mmS);
-//
-//
-//
-//
-//  
-//
-//	//======== w/ AC tuning hist ===============//
-//
-//  
-//	hmm_fom_acc->Scale(2.0/100.);
-//	hmm_fom_p->Add(hmm_fom,hmm_fom_acc,1.0,-1.0);
-//
-//	hmm_fom->Fit("fL_fom_bg","Rq0","",1.08,1.15);
-//	hmm_fom->Fit("fS_fom_bg","Rq0","",1.17,1.23);
-//
-//	
-//	for(int i=0;i<3;i++){
-//	  Lbg_fom[i]=fL_fom_bg->GetParameter(i);
-//	  Sbg_fom[i]=fS_fom_bg->GetParameter(i);
-//	  fL_fom->FixParameter(i+3,Lbg_fom[i]);
-//	  fS_fom->FixParameter(i+3,Sbg_fom[i]);}
-//
-//        fL_fom->SetParameter(0,1.0);
-//        fL_fom->SetParameter(1,1.115);
-//	fL_fom->SetParameter(2,1.5e-3);
-//
-//        fS_fom->SetParLimits(0,0.0,10);
-//	fS_fom->SetParLimits(1,1.180,1.200);
-//	fS_fom->SetParameter(2,6.0e-3);
-//
-//	hmm_fom->Fit("fL_fom","Rq0","",1.1,1.15);
-//	hmm_fom->Fit("fS_fom","Rq0","",1.17,1.23);
-//
-//	NL_err=fL_fom->GetParError(0);
-//	NS_err=fS_fom->GetParError(0);
-//
-//	for(int i=0;i<3;i++){
-//	 Lam_p[i]=fL_fom->GetParameter(i);
-//	 Sig_p[i]=fS_fom->GetParameter(i);
-//	 Lam_p_err[i]=fL_fom->GetParError(i);
-//	 Sig_p_err[i]=fS_fom->GetParError(i);
-//}
-//
-//
-//
-//    all_L=hmm_fom->Integral(hmm_fom->FindBin(Lam_p[1]-3*Lam_p[2]),hmm_fom->FindBin(Lam_p[1]+3*Lam_p[2]));
-//    all_S=hmm_fom->Integral(hmm_fom->FindBin(Sig_p[1]-3*Sig_p[2]),hmm_fom->FindBin(Sig_p[1]+3*Sig_p[2]));
-//
-//
-//    bg_L=all_L-(Lam_p[0]/0.002);
-//    bg_S=all_S-(Sig_p[0]/0.002);
-//
-//
-//
-//    //===== FOM Peak Fit =========//
-//    
-//	fL_fom_p->SetNpx(2000);	
-//	fL_fom_p->SetParameter(0,Lam_p[0]);
-//	fL_fom_p->SetParameter(1,Lam_p[1]);
-//	fL_fom_p->SetParameter(2,Lam_p[2]);
-//
-//	fS_fom_p->SetNpx(2000);	
-//	fS_fom_p->SetParameter(0,Sig_p[0]);
-//	fS_fom_p->SetParameter(1,Sig_p[1]);
-//	fS_fom_p->SetParameter(2,Sig_p[2]);
-//
-//
-//
-//	
-//	
-//        hcoin_acc->Scale(20./100.);
-//	hcoin_fom_p->Add(hcoin_fom,hcoin_acc,1.0,-1.0);
-//	set->SetTH1(hcoin_fom_p,"","","");
-//
-//
-//        fk_fom->SetNpx(2000);
-//        fk_fom->FixParameter(1,def_mean_k);
-//        fk_fom->FixParameter(2,def_sig_k);
-//	hcoin_fom_p->Fit("fk_fom","","",def_mean_k-3*def_sig_k,def_mean_k+3*def_sig_k);
-//	sumk_fom=fk_fom->GetParameter(0);
-//	meank_fom=fk_fom->GetParameter(1);
-//        sigk_fom=fk_fom->GetParameter(2);
-//	sumk_fom=sumk_fom/tdc_time;
-//        sk_fom=hcoin_fom_p->Integral(hcoin_fom_p->FindBin(-3*sigk_fom+meank_fom)
-//					    ,hcoin_fom_p->FindBin(3*sigk_fom+meank_fom));
-//
-//        sk_fom_ct=hcoin_fom_p->Integral(hcoin_fom_p->FindBin(-1.0)
-//					    ,hcoin_fom_p->FindBin(1.0));
-//
-//
-//        nk_fom=hcoin_acc->Integral(hcoin_acc->FindBin(-3*sigk_fom+meank_fom)
-//					    ,hcoin_acc->FindBin(3*sigk_fom+meank_fom));
-//
-//	snk_fom=sk_fom/nk_fom; 
-//	fom=sqrt(snk_fom*sumk_fom);
-//
-//
-//#endif
-
-	cout<<"FOM ana is done"<<endl;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -5961,7 +5525,7 @@ cout << "Start Fill" << endl;
   
   cout<<"=========== Output files ============="<<endl;
   //cout<<"output rootfile: "<<root_name<<endl;
-  cout<<"output rootfile: fout.root"<<endl;
+  cout<<"output rootfile: h2all.root"<<endl;
   
   
 	

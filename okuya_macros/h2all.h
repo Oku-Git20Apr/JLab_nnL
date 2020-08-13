@@ -72,6 +72,7 @@ struct TreeBranch{
   double ctimecorR,ctimecorL;
   double ct_acc,ct_b,ct_c; 
   double ct_g,ct_gb;
+  double ct_orig[100][100];
   double Rs0ra_p,Rs0la_p,Rs0a_p;
   double Rs2ra_p[16],Rs2la_p[16],Rs2a_p[16];
   double Ls2ra_p[16],Ls2la_p[16],Ls2a_p[16];
@@ -92,12 +93,31 @@ struct TreeBranch{
   double Rpathl,Lpathl,Rpathl_c,Lpathl_c;
   //int runnum;
   double ct_den, ctbg_den, mm_den, mmbg_den, cut_par[100], ct_eff[100], ctbg_eff[100], mm_eff[100], mmbg_eff[100];//Okuyama
+  double chi2_l[100];
+  double x_l[100];
+  double y_l[100];
+  double th_l[100];
+  double ph_l[100];
+  double mom_l[100];
+  double tg_th_l[100];
+  double tg_ph_l[100];
+  double vz_l[100];
+  double chi2_r[100];
+  double x_r[100];
+  double y_r[100];
+  double th_r[100];
+  double ph_r[100];
+  double mom_r[100];
+  double tg_th_r[100];
+  double tg_ph_r[100];
+  double vz_r[100];
+
 };
 static TreeBranch tr;
 ////////////////////////////////////
 ////SET PARAMETERS//////////////////
 ////////////////////////////////////
-int nth=100;//change, nth=0 originally, max 99
+int nth=0;//change, nth=0 originally, max 99
 char const* mode="H";
 int kine=1;
 //double tdc_time=56.23;
