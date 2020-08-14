@@ -189,7 +189,7 @@ const double PI=3.14159265359;
   double B_p, L_p, R_p;//Momentum
 
   int ENum=0;
-  tree->Draw(">>elist", "abs(ct+5.0*2.0)<1.0||abs(ct-1.0*2.0)<1.0||abs(ct-2.0*2.0)<1.0||abs(ct-7.0*2.0)<1.0||abs(ct+4.0*2.0)<1.0");
+  tree->Draw(">>elist", "abs(ct_orig+5.0*2.0)<1.0||abs(ct_orig-1.0*2.0)<1.0||abs(ct_orig-2.0*2.0)<1.0||abs(ct_orig-7.0*2.0)<1.0||abs(ct_orig+4.0*2.0)<1.0");
   TEventList *elist = (TEventList*)gROOT->FindObject("elist");
   ENum = elist->GetN(); 
   //ENum = tree->GetEntries();
@@ -214,8 +214,6 @@ cout<<"Entries: "<<ENum<<endl;
 	time_t start, end;
 	start = time(NULL);
 	time(&start);
-	int nmulti_trackl=0;
-	int nmulti_trackr=0;
 
 //***************************//
 //  MIXED! EVENT! ANALYSIS!  //
@@ -233,18 +231,6 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
       cout<<i<<" / "<<ENum<<" ("<<i*100/ENum<<"%) : "<<Form("%.0lf sec passed,  %.0lf sec left",diff,esttime)<<endl;
     }
 
-      //int NLtr = (int)L_tr_n;  if(NLtr>MAX) NLtr = MAX;
-      //int NRtr = (int)R_tr_n;  if(NRtr>MAX) NRtr = MAX;
-      if(NLtr>1){
-		nmulti_trackl++;
-		cout<<"Multi Track (L)"<<endl;
-	  }
-      if(NRtr>1){
-		nmulti_trackr++;
-		cout<<"Multi Track (R)"<<endl;
-	  }
-      NLtr=1;
-	  NRtr=1; 
       for(int lt=0;lt<NLtr;lt++){
         L_Tr = L_FP = false;
         if( L_tr_chi2[lt]<0.01 ) L_Tr = true;
@@ -364,9 +350,6 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
 		//Electron info.
 		L_tr_vz[lt]=L_tr_vz_saved[lt];
 	
-		//Multi_track
-      NLtr=1;
-	  NRtr=1; 
         for(int rt=0;rt<NRtr;rt++){
         R_Tr = R_FP = false;
         // FP and chi2 cuts
@@ -430,7 +413,7 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
 /*************************************/
 //Following code is just for some checks using true-kaon event
 //e.g.) filling MM histogram, comparing MM & BG(MEA), etc.
-  tree->Draw(">>elist_kaon", "abs(ct)<1.0");
+  tree->Draw(">>elist_kaon", "abs(ct_orig)<1.0");
   TEventList *elist_kaon = (TEventList*)gROOT->FindObject("elist_kaon");
   int ENum_kaon = elist_kaon->GetN(); 
 cout<<"Entries(kaon): "<<ENum_kaon<<endl;
@@ -517,6 +500,7 @@ cout<<"Entries(kaon): "<<ENum_kaon<<endl;
     
   cout << endl;
   TH1F* hmm_mixacc_clone   = (TH1F*)hmm_mixacc->Clone();
+  TH1F* hmm_mixacc_result   = (TH1F*)hmm_mixacc->Clone();
   //TH1F* h2_H_acc2 = (TH1F*)h2_H_acc->Clone();
   for(int i=0 ; i<xbin ; i++){
     hmm_mixacc_clone->SetBinContent( i+1, hmm_mixacc->GetBinContent(i+1)*mixscale);
@@ -563,7 +547,9 @@ cout << "Print is starting" << endl;
 	c6->Print(Form("%s]",pdfname.c_str()));
 
 
-cout << "Multi Track (L) = "<<nmulti_trackl<<endl;
-cout << "Multi Track (R) = "<<nmulti_trackr<<endl;
+cout << "creating new rootfile ... "<<endl;
+file_new->Write();
+file_new->Close();
+
 cout << "Well done!" << endl;
 }//mea_hist

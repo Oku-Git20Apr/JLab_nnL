@@ -987,7 +987,6 @@ void tuning::CoinCalc(int RS2_seg, int LS2_seg, int rhit, int lhit){
 
   tr.ct_g=-1000.;
   tr.ct_gb=-1000.;
-  tr.ct_orig[lhit][rhit]=-1000.;
   ct_test=ct;
   //tr.ct_g=CoinCalc_gogami(RS2_seg,LS2_seg,rhit,lhit);
   ct=CoinCalc_gogami(RS2_seg,LS2_seg,rhit,lhit);
@@ -1649,7 +1648,7 @@ void tuning::MakeHist(){
   tree_out->Branch("ctbg_eff"     ,tr.ctbg_eff   ,"ctbg_eff[100]/D"  );//Cointime
   tree_out->Branch("mm_eff"     ,tr.mm_eff   ,"mm_eff[100]/D"  );//Missing Mass
   tree_out->Branch("mmbg_eff"     ,tr.mmbg_eff   ,"mmbg_eff[100]/D"  );//Missing Mass BG
-  tree_out->Branch("ct_orig"     ,tr.ct_orig   ,"ct_orig[100][100]/D"  );//Missing Mass BG
+  tree_out->Branch("ct_orig"     ,tr.ct_orig   ,"ct_orig[100][100]/D"  );
   tree_out->Branch("tr.ntrack_l"  ,&tr.ntrack_l   ,"tr.ntrack_l/I"  );
   tree_out->Branch("tr.ntrack_r"  ,&tr.ntrack_r   ,"tr.ntrack_r/I"  );
 
@@ -2604,6 +2603,11 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 		tr.tg_th_r[i]= -1000.;
 		tr.tg_ph_r[i]= -1000.;
 		tr.vz_r[i]   = -1000.;
+		}
+		for(int i=0;i<100;i++){
+			for(int j=0;j<100;j++){
+				tr.ct_orig[i][j]=-1000.;
+				}
 		}
 
 	    tr.AC1_npe_sum=0.0;
@@ -5371,8 +5375,9 @@ int main(int argc, char** argv){
   //string ifname = "/adaqfs/home/a-onl/tritium_work/itabashi/nnL/HallA-Online-Tritium/replay/scripts/ita_scripts/run_list/Lambda_test.list";
   //string ofname = "/pdf/hydro1_AC_eff_test.pdf";
 // string ifname = "../small.list";//Run111157~111220
- string ifname = "../small2.list";//Run111157~111220 & Run111480~111542
+// string ifname = "../small2.list";//Run111157~111220 & Run111480~111542
 //  string ifname = "../test.list";//for debug
+	string ifname = "../tyoudo.list";//Run111157~Run111167
 //  string runlistname;
   string pname = "./Lambda_H1.param";
   string mtparam = "../matrix/matrix_new.list";
