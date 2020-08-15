@@ -72,7 +72,7 @@ struct TreeBranch{
   double ctimecorR,ctimecorL;
   double ct_acc,ct_b,ct_c; 
   double ct_g,ct_gb;
-  double ct_orig[100][100];
+  double ct_orig;
   double Rs0ra_p,Rs0la_p,Rs0a_p;
   double Rs2ra_p[16],Rs2la_p[16],Rs2a_p[16];
   double Ls2ra_p[16],Ls2la_p[16],Ls2a_p[16];
@@ -82,8 +82,7 @@ struct TreeBranch{
   double RXt,RYt,RXpt,RYpt;
   double LXFP,LYFP,LXpFP,LYpFP;
   double LXt,LYt,LXpt,LYpt;
-  double Lp[100],Rp[100],Bp;
-  double Lp_c[100],Rp_c[100],Bp_c;  
+  double Lp_c,Rp_c,Bp_c;  
   double dpe,dpe_[100],dpk[100];
   int Rs2_pad[100],Ls2_pad[100];
   double RS2T_F1[16],RS2B_F1[16],RS2T_ref,RS2B_ref,RS2T_F1_c[16],RS2B_F1_c[16],RS2T_F1_b[16],RS2B_F1_b[16];
@@ -93,24 +92,24 @@ struct TreeBranch{
   double Rpathl,Lpathl,Rpathl_c,Lpathl_c;
   //int runnum;
   double ct_den, ctbg_den, mm_den, mmbg_den, cut_par[100], ct_eff[100], ctbg_eff[100], mm_eff[100], mmbg_eff[100];//Okuyama
-  double chi2_l[100];
-  double x_l[100];
-  double y_l[100];
-  double th_l[100];
-  double ph_l[100];
-  double mom_l[100];
-  double tg_th_l[100];
-  double tg_ph_l[100];
-  double vz_l[100];
-  double chi2_r[100];
-  double x_r[100];
-  double y_r[100];
-  double th_r[100];
-  double ph_r[100];
-  double mom_r[100];
-  double tg_th_r[100];
-  double tg_ph_r[100];
-  double vz_r[100];
+  double chi2_l;
+  double x_l;
+  double y_l;
+  double th_l;
+  double ph_l;
+  double mom_l;
+  double tg_th_l;
+  double tg_ph_l;
+  double vz_l;
+  double chi2_r;
+  double x_r;
+  double y_r;
+  double th_r;
+  double ph_r;
+  double mom_r;
+  double tg_th_r;
+  double tg_ph_r;
+  double vz_r;
 
 };
 static TreeBranch tr;
@@ -371,6 +370,7 @@ double Rs2trpad[100],Ls2trpad[100];
  TH1F* hcoin_bg_fom_Zsum;
  TH1F* hcoin_wo_bg_fom_Zsum;
  TH1F* hmm_pi_fom_noZ;//MM if pion
+ TH1F* hmm_pi_fom_best;//MM if pion
  TH1F* hmm_bg_fom_noZ;
  TH1F* hmm_pi_wobg_fom_noZ;
  TH1F* hct_test;

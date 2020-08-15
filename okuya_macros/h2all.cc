@@ -798,9 +798,9 @@ void tuning::Calib(int rt, int lt ){
 
 
     //=========== Energy Loss ===================//
-    B_p     = B_p + Eloss(0.0,0,"B");
-    R_p     = R_p + Eloss(R_tr_tg_ph[rt],R_tr_vz[rt],"R");
-    L_p     = L_p + Eloss(L_tr_tg_ph[lt],L_tr_vz[lt],"L");
+    B_p     = B_p - Eloss(0.0,0,"B");
+    R_p     = R_p - Eloss(R_tr_tg_ph[rt],R_tr_vz[rt],"R");
+    L_p     = L_p - Eloss(L_tr_tg_ph[lt],L_tr_vz[lt],"L");
 
 
     
@@ -1125,7 +1125,7 @@ double tuning::CoinCalc_gogami(int RS2_seg, int LS2_seg,int rhit, int lhit){
 
  ctime=-ctime;
  ctime_before=-ctime_before;
-tr.ct_orig[lhit][rhit]=ctime;
+tr.ct_orig=ctime;
 
  return ctime;
 
@@ -1282,8 +1282,21 @@ double tuning::Eloss(double yp,double z,char const* arm){
   }else{
     dEloss_l = pl[0]*x +pl[1];    
     dEloss = dEloss_l;}
+
+if(z<-0.1){
+    if(*arm=='B')dEloss  = 0.1345;
+    if(*arm=='R')dEloss += 0.803;
+    if(*arm=='L')dEloss += 0.809;
+  }
+  else if(z>0.1){
+    if(*arm=='B')dEloss  = 0.264;
+    if(*arm=='R')dEloss += 0.313;
+    if(*arm=='L')dEloss += 0.313;
+    
+  }
   //==== thickness 0.4 mm in beam energy loss ======//
   if(*arm=='B')dEloss=0.184; //[MeV/c]
+
   dEloss=dEloss/1000.; // [GeV/c]
   return dEloss;
 
@@ -1551,8 +1564,6 @@ void tuning::MakeHist(){
   tree_out ->Branch("pid_cut"        ,&tr.pid_cut      ,"pid_cut/I"     );
   tree_out ->Branch("ct_cut"        ,&tr.ct_cut      ,"ct_cut/I"     );
   tree_out ->Branch("z_cut"        ,&tr.z_cut      ,"z_cut/I"     );
-  tree_out ->Branch("nrun"        ,&tr.nrun      ,"nrun/I"     );
-  tree_out ->Branch("nev"        ,&tr.nev      ,"nev/I"     );
 //  tree_out ->Branch("ntr_r",&tr.ntrack_r ,"ntr_r/I");
 //  tree_out ->Branch("ntr_l",&tr.ntrack_l ,"ntr_l/I");
   tree_out ->Branch("mm",&tr.missing_mass ,"missing_mass/D");
@@ -1564,14 +1575,13 @@ void tuning::MakeHist(){
   tree_out ->Branch("mm_MgL",&tr.missing_mass_MgL ,"missing_mass_MgL/D");
   tree_out ->Branch("mm_MgL_acc",&tr.missing_mass_MgL_acc ,"missing_mass_MgL_acc/D");
   tree_out ->Branch("mm_acc",&tr.missing_mass_acc ,"missing_mass_acc/D");
-  tree_out ->Branch("runnum",&runnum ,"runnum/I");
   tree_out ->Branch("ct_b",&tr.ct_b ,"ct_b/D");
   tree_out ->Branch("ct_c",&tr.ct_c ,"ct_c/D");
   tree_out ->Branch("ct_g",&tr.ct_g ,"ct_g/D");
+  tree_out ->Branch("ct_gb",&tr.ct_gb ,"ct_gb/D");
   tree_out ->Branch("yp_cor",&tr.yp_cor ,"yp_cor/D");
   tree_out ->Branch("ctimecorR",&tr.ctimecorR ,"ctimecorR/D");
   tree_out ->Branch("ctimecorL",&tr.ctimecorL ,"ctimecorL/D");
-  tree_out ->Branch("ct_gb",&tr.ct_gb ,"ct_gb/D");
   tree_out ->Branch("rtof"        ,tr.Rtof      ,"rtof[16]/D"     );
   tree_out ->Branch("ltof"        ,tr.Ltof      ,"ltof[16]/D"     );  
   tree_out ->Branch("RS2T"        ,tr.RS2T_F1      ,"RS2T_F1[16]/D"     );
@@ -1590,9 +1600,8 @@ void tuning::MakeHist(){
   tree_out ->Branch("RS2B_ref"        ,&tr.RS2B_ref   ,"RS2B_ref/D"     );
   tree_out ->Branch("LS2T_ref"        ,&tr.LS2T_ref   ,"LS2T_ref/D"     );
   tree_out ->Branch("LS2B_ref"        ,&tr.LS2B_ref   ,"LS2B_ref/D"     );  
-  tree_out ->Branch("ct"   ,&tr.coin_time ,"coin_time/D");
-  tree_out ->Branch("Rp"        ,&tr.momR      ,"momR/D"     );
-  tree_out ->Branch("Lp"        ,&tr.momL      ,"momL/D"     );
+  tree_out ->Branch("momR"        ,&tr.momR      ,"momR/D"     );
+  tree_out ->Branch("momL"        ,&tr.momL      ,"momL/D"     );
   tree_out ->Branch("Rs2_pad",tr.Rs2_pad,"Rs2_pad[100]/I");
   tree_out ->Branch("Ls2_pad",tr.Ls2_pad,"Ls2_pad[100]/I");
 
@@ -1629,49 +1638,37 @@ void tuning::MakeHist(){
   tree_out ->Branch("Rs2la_p"     ,tr.Rs2la_p   ,"Rs2la_p[16]/D"  );
   tree_out ->Branch("Ls2ra_p"     ,tr.Ls2ra_p   ,"Ls2ra_p[16]/D"  );
   tree_out ->Branch("Ls2la_p"     ,tr.Ls2la_p   ,"Ls2la_p[16]/D"  );  
-  tree_out->Branch("Bp"     ,&tr.Bp   ,"Bp/D"  );
-  //  tree_out->Branch("Lp"     ,tr.Lp   ,"Lp[100]/D"  );
-  //  tree_out->Branch("Rp"     ,tr.Rp   ,"Rp[100]/D"  );
   tree_out->Branch("Bp_c"     ,&tr.Bp_c   ,"Bp_c/D"  );
-  tree_out->Branch("Lp_c"     ,tr.Lp_c   ,"Lp_c[100]/D"  );
-  tree_out->Branch("Rp_c"     ,tr.Rp_c   ,"Rp_c[100]/D"  );
+  tree_out->Branch("Lp_c"     ,&tr.Lp_c   ,"Lp_c/D"  );
+  tree_out->Branch("Rp_c"     ,&tr.Rp_c   ,"Rp_c/D"  );
   tree_out ->Branch("trig"     ,&tr.trig   ,"trig/D"  );
   tree_out->Branch("dpe"     ,&tr.dpe   ,"dpe/D"  );
   tree_out->Branch("dpe_"     ,tr.dpe_   ,"dpe_[10]/D"  );
   tree_out->Branch("dpk"     ,tr.dpk   ,"dpk[10]/D"  );
-  tree_out->Branch("ct_den"     ,&tr.ct_den   ,"ct_den/D"  );//Cointime noZ
-  tree_out->Branch("ctbg_den"     ,&tr.ctbg_den   ,"ctbg_den/D"  );//Cointime noZ
-  tree_out->Branch("mm_den"     ,&tr.mm_den   ,"mm_den/D"  );//Missing Mass noZ
-  tree_out->Branch("mmbg_den"     ,&tr.mmbg_den   ,"mmbg_den/D"  );//Missing Mass BG noZ
-  tree_out->Branch("cut_par"     ,tr.cut_par   ,"cut_par[100]/D"  );//Cut parameter (zcut)
-  tree_out->Branch("ct_eff"     ,tr.ct_eff   ,"ct_eff[100]/D"  );//Cointime
-  tree_out->Branch("ctbg_eff"     ,tr.ctbg_eff   ,"ctbg_eff[100]/D"  );//Cointime
-  tree_out->Branch("mm_eff"     ,tr.mm_eff   ,"mm_eff[100]/D"  );//Missing Mass
-  tree_out->Branch("mmbg_eff"     ,tr.mmbg_eff   ,"mmbg_eff[100]/D"  );//Missing Mass BG
-  tree_out->Branch("ct_orig"     ,tr.ct_orig   ,"ct_orig[100][100]/D"  );
+  tree_out->Branch("ct_orig"     ,&tr.ct_orig   ,"ct_orig/D"  );
   tree_out->Branch("tr.ntrack_l"  ,&tr.ntrack_l   ,"tr.ntrack_l/I"  );
   tree_out->Branch("tr.ntrack_r"  ,&tr.ntrack_r   ,"tr.ntrack_r/I"  );
 
 //ADD 2020/8/12
-  tree_out->Branch("L.tr.chi2"  ,tr.chi2_l   ,"L.tr.chi2[100]/D"  );
-  tree_out->Branch("L.tr.x"  ,tr.x_l   ,"L.tr.x[100]/D"  );
-  tree_out->Branch("L.tr.y"  ,tr.y_l   ,"L.tr.y[100]/D"  );
-  tree_out->Branch("L.tr.th"  ,tr.th_l   ,"L.tr.th[100]/D"  );
-  tree_out->Branch("L.tr.ph"  ,tr.ph_l   ,"L.tr.ph[100]/D"  );
-  tree_out->Branch("L.tr.p"  ,tr.mom_l   ,"L.tr.p[100]/D"  );
-  tree_out->Branch("L.tr.tg_th"  ,tr.tg_th_l   ,"L.tr.tg_th[100]/D"  );
-  tree_out->Branch("L.tr.tg_ph"  ,tr.tg_ph_l   ,"L.tr.tg_ph[100]/D"  );
-  tree_out->Branch("L.tr.vz"  ,tr.vz_l   ,"L.tr.vz[100]/D"  );
+  tree_out->Branch("L.tr.chi2"  ,&tr.chi2_l   ,"L.tr.chi2/D"  );
+  tree_out->Branch("L.tr.x"  ,&tr.x_l   ,"L.tr.x/D"  );
+  tree_out->Branch("L.tr.y"  ,&tr.y_l   ,"L.tr.y/D"  );
+  tree_out->Branch("L.tr.th"  ,&tr.th_l   ,"L.tr.th/D"  );
+  tree_out->Branch("L.tr.ph"  ,&tr.ph_l   ,"L.tr.ph/D"  );
+  tree_out->Branch("L.tr.p"  ,&tr.mom_l   ,"L.tr.p/D"  );
+  tree_out->Branch("L.tr.tg_th"  ,&tr.tg_th_l   ,"L.tr.tg_th/D"  );
+  tree_out->Branch("L.tr.tg_ph"  ,&tr.tg_ph_l   ,"L.tr.tg_ph/D"  );
+  tree_out->Branch("L.tr.vz"  ,&tr.vz_l   ,"L.tr.vz/D"  );
 
-  tree_out->Branch("R.tr.chi2"  ,tr.chi2_r   ,"R.tr.chi2[100]/D"  );
-  tree_out->Branch("R.tr.x"  ,tr.x_r   ,"R.tr.x[100]/D"  );
-  tree_out->Branch("R.tr.y"  ,tr.y_r   ,"R.tr.y[100]/D"  );
-  tree_out->Branch("R.tr.th"  ,tr.th_r   ,"R.tr.th[100]/D"  );
-  tree_out->Branch("R.tr.ph"  ,tr.ph_r   ,"R.tr.ph[100]/D"  );
-  tree_out->Branch("R.tr.p"  ,tr.mom_r   ,"R.tr.p[100]/D"  );
-  tree_out->Branch("R.tr.tg_th"  ,tr.tg_th_r   ,"R.tr.tg_th[100]/D"  );
-  tree_out->Branch("R.tr.tg_ph"  ,tr.tg_ph_r   ,"R.tr.tg_ph[100]/D"  );
-  tree_out->Branch("R.tr.vz"  ,tr.vz_r   ,"R.tr.vz[100]/D"  );
+  tree_out->Branch("R.tr.chi2"  ,&tr.chi2_r   ,"R.tr.chi2/D"  );
+  tree_out->Branch("R.tr.x"  ,&tr.x_r   ,"R.tr.x/D"  );
+  tree_out->Branch("R.tr.y"  ,&tr.y_r   ,"R.tr.y/D"  );
+  tree_out->Branch("R.tr.th"  ,&tr.th_r   ,"R.tr.th/D"  );
+  tree_out->Branch("R.tr.ph"  ,&tr.ph_r   ,"R.tr.ph/D"  );
+  tree_out->Branch("R.tr.p"  ,&tr.mom_r   ,"R.tr.p/D"  );
+  tree_out->Branch("R.tr.tg_th"  ,&tr.tg_th_r   ,"R.tr.tg_th/D"  );
+  tree_out->Branch("R.tr.tg_ph"  ,&tr.tg_ph_r   ,"R.tr.tg_ph/D"  );
+  tree_out->Branch("R.tr.vz"  ,&tr.vz_r   ,"R.tr.vz/D"  );
 
 //////////////
 //Parameters//
@@ -2207,6 +2204,8 @@ for (int i=0;i<nth;i++){
 	set->SetTH1(hmm_pibg_fom_noZ,"No Z cut","","");
 	hmm_pi_wobg_fom_noZ=new TH1F("hmm_pi_wobg_fom_noZ", "No Z cut",bin_mm,min_mm,max_mm);
 	set->SetTH1(hmm_pi_wobg_fom_noZ,"No Z cut","","");
+	hmm_pi_fom_best=new TH1F("hmm_pi_fom_best", "w/ Z cut",bin_mm,min_mm,max_mm);
+	set->SetTH1(hmm_pi_fom_best,"w/ Z cut (Pion Selected)","","");
 
     //-------Z vertex test------------//
   h_zz1    = new TH2D("h_zz1"   ,"h_zz1"   ,bin_coin_c,min_coin_c,max_coin_c,bin_mm,min_mm,max_mm); 
@@ -2540,75 +2539,84 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 	  
   
 	    //---- Initialization ----//
-	    tr.Lp[lt] =-100.;
-	    tr.Lp[rt] =-100.;
-	    tr.Bp     =-100.;
-	    tr.dpe     = -100.;
-	    tr.dpk[rt] = -100.;
-	    tr.dpe_[lt]= -100.;
-	    
-	    tr.Lp[lt] = L_p;
-	    tr.Rp[rt] = R_p;
-	    tr.Bp     = B_p;
-	    tr.ct_c=-1000.;
-	    tr.ct_g=-1000.;
 	    tr.pid_cut = 0;
 	    tr.ct_cut  = 0;
 	    tr.z_cut   = 0;
-	    tr.Lp_c[lt] = -100.;
-	    tr.Rp_c[rt] = -100.;
-	    tr.Bp_c     = -100.;
 	    tr.missing_mass=-100000.;
-	    tr.coin_time=-1000000.;
-	    tr.missing_mass_acc =-100000.;
+	    tr.missing_mass_b   =-100000.;
 	    tr.missing_mass_L   =-100000.;
 	    tr.missing_mass_nnL =-100000.;
 	    tr.missing_mass_H3L =-100000.;
 	    tr.missing_mass_cut =-100000.;
+	    tr.missing_mass_MgL=-100000.;
+	    tr.missing_mass_MgL_acc =-100000.;
+	    tr.missing_mass_acc =-100000.;
+		tr.ct_b=-1000;
+	    tr.ct_c=-1000.;
+	    tr.ct_g=-1000.;
+	    tr.ct_gb=-1000.;
+		tr.yp_cor=-1000.;
+		tr.ctimecorR=-1000.;
+ 		tr.ctimecorL=-1000.;
+		tr.Rtof[rt]=-1000.;
+		tr.Ltof[lt]=-1000.;
+		tr.RS2T_ref=-100000.;
+    	tr.RS2B_ref=-100000.;
+    	tr.LS2T_ref=-100000.;
+    	tr.LS2B_ref=-100000.;
+    	tr.RS2T_F1[rt]=-100000.;
+    	tr.RS2B_F1[rt]=-100000.;
+    	tr.LS2T_F1[lt]=-100000.;
+    	tr.LS2B_F1[lt]=-100000.;
+    	tr.RS2T_F1_c[rt]=-100000.;
+    	tr.RS2B_F1_c[rt]=-100000.;
+    	tr.LS2T_F1_c[lt]=-100000.;
+    	tr.LS2B_F1_c[lt]=-100000.;
+    	tr.RS2T_F1_b[rt]=-100000.;
+    	tr.RS2B_F1_b[rt]=-100000.;
+    	tr.LS2T_F1_b[lt]=-100000.;
+    	tr.LS2B_F1_b[lt]=-100000.;
+	    tr.momR=-1000.;
+		tr.momL=-1000.;
+
+	    ct=-1000.0;
+
+
+	    tr.dpe     = -100.;
+	    tr.dpk[rt] = -100.;
+	    tr.dpe_[lt]= -100.;
+	    
 	    tr.missing_mass_Al  =-100000.;
 	    tr.missing_mass_Lb  =-100000.;
 	    tr.missing_mass_nnLb=-100000.;
-	    tr.missing_mass_b   =-100000.;
 	    tr.missing_mass_Al=-100000.;
-	    tr.missing_mass_MgL=-100000.;
-	    tr.missing_mass_MgL_acc =-100000.;
 	    tr.missing_mass_Al_bg=-100000.;
 	    tr.Rpathl=-100.; tr.Lpathl=-100.;
 	    tr.Rpathl_c=-100.; tr.Lpathl_c=-100.;
-	    ct=-1000.0;
-		tr.ct_den=-1000.;
-		tr.ctbg_den=-1000.;
-		tr.mm_den=-1000.;
-		tr.mmbg_den=-1000.;
-		for(int i=0;i<100;i++){
-		tr.ct_eff[i]=-1000.;
-		tr.mm_eff[i]=-1000.;
-		tr.mmbg_eff[i]=-1000.;
 	  //==== tree_out for mixed event analysis =======//
-		tr.chi2_l[i] = -1000.;
-		tr.x_l[i]    = -1000.;
-		tr.y_l[i]    = -1000.;
-		tr.th_l[i]   = -1000.;
-		tr.ph_l[i]   = -1000.;
-		tr.mom_l[i]  = -1000.;
-		tr.tg_th_l[i]= -1000.;
-		tr.tg_ph_l[i]= -1000.;
-		tr.vz_l[i]   = -1000.;
-		tr.chi2_r[i] = -1000.;
-		tr.x_r[i]    = -1000.;
-		tr.y_r[i]    = -1000.;
-		tr.th_r[i]   = -1000.;
-		tr.ph_r[i]   = -1000.;
-		tr.mom_r[i]  = -1000.;
-		tr.tg_th_r[i]= -1000.;
-		tr.tg_ph_r[i]= -1000.;
-		tr.vz_r[i]   = -1000.;
-		}
-		for(int i=0;i<100;i++){
-			for(int j=0;j<100;j++){
-				tr.ct_orig[i][j]=-1000.;
-				}
-		}
+	    tr.Lp_c = -100.;
+	    tr.Rp_c = -100.;
+	    tr.Bp_c = -100.;
+
+		tr.chi2_l = -1000.;
+		tr.x_l    = -1000.;
+		tr.y_l    = -1000.;
+		tr.th_l   = -1000.;
+		tr.ph_l   = -1000.;
+		tr.mom_l  = -1000.;
+		tr.tg_th_l= -1000.;
+		tr.tg_ph_l= -1000.;
+		tr.vz_l   = -1000.;
+		tr.chi2_r = -1000.;
+		tr.x_r    = -1000.;
+		tr.y_r    = -1000.;
+		tr.th_r   = -1000.;
+		tr.ph_r   = -1000.;
+		tr.mom_r  = -1000.;
+		tr.tg_th_r= -1000.;
+		tr.tg_ph_r= -1000.;
+		tr.vz_r   = -1000.;
+		tr.ct_orig= -1000.;
 
 	    tr.AC1_npe_sum=0.0;
 	    tr.AC2_npe_sum=0.0;
@@ -2636,25 +2644,25 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 
 	
 	  //==== tree_out for mixed event analysis =======//
-		tr.chi2_l[lt] = L_tr_chi2[lt];
-		tr.x_l[lt]    = L_tr_x[lt];
-		tr.y_l[lt]    = L_tr_y[lt];
-		tr.th_l[lt]   = L_tr_th[lt];
-		tr.ph_l[lt]   = L_tr_ph[lt];
-		tr.mom_l[lt]  = L_tr_p[lt];
-		tr.tg_th_l[lt]= L_tr_tg_th[lt];
-		tr.tg_ph_l[lt]= L_tr_tg_ph[lt];
-		tr.vz_l[lt]   = L_tr_vz[lt];
+		tr.chi2_l = L_tr_chi2[lt];
+		tr.x_l    = L_tr_x[lt];
+		tr.y_l    = L_tr_y[lt];
+		tr.th_l   = L_tr_th[lt];
+		tr.ph_l   = L_tr_ph[lt];
+		tr.mom_l  = L_tr_p[lt];
+		tr.tg_th_l= L_tr_tg_th[lt];
+		tr.tg_ph_l= L_tr_tg_ph[lt];
+		tr.vz_l   = L_tr_vz[lt];
 
-		tr.chi2_r[rt] = R_tr_chi2[rt];
-		tr.x_r[rt]    = R_tr_x[rt];
-		tr.y_r[rt]    = R_tr_y[rt];
-		tr.th_r[rt]   = R_tr_th[rt];
-		tr.ph_r[rt]   = R_tr_ph[rt];
-		tr.mom_r[rt]  = R_tr_p[rt];
-		tr.tg_th_r[rt]= R_tr_tg_th[rt];
-		tr.tg_ph_r[rt]= R_tr_tg_ph[rt];
-		tr.vz_r[rt]   = R_tr_vz[rt];
+		tr.chi2_r = R_tr_chi2[rt];
+		tr.x_r    = R_tr_x[rt];
+		tr.y_r    = R_tr_y[rt];
+		tr.th_r   = R_tr_th[rt];
+		tr.ph_r   = R_tr_ph[rt];
+		tr.mom_r  = R_tr_p[rt];
+		tr.tg_th_r= R_tr_tg_th[rt];
+		tr.tg_ph_r= R_tr_tg_ph[rt];
+		tr.vz_r   = R_tr_vz[rt];
 
           //Kaon = true; // Without AC CUT
 //2020 Okuyama	  	  if( R_a1_asum_p<200 && R_a2_asum_p>1000 && R_a2_asum_p<4000) Kaon = true;
@@ -2686,8 +2694,11 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 //	    double B_pc,R_pc,L_pc;
 
 	    tr.dpe     = Eloss(0.0,R_tr_vz[0],"B");
+//if(tr.dpe>0.)cout<<"ELoss(B) = "<<tr.dpe<<endl;
 	    tr.dpk[rt] = Eloss(R_tr_tg_ph[rt],R_tr_vz[rt],"R");
+//if(tr.dpk[rt]>0.)cout<<"ELoss(R) = "<<tr.dpk[rt]<<endl;
 	    tr.dpe_[lt]= Eloss(L_tr_tg_ph[lt],L_tr_vz[lt],"L");
+//if(tr.dpe_[lt]>0.)cout<<"ELoss(L) = "<<tr.dpe_[lt]<<endl;
 	  //  
 	  //  R_pc = R_p + tr.dpk[rt];
 	  //  L_pc = L_p + tr.dpe_[lt];
@@ -2808,31 +2819,31 @@ if(tr.AC1_npe_sum<3.75 && 3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20. && fabs(R_tr
 	    h_Lth_c->Fill(L_tr_tg_th[lt]);	    	    
 	    h_Lph_c->Fill(L_tr_tg_ph[lt]);	    	    
 	    h_Lp_c->Fill(L_p);
-	    tr.Lp_c[lt] = L_p;
-	    tr.Rp_c[rt] = R_p;
-	    tr.Bp_c     = B_p;
+	    tr.Lp_c = L_p;
+	    tr.Rp_c = R_p;
+	    tr.Bp_c = B_p;
 	    
 	  //==== tree_out for mixed event analysis =======//
 	  //Fill again after event selection
-		tr.chi2_l[lt] = L_tr_chi2[lt];
-		tr.x_l[lt]    = L_tr_x[lt];
-		tr.y_l[lt]    = L_tr_y[lt];
-		tr.th_l[lt]   = L_tr_th[lt];
-		tr.ph_l[lt]   = L_tr_ph[lt];
-		tr.mom_l[lt]  = L_tr_p[lt];
-		tr.tg_th_l[lt]= L_tr_tg_th[lt];
-		tr.tg_ph_l[lt]= L_tr_tg_ph[lt];
-		tr.vz_l[lt]   = L_tr_vz[lt];
+		tr.chi2_l = L_tr_chi2[lt];
+		tr.x_l    = L_tr_x[lt];
+		tr.y_l    = L_tr_y[lt];
+		tr.th_l   = L_tr_th[lt];
+		tr.ph_l   = L_tr_ph[lt];
+		tr.mom_l  = L_tr_p[lt];
+		tr.tg_th_l= L_tr_tg_th[lt];
+		tr.tg_ph_l= L_tr_tg_ph[lt];
+		tr.vz_l   = L_tr_vz[lt];
 
-		tr.chi2_r[rt] = R_tr_chi2[rt];
-		tr.x_r[rt]    = R_tr_x[rt];
-		tr.y_r[rt]    = R_tr_y[rt];
-		tr.th_r[rt]   = R_tr_th[rt];
-		tr.ph_r[rt]   = R_tr_ph[rt];
-		tr.mom_r[rt]  = R_tr_p[rt];
-		tr.tg_th_r[rt]= R_tr_tg_th[rt];
-		tr.tg_ph_r[rt]= R_tr_tg_ph[rt];
-		tr.vz_r[rt]   = R_tr_vz[rt];
+		tr.chi2_r = R_tr_chi2[rt];
+		tr.x_r    = R_tr_x[rt];
+		tr.y_r    = R_tr_y[rt];
+		tr.th_r   = R_tr_th[rt];
+		tr.ph_r   = R_tr_ph[rt];
+		tr.mom_r  = R_tr_p[rt];
+		tr.tg_th_r= R_tr_tg_th[rt];
+		tr.tg_ph_r= R_tr_tg_ph[rt];
+		tr.vz_r   = R_tr_vz[rt];
 
 
 
@@ -3279,8 +3290,6 @@ if(tr.AC1_npe_sum<3.75 && 3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20. && fabs(R_tr
 					  if(-20.<ct && ct<20.){
 						 hcoin_bg_fom_noZ->Fill(ct);
 						 hmm_bg_fom_noZ->Fill(mm);
-						 tr.mmbg_den=mm;
-						 tr.ctbg_den=ct;
 						 hmm_pibg_fom_noZ->Fill(mm);
 						 break;}
 					       else if(ct<-20.){ct=ct+40.;}
@@ -3290,12 +3299,12 @@ if(tr.AC1_npe_sum<3.75 && 3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20. && fabs(R_tr
 					}//cointime
 					if(fabs(ct)<1.){
 						hmm_L_fom_noZ->Fill(mm);
-						 tr.mm_den=mm;
 						if(fabs(R_tr_vz[rt]-L_tr_vz[lt])>0.2)hmm_L_fom_Zdiff->Fill(mm);
 						if(fabs(R_tr_vz[rt]+L_tr_vz[lt])/2.>0.5)hmm_L_fom_Zsum->Fill(mm);
 				}
 					if(fabs(ct-3.05)<0.7){
 						hmm_pi_fom_noZ->Fill(mm);//MM if pion
+						if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1)hmm_pi_fom_best->Fill(mm);
 					}
 	}//No Z Cut, w/ AC Cut
 
@@ -3364,8 +3373,6 @@ if(tr.AC1_npe_sum<3.75 && 3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20. && fabs(R_tr
 					  if(-20.<ct && ct<20.){
 						 hcoin_bg_fom[i][j][l]->Fill(ct);
 						 hmm_bg_fom[i][j][l]->Fill(mm);
-						 tr.mmbg_eff[i]=mm;
-						 tr.ctbg_eff[i]=ct;
 						 hmm_pibg_fom[i][j][l]->Fill(mm);//MM if pion
 						 break;}
 					       else if(ct<-20.){ct=ct+40.;}
@@ -3381,11 +3388,11 @@ if(tr.AC1_npe_sum<3.75 && 3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20. && fabs(R_tr
 				if(l==30)npe_sum_a2->Fill(tr.AC2_npe_sum);
 					//if(fabs(ct-mean_k[i][j][l])<sig_k[i][j][l]){
 						hmm_L_fom[i][j][l]->Fill(mm);
-						tr.mm_eff[i]=mm;
 					}//cointime
 					if(fabs(ct-3.05)<0.7){
 						// def_sig_pi=0.443; def_mean_pi=3.0;
 						hmm_pi_fom[i][j][l]->Fill(mm);//MM if pion
+						//if(i==20)hmm_pi_fom_best->Fill(mm);
 					}
 					//}
 				}//if cut condition
@@ -3518,7 +3525,7 @@ if(tr.AC1_npe_sum<3.75 && 3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20. && fabs(R_tr
 	      }
 	
 	
-             tr.missing_mass = mm          ; tr.coin_time =ct         ;
+             tr.missing_mass = mm;
 	     tr.momR         = R_tr_p[0]  ; tr.momL      =L_tr_p[0] ;
 	     tr.zR           = R_tr_vz[0] ; tr.zL        =L_tr_vz[0];
 	     //	     tr.AC1_sum      = R_a1_asum_p/400. ; tr.AC2_sum   =R_a2_asum_p/400.;
@@ -5375,9 +5382,9 @@ int main(int argc, char** argv){
   //string ifname = "/adaqfs/home/a-onl/tritium_work/itabashi/nnL/HallA-Online-Tritium/replay/scripts/ita_scripts/run_list/Lambda_test.list";
   //string ofname = "/pdf/hydro1_AC_eff_test.pdf";
 // string ifname = "../small.list";//Run111157~111220
-// string ifname = "../small2.list";//Run111157~111220 & Run111480~111542
+ string ifname = "../small2.list";//Run111157~111220 & Run111480~111542
 //  string ifname = "../test.list";//for debug
-	string ifname = "../tyoudo.list";//Run111157~Run111167
+//	string ifname = "../tyoudo.list";//Run111157~Run111167
 //  string runlistname;
   string pname = "./Lambda_H1.param";
   string mtparam = "../matrix/matrix_new.list";

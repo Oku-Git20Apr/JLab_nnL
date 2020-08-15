@@ -18,6 +18,15 @@
 #define LS2 16     // No. of Segments of L-S2
 #define LF1TDC 64  // No. of ch of L-F1TDC
 
+double F_Voigt( double *x, double *par )
+  {
+    // par[0] : area
+    // par[1] : location
+    // par[2] : gaussian sigma
+    // par[3] : lorentz fwhm
+    double val = par[0] * TMath::Voigt(x[0]-par[1],par[2],par[3],4);
+    return val;
+  }
 
 void fit(){
 	string pdfname = "fitting.pdf";
@@ -25,7 +34,7 @@ cout << "Output pdf file name is " << pdfname << endl;
   
   //TFile *file = new TFile("h2_10run.root","read");
   TFile *file = new TFile("h2all3.root","read");//input file of all H2 run(default: h2all3.root)
-  TFile *file_mea = new TFile("bgmea.root","read");//input file of BG(MEA) histo.(default: bgmea.root)
+  TFile *file_mea = new TFile("z_MEA.root","read");//input file of BG(MEA) histo.(default: bgmea.root)
  // TTree *tree_old = (TTree*)file->Get("tree_out");
 //cout<<"Please wait a moment. CloneTree() is working..."<<endl;
   //TTree *tree = tree_old->CloneTree();
@@ -85,6 +94,7 @@ cout << "Output pdf file name is " << pdfname << endl;
  TF1* fk_noZ;
  TF1* fp_noZ;
  TF1* fmmbg_noZ;
+ TF1* fmm_pi_noZ;
  TF1* fL_noZ;
  TF1* fS_noZ;
  TF1* fmm_noZ;
@@ -128,13 +138,6 @@ cout << "Output pdf file name is " << pdfname << endl;
 	double L_mom[MAX], R_mom[MAX], B_mom; 
 	double L_ene[MAX], R_ene[MAX], B_ene; 
 	double ac1sum, ac2sum;//NPE SUM
-	
-//	string branchname[]={"tr.ntrack_l","tr.ntrack_r","tr.Ls2_pad[100]"};
-//	Int_t nbranch = sizeof(branchname)/sizeof(branchname[0]);
-//	tree->SetBranchStatus("*",0);
-//	for(Int_t ibranch;ibranch<nbranch;ibranch++){
-//	tree->SetBranchStatus(branchname[ibranch].c_str(),1);
-//	}
 
 	tree->SetBranchStatus("*",0);
 	tree->SetBranchStatus("tr.ntrack_l",1);tree->SetBranchAddress("tr.ntrack_l",&NLtr);
@@ -148,7 +151,6 @@ cout << "Output pdf file name is " << pdfname << endl;
   	tree->SetBranchStatus("ct_orig",1);  tree->SetBranchAddress("ct_orig", ct);
   	tree->SetBranchStatus("ct",1);  tree->SetBranchAddress("ct", &ct_sum);
 
-//ADD 2020/8/12
   	tree->SetBranchStatus("L.tr.chi2",1);  tree->SetBranchAddress("L.tr.chi2", L_tr_chi2);
   	tree->SetBranchStatus("L.tr.x",1);  tree->SetBranchAddress("L.tr.x", L_tr_x);
   	tree->SetBranchStatus("L.tr.y",1);  tree->SetBranchAddress("L.tr.y", L_tr_y);
@@ -176,18 +178,6 @@ cout << "Output pdf file name is " << pdfname << endl;
   h1->GetXaxis()->SetTitle("coin time (ns)");
   h1->GetYaxis()->SetTitle("Counts / 100 ps");
   h1->GetXaxis()->SetRangeUser(-14.0,17.);
-  TH1F* h2  = new TH1F("h2","",400,-20.,20.0);
-  h2->GetXaxis()->SetTitle("coin time (ns)");
-  h2->GetYaxis()->SetTitle("Counts / 100 ps");
-  h2->GetXaxis()->SetRangeUser(-14.0,17.);
-  TH1F* h3  = new TH1F("h3","",400,-20.,20.0);
-  h3->GetXaxis()->SetTitle("coin time (ns)");
-  h3->GetYaxis()->SetTitle("Counts / 100 ps");
-  h3->GetXaxis()->SetRangeUser(-14.0,17.);
-  TH1F* h4  = new TH1F("h4","",400,-20.,20.0);
-  h4->GetXaxis()->SetTitle("coin time (ns)");
-  h4->GetYaxis()->SetTitle("Counts / 100 ps");
-  h4->GetXaxis()->SetRangeUser(-14.0,17.);
   double xmin = -0.1, xmax = 0.2; int xbin = 300; // 1 MeV / bin
   TH1F* hmm_L_fom_best  = new TH1F("hmm_L_fom_best","hmm_L_fom_best",xbin,xmin,xmax);
   hmm_L_fom_best->GetXaxis()->SetTitle("M_{x} - M_{#Lambda} (GeV/c^{2})");
@@ -217,11 +207,6 @@ cout << "Output pdf file name is " << pdfname << endl;
   
   h1 ->SetLineColor(2);
   h1->SetLineWidth(2);
-  h2->SetLineColor(1);
-  h3->SetLineColor(1);
-  h3->SetFillColor(1);
-  h3->SetFillStyle(3001);
-  h4->SetLineColor(9);
 
   TH1F* h_test  = new TH1F("h_test","",1000,1.8,2.4);
 
@@ -339,8 +324,10 @@ cout<<"Entries: "<<ENum<<endl;
 	TCanvas* c1 = new TCanvas("c1","c1");
 	hmm_L_fom_best->Draw("");
 	TCanvas* c2 = new TCanvas("c2","c2");
+	TH1F* hmm_pi_fom_noZ=(TH1F*)file->Get("hmm_pi_fom_noZ");
+	TH1F* hmm_pi_fom_best=(TH1F*)file->Get("hmm_pi_fom_best");
 	//ACCBGの引き算はmea_hist.rootから
-	TH1F* hmm_bg_fom_best=(TH1F*)file_mea->Get("hmm_mixacc");
+	TH1F* hmm_bg_fom_best=(TH1F*)file_mea->Get("hmm_mixacc_result");
     int fitmin = hmm_L_fom_best->FindBin(0.10);
     int fitmax = hmm_L_fom_best->FindBin(0.15);
     double num1 = hmm_L_fom_best->Integral(fitmin,fitmax);
@@ -349,116 +336,134 @@ cout<<"Entries: "<<ENum<<endl;
 	cout<<"hmm_L integral ="<<num1<<endl;
 	cout<<"hmm_bg integral ="<<num2<<endl;
 	cout<<"mixscale(original/mixed)="<<mixscale<<endl;
-	hmm_bg_fom_best->Scale(mixscale);
+	hmm_bg_fom_best->Scale(1./15.);
 	//TH1F* hmm_wo_bg_fom_best = (TH1F*)hmm_L_fom_best->Clone("hmm_wo_bg_fom_best");
 	hmm_wo_bg_fom_best->Add(hmm_L_fom_best,hmm_bg_fom_best,1.0,-1.0);
 	fmmbg_noZ=new TF1("fmmbg_noZ","pol4",min_mm,max_mm);
- fmmbg_noZ->SetNpx(2000);
- fL_noZ=new TF1("fL_noZ","gausn(0)",min_mm,max_mm);
- fL_noZ->SetNpx(2000);
- fL_noZ->SetParameters(def_n_L,def_mean_L,def_sig_L);
- fL_noZ->SetParLimits(0,0.,100000);
- fL_noZ->SetParLimits(1,def_mean_L-def_sig_L,def_mean_L+def_sig_L);
- fL_noZ->SetParLimits(2,0.,0.01);
- fS_noZ=new TF1("fS_noZ","gausn(0)",min_mm,max_mm);
- fS_noZ->SetNpx(2000);
- fS_noZ->SetParameters(def_n_S,def_mean_S,def_sig_S);
- fS_noZ->SetParLimits(0,0.,100000);
- fS_noZ->SetParLimits(1,def_mean_S-def_sig_S,def_mean_S+def_sig_S);
- fS_noZ->SetParLimits(2,0.,0.01);//sigma limit in order not to mix with bg
- 
- fmm_noZ=new TF1("fmm_noZ","gausn(0)+gausn(3)+pol4(6)",min_mm,max_mm);
- fmm_noZ->SetNpx(2000);
- fmm_noZ->SetTitle("Missing Mass (best cut)");
- fmm_noZ->SetParLimits(0,0.,1000000.);//positive
- fmm_noZ->SetParLimits(3,0.,1000000.);//positive
+	fmmbg_noZ->SetNpx(2000);
+	fmm_pi_noZ=new TF1("fmm_pi_noZ",F_Voigt,min_mm,max_mm,4);
+	fmm_pi_noZ->SetNpx(2000);
+	 fL_noZ=new TF1("fL_noZ","gausn(0)",min_mm,max_mm);
+	 fL_noZ->SetNpx(2000);
+	 fL_noZ->SetParameters(def_n_L,def_mean_L,def_sig_L);
+	 fL_noZ->SetParLimits(0,0.,100000);
+	 fL_noZ->SetParLimits(1,def_mean_L-def_sig_L,def_mean_L+def_sig_L);
+	 fL_noZ->SetParLimits(2,0.,0.01);
+	 fS_noZ=new TF1("fS_noZ","gausn(0)",min_mm,max_mm);
+	 fS_noZ->SetNpx(2000);
+	 fS_noZ->SetParameters(def_n_S,def_mean_S,def_sig_S);
+	 fS_noZ->SetParLimits(0,0.,100000);
+	 fS_noZ->SetParLimits(1,def_mean_S-def_sig_S,def_mean_S+def_sig_S);
+	 fS_noZ->SetParLimits(2,0.,0.01);//sigma limit in order not to mix with bg
+	 
+	 fmm_noZ=new TF1("fmm_noZ","gausn(0)+gausn(3)+pol4(6)",min_mm,max_mm);
+	 fmm_noZ->SetNpx(2000);
+	 fmm_noZ->SetTitle("Missing Mass (best cut)");
+	 fmm_noZ->SetParLimits(0,0.,1000000.);//positive
+	 fmm_noZ->SetParLimits(3,0.,1000000.);//positive
+		
+	 hmm_wo_bg_fom_best->Fit("fL_noZ","","",def_mean_L-def_sig_L,def_mean_L+def_sig_L);
+	 const_L_noZ=fL_noZ->GetParameter(0);
+	 mean_L_noZ=fL_noZ->GetParameter(1);
+	 sig_L_noZ=fL_noZ->GetParameter(2);
+	 center_L=def_mean_L;
+	 range_L=2*def_sig_L;
 	
- hmm_wo_bg_fom_best->Fit("fL_noZ","","",def_mean_L-def_sig_L,def_mean_L+def_sig_L);
- const_L_noZ=fL_noZ->GetParameter(0);
- mean_L_noZ=fL_noZ->GetParameter(1);
- sig_L_noZ=fL_noZ->GetParameter(2);
- center_L=def_mean_L;
- range_L=2*def_sig_L;
+	 hmm_wo_bg_fom_best->Fit("fS_noZ","","",def_mean_S-def_sig_S,def_mean_S+def_sig_S);
+	 const_S_noZ=fS_noZ->GetParameter(0);
+	 mean_S_noZ=fS_noZ->GetParameter(1);
+	 sig_S_noZ=fS_noZ->GetParameter(2);
+	 center_S=def_mean_S;
+	 range_S=2*def_sig_S;
 
- hmm_wo_bg_fom_best->Fit("fS_noZ","","",def_mean_S-def_sig_S,def_mean_S+def_sig_S);
- const_S_noZ=fS_noZ->GetParameter(0);
- mean_S_noZ=fS_noZ->GetParameter(1);
- sig_S_noZ=fS_noZ->GetParameter(2);
- center_S=def_mean_S;
- range_S=2*def_sig_S;
+cout<<"fmm_pi_noZ fit start"<<endl;
+	fmm_pi_noZ->SetParameters(50,0.05,0.05,0.00006);
+	hmm_pi_fom_noZ->Fit("fmm_pi_noZ","","",min_mm,max_mm);//1st Fit
+	double fmmpi1=fmm_pi_noZ->GetParameter(1);
+	double fmmpi2=fmm_pi_noZ->GetParameter(2);
+	double fmmpi3=fmm_pi_noZ->GetParameter(3);
+	fmm_pi_noZ->FixParameter(1,fmmpi1);
+	fmm_pi_noZ->FixParameter(2,fmmpi2);
+	fmm_pi_noZ->FixParameter(3,fmmpi3);
+	fmm_pi_noZ->SetParLimits(0,0.,1000000);//positive
+	hmm_wo_bg_fom_best->Fit("fmm_pi_noZ","","",-0.1,-0.02);//2nd Fit
 
-cout<<"fmmbg fit start"<<endl;
-
- fmm_noZ->SetParameter(0,const_L_noZ);
- fmm_noZ->SetParameter(1,mean_L_noZ);
- fmm_noZ->SetParLimits(1,def_mean_L-def_sig_L,def_mean_L+def_sig_L);
- fmm_noZ->SetParameter(2,sig_L_noZ);
- fmm_noZ->SetParLimits(2,0.,2*def_sig_L);
-// fmm_noZ->SetParameters(9,100);
- fmm_noZ->SetParameter(3,const_S_noZ);
- fmm_noZ->SetParameter(4,mean_S_noZ);
- fmm_noZ->SetParLimits(4,def_mean_S-def_sig_S,def_mean_S+def_sig_S);
- fmm_noZ->SetParameter(5,sig_S_noZ);
- fmm_noZ->SetParLimits(5,0.,2*def_sig_S);
- hmm_wo_bg_fom_best->Fit("fmm_noZ","Rq0","0",-0.05,0.15);
-double fmm_noZpar0 = fmm_noZ->GetParameter(0);cout<<"fmm_noZ[0]="<<fmm_noZpar0<<endl;//area(L)
-double fmm_noZpar1 = fmm_noZ->GetParameter(1);cout<<"fmm_noZ[1]="<<fmm_noZpar1<<endl;//mean(L)
-double fmm_noZpar2 = fmm_noZ->GetParameter(2);cout<<"fmm_noZ[2]="<<fmm_noZpar2<<endl;//sigma(L)
-double fmm_noZpar3 = fmm_noZ->GetParameter(3);cout<<"fmm_noZ[3]="<<fmm_noZpar3<<endl;//area(S)
-double fmm_noZpar4 = fmm_noZ->GetParameter(4);cout<<"fmm_noZ[4]="<<fmm_noZpar4<<endl;//mean(S)
-double fmm_noZpar5 = fmm_noZ->GetParameter(5);cout<<"fmm_noZ[5]="<<fmm_noZpar5<<endl;//sigma(S)
-double fmm_noZpar6 = fmm_noZ->GetParameter(6);cout<<"fmm_noZ[6]="<<fmm_noZpar6<<endl;//poly_const
-double fmm_noZpar7 = fmm_noZ->GetParameter(7);cout<<"fmm_noZ[7]="<<fmm_noZpar7<<endl;//poly_x
-double fmm_noZpar8 = fmm_noZ->GetParameter(8);cout<<"fmm_noZ[8]="<<fmm_noZpar8<<endl;//poly_x^2
-double fmm_noZpar9 = fmm_noZ->GetParameter(9);cout<<"fmm_noZ[9]="<<fmm_noZpar9<<endl;//poly_x^3
-double fmm_noZpar10 = fmm_noZ->GetParameter(10);cout<<"fmm_noZ[10]="<<fmm_noZpar10<<endl;//poly_x^4
- fmmbg_noZ->SetParameters(fmm_noZpar6,fmm_noZpar7,fmm_noZpar8,fmm_noZpar9,fmm_noZpar10);
-
- mean_L_noZ=def_mean_L;
- mean_S_noZ=def_mean_S;
- sig_L_noZ=def_sig_L;
- sig_S_noZ=def_sig_S;
- n_L_noZ=hmm_wo_bg_fom_best->Integral(hmm_wo_bg_fom_best->FindBin(center_L-range_L),hmm_wo_bg_fom_best->FindBin(center_L+range_L));
-cout<<"before(L):: "<<n_L_noZ<<endl;
- double integralL=fmmbg_noZ->Integral(center_L-range_L,center_L+range_L);
- integralL=integralL/(2*range_L/(hmm_wo_bg_fom_best->FindBin(center_L+range_L)-hmm_wo_bg_fom_best->FindBin(center_L-range_L)));
-cout<<"integralL="<<integralL<<endl;
- if(integralL>0)n_L_noZ=n_L_noZ-integralL;
-cout<<"after(L):: "<<n_L_noZ<<endl;
- n_S_noZ=hmm_wo_bg_fom_best->Integral(hmm_wo_bg_fom_best->FindBin(center_S-range_S),hmm_wo_bg_fom_best->FindBin(center_S+range_S));
-cout<<"before(S):: "<<n_S_noZ<<endl;
- double integralS=fmmbg_noZ->Integral(center_S-range_S,center_S+range_S);
- integralS=integralS/(2*range_S/(hmm_wo_bg_fom_best->FindBin(center_S+range_S)-hmm_wo_bg_fom_best->FindBin(center_S-range_S)));
-cout<<"integralS="<<integralS<<endl;
- if(integralS>0)n_S_noZ-=integralS;
-cout<<"after(S):: "<<n_S_noZ<<endl;
- cout<<"n_L"<<n_L_noZ<<endl;
-cout<<"mean_L"<<mean_L_noZ<<endl;
-cout<<"sig_L"<<sig_L_noZ<<endl;
- cout<<"n_S"<<n_S_noZ<<endl;
-cout<<"mean_S"<<mean_S_noZ<<endl;
-cout<<"sig_S"<<sig_S_noZ<<endl;
-
-hmm_L_fom_best->Draw();
-hmm_bg_fom_best->Draw("same");
-
-	TCanvas* c3 = new TCanvas("c3","c3");
-fmmbg_noZ->SetLineColor(kGreen);
-fL_noZ->SetLineColor(kRed);
-fS_noZ->SetLineColor(kRed);
-fL_noZ->Draw("");
-fS_noZ->Draw("same");
-fmmbg_noZ->Draw("same");
-	TCanvas* c4 = new TCanvas("c4","c4");
-hmm_wo_bg_fom_best->Draw("");
-fmmbg_noZ->Draw("same");
-fL_noZ->Draw("same");
-fS_noZ->Draw("same");
-	TCanvas* c5 = new TCanvas("c5","c5");
-hmm_wo_bg_fom_best->Draw("");
-fmm_noZ->Draw("same");
-	TCanvas* c6 = new TCanvas("c6","c6");
-hmm_bg_fom_best->Draw("");
+	 fmm_noZ->SetParameter(0,const_L_noZ);
+	 fmm_noZ->SetParameter(1,mean_L_noZ);
+	 fmm_noZ->SetParLimits(1,def_mean_L-def_sig_L,def_mean_L+def_sig_L);
+	 fmm_noZ->SetParameter(2,sig_L_noZ);
+	 fmm_noZ->SetParLimits(2,0.,2*def_sig_L);
+	// fmm_noZ->SetParameters(9,100);
+	 fmm_noZ->SetParameter(3,const_S_noZ);
+	 fmm_noZ->SetParameter(4,mean_S_noZ);
+	 fmm_noZ->SetParLimits(4,def_mean_S-def_sig_S,def_mean_S+def_sig_S);
+	 fmm_noZ->SetParameter(5,sig_S_noZ);
+	 fmm_noZ->SetParLimits(5,0.,2*def_sig_S);
+	 hmm_wo_bg_fom_best->Fit("fmm_noZ","Rq0","0",-0.05,0.15);
+	double fmm_noZpar0 = fmm_noZ->GetParameter(0);cout<<"fmm_noZ[0]="<<fmm_noZpar0<<endl;//area(L)
+	double fmm_noZpar1 = fmm_noZ->GetParameter(1);cout<<"fmm_noZ[1]="<<fmm_noZpar1<<endl;//mean(L)
+	double fmm_noZpar2 = fmm_noZ->GetParameter(2);cout<<"fmm_noZ[2]="<<fmm_noZpar2<<endl;//sigma(L)
+	double fmm_noZpar3 = fmm_noZ->GetParameter(3);cout<<"fmm_noZ[3]="<<fmm_noZpar3<<endl;//area(S)
+	double fmm_noZpar4 = fmm_noZ->GetParameter(4);cout<<"fmm_noZ[4]="<<fmm_noZpar4<<endl;//mean(S)
+	double fmm_noZpar5 = fmm_noZ->GetParameter(5);cout<<"fmm_noZ[5]="<<fmm_noZpar5<<endl;//sigma(S)
+	double fmm_noZpar6 = fmm_noZ->GetParameter(6);cout<<"fmm_noZ[6]="<<fmm_noZpar6<<endl;//poly_const
+	double fmm_noZpar7 = fmm_noZ->GetParameter(7);cout<<"fmm_noZ[7]="<<fmm_noZpar7<<endl;//poly_x
+	double fmm_noZpar8 = fmm_noZ->GetParameter(8);cout<<"fmm_noZ[8]="<<fmm_noZpar8<<endl;//poly_x^2
+	double fmm_noZpar9 = fmm_noZ->GetParameter(9);cout<<"fmm_noZ[9]="<<fmm_noZpar9<<endl;//poly_x^3
+	double fmm_noZpar10 = fmm_noZ->GetParameter(10);cout<<"fmm_noZ[10]="<<fmm_noZpar10<<endl;//poly_x^4
+	 fmmbg_noZ->SetParameters(fmm_noZpar6,fmm_noZpar7,fmm_noZpar8,fmm_noZpar9,fmm_noZpar10);
+	
+	 mean_L_noZ=def_mean_L;
+	 mean_S_noZ=def_mean_S;
+	 sig_L_noZ=def_sig_L;
+	 sig_S_noZ=def_sig_S;
+	 n_L_noZ=hmm_wo_bg_fom_best->Integral(hmm_wo_bg_fom_best->FindBin(center_L-range_L),hmm_wo_bg_fom_best->FindBin(center_L+range_L));
+	cout<<"before(L):: "<<n_L_noZ<<endl;
+	 double integralL=fmmbg_noZ->Integral(center_L-range_L,center_L+range_L);
+	 integralL=integralL/(2*range_L/(hmm_wo_bg_fom_best->FindBin(center_L+range_L)-hmm_wo_bg_fom_best->FindBin(center_L-range_L)));
+	cout<<"integralL="<<integralL<<endl;
+	 if(integralL>0)n_L_noZ=n_L_noZ-integralL;
+	cout<<"after(L):: "<<n_L_noZ<<endl;
+	 n_S_noZ=hmm_wo_bg_fom_best->Integral(hmm_wo_bg_fom_best->FindBin(center_S-range_S),hmm_wo_bg_fom_best->FindBin(center_S+range_S));
+	cout<<"before(S):: "<<n_S_noZ<<endl;
+	 double integralS=fmmbg_noZ->Integral(center_S-range_S,center_S+range_S);
+	 integralS=integralS/(2*range_S/(hmm_wo_bg_fom_best->FindBin(center_S+range_S)-hmm_wo_bg_fom_best->FindBin(center_S-range_S)));
+	cout<<"integralS="<<integralS<<endl;
+	 if(integralS>0)n_S_noZ-=integralS;
+	cout<<"after(S):: "<<n_S_noZ<<endl;
+	 cout<<"n_L"<<n_L_noZ<<endl;
+	cout<<"mean_L"<<mean_L_noZ<<endl;
+	cout<<"sig_L"<<sig_L_noZ<<endl;
+	 cout<<"n_S"<<n_S_noZ<<endl;
+	cout<<"mean_S"<<mean_S_noZ<<endl;
+	cout<<"sig_S"<<sig_S_noZ<<endl;
+	
+	hmm_L_fom_best->Draw();
+	hmm_bg_fom_best->Draw("same");
+	
+		TCanvas* c3 = new TCanvas("c3","c3");
+	fmmbg_noZ->SetLineColor(kGreen);
+	fL_noZ->SetLineColor(kRed);
+	fS_noZ->SetLineColor(kRed);
+	fL_noZ->Draw("");
+	fS_noZ->Draw("same");
+	fmmbg_noZ->Draw("same");
+		TCanvas* c4 = new TCanvas("c4","c4");
+	hmm_wo_bg_fom_best->Draw("");
+	fmmbg_noZ->Draw("same");
+	fL_noZ->Draw("same");
+	fS_noZ->Draw("same");
+		TCanvas* c5 = new TCanvas("c5","c5");
+	hmm_wo_bg_fom_best->Draw("");
+	fmm_noZ->Draw("same");
+		TCanvas* c6 = new TCanvas("c6","c6");
+	//hmm_pi_fom_noZ->Draw("");
+	hmm_wo_bg_fom_best->Draw("");
+	fmm_pi_noZ->SetLineColor(kOrange);
+	fmm_pi_noZ->Draw("same");
+		TCanvas* c7 = new TCanvas("c7","c7");
+	hmm_pi_fom_noZ->Draw("");
+	fmm_pi_noZ->Draw("same");
 
 /*--- Print ---*/
 cout << "Print is starting" << endl;
