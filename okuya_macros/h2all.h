@@ -371,6 +371,7 @@ double Rs2trpad[100],Ls2trpad[100];
  TH1F* hcoin_wo_bg_fom_Zsum;
  TH1F* hmm_pi_fom_noZ;//MM if pion
  TH1F* hmm_pi_fom_best;//MM if pion
+ TH1F* hmm_Al_fom_best;//MM if Al 
  TH1F* hmm_bg_fom_noZ;
  TH1F* hmm_pi_wobg_fom_noZ;
  TH1F* hct_test;

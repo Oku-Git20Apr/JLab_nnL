@@ -3,6 +3,9 @@
 //---------------//
 //
 //K. Okuyama (Aug. 15, 2020)
+//
+//This is taken over from fit_noarray.C
+//No array branch mode 
 
 double F_Voigt( double *x, double *par )
   {
@@ -11,6 +14,19 @@ double F_Voigt( double *x, double *par )
     // par[2] : gaussian sigma
     // par[3] : lorentz fwhm
     double val = par[0] * TMath::Voigt(x[0]-par[1],par[2],par[3],4);
+    return val;
+  }
+
+double F_2Gauss( double *x, double *par )
+  {
+	double val = par[0] * TMath::Gaus(x[0],par[1],par[2]);
+	val += par[3] * TMath::Gaus(x[0],par[4],par[5]);
+    return val;
+  }
+
+double F_1Gauss( double *x, double *par )
+  {
+	double val = par[0] * TMath::Gaus(x[0],par[1],par[2]);
     return val;
   }
 
@@ -26,12 +42,51 @@ double FMM_Voigt( double *x, double *par )
     return val;
   }
 
+double FMM_1Gauss( double *x, double *par )
+  {
+	double val = par[0] * TMath::Gaus(x[0],par[1],par[2]);
+	val += par[3] * TMath::Gaus(x[0],par[4],par[5]);
+	val += par[6] * TMath::Gaus(x[0],par[7],par[8]);
+    return val;
+  }
 
-void fit_noarray(){
+double FMM_2Gauss( double *x, double *par )
+  {
+	double val = par[0] * TMath::Gaus(x[0],par[1],par[2]);
+	val += par[3] * TMath::Gaus(x[0],par[4],par[5]);
+	val += par[6] * TMath::Gaus(x[0],par[7],par[8]);
+	val += par[9] * TMath::Gaus(x[0],par[10],par[11]);
+    return val;
+  }
+
+double FMM_2Poly( double *x, double *par )
+  {
+	double val = par[0] * TMath::Gaus(x[0],par[1],par[2]);
+	val += par[3] * TMath::Gaus(x[0],par[4],par[5]);
+    val += par[6] + par[7]*x[0] + par[8]*x[0]*x[0];
+    return val;
+  }
+
+double FMM_3Poly( double *x, double *par )
+  {
+	double val = par[0] * TMath::Gaus(x[0],par[1],par[2]);
+	val += par[3] * TMath::Gaus(x[0],par[4],par[5]);
+    val += par[6] + par[7]*x[0] + par[8]*x[0]*x[0] + par[9]*x[0]*x[0]*x[0];
+    return val;
+  }
+
+double FMM_4Poly( double *x, double *par )
+  {
+	double val = par[0] * TMath::Gaus(x[0],par[1],par[2]);
+	val += par[3] * TMath::Gaus(x[0],par[4],par[5]);
+    val += par[6] + par[7]*x[0] + par[8]*x[0]*x[0] + par[9]*x[0]*x[0]*x[0] + par[10]*TMath::Power(x[0],4.);
+    return val;
+  }
+
+void fit_many(){
 	string pdfname = "fitting.pdf";
 cout << "Output pdf file name is " << pdfname << endl;
   
-  //TFile *file = new TFile("h2_10run.root","read");
   TFile *file = new TFile("h2all4.root","read");//input file of all H2 run(default: h2all4.root)
 	//ACCBGの引き算はmea_hist.ccから
   TFile *file_mea = new TFile("bgmea3.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
@@ -95,11 +150,21 @@ cout << "Output pdf file name is " << pdfname << endl;
 
 //---Fitting Function---//
  TF1* fmmbg_nocut;
- TF1* fmm_pi_nocut;
+ TF1* fmm_pi_nocut_Voigt;
+ TF1* fmm_pi_nocut_4Poly;
+ TF1* fmm_pi_nocut_3Poly;
+ TF1* fmm_pi_nocut_2Poly;
+ TF1* fmm_pi_nocut_2Gauss;
+ TF1* fmm_pi_nocut_1Gauss;
  TF1* fL_nocut;
  TF1* fS_nocut;
  TF1* fmm_nocut;
  TF1* fmm_nocut_Voigt;
+ TF1* fmm_nocut_4Poly;
+ TF1* fmm_nocut_3Poly;
+ TF1* fmm_nocut_2Poly;
+ TF1* fmm_nocut_2Gauss;
+ TF1* fmm_nocut_1Gauss;
  TF1* fmmbg_best;
  TF1* fmm_pi_best;
  TF1* fL_best;
@@ -350,7 +415,8 @@ cout<<"Entries: "<<ENum<<endl;
 	TCanvas* c1 = new TCanvas("c1","c1");
 	hmm_L_fom_best->Draw("");
 	TCanvas* c2 = new TCanvas("c2","c2");
-	TH1F* hmm_pi_fom_nocut=(TH1F*)file->Get("hmm_pi_fom_noZ");
+	//TH1F* hmm_pi_fom_nocut=(TH1F*)file->Get("hmm_pi_fom_noZ");
+	TH1F* hmm_pi_fom_nocut=(TH1F*)file->Get("hmm_Al_fom_best");
 	TH1F* hmm_pi_fom_best=(TH1F*)file->Get("hmm_pi_fom_best");
 	TH1F* hmm_bg_fom_best=(TH1F*)file_mea->Get("hmm_mixacc_result_best");
 	TH1F* hmm_bg_fom_nocut=(TH1F*)file_mea->Get("hmm_mixacc_result_nocut");
@@ -374,8 +440,6 @@ cout<<"Entries: "<<ENum<<endl;
 cout<<"NO CUT START"<<endl;
 	fmmbg_nocut=new TF1("fmmbg_nocut","pol4",min_mm,max_mm);
 	fmmbg_nocut->SetNpx(2000);
-	fmm_pi_nocut=new TF1("fmm_pi_nocut",F_Voigt,min_mm,max_mm,4);
-	fmm_pi_nocut->SetNpx(2000);
 	 fL_nocut=new TF1("fL_nocut","gaus(0)",min_mm,max_mm);
 	 fL_nocut->SetNpx(2000);
 	 fL_nocut->SetParameters(def_n_L,def_mean_L,def_sig_L);
@@ -410,19 +474,41 @@ cout<<"NO CUT START"<<endl;
 	 range_S=2*def_sig_S;
 
 
-cout<<"fmm_pi_nocut fit start"<<endl;
-	fmm_pi_nocut->SetParameters(50,0.05,0.05,0.00006);
-	hmm_pi_fom_nocut->Fit("fmm_pi_nocut","","",min_mm,max_mm);//1st Fit
-	double fmmpinocut1=fmm_pi_nocut->GetParameter(1);
-	double fmmpinocut2=fmm_pi_nocut->GetParameter(2);
-	double fmmpinocut3=fmm_pi_nocut->GetParameter(3);
-	fmm_pi_nocut->FixParameter(1,fmmpinocut1);
-	fmm_pi_nocut->FixParameter(2,fmmpinocut2);
-	fmm_pi_nocut->FixParameter(3,fmmpinocut3);
-	fmm_pi_nocut->SetParLimits(0,0.,1000000);//positive
-	//hmm_wo_bg_fom_nocut->Fit("fmm_pi_nocut","","",-0.1,-0.02);//2nd Fit
+	
+	//--- w/ 4th Polynomial func.
+	 cout<<"4Poly MODE START"<<endl;
+	 fmm_nocut_4Poly=new TF1("fmm_nocut_4Poly",FMM_4Poly,min_mm,max_mm,11);
+	 fmm_nocut_4Poly->SetNpx(2000);
+	 fmm_nocut_4Poly->SetTitle("Missing Mass (nocut)");
+	 fmm_nocut_4Poly->SetParLimits(0,0.,1000000.);//positive
+	 fmm_nocut_4Poly->SetParLimits(3,0.,1000000.);//positive
+	 fmm_nocut_4Poly->SetParameter(0,const_L_nocut);
+	 fmm_nocut_4Poly->SetParameter(1,mean_L_nocut);
+	 fmm_nocut_4Poly->SetParLimits(1,def_mean_L-def_sig_L,def_mean_L+def_sig_L);
+	 fmm_nocut_4Poly->SetParameter(2,sig_L_nocut);
+	 fmm_nocut_4Poly->SetParLimits(2,0.,0.01);
+	 fmm_nocut_4Poly->SetParameter(3,const_S_nocut);
+	 fmm_nocut_4Poly->SetParameter(4,mean_S_nocut);
+	 fmm_nocut_4Poly->SetParLimits(4,def_mean_S-def_sig_S,def_mean_S+def_sig_S);
+	 fmm_nocut_4Poly->SetParameter(5,sig_S_nocut);
+	 fmm_nocut_4Poly->SetParLimits(5,0.,0.01);
+	 hmm_wo_bg_fom_nocut->Fit("fmm_nocut_4Poly","","",-0.05,0.15);//Total fitting w/ 4Poly BG
 	
 	//--- w/ Voigt func.
+	 cout<<"Voigt MODE START"<<endl;
+	 fmm_pi_nocut_Voigt=new TF1("fmm_pi_nocut_Voigt",F_Voigt,min_mm,max_mm,4);
+	 fmm_pi_nocut_Voigt->SetNpx(2000);
+	 fmm_pi_nocut_Voigt->SetParameters(10,0.05,0.05,0.00006);
+	 fmm_pi_nocut_Voigt->SetParLimits(0,0.,1000000);//positive
+	 hmm_pi_fom_nocut->Fit("fmm_pi_nocut_Voigt","","",min_mm,max_mm);//1st Fit
+	 double fmmpinocut1=fmm_pi_nocut_Voigt->GetParameter(1);
+	 double fmmpinocut2=fmm_pi_nocut_Voigt->GetParameter(2);
+	 double fmmpinocut3=fmm_pi_nocut_Voigt->GetParameter(3);
+	 fmm_pi_nocut_Voigt->FixParameter(1,fmmpinocut1);
+	 fmm_pi_nocut_Voigt->FixParameter(2,fmmpinocut2);
+	 fmm_pi_nocut_Voigt->FixParameter(3,fmmpinocut3);
+	 fmm_pi_nocut_Voigt->SetParLimits(0,0.,1000000);//positive
+	 //hmm_wo_bg_fom_nocut->Fit("fmm_pi_nocut_Voigt","","",-0.1,-0.02);//2nd Fit
 	 fmm_nocut_Voigt=new TF1("fmm_nocut_Voigt",FMM_Voigt,min_mm,max_mm,10);
 	 fmm_nocut_Voigt->SetNpx(2000);
 	 fmm_nocut_Voigt->SetTitle("Missing Mass (nocut)");
@@ -439,11 +525,53 @@ cout<<"fmm_pi_nocut fit start"<<endl;
 	 fmm_nocut_Voigt->SetParLimits(4,def_mean_S-def_sig_S,def_mean_S+def_sig_S);
 	 fmm_nocut_Voigt->SetParameter(5,sig_S_nocut);
 	 fmm_nocut_Voigt->SetParLimits(5,0.,0.01);
-	 fmm_nocut_Voigt->SetParameter(6,(fmm_pi_nocut->GetParameter(0))/20.);
+	 fmm_nocut_Voigt->SetParameter(6,(fmm_pi_nocut_Voigt->GetParameter(0))/20.);
 	 fmm_nocut_Voigt->FixParameter(7,fmmpinocut1);
 	 fmm_nocut_Voigt->FixParameter(8,fmmpinocut2);
 	 fmm_nocut_Voigt->FixParameter(9,fmmpinocut3);
 	 hmm_wo_bg_fom_nocut->Fit("fmm_nocut_Voigt","","",min_mm,max_mm);//Total fitting w/ Voigt BG
+
+	//--- w/ 2Gauss func.
+	 cout<<"2Gauss MODE START"<<endl;
+	 fmm_pi_nocut_2Gauss=new TF1("fmm_pi_nocut_2Gauss",F_2Gauss,min_mm,max_mm,6);
+	 fmm_pi_nocut_2Gauss->SetNpx(2000);
+	 fmm_pi_nocut_2Gauss->SetParameters(20,0.05,0.05,2,0.05,0.05);
+	 hmm_pi_fom_nocut->Fit("fmm_pi_nocut_2Gauss","","",min_mm,max_mm);//1st Fit
+	 double fmmpinocut2Gauss1=fmm_pi_nocut_2Gauss->GetParameter(1);
+	 double fmmpinocut2Gauss2=fmm_pi_nocut_2Gauss->GetParameter(2);
+	 double fmmpinocut2Gauss4=fmm_pi_nocut_2Gauss->GetParameter(4);
+	 double fmmpinocut2Gauss5=fmm_pi_nocut_2Gauss->GetParameter(5);
+	 fmm_pi_nocut_2Gauss->FixParameter(1,fmmpinocut2Gauss1);
+	 fmm_pi_nocut_2Gauss->FixParameter(2,fmmpinocut2Gauss2);
+	 fmm_pi_nocut_2Gauss->FixParameter(4,fmmpinocut2Gauss4);
+	 fmm_pi_nocut_2Gauss->FixParameter(5,fmmpinocut2Gauss5);
+	 fmm_pi_nocut_2Gauss->SetParLimits(0,0.,1000000);//positive
+	 fmm_pi_nocut_2Gauss->SetParLimits(3,0.,1000000);//positive
+	 //hmm_wo_bg_fom_nocut->Fit("fmm_pi_nocut_2Gauss","","",-0.1,-0.02);//2nd Fit
+	 fmm_nocut_2Gauss=new TF1("fmm_nocut_2Gauss",FMM_2Gauss,min_mm,max_mm,12);
+	 fmm_nocut_2Gauss->SetNpx(2000);
+	 fmm_nocut_2Gauss->SetTitle("Missing Mass (nocut)");
+	 fmm_nocut_2Gauss->SetParLimits(0,0.,1000000.);//positive
+	 fmm_nocut_2Gauss->SetParLimits(3,0.,1000000.);//positive
+	 fmm_nocut_2Gauss->SetParLimits(6,0.,1000000.);//positive
+	 fmm_nocut_2Gauss->SetParLimits(9,0.,1000000.);//positive
+	 fmm_nocut_2Gauss->SetParameter(0,const_L_nocut);
+	 fmm_nocut_2Gauss->SetParameter(1,mean_L_nocut);
+	 fmm_nocut_2Gauss->SetParLimits(1,def_mean_L-def_sig_L,def_mean_L+def_sig_L);
+	 fmm_nocut_2Gauss->SetParameter(2,sig_L_nocut);
+	 fmm_nocut_2Gauss->SetParLimits(2,0.,0.01);
+	 fmm_nocut_2Gauss->SetParameter(3,const_S_nocut);
+	 fmm_nocut_2Gauss->SetParameter(4,mean_S_nocut);
+	 fmm_nocut_2Gauss->SetParLimits(4,def_mean_S-def_sig_S,def_mean_S+def_sig_S);
+	 fmm_nocut_2Gauss->SetParameter(5,sig_S_nocut);
+	 fmm_nocut_2Gauss->SetParLimits(5,0.,0.01);
+	 fmm_nocut_2Gauss->SetParameter(6,20.);
+	 fmm_nocut_2Gauss->FixParameter(7,fmmpinocut2Gauss1);
+	 fmm_nocut_2Gauss->FixParameter(8,fmmpinocut2Gauss2);
+	 fmm_nocut_2Gauss->SetParameter(9,2.);
+	 fmm_nocut_2Gauss->FixParameter(10,fmmpinocut2Gauss4);
+	 fmm_nocut_2Gauss->FixParameter(11,fmmpinocut2Gauss5);
+	 hmm_wo_bg_fom_nocut->Fit("fmm_nocut_2Gauss","","",min_mm,max_mm);//Total fitting w/ 2Gauss BG
 
 	 fmm_nocut->SetParameter(0,const_L_nocut);
 	 fmm_nocut->SetParameter(1,mean_L_nocut);
@@ -631,15 +759,27 @@ cout<<"fmm_pi_best fit start"<<endl;
 		TCanvas* c9 = new TCanvas("c9","c9");
 	hmm_L_fom_nocut->Draw();
 	hmm_bg_fom_nocut->Draw("same");
-		TCanvas* c10 = new TCanvas("c10","c10");
+		TCanvas* c10 = new TCanvas("c10","4Poly");
 	hmm_wo_bg_fom_nocut->Draw("");
-	fmm_nocut->Draw("same");
-		TCanvas* c11 = new TCanvas("c11","c11");
+	fmm_nocut_4Poly->SetLineColor(kGreen);
+	fmm_nocut_4Poly->Draw("same");
+		TCanvas* c11 = new TCanvas("c11","Voigt");
 	//hmm_pi_fom_best->Draw("");
 	hmm_wo_bg_fom_nocut->Draw("");
 	fmm_nocut_Voigt->SetLineColor(kOrange);
 	fmm_nocut_Voigt->Draw("same");
 
+		TCanvas* c12 = new TCanvas("c12","2Gauss");
+	hmm_wo_bg_fom_nocut->Draw("");
+	fmm_nocut_2Gauss->SetLineColor(kRed);
+	fmm_nocut_2Gauss->Draw("same");
+		TCanvas* c13 = new TCanvas("c13","Total");
+	hmm_wo_bg_fom_nocut->Draw("");
+	fmm_nocut_4Poly->Draw("same");
+	fmm_nocut_Voigt->Draw("same");
+	fmm_nocut_2Gauss->Draw("same");
+		TCanvas* c14 = new TCanvas("c14","Al");
+	hmm_pi_fom_nocut->Draw();
 
 /*--- Print ---*/
 cout << "Print is starting" << endl;
@@ -655,7 +795,9 @@ cout << "Print is starting" << endl;
 	c9->Print(Form("%s",pdfname.c_str()));
 	c10->Print(Form("%s",pdfname.c_str()));
 	c11->Print(Form("%s",pdfname.c_str()));
-	c11->Print(Form("%s]",pdfname.c_str()));
+	c12->Print(Form("%s",pdfname.c_str()));
+	c13->Print(Form("%s",pdfname.c_str()));
+	c13->Print(Form("%s]",pdfname.c_str()));
 
 
 cout << "Well done!" << endl;

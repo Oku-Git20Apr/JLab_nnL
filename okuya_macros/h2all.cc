@@ -2206,6 +2206,8 @@ for (int i=0;i<nth;i++){
 	set->SetTH1(hmm_pi_wobg_fom_noZ,"No Z cut","","");
 	hmm_pi_fom_best=new TH1F("hmm_pi_fom_best", "w/ Z cut",bin_mm,min_mm,max_mm);
 	set->SetTH1(hmm_pi_fom_best,"w/ Z cut (Pion Selected)","","");
+	hmm_Al_fom_best=new TH1F("hmm_Al_fom_best", "w/ Z cut",bin_mm,min_mm,max_mm);
+	set->SetTH1(hmm_Al_fom_best,"w/ Z cut (Al Selected)","","");
 
     //-------Z vertex test------------//
   h_zz1    = new TH2D("h_zz1"   ,"h_zz1"   ,bin_coin_c,min_coin_c,max_coin_c,bin_mm,min_mm,max_mm); 
@@ -3301,6 +3303,7 @@ if(tr.AC1_npe_sum<3.75 && 3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20. && fabs(R_tr
 						hmm_L_fom_noZ->Fill(mm);
 						if(fabs(R_tr_vz[rt]-L_tr_vz[lt])>0.2)hmm_L_fom_Zdiff->Fill(mm);
 						if(fabs(R_tr_vz[rt]+L_tr_vz[lt])/2.>0.5)hmm_L_fom_Zsum->Fill(mm);
+						if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025&&(fabs(fabs(R_tr_vz[rt]+L_tr_vz[lt])/2.-0.12)<0.02||fabs(fabs(R_tr_vz[rt]+L_tr_vz[lt])/2.+0.12)<0.02))hmm_Al_fom_best->Fill(mm);
 				}
 					if(fabs(ct-3.05)<0.7){
 						hmm_pi_fom_noZ->Fill(mm);//MM if pion
