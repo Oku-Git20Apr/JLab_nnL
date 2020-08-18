@@ -160,11 +160,11 @@ const double PI=3.14159265359;
   hmm_nocut->GetXaxis()->SetTitle("M_{x} - M_{#Lambda} (GeV/c^{2})");
   hmm_nocut->GetYaxis()->SetTitle("Counts / MeV");
   hmm_nocut->SetLineColor(1);
-  TH1F* hm2   = (TH1F*)hmm_best->Clone("hm2");
+  TH1F* hm2  = new TH1F("hm2","Mix region 1",xbin,xmin,xmax);
   TH1F* hmm_acc  = new TH1F("hmm_acc","ACC (original)",xbin,xmin,xmax);
   TH1F* hmm_mixacc  = new TH1F("hmm_mixacc","ACC (mixed)",xbin,xmin,xmax);
-  TH1F* hmm_mixacc_result_best  = new TH1F("hmm_mixacc_result_best","ACC (20 bunch mixed)",xbin,xmin,xmax);
-  TH1F* hmm_mixacc_result_nocut  = new TH1F("hmm_mixacc_result_nocut","ACC (20 bunch mixed)",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_best  = new TH1F("hmm_mixacc_result_best","ACC (30 bunch mixed)",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_nocut  = new TH1F("hmm_mixacc_result_nocut","ACC (30 bunch mixed)",xbin,xmin,xmax);
   TH1F* hm4   = (TH1F*)hmm_best->Clone("hm4");
   
   h1 ->SetLineColor(2);
@@ -189,6 +189,8 @@ const double PI=3.14159265359;
   bool mix_region2 = false;
   bool mix_region3 = false;
   bool mix_region4 = false;
+  bool mix_region5 = false;
+  bool mix_region6 = false;
   double rf_bunch=2.0;//ns (RF bunch structure)
   const double kcenter = 0.0;
   double mh = ML;//hypernuclei
@@ -207,7 +209,7 @@ const double PI=3.14159265359;
 /***********************************/
 
   int ENum=0;
-  tree->Draw(">>elist", "abs(ct_orig+2*2.0)<1.0||abs(ct_orig+1.0*2.0)<1.0||abs(ct_orig-3.0*2.0)<1.0||abs(ct_orig-4.0*2.0)<1.0");
+  tree->Draw(">>elist", "abs(ct_orig+7*2.0)<1.0||abs(ct_orig+2*2.0)<1.0||abs(ct_orig+1.0*2.0)<1.0||abs(ct_orig-4.0*2.0)<1.0||abs(ct_orig-5.0*2.0)<1.0||abs(ct_orig-6.0*2.0)<1.0");
   TEventList *elist = (TEventList*)gROOT->FindObject("elist");
   ENum = elist->GetN(); 
   //ENum = tree->GetEntries();
@@ -222,12 +224,6 @@ cout<<"Entries: "<<ENum<<endl;
   TLorentzVector T_4vec;
   TLorentzVector Missing;
   TLorentzVector L_4vec_saved, B_4vec_saved, T_4vec_saved;
-
-	    //==============================//
-	    //======  Initialization  ======//
-	    //==============================//
-		for(int j=0;j<MAX;j++){
-    	}
 
 	time_t start, end;
 	start = time(NULL);
@@ -266,15 +262,20 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
 	
 
 
-		if(abs(ct+2.0*rf_bunch)<1.0) mix_region1 = true;
+		if(abs(ct+7.0*rf_bunch)<1.0) mix_region1 = true;
     	else mix_region1 = false;
-    	if(abs(ct+1.0*rf_bunch)<1.0) mix_region2 = true;
+    	if(abs(ct+2.0*rf_bunch)<1.0) mix_region2 = true;
     	else mix_region2 = false;
-    	if(abs(ct-3.0*rf_bunch)<1.0) mix_region3 = true;
+    	if(abs(ct+1.0*rf_bunch)<1.0) mix_region3 = true;
     	else mix_region3 = false;
     	if(abs(ct-4.0*rf_bunch)<1.0) mix_region4 = true;
     	else mix_region4 = false;
-		if(mix_region1==false&&mix_region2==false&&mix_region3==false&&mix_region4==false)cout<<"Weird!"<<endl;
+    	if(abs(ct-5.0*rf_bunch)<1.0) mix_region5 = true;
+    	else mix_region5 = false;
+    	if(abs(ct-6.0*rf_bunch)<1.0) mix_region6 = true;
+    	else mix_region6 = false;
+		if(mix_region1==false&&mix_region2==false&&mix_region3==false&&mix_region4==false&&mix_region5==false&&mix_region6==false)cout<<"Weird!"<<endl;
+		if(L_Tr==false||R_Tr==false||L_FP==false||R_FP==false)cout<<"Weird! (Tr, FP)"<<endl;
 	if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
 	else event_selection=false;
 
@@ -350,7 +351,7 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
         //mass = sqrt( (Ee + mt - L_E - R_E)*(Ee + mt - L_E - R_E)-(B_v - L_v - R_v)*(B_v - L_v - R_v) );
 	    mm=mass - mh;//shift by ML
 		//without Matrix & Energy Loss calibration
-		if((mix_region1||mix_region2||mix_region3||mix_region4)&&event_selection)hmm_acc->Fill(mm);
+		if(event_selection)hmm_acc->Fill(mm);
 
 
 
@@ -362,7 +363,6 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
 		L_tr_vz_saved  = L_tr_vz;
 		/*--Electron information is saved.--*/
 		
-		if(mix_region1||mix_region2||mix_region3||mix_region4){
 	for(int j=0 ; j<(int)nmix ; j++){
 	  
 	  int ENum_mixed = i+j;
@@ -376,16 +376,6 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
 	    tree->GetEntry(elist->GetEntry(ENum_mixed-ENum));
 	  }
 
-		//Re-evaluation: Dit this event truely exist in mix_region?
-		if(abs(ct+2.0*rf_bunch)<1.0) mix_region1 = true;
-    	else mix_region1 = false;
-    	if(abs(ct+1.0*rf_bunch)<1.0) mix_region2 = true;
-    	else mix_region2 = false;
-    	if(abs(ct-3.0*rf_bunch)<1.0) mix_region3 = true;
-    	else mix_region3 = false;
-    	if(abs(ct-4.0*rf_bunch)<1.0) mix_region4 = true;
-    	else mix_region4 = false;
-		if(mix_region1==false&&mix_region2==false&&mix_region3==false&&mix_region4==false)cout<<"Weird!"<<endl;
 
 		//Electron info.
 		L_tr_vz=L_tr_vz_saved;
@@ -397,8 +387,8 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
          && R_tr_th>0.17*R_tr_x-0.035
          && R_tr_th<0.40*R_tr_x+0.130 ) R_FP = true;
 
-	if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
-	else event_selection=false;
+	//if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
+	//else event_selection=false;
 	if(event_selection_nocut){
 	// Change Only Kaon information
 	    double R_pz = R_mom/sqrt(1.0*1.0 + pow((R_tr_tg_th), 2.0) + pow(( R_tr_tg_ph),2.0) );
@@ -422,9 +412,7 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
 	    mm_mixed=mass_mixed - mh;//shift by ML
 		//without Matrix & Energy Loss calibration
 
-		if(mix_region1||mix_region2||mix_region3||mix_region4){
 			hmm_mixacc_result_nocut->Fill(mm);
-		}
 	  }//event_selection_nocut
 //Cut condition
 	if(event_selection){
@@ -451,13 +439,10 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
 		//without Matrix & Energy Loss calibration
 
 		if(mix_region1)hm2->Fill(mm);
-		if(mix_region1||mix_region2||mix_region3||mix_region4){
 			hmm_mixacc->Fill(mm);
 			hmm_mixacc_result_best->Fill(mm);
-		}
 	  }//event_selection
 	}//Mix (j loop)
-	}//mix_region_if
 
 }//ENum (i loop)
 
@@ -554,17 +539,22 @@ cout<<"Entries(kaon): "<<ENum_kaon<<endl;
   }//ENum_kaon
 
   double dbin = (xmax-xmin)/(double)xbin;
-  double minx=-0.15,maxx=-0.02;
+  double minx=-0.1,maxx=-0.02;
   int fitmin = (minx-xmin)/dbin;
   int fitmax = (maxx-xmin)/dbin;
   double num1 = hmm_best->Integral(fitmin,fitmax);
-  double num2 = hmm_mixacc->Integral(fitmin,fitmax);
+  double num2 = hmm_mixacc_result_best->Integral(fitmin,fitmax);
+  double num3 = hmm_nocut->Integral(fitmin,fitmax);
+  double num4 = hmm_mixacc_result_nocut->Integral(fitmin,fitmax);
   double mixscale = num1/num2;
+  double mixscale2 = num3/num4;
   //cout << fitmin << "," << fitmax << ": "<< num1 << "/" << num2 << "= " << mixscale<< endl;
   cout<<"Information:"<<endl;
   cout<<"Scale adjustment: ["<<minx<<", "<<maxx<<"]"<<endl;
   cout<<"Mixscale="<<num1<<"/"<<num2<<"="<<mixscale<<endl;
-  cout<<nmix<<" x 4 bunches"<<"= "<<nmix * 4.0 <<" (" << "effective scale="<<1/mixscale<<")"<<endl;
+  cout<<"Mixscale (nocut)="<<num3<<"/"<<num4<<"="<<mixscale2<<endl;
+  cout<<nmix<<" x 6 bunches"<<"= "<<nmix * 6.0 <<" (" << "effective scale="<<1/mixscale<<") <-- best"<<endl;
+  cout<<nmix<<" x 6 bunches"<<"= "<<nmix * 6.0 <<" (" << "effective scale="<<1/mixscale2<<") <-- nocut"<<endl;
     
   cout << endl;
   TH1F* hmm_mixacc_clone   = (TH1F*)hmm_mixacc->Clone();
@@ -579,9 +569,9 @@ cout<<"Entries(kaon): "<<ENum_kaon<<endl;
   TCanvas* c2 = new TCanvas("c2","c2");
   hm2->Draw("");
   TCanvas* c3 = new TCanvas("c3","c3");
-  hmm_mixacc->Draw("");
+  hmm_mixacc_result_best->Draw("");
   TCanvas* c4 = new TCanvas("c4","c4");
-  h_test->Draw("");
+  hmm_mixacc_result_nocut->Draw("");
   TCanvas* c5 = new TCanvas("c5","BG + BG(MEA)");
   //h2->Draw();
   double ntemp1 = hmm_acc->GetEntries();
@@ -592,9 +582,13 @@ cout<<"Entries(kaon): "<<ENum_kaon<<endl;
   hmm_mixacc->SetMarkerStyle(1);
   hmm_mixacc->Scale(ntemp1/ntemp2);
 cout<<"ntemp1/ntemp2="<<ntemp1<<"/"<<ntemp2<<"="<<ntemp1/ntemp2<<endl;
+cout<<nmix<<" times mixed "<<"( effective scale = "<<ntemp2/ntemp1<<" )"<<endl;
 cout<<"hmm_mixacc was scaled."<<endl;
   hmm_mixacc->SetLineColor(kRed);
   hmm_acc->Draw("same");
+  double ntemp3 = hm2->GetEntries();
+  double ntemp4 = hmm_mixacc_result_best->GetEntries();
+cout<<"6 bunches used "<<"( effective scale = "<<ntemp4/ntemp3<<" )"<<endl;
   
   TCanvas* c6 = new TCanvas("c6","MM + BG(MEA)");
   hmm_best->Draw();
