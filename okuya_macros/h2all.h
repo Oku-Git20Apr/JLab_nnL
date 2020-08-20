@@ -116,7 +116,7 @@ static TreeBranch tr;
 ////////////////////////////////////
 ////SET PARAMETERS//////////////////
 ////////////////////////////////////
-int nth=0;//change, nth=0 originally, max 99
+int nth=100;//change, nth=0 originally, max 99
 char const* mode="H";
 int kine=1;
 //double tdc_time=56.23;

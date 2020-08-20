@@ -799,8 +799,8 @@ void tuning::Calib(int rt, int lt ){
 
     //=========== Energy Loss ===================//
     B_p     = B_p - Eloss(0.0,0,"B");
-    R_p     = R_p - Eloss(R_tr_tg_ph[rt],R_tr_vz[rt],"R");
-    L_p     = L_p - Eloss(L_tr_tg_ph[lt],L_tr_vz[lt],"L");
+    R_p     = R_p + Eloss(R_tr_tg_ph[rt],R_tr_vz[rt],"R");
+    L_p     = L_p + Eloss(L_tr_tg_ph[lt],L_tr_vz[lt],"L");
 
 
     
@@ -814,27 +814,6 @@ tuning::tuning(){
 
 tuning::~tuning(){}
 
-////////////////////////////////////////////////////////Copy from ana_Lambda
-void tuning::SetRoot(string ifname){
-//  tnew = new TChain("tree");
-//	cout << "SetRoot" <<endl;
-//  fnew = new TFile(Form("%s",ifname.c_str()),"recreate");
-//	cout << "SetRoot" <<endl;
-//  tnew =new TTree("tnew",ifname.c_str());
-//	cout << "SetRoot" <<endl;
-//  tnew = tree->CloneTree(0);
-//
-//	cout << "SetRoot" <<endl;
-//  add_tree(ifname);
-//	cout << "SetRoot" <<endl;
-//  pack_tree();
-//	cout << "SetRoot" <<endl;
-//  readtreeHRSR();
-//	cout << "SetRoot" <<endl;
-//  readtreeHRSL();
-//
-}
-/////////////////////////////
 void tuning::SetRunList(string ifname){
 
   ifstream ifp(Form("%s",ifname.c_str()),ios::in);
@@ -856,56 +835,6 @@ void tuning::SetRunList(string ifname){
   readtreeHRSR();
   readtreeHRSL();
 }
-////////////////////////////////////////////////////////////////////////////
-////////hrs_tuningAC.h
-/////////////////////////////////////////////////////////////////
-//void tuning::SetRunList(string ifname){
-//  cout<<"Set Run List "<<endl;
-//  
-//  T=new TChain("T");
-//
-//  ifstream ifp(Form("%s",ifname.c_str()),ios::in);
-//  if(!ifp){ cout<<"no input file "<<ifname<<endl; exit(1); }
-//  string buf, runname;
-//  while(1){
-//    getline(ifp,buf);
-//    if( buf[0]=='#' ){ continue; }
-//    if( ifp.eof() ) break;
-//    istringstream sbuf(buf);
-//    sbuf >> runname;
-//    T->Add(runname.c_str());
-//  }
-//  ENum=tree->GetEntries();
-////  ENum=T->GetEntries();
-//  cout<<"Events: "<<ENum<<endl; 
-//}
-//
-//
-//
-//
-//void tuning::SetRoot(string ofname){
-//
-//
-//  fnew = new TFile(Form("%s",ofname.c_str()),"recreate");
-//  tnew =new TTree("T",ofname.c_str());
-//  tnew = T->CloneTree(0);
-//    
-////  tnew->Branch("mm_c",&mm_c,"mm_c/D");
-////  tnew->Branch("ct_c",&ct_c,"ct_c/D");  
-//  /*
-//
-//  tnew->Branch("mm_ac1",mm_ac1,"mm_ac1[100][100]/D");
-//  tnew->Branch("mm_ac2",mm_ac2,"mm_ac2[100][100]/D");
-//  tnew->Branch("fom_ac1",fom_ac1,"fom_ac1[100]/D");
-//  tnew->Branch("fom_ac2",fom_ac2,"fom_ac2[100]/D");  
-//  tnew->Branch("th_ac1",th_ac1,"th_ac1[100]/D");
-//  tnew->Branch("th_ac2",th_ac2,"th_ac2[100]/D");  
-//  */
-//
-//  
-//}
-
-////////////////////////////////////////////////////////////////////////////
 void tuning::ReadParam(string name){
 
   param = new ParamMan(name.c_str());
@@ -1248,8 +1177,8 @@ double tuning::Eloss(double yp,double z,char const* arm){
   // R-HRS : right hand coordinate (Unticlockwise rotation)//
   // L-HRS : left  hand coordinate (    Clockwise rotation)//
   
-  if(*arm=='R')        x = - hrs_ang - yp; //yp : phi [rad] RHRS
-  else if(*arm=='L')   x = - hrs_ang + yp; //yp : phi [rad] LHRS
+  if(*arm=='R')        x = - hrs_ang + yp; //yp : phi [rad] RHRS
+  else if(*arm=='L')   x = - hrs_ang - yp; //yp : phi [rad] LHRS
   else x=0.0;
   double ph[3],pl[2];
   double dEloss=0.0;
@@ -1302,68 +1231,6 @@ if(z<-0.1){
 
   
 }
-
-/////////////////////////////////////////////////////////////////////////////
-#if 0
-//////////branch should be set in Tree.cc, under a name of "tree".
-void tuning::SetBranch(){
-
-	T->SetBranchStatus("*",0);
-
-//------ Right Arm -------------//
-
- T->SetBranchStatus("RTDC.F1FirstHit",1);
- T->SetBranchAddress("RTDC.F1FirstHit",RF1); 
- T->SetBranchStatus("R.s2.t_pads",1);
- T->SetBranchAddress("R.s2.t_pads",Rs2tpads);
- T->SetBranchStatus("R.s2.trpad",1);
- T->SetBranchAddress("R.s2.trpad",Rs2trpad);
- T->SetBranchStatus("R.a1.a_c",1);
- T->SetBranchAddress("R.a1.a_c",Ra1a_c);
- T->SetBranchStatus("R.a2.a_c",1);
- T->SetBranchAddress("R.a2.a_c",Ra2a_c); 
-// T->SetBranchStatus("R.a1.asum_c",1);
-// T->SetBranchAddress("R.a1.asum_c",&R_a1_asum_p);
-// T->SetBranchStatus("R.a2.asum_c",1);
-// T->SetBranchAddress("R.a2.asum_c",&R_a2_asum_p);
- T->SetBranchStatus("R.a1.asum_p",1);
- T->SetBranchAddress("R.a1.asum_p",&R_a1_asum_p);
- T->SetBranchStatus("R.a2.asum_p",1);
- T->SetBranchAddress("R.a2.asum_p",&R_a2_asum_p);
-//change 
- T->SetBranchStatus("R.vdc.u1.time",1);
- T->SetBranchAddress("R.vdc.u1.time",Ru1_time);
- T->SetBranchStatus("Ndata.R.vdc.u1.time",1);
- T->SetBranchAddress("Ndata.R.vdc.u1.time",&NRu1_time);
- // path length//
- T->SetBranchStatus("R.s2.trpath",1); 
- T->SetBranchAddress("R.s2.trpath",rs2pathl); 
- T->SetBranchStatus("R.tr.pathl",1);  
- T->SetBranchAddress("R.tr.pathl",rtrpathl);
- // Target positon information //
- T->SetBranchStatus("R.tr.p",1);
- T->SetBranchAddress("R.tr.p",Rp);
- T->SetBranchStatus("R.tr.vz",1);    
- T->SetBranchAddress("R.tr.vz",Rvz); 
-
- //------ Left Arm a---------------//
- T->SetBranchStatus("LTDC.F1FirstHit",1);
- T->SetBranchAddress("LTDC.F1FirstHit",LF1); 
- T->SetBranchStatus("L.s2.t_pads",1);
- T->SetBranchAddress("L.s2.t_pads",Ls2tpads);
- T->SetBranchStatus("L.s2.trpad",1);
- T->SetBranchAddress("L.s2.trpad",Ls2trpad);
-  // path length//
- T->SetBranchStatus("L.s2.trpath",1); 
- T->SetBranchAddress("L.s2.trpath",ls2pathl); 
- T->SetBranchStatus("L.tr.pathl",1);   
- T->SetBranchAddress("L.tr.pathl",ltrpathl);
- T->SetBranchStatus("L.tr.p",1);
- T->SetBranchAddress("L.tr.p",Lp);  
- T->SetBranchStatus("L.tr.vz",1);    
- T->SetBranchAddress("L.tr.vz",Lvz);
-}
-#endif
 
 void tuning::SetParam(){
 
@@ -1676,7 +1543,7 @@ void tuning::MakeHist(){
 
   min_mm=-0.1;//GeV/c^2
   max_mm=0.2;//GeV/c^2
-  bin_mm=(max_mm-min_mm)/0.002; //Counts/2 MeV
+  bin_mm=(max_mm-min_mm)/0.001; //Counts/2 MeV
   bin_mm=(int)bin_mm;
 	iter_ac1=30;//iteration number
  min_s2=-10;
@@ -2358,23 +2225,6 @@ void tuning::Filling(){
 cout << "Event (Fill) : " << k << "/" << ENum << endl;
 	ev += 1;
 	}
-
-//	pe_		  = Lp[0];//*sqrt(1+pow(Lth[0],2)+pow(Lph[0],2));
-//	pk		  = Rp[0];//*sqrt(1+pow(Rth[0],2)+pow(Rph[0],2));
-//	ppi		  = Rp[0];//*sqrt(1+pow(Rth[0],2)+pow(Rph[0],2));
-//	pe		  = 4.313; // GeV   //hallap*1.0e-3;
-//	Ee		  = sqrt(pe*pe + Me*Me);
-//	Ee_		  = sqrt(pe*pe + Me*Me);
-//	Epi		  = sqrt(ppi*ppi + Mpi*Mpi);
-//	Ek		  = sqrt(pk*pk + MK*MK);
-//	Ls2pads   = (int)Ls2tpads[0];
-//	Rs2pads   = (int)Rs2tpads[0];
-//	rpathl    = rtrpathl[0]+rs2pathl[0]; // R-HRS path length S2 -RF
-//	lpathl    = ltrpathl[0]+ls2pathl[0]; // L-HRS path length S2 -RF
-//	rbeta     = pk/Ek; 
-//	rpath_corr=rpathl/rbeta/c;
-//	lbeta     =1.0;//pe_/Ee_; 
-//	lpath_corr=lpathl/lbeta/c;
  
 ///Cointime///
 ////////////////////from ana_Lambda.cc line 978 
@@ -3303,9 +3153,9 @@ if(tr.AC1_npe_sum<3.75 && 3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20. && fabs(R_tr
 						hmm_L_fom_noZ->Fill(mm);
 						if(fabs(R_tr_vz[rt]-L_tr_vz[lt])>0.2)hmm_L_fom_Zdiff->Fill(mm);
 						if(fabs(R_tr_vz[rt]+L_tr_vz[lt])/2.>0.5)hmm_L_fom_Zsum->Fill(mm);
-						if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025&&(fabs(fabs(R_tr_vz[rt]+L_tr_vz[lt])/2.-0.12)<0.02||fabs(fabs(R_tr_vz[rt]+L_tr_vz[lt])/2.+0.12)<0.02))hmm_Al_fom_best->Fill(mm);
+						if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025&&(fabs(fabs(R_tr_vz[rt]+L_tr_vz[lt])/2.-0.12)<0.01||fabs(fabs(R_tr_vz[rt]+L_tr_vz[lt])/2.+0.12)<0.01))hmm_Al_fom_best->Fill(mm);
 				}
-					if(fabs(ct-3.05)<0.7){
+					if(fabs(ct-3.0)<1.0){//3.05//0.7
 						hmm_pi_fom_noZ->Fill(mm);//MM if pion
 						if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1)hmm_pi_fom_best->Fill(mm);
 					}
@@ -3392,7 +3242,7 @@ if(tr.AC1_npe_sum<3.75 && 3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20. && fabs(R_tr
 					//if(fabs(ct-mean_k[i][j][l])<sig_k[i][j][l]){
 						hmm_L_fom[i][j][l]->Fill(mm);
 					}//cointime
-					if(fabs(ct-3.05)<0.7){
+					if(fabs(ct-3.05)<1.0){
 						// def_sig_pi=0.443; def_mean_pi=3.0;
 						hmm_pi_fom[i][j][l]->Fill(mm);//MM if pion
 						//if(i==20)hmm_pi_fom_best->Fill(mm);
@@ -3625,75 +3475,6 @@ if(tr.AC1_npe_sum<3.75 && 3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20. && fabs(R_tr
 
 
 void tuning::Fitting(){
-//OLD
- //def_sig_p=0.852; def_mean_p=0.0;
- //def_sig_pi=0.443; def_mean_pi=11;
- //def_sig_k=0.644; def_mean_k=8.;
- //def_acc=27.7;
-
- def_sig_p=0.852; def_mean_p=-8.0;
- def_sig_pi=0.443; def_mean_pi=3.0;
- def_sig_k=0.644; def_mean_k=0.0;
- def_acc=27.7;
-
-// fpi_pic->SetParameter(1,def_mean_pi);
-// fpi_pic->SetParLimits(1,def_mean_pi-0.5*def_sig_pi,def_mean_pi+0.5*def_sig_pi);
-// fpi_pic->SetParameter(2,def_sig_pi);
-// fpi_pic->SetParLimits(2,0.8*def_sig_pi,1.2*def_sig_pi);
-// fpi_pic->SetParameter(3,def_acc);
-//
-// fp_pc->SetParameter(1,def_mean_p);
-// fp_pc->SetParLimits(1,def_mean_p-0.5*def_sig_p,def_mean_p+0.5*def_sig_p);
-// fp_pc->SetParameter(2,def_sig_p);
-// fp_pc->SetParLimits(2,0.8*def_sig_p,1.2*def_sig_p);
-// fp_pc->SetParameter(3,def_acc);
-//
-//// hcoin_k->Fit("facc_kc","Rq0","",min_coin_c,min_coin_c+3.0);
-// h_ct_wK->Fit("facc_kc","Rq0","",min_coin_c,min_coin_c+3.0);
-// def_acc_k=facc_kc->GetParameter(0);
-//
-// fk_kc->SetParameter(1,def_mean_k);
-// fk_kc->SetParLimits(1,def_mean_k-0.5*def_sig_k,def_mean_k+0.5*def_sig_k);
-// fk_kc->SetParameter(2,def_sig_k);
-// fk_kc->SetParLimits(2,0.8*def_sig_k,1.2*def_sig_k);
-// fk_kc->FixParameter(3,def_acc_k);
-//
-//// hcoin_k->Fit("fk_kc","Rq0","",def_mean_k-3*def_sig_k,def_mean_k+3*def_sig_k);
-// h_ct_wK->Fit("fk_kc","Rq0","",-1,1);
-// h_ct_wK->Fit("fpi_pic","Rq0","",def_mean_pi-3*def_sig_pi,def_mean_pi+3*def_sig_pi);
-// h_ct_wK->Fit("fp_pc","Rq0","",def_mean_p-3*def_sig_p,def_mean_p+3*def_sig_p);
-//
-// def_num_k=fk_kc->GetParameter(0);
-// def_mean_k=fk_kc->GetParameter(1);
-// def_sig_k=fk_kc->GetParameter(2);
-//
-// def_num_p=fp_pc->GetParameter(0);
-// def_mean_p=fp_pc->GetParameter(1);
-// def_sig_p=fp_pc->GetParameter(2);
-//
-// def_num_pi=fpi_pic->GetParameter(0);
-// def_mean_pi=fpi_pic->GetParameter(1);
-// def_sig_pi=fpi_pic->GetParameter(2);
- 
-//for(int i=0;i<nth;i++){
-// noise[i]=signal[i]=0.;
-//cout << "hcoin_k_ac2[" <<i<<"] fitting start" << endl;
-//cout << min_coin_c << endl; 
-// hcoin_k_ac2[i]->Fit(Form("fac[%d]",i),"Rq0","",min_coin_c,min_coin_c+3.0);
-//cout << "hcoin_k_ac2[" <<i<<"] fitting end" << endl;
-// noise[i]=fac[i]->GetParameter(0);
-//
-// fkk[i]->SetParameter(1,def_mean_k);
-// fkk[i]->SetParLimits(1,def_mean_k-0.5*def_sig_k,def_mean_k+0.5*def_sig_k);
-// fkk[i]->SetParameter(2,def_sig_k);
-// fkk[i]->SetParLimits(2,0.8*def_sig_k,1.2*def_sig_k);
-// fkk[i]->FixParameter(3,noise[i]);
-//
-// hcoin_k_ac2[i]->Fit(Form("fkk[%d]",i),"Rq0","",def_mean_k-3*def_sig_k,def_mean_k+3*def_sig_k);
-//
-// signal[i]=fkk[i]->GetParameter(0);
-//cout << "Cut[" << i << "] " << "S = " << signal[i] << "/ N = " << noise[i] << "... S*S/N = " << signal[i]*signal[i]/noise[i] << endl;
-//}//for i
 }//Fitting
 //////////////////////////////////////////////////////////////////
 
@@ -3709,16 +3490,6 @@ void tuning::ACtune(){
  def_sig_k=0.644; def_mean_k=0.0;
  def_acc=27.7;
 
-
-
-//-----Main FOM histgram------//
- int h3_fom_bin_ac1 = 10;
- int h3_fom_bin_ac2l = 10;
- int h3_fom_bin_ac2u = 10;
- //h3_fom = new TH3D("h3_fom","",10,400.,600.,10,600.,1050.,25,1500.,4000.);
- h3_fom = new TH3D("h3_fom","",h3_fom_bin_ac1,ac1_adc[0],ac1_adc[9],h3_fom_bin_ac2l,ac2l_adc[0],ac2l_adc[9],h3_fom_bin_ac2u,ac2u_adc[0],ac2u_adc[9]);
- //h3_fom = new TH3D("h3_fom","",10,400.,580.,10,600.,1050.,10,1500.,4000.);
- 
 
 //-----No AC Cut-----//
  hcoin_bg_fom_noZ->Scale(40./80.);
@@ -3800,7 +3571,7 @@ cout<<"n_pi_noZ="<<n_pi_noZ<<"n_k_noZ="<<n_k_noZ<<"n_p_noZ="<<n_p_noZ
 //--	Missing Mass  Start     ----------------//
 //----------------------------------------------//
  hmm_bg_fom_noZ->Scale(2./80.);
- hmm_pibg_fom_noZ->Scale(0.7/80.);
+ hmm_pibg_fom_noZ->Scale(2.0/80.);
  hmm_wo_bg_fom_noZ->Add(hmm_L_fom_noZ,hmm_bg_fom_noZ,1.0,-1.0);
  hmm_pi_wobg_fom_noZ->Add(hmm_pi_fom_noZ,hmm_pibg_fom_noZ,1.0,-1.0);
 
@@ -4019,7 +3790,7 @@ cout<<"n_p["<<i<<"]["<<j<<"]["<<l<<"]="<<n_p[i][j][l]<<endl;
 //--	Missing Mass  Start     ----------------//
 //----------------------------------------------//
  hmm_bg_fom[i][j][l]->Scale(2./80.);
- hmm_pibg_fom[i][j][l]->Scale(0.7/80.);
+ hmm_pibg_fom[i][j][l]->Scale(2.0/80.);
  hmm_wo_bg_fom[i][j][l]->Add(hmm_L_fom[i][j][l],hmm_bg_fom[i][j][l],1.0,-1.0);
  hmm_pi_wobg_fom[i][j][l]->Add(hmm_pi_fom[i][j][l],hmm_pibg_fom[i][j][l],1.0,-1.0);
 
@@ -5380,6 +5151,7 @@ cout<<"after file_out"<<endl;
 
 int main(int argc, char** argv){
 
+	cout<<"nth = "<<nth<<endl;
 //  gStyle->SetOptFit(111111111);
 //  int ch;
   //string ifname = "/adaqfs/home/a-onl/tritium_work/itabashi/nnL/HallA-Online-Tritium/replay/scripts/ita_scripts/run_list/Lambda_test.list";

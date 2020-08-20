@@ -19,8 +19,7 @@ double F_Voigt( double *x, double *par )
 
 double F_2Gauss( double *x, double *par )
   {
-	double val = par[0] * TMath::Gaus(x[0],par[1],par[2]);
-	val += par[3] * TMath::Gaus(x[0],par[4],par[5]);
+	double val = par[0] * (TMath::Gaus(x[0],par[1],par[2]) + par[3] * TMath::Gaus(x[0],par[4],par[5]));
     return val;
   }
 
@@ -54,8 +53,7 @@ double FMM_2Gauss( double *x, double *par )
   {
 	double val = par[0] * TMath::Gaus(x[0],par[1],par[2]);
 	val += par[3] * TMath::Gaus(x[0],par[4],par[5]);
-	val += par[6] * TMath::Gaus(x[0],par[7],par[8]);
-	val += par[9] * TMath::Gaus(x[0],par[10],par[11]);
+	val += par[6] * (TMath::Gaus(x[0],par[7],par[8]) + par[9] * TMath::Gaus(x[0],par[10],par[11]));
     return val;
   }
 
@@ -87,9 +85,10 @@ void fit_many(){
 	string pdfname = "fitting.pdf";
 cout << "Output pdf file name is " << pdfname << endl;
   
-  TFile *file = new TFile("h2all4.root","read");//input file of all H2 run(default: h2all4.root)
+  TFile *file = new TFile("h2all5.root","read");//input file of all H2 run(default: h2all4.root)
 	//ACCBGの引き算はmea_hist.ccから
-  TFile *file_mea = new TFile("z_MEA.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
+  TFile *file_mea = new TFile("bgmea6.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
+  double nbunch = 600.;//effetive bunches (6 bunches x 5 mixtures)
  // TTree *tree_old = (TTree*)file->Get("tree_out");
 //cout<<"Please wait a moment. CloneTree() is working..."<<endl;
   //TTree *tree = tree_old->CloneTree();
@@ -115,7 +114,7 @@ cout << "Output pdf file name is " << pdfname << endl;
  const double def_n_L=250.; 
  const double def_sig_L=0.003; 
  const double def_mean_L=0.0;
- const double def_n_S=50.; 
+ const double def_n_S=70.; 
  const double def_sig_S=0.004;
  const double def_mean_S=MS0-ML;
  const double def_sig_p=0.852;
@@ -277,6 +276,8 @@ cout << "Output pdf file name is " << pdfname << endl;
 //  TH1F* hmm_bg_fom_best  = new TH1F("hmm_bg_fom_best","hmm_bg_fom_best",xbin,xmin,xmax);
   TH1F* hmm_wo_bg_fom_best  = new TH1F("hmm_wo_bg_fom_best","hmm_wo_bg_fom_best",xbin,xmin,xmax);
   TH1F* hmm_wo_bg_fom_nocut  = new TH1F("hmm_wo_bg_fom_nocut","hmm_wo_bg_fom_nocut",xbin,xmin,xmax);
+  TH1F* hmm_pi_wobg_fom_best  = new TH1F("hmm_pi_wobg_fom_best","hmm_pi_wobg_fom_best",xbin,xmin,xmax);
+  TH1F* hmm_pi_wobg_fom_nocut  = new TH1F("hmm_pi_wobg_fom_nocut","hmm_pi_wobg_fom_nocut",xbin,xmin,xmax);
   TH1F* hm2   = (TH1F*)hmm_L_fom_best->Clone("hm2");
   TH1F* hm4   = (TH1F*)hmm_L_fom_best->Clone("hm4");
 
@@ -437,14 +438,18 @@ cout<<"Entries: "<<ENum<<endl;
 
 }//ENum
 
+	cout<<"nbunch="<<nbunch<<endl;
 	TCanvas* c1 = new TCanvas("c1","c1");
 	hmm_L_fom_best->Draw("");
 	TCanvas* c2 = new TCanvas("c2","c2");
-	//TH1F* hmm_pi_fom_nocut=(TH1F*)file->Get("hmm_pi_fom_noZ");
-	TH1F* hmm_pi_fom_nocut=(TH1F*)file->Get("hmm_Al_fom_best");
+	TH1F* hmm_pi_fom_nocut=(TH1F*)file->Get("hmm_pi_fom_noZ");
+	TH1F* hmm_Al_fom_nocut=(TH1F*)file->Get("hmm_Al_fom_best");
 	TH1F* hmm_pi_fom_best=(TH1F*)file->Get("hmm_pi_fom_best");
+	//TH1F* hmm_pi_fom_nocut=(TH1F*)file->Get("hmm_pi_fom_noZ");
+	//TH1F* hmm_pi_fom_best=(TH1F*)file->Get("hmm_pi_fom_best");
 	TH1F* hmm_bg_fom_best=(TH1F*)file_mea->Get("hmm_mixacc_result_best");
 	TH1F* hmm_bg_fom_nocut=(TH1F*)file_mea->Get("hmm_mixacc_result_nocut");
+	TH1F* hmm_Albg_fom_nocut=(TH1F*)file_mea->Get("hmm_mixacc_result_nocut_forAl");
 	//TH1F* hmm_bg_fom_nocut=(TH1F*)file_mea->Get("hmm_mixacc_nocut_result");
     int fitmin = hmm_L_fom_best->FindBin(0.10);
     int fitmax = hmm_L_fom_best->FindBin(0.15);
@@ -454,11 +459,18 @@ cout<<"Entries: "<<ENum<<endl;
 	cout<<"hmm_L integral ="<<num1<<endl;
 	cout<<"hmm_bg integral ="<<num2<<endl;
 	cout<<"mixscale(mixed/original)="<<1/mixscale<<endl;
-	hmm_bg_fom_best->Scale(1./30.);
-	hmm_bg_fom_nocut->Scale(1./30.);
+	hmm_bg_fom_best->Sumw2();
+	hmm_bg_fom_nocut->Sumw2();
+	hmm_Albg_fom_nocut->Sumw2();
+	hmm_bg_fom_best->Scale(1./nbunch);
+	hmm_bg_fom_nocut->Scale(1./nbunch);
+	hmm_Albg_fom_nocut->Scale(1./nbunch);
 	//TH1F* hmm_wo_bg_fom_best = (TH1F*)hmm_L_fom_best->Clone("hmm_wo_bg_fom_best");
 	hmm_wo_bg_fom_best->Add(hmm_L_fom_best,hmm_bg_fom_best,1.0,-1.0);
 	hmm_wo_bg_fom_nocut->Add(hmm_L_fom_nocut,hmm_bg_fom_nocut,1.0,-1.0);
+	hmm_pi_wobg_fom_best->Add(hmm_pi_fom_best,hmm_bg_fom_best,1.0,-1.0);
+	//hmm_pi_wobg_fom_nocut->Add(hmm_pi_fom_nocut,hmm_bg_fom_nocut,1.0,-1.0);
+	hmm_pi_wobg_fom_nocut->Add(hmm_Al_fom_nocut,hmm_Albg_fom_nocut,1.0,-1.0);
 /****************************************/
 /************NO CUT**********************/
 /****************************************/
@@ -489,14 +501,14 @@ cout<<"NO CUT START"<<endl;
 	 mean_L_nocut=fL_nocut->GetParameter(1);
 	 sig_L_nocut=fL_nocut->GetParameter(2);
 	 center_L=def_mean_L;
-	 range_L=2*def_sig_L;
+	 range_L=2.*def_sig_L;
 	
 	 hmm_wo_bg_fom_nocut->Fit("fS_nocut","N","",def_mean_S-def_sig_S,def_mean_S+def_sig_S);
 	 const_S_nocut=fS_nocut->GetParameter(0);
 	 mean_S_nocut=fS_nocut->GetParameter(1);
 	 sig_S_nocut=fS_nocut->GetParameter(2);
 	 center_S=def_mean_S;
-	 range_S=2*def_sig_S;
+	 range_S=2.*def_sig_S;
 
 
 	 double constL=0.;
@@ -515,6 +527,8 @@ cout<<"NO CUT START"<<endl;
 	 double integralS_nocut = 0.;
 	 n_L_nocut=0.;
 	 n_S_nocut=0.;
+	 double fmin = -0.05;
+	 double fmax =  0.15;
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%*/
 /*%%    4th Polynomial	%%*/
@@ -537,7 +551,7 @@ cout<<"NO CUT START"<<endl;
 	 fmm_nocut_4Poly->SetParLimits(4,def_mean_S-def_sig_S,def_mean_S+def_sig_S);
 	 fmm_nocut_4Poly->SetParameter(5,sig_S_nocut);
 	 fmm_nocut_4Poly->SetParLimits(5,0.,0.01);
-	 hmm_wo_bg_fom_nocut->Fit("fmm_nocut_4Poly","N","",-0.05,0.15);//Total fitting w/ 4Poly BG
+	 hmm_wo_bg_fom_nocut->Fit("fmm_nocut_4Poly","N","",fmin,fmax);//Total fitting w/ 4Poly BG
 	 constL=fmm_nocut_4Poly->GetParameter(0);
 	 meanL =fmm_nocut_4Poly->GetParameter(1);
 	 sigL  =fmm_nocut_4Poly->GetParameter(2);
@@ -586,9 +600,9 @@ cout<<"NO CUT START"<<endl;
 	 fmmbg_nocut_Voigt=new TF1("fmmbg_nocut_Voigt",F_Voigt,min_mm,max_mm,4);
 	 fmm_pi_nocut_Voigt=new TF1("fmm_pi_nocut_Voigt",F_Voigt,min_mm,max_mm,4);
 	 fmm_pi_nocut_Voigt->SetNpx(2000);
-	 fmm_pi_nocut_Voigt->SetParameters(10,0.05,0.05,0.00006);
+	 fmm_pi_nocut_Voigt->SetParameters(3.7,0.051,0.045,0.00001);
 	 fmm_pi_nocut_Voigt->SetParLimits(0,0.,1000000);//positive
-	 hmm_pi_fom_nocut->Fit("fmm_pi_nocut_Voigt","N","",min_mm,max_mm);//1st Fit
+	 hmm_pi_wobg_fom_nocut->Fit("fmm_pi_nocut_Voigt","N","",-0.04,0.10);//1st Fit
 	 double fmmpinocut1=fmm_pi_nocut_Voigt->GetParameter(1);
 	 double fmmpinocut2=fmm_pi_nocut_Voigt->GetParameter(2);
 	 double fmmpinocut3=fmm_pi_nocut_Voigt->GetParameter(3);
@@ -613,11 +627,11 @@ cout<<"NO CUT START"<<endl;
 	 fmm_nocut_Voigt->SetParLimits(4,def_mean_S-def_sig_S,def_mean_S+def_sig_S);
 	 fmm_nocut_Voigt->SetParameter(5,sig_S_nocut);
 	 fmm_nocut_Voigt->SetParLimits(5,0.,0.01);
-	 fmm_nocut_Voigt->SetParameter(6,(fmm_pi_nocut_Voigt->GetParameter(0))/20.);
+	 fmm_nocut_Voigt->SetParameter(6,(fmm_pi_nocut_Voigt->GetParameter(0))/30.);
 	 fmm_nocut_Voigt->FixParameter(7,fmmpinocut1);
 	 fmm_nocut_Voigt->FixParameter(8,fmmpinocut2);
 	 fmm_nocut_Voigt->FixParameter(9,fmmpinocut3);
-	 hmm_wo_bg_fom_nocut->Fit("fmm_nocut_Voigt","N","",min_mm,max_mm);//Total fitting w/ Voigt BG
+	 hmm_wo_bg_fom_nocut->Fit("fmm_nocut_Voigt","N","",fmin,fmax);//Total fitting w/ Voigt BG
 	 constL=fmm_nocut_Voigt->GetParameter(0);
 	 meanL =fmm_nocut_Voigt->GetParameter(1);
 	 sigL  =fmm_nocut_Voigt->GetParameter(2);
@@ -664,10 +678,15 @@ cout<<"NO CUT START"<<endl;
 	 fmm_pi_nocut_2Gauss=new TF1("fmm_pi_nocut_2Gauss",F_2Gauss,min_mm,max_mm,6);
 	 fmmbg_nocut_2Gauss=new TF1("fmmbg_nocut_2Gauss",F_2Gauss,min_mm,max_mm,6);
 	 fmm_pi_nocut_2Gauss->SetNpx(2000);
-	 fmm_pi_nocut_2Gauss->SetParameters(20,0.05,0.05,2,0.05,0.05);
-	 hmm_pi_fom_nocut->Fit("fmm_pi_nocut_2Gauss","N","",min_mm,max_mm);//1st Fit
+	 fmm_pi_nocut_2Gauss->SetParameters(30,0.05,0.04,0.1,0.08,0.04);
+	 fmm_pi_nocut_2Gauss->SetParLimits(0,0.,10000000.);//positive
+	 fmm_pi_nocut_2Gauss->SetParLimits(3,0.,10000000.);//positive
+	 fmm_pi_nocut_2Gauss->SetParLimits(2,0.01,1.);//Not too narrow
+	 fmm_pi_nocut_2Gauss->SetParLimits(5,0.01,1.);//Not too narrow
+	 hmm_pi_wobg_fom_nocut->Fit("fmm_pi_nocut_2Gauss","N","",-0.02,0.08);//1st Fit
 	 double fmmpinocut2Gauss1=fmm_pi_nocut_2Gauss->GetParameter(1);
 	 double fmmpinocut2Gauss2=fmm_pi_nocut_2Gauss->GetParameter(2);
+	 double fmmpinocut2Gauss3=fmm_pi_nocut_2Gauss->GetParameter(3);
 	 double fmmpinocut2Gauss4=fmm_pi_nocut_2Gauss->GetParameter(4);
 	 double fmmpinocut2Gauss5=fmm_pi_nocut_2Gauss->GetParameter(5);
 	 fmm_pi_nocut_2Gauss->FixParameter(1,fmmpinocut2Gauss1);
@@ -697,10 +716,10 @@ cout<<"NO CUT START"<<endl;
 	 fmm_nocut_2Gauss->SetParameter(6,20.);
 	 fmm_nocut_2Gauss->FixParameter(7,fmmpinocut2Gauss1);
 	 fmm_nocut_2Gauss->FixParameter(8,fmmpinocut2Gauss2);
-	 fmm_nocut_2Gauss->SetParameter(9,2.);
+	 fmm_nocut_2Gauss->FixParameter(9,fmmpinocut2Gauss3);
 	 fmm_nocut_2Gauss->FixParameter(10,fmmpinocut2Gauss4);
 	 fmm_nocut_2Gauss->FixParameter(11,fmmpinocut2Gauss5);
-	 hmm_wo_bg_fom_nocut->Fit("fmm_nocut_2Gauss","N","",min_mm,max_mm);//Total fitting w/ 2Gauss BG
+	 hmm_wo_bg_fom_nocut->Fit("fmm_nocut_2Gauss","N","",fmin,fmax);//Total fitting w/ 2Gauss BG
 	 constL=fmm_nocut_2Gauss->GetParameter(0);
 	 meanL =fmm_nocut_2Gauss->GetParameter(1);
 	 sigL  =fmm_nocut_2Gauss->GetParameter(2);
@@ -831,7 +850,7 @@ cout<<"BEST CUT START"<<endl;
 //
 //cout<<"fmm_pi_best fit start"<<endl;
 //	fmm_pi_best->SetParameters(50,0.05,0.05,0.00006);
-//	hmm_pi_fom_best->Fit("fmm_pi_best","","",min_mm,max_mm);//1st Fit
+//	hmm_pi_wobg_fom_best->Fit("fmm_pi_best","","",min_mm,max_mm);//1st Fit
 //	double fmmpibest1=fmm_pi_best->GetParameter(1);
 //	double fmmpibest2=fmm_pi_best->GetParameter(2);
 //	double fmmpibest3=fmm_pi_best->GetParameter(3);
@@ -917,15 +936,11 @@ cout<<"BEST CUT START"<<endl;
 	 const_L_best=fL_best->GetParameter(0);
 	 mean_L_best=fL_best->GetParameter(1);
 	 sig_L_best=fL_best->GetParameter(2);
-	 center_L=def_mean_L;
-	 range_L=2*def_sig_L;
 	
 	 hmm_wo_bg_fom_best->Fit("fS_best","N","",def_mean_S-def_sig_S,def_mean_S+def_sig_S);
 	 const_S_best=fS_best->GetParameter(0);
 	 mean_S_best=fS_best->GetParameter(1);
 	 sig_S_best=fS_best->GetParameter(2);
-	 center_S=def_mean_S;
-	 range_S=2*def_sig_S;
 
 
 	 constL=0.;
@@ -966,7 +981,7 @@ cout<<"BEST CUT START"<<endl;
 	 fmm_best_4Poly->SetParLimits(4,def_mean_S-def_sig_S,def_mean_S+def_sig_S);
 	 fmm_best_4Poly->SetParameter(5,sig_S_best);
 	 fmm_best_4Poly->SetParLimits(5,0.,0.01);
-	 hmm_wo_bg_fom_best->Fit("fmm_best_4Poly","N","",-0.05,0.15);//Total fitting w/ 4Poly BG
+	 hmm_wo_bg_fom_best->Fit("fmm_best_4Poly","N","",fmin,fmax);//Total fitting w/ 4Poly BG
 	 constL=fmm_best_4Poly->GetParameter(0);
 	 meanL =fmm_best_4Poly->GetParameter(1);
 	 sigL  =fmm_best_4Poly->GetParameter(2);
@@ -1015,9 +1030,9 @@ cout<<"BEST CUT START"<<endl;
 	 fmmbg_best_Voigt=new TF1("fmmbg_best_Voigt",F_Voigt,min_mm,max_mm,4);
 	 fmm_pi_best_Voigt=new TF1("fmm_pi_best_Voigt",F_Voigt,min_mm,max_mm,4);
 	 fmm_pi_best_Voigt->SetNpx(2000);
-	 fmm_pi_best_Voigt->SetParameters(10,0.05,0.05,0.00006);
+	 fmm_pi_best_Voigt->SetParameters(30,0.05,0.05,0.00006);
 	 fmm_pi_best_Voigt->SetParLimits(0,0.,1000000);//positive
-	 hmm_pi_fom_best->Fit("fmm_pi_best_Voigt","N","",min_mm,max_mm);//1st Fit
+	 hmm_pi_wobg_fom_best->Fit("fmm_pi_best_Voigt","N","",fmin,fmax);//1st Fit
 	 double fmmpibest1=fmm_pi_best_Voigt->GetParameter(1);
 	 double fmmpibest2=fmm_pi_best_Voigt->GetParameter(2);
 	 double fmmpibest3=fmm_pi_best_Voigt->GetParameter(3);
@@ -1042,11 +1057,11 @@ cout<<"BEST CUT START"<<endl;
 	 fmm_best_Voigt->SetParLimits(4,def_mean_S-def_sig_S,def_mean_S+def_sig_S);
 	 fmm_best_Voigt->SetParameter(5,sig_S_best);
 	 fmm_best_Voigt->SetParLimits(5,0.,0.01);
-	 fmm_best_Voigt->SetParameter(6,(fmm_pi_best_Voigt->GetParameter(0))/20.);
+	 fmm_best_Voigt->SetParameter(6,(fmm_pi_best_Voigt->GetParameter(0))/40.);
 	 fmm_best_Voigt->FixParameter(7,fmmpibest1);
 	 fmm_best_Voigt->FixParameter(8,fmmpibest2);
 	 fmm_best_Voigt->FixParameter(9,fmmpibest3);
-	 hmm_wo_bg_fom_best->Fit("fmm_best_Voigt","N","",min_mm,max_mm);//Total fitting w/ Voigt BG
+	 hmm_wo_bg_fom_best->Fit("fmm_best_Voigt","N","",-0.02,0.08);//Total fitting w/ Voigt BG
 	 constL=fmm_best_Voigt->GetParameter(0);
 	 meanL =fmm_best_Voigt->GetParameter(1);
 	 sigL  =fmm_best_Voigt->GetParameter(2);
@@ -1093,10 +1108,11 @@ cout<<"BEST CUT START"<<endl;
 	 fmm_pi_best_2Gauss=new TF1("fmm_pi_best_2Gauss",F_2Gauss,min_mm,max_mm,6);
 	 fmmbg_best_2Gauss=new TF1("fmmbg_best_2Gauss",F_2Gauss,min_mm,max_mm,6);
 	 fmm_pi_best_2Gauss->SetNpx(2000);
-	 fmm_pi_best_2Gauss->SetParameters(20,0.05,0.05,2,0.05,0.05);
-	 hmm_pi_fom_best->Fit("fmm_pi_best_2Gauss","N","",min_mm,max_mm);//1st Fit
+	 fmm_pi_best_2Gauss->SetParameters(50,0.05,0.05,0.5,0.1,0.05);
+	 hmm_pi_wobg_fom_best->Fit("fmm_pi_best_2Gauss","N","",fmin,fmax);//1st Fit
 	 double fmmpibest2Gauss1=fmm_pi_best_2Gauss->GetParameter(1);
 	 double fmmpibest2Gauss2=fmm_pi_best_2Gauss->GetParameter(2);
+	 double fmmpibest2Gauss3=fmm_pi_best_2Gauss->GetParameter(3);
 	 double fmmpibest2Gauss4=fmm_pi_best_2Gauss->GetParameter(4);
 	 double fmmpibest2Gauss5=fmm_pi_best_2Gauss->GetParameter(5);
 	 fmm_pi_best_2Gauss->FixParameter(1,fmmpibest2Gauss1);
@@ -1123,13 +1139,13 @@ cout<<"BEST CUT START"<<endl;
 	 fmm_best_2Gauss->SetParLimits(4,def_mean_S-def_sig_S,def_mean_S+def_sig_S);
 	 fmm_best_2Gauss->SetParameter(5,sig_S_best);
 	 fmm_best_2Gauss->SetParLimits(5,0.,0.01);
-	 fmm_best_2Gauss->SetParameter(6,20.);
+	 fmm_best_2Gauss->SetParameter(6,1.);
 	 fmm_best_2Gauss->FixParameter(7,fmmpibest2Gauss1);
 	 fmm_best_2Gauss->FixParameter(8,fmmpibest2Gauss2);
-	 fmm_best_2Gauss->SetParameter(9,2.);
+	 fmm_best_2Gauss->FixParameter(9,fmmpibest2Gauss3);
 	 fmm_best_2Gauss->FixParameter(10,fmmpibest2Gauss4);
 	 fmm_best_2Gauss->FixParameter(11,fmmpibest2Gauss5);
-	 hmm_wo_bg_fom_best->Fit("fmm_best_2Gauss","N","",min_mm,max_mm);//Total fitting w/ 2Gauss BG
+	 hmm_wo_bg_fom_best->Fit("fmm_best_2Gauss","N","",-0.02,0.08);//Total fitting w/ 2Gauss BG
 	 constL=fmm_best_2Gauss->GetParameter(0);
 	 meanL =fmm_best_2Gauss->GetParameter(1);
 	 sigL  =fmm_best_2Gauss->GetParameter(2);
@@ -1182,8 +1198,8 @@ cout<<"BEST CUT START"<<endl;
 	hmm_wo_bg_fom_nocut->SetLineColor(kAzure);
 	hmm_bg_fom_best->SetLineColor(kRed);
 	hmm_bg_fom_nocut->SetLineColor(kRed);
-	hmm_pi_fom_best->SetLineColor(kAzure);
-	hmm_pi_fom_nocut->SetLineColor(kAzure);
+	hmm_pi_wobg_fom_best->SetLineColor(kAzure);
+	hmm_pi_wobg_fom_nocut->SetLineColor(kAzure);
 
 	gStyle->SetOptStat(0);
 	gStyle->SetOptFit(0);
@@ -1279,43 +1295,51 @@ cout<<"BEST CUT START"<<endl;
 //	hmm_wo_bg_fom_best->Draw("");
 //	fmm_best->Draw("same");
 //		TCanvas* c6 = new TCanvas("c6","c6");
-//	//hmm_pi_fom_best->Draw("");
+//	//hmm_pi_wobg_fom_best->Draw("");
 //	hmm_wo_bg_fom_best->Draw("");
 //	//fmm_pi_best->SetLineColor(kOrange);
 //	//fmm_pi_best->Draw("same");
 		TCanvas* c7 = new TCanvas("c7","Pion (best)");
 	c7->Divide(2,2);
 	c7->cd(1);
-	hmm_pi_fom_best->Draw("");
+	hmm_pi_wobg_fom_best->Draw("");
 	//fmm_pi_best_4Poly->SetLineColor(kGreen);
 	//fmm_pi_best_4Poly->Draw("same");
 	c7->cd(2);
-	hmm_pi_fom_best->Draw("");
+	hmm_pi_wobg_fom_best->Draw("");
 	fmm_pi_best_Voigt->SetLineColor(kOrange);
 	fmm_pi_best_Voigt->Draw("same");
 	c7->cd(3);
-	hmm_pi_fom_best->Draw("");
+	hmm_pi_wobg_fom_best->Draw("");
 	fmm_pi_best_2Gauss->SetLineColor(kRed);
 	fmm_pi_best_2Gauss->Draw("same");
 		TCanvas* c8 = new TCanvas("c8","Pion (nocut)");
 	c8->Divide(2,2);
 	c8->cd(1);
-	hmm_pi_fom_nocut->Draw("");
+	hmm_pi_wobg_fom_nocut->Draw("");
 	//fmm_pi_nocut_4Poly->SetLineColor(kGreen);
 	//fmm_pi_nocut_4Poly->Draw("same");
 	c8->cd(2);
-	hmm_pi_fom_nocut->Draw("");
+	hmm_pi_wobg_fom_nocut->Draw("");
 	fmm_pi_nocut_Voigt->SetLineColor(kOrange);
 	fmm_pi_nocut_Voigt->Draw("same");
 	c8->cd(3);
-	hmm_pi_fom_nocut->Draw("");
+	hmm_pi_wobg_fom_nocut->Draw("");
 	fmm_pi_nocut_2Gauss->SetLineColor(kRed);
 	fmm_pi_nocut_2Gauss->Draw("same");
-		TCanvas* c9 = new TCanvas("c9","Total");
+	c8->cd(4);
+	//hmm_pi_fom_nocut->Draw("");
+	//hmm_pi_fom_best->Draw("same");
+		TCanvas* c9 = new TCanvas("c9","Total(nocut)");
 	hmm_wo_bg_fom_nocut->Draw("");
 	fmm_nocut_4Poly->Draw("same");
 	fmm_nocut_Voigt->Draw("same");
 	fmm_nocut_2Gauss->Draw("same");
+		TCanvas* c10 = new TCanvas("c10","Total(best)");
+	hmm_wo_bg_fom_best->Draw("");
+	fmm_best_4Poly->Draw("same");
+	fmm_best_Voigt->Draw("same");
+	fmm_best_2Gauss->Draw("same");
 
 /*--- Print ---*/
 cout << "Print is starting" << endl;
@@ -1329,7 +1353,8 @@ cout << "Print is starting" << endl;
 	c7->Print(Form("%s",pdfname.c_str()));
 	c8->Print(Form("%s",pdfname.c_str()));
 	c9->Print(Form("%s",pdfname.c_str()));
-	c9->Print(Form("%s]",pdfname.c_str()));
+	c10->Print(Form("%s",pdfname.c_str()));
+	c10->Print(Form("%s]",pdfname.c_str()));
 
 
 cout << "Well done!" << endl;

@@ -9,28 +9,15 @@
 //delete matrix() and Calib() (Aug. 12, 2020)
 //
 //Converting to a PDF file becomes available. (Aug. 13, 2020)
-
-#define MAX 100     // Maximum No. of Tracks
-#define RS0 1      // No. of Segments of R-S0
-#define RS2 16     // No. of Segments of R-S2
-#define RA1 24     // No. of Segments of R-AC1
-#define RA2 26     // No. of Segments of R-AC2
-#define RCR 10     // No. of Segments of R-GC
-#define LCL 10     // No. of Segments of L-GC
-#define RPS 48     // No. of Segments of R-Pre-Shower
-#define RSH 75     // No. of Segments of R-Shower
-#define RF1TDC 64  // No. of ch of R-F1TDC
-#define LS0 1      // No. of Segments of L-S0
-#define LS2 16     // No. of Segments of L-S2
-#define LF1TDC 64  // No. of ch of L-F1TDC
-
+//
+//add MEA for Al (Aug. 19, 2020)
 
 void mea_hist_noarray(){
-	string pdfname = "z_MEA.pdf";
+	string pdfname = "bgmea7.pdf";
 cout << "Output pdf file name is " << pdfname << endl;
   
-  TFile *file = new TFile("h2all4.root","read");//input file (default: h2all2.root)
-  TFile *file_new = new TFile("z_MEA.root","recreate");//new root
+  TFile *file = new TFile("h2all5.root","read");//input file (default: h2all2.root)
+  TFile *file_new = new TFile("bgmea7.root","recreate");//new root
  // TTree *tree_old = (TTree*)file->Get("tree_out");
 //cout<<"Please wait a moment. CloneTree() is working..."<<endl;
   //TTree *tree = tree_old->CloneTree();
@@ -42,12 +29,12 @@ cout << "Output pdf file name is " << pdfname << endl;
 
 //---Physics Constant---//
  
-const double Mpi = 0.13957018;         // charged pion mass (GeV/c2)
-const double Mp = 0.938272046;         // proton       mass (GeV/c2)
-const double MK = 0.493677;            // charged Kaon mass (GeV/c2)
-const double Me = 0.510998928e-3;      // electron     mass (GeV/c2)
-const double LightVelocity = 0.299792458;          // speed of light in vacuum (m/ns)
-const double PI=3.14159265359;
+ const double Mpi = 0.13957018;         // charged pion mass (GeV/c2)
+ const double Mp = 0.938272046;         // proton       mass (GeV/c2)
+ const double MK = 0.493677;            // charged Kaon mass (GeV/c2)
+ const double Me = 0.510998928e-3;      // electron     mass (GeV/c2)
+ const double LightVelocity = 0.299792458;          // speed of light in vacuum (m/ns)
+ const double PI=3.14159265359;
  const double ML = 1.115683;            // Lambda       mass (GeV/c2)
  const double MS0 = 1.192642;           // Sigma Zero   mass (GeV/c2)
  const double def_sig_L=0.003; 
@@ -67,7 +54,7 @@ const double PI=3.14159265359;
  int bin_coin_c=(int)((max_coin_c-min_coin_c)/tdc_time);
  const double min_mm=-0.1;//GeV/c^2
  const double max_mm=0.2;//GeV/c^2
- int bin_mm=(max_mm-min_mm)/0.002; //Counts/2 MeV
+ int bin_mm=(max_mm-min_mm)/0.001; //Counts/1 MeV
  bin_mm=(int)bin_mm;
 
  int NLtr, NRtr, Ls2_pad[100], Rs2_pad[100];
@@ -100,7 +87,7 @@ const double PI=3.14159265359;
 //	tree->SetBranchStatus(branchname[ibranch].c_str(),1);
 //	}
 
-	//tree->SetBranchStatus("*",0);
+	tree->SetBranchStatus("*",0);
 	tree->SetBranchStatus("tr.ntrack_l",1);tree->SetBranchAddress("tr.ntrack_l",&NLtr);
 	tree->SetBranchStatus("tr.ntrack_r",1);tree->SetBranchAddress("tr.ntrack_r",&NRtr);
 	
@@ -161,11 +148,33 @@ const double PI=3.14159265359;
   hmm_nocut->GetYaxis()->SetTitle("Counts / MeV");
   hmm_nocut->SetLineColor(1);
   TH1F* hm2  = new TH1F("hm2","Mix region 1",xbin,xmin,xmax);
+
   TH1F* hmm_acc  = new TH1F("hmm_acc","ACC (original)",xbin,xmin,xmax);
   TH1F* hmm_mixacc  = new TH1F("hmm_mixacc","ACC (mixed)",xbin,xmin,xmax);
+  TH1F* hmm_mixacc2  = new TH1F("hmm_mixacc2","ACC (mixed)",xbin,xmin,xmax);
+  TH1F* hmm_mixacc3  = new TH1F("hmm_mixacc3","ACC (mixed)",xbin,xmin,xmax);
+/*-----------------*/
+/*--RESULT OUTPUT--*/
+/*-----------------*/
+  TH1F* hmm_Al  = new TH1F("hmm_Al","Al",400,-0.1,0.3);
+  hmm_Al->GetXaxis()->SetTitle("M_{x} - (M_{Mg}+M_{#Lambda}) (GeV/c^{2})");
+  hmm_Al->GetYaxis()->SetTitle("Counts / MeV");
+  TH1F* hmm_Al_fake  = new TH1F("hmm_Al_fake","Al (fake)",xbin,xmin,xmax);
+  hmm_Al_fake->GetXaxis()->SetTitle("M_{x} - M_{#Lambda} (GeV/c^{2})");
+  hmm_Al_fake->GetYaxis()->SetTitle("Counts / MeV");
+  TH1F* hmm_Al_fakeL  = new TH1F("hmm_Al_fakeL","Al (fake)",400,-0.1,0.3);
+  TH1F* hmm_Al_fakeS  = new TH1F("hmm_Al_fakeS","Al (fake)",400,-0.1,0.3);
+  TH1F* hmm_Al_2MeV  = new TH1F("hmm_Al_2MeV","Al",200,-0.1,0.3);
+  hmm_Al_2MeV->GetXaxis()->SetTitle("M_{x} - (M_{Mg}+M_{#Lambda}) (GeV/c^{2})");
+  hmm_Al_2MeV->GetYaxis()->SetTitle("Counts /2 MeV");
+  TH1F* hmm_Al_fakeL_2MeV  = new TH1F("hmm_Al_fakeL_2MeV","Al (fake)",200,-0.1,0.3);
+  TH1F* hmm_Al_fakeS_2MeV  = new TH1F("hmm_Al_fakeS_2MeV","Al (fake)",200,-0.1,0.3);
   TH1F* hmm_mixacc_result_best  = new TH1F("hmm_mixacc_result_best","ACC (30 bunch mixed)",xbin,xmin,xmax);
   TH1F* hmm_mixacc_result_nocut  = new TH1F("hmm_mixacc_result_nocut","ACC (30 bunch mixed)",xbin,xmin,xmax);
-  TH1F* hm4   = (TH1F*)hmm_best->Clone("hm4");
+  TH1F* hmm_mixacc_result_nocut_forAl  = new TH1F("hmm_mixacc_result_nocut_forAl","ACC (30 bunch mixed)",xbin,xmin,xmax);
+/*-----------------*/
+/*--RESULT OUTPUT--*/
+/*-----------------*/
   
   h1 ->SetLineColor(2);
   h1->SetLineWidth(2);
@@ -175,13 +184,13 @@ const double PI=3.14159265359;
   h3->SetFillStyle(3001);
   h4->SetLineColor(9);
 
-  TH1F* h_test  = new TH1F("h_test","",1000,1.8,2.4);
 
   bool L_Tr = false;
   bool L_FP = false;
   bool R_Tr = false;
   bool R_FP = false;
   bool event_selection = false;
+  bool event_selection_Al = false;
   bool event_selection_nocut = false;
   double z_par[100], ac_par[100], ct_par[100];
   double z2_par[100][100], ac2_par[100][100];
@@ -216,7 +225,7 @@ const double PI=3.14159265359;
 cout<<"Entries: "<<ENum<<endl;
   int time_div=ENum/25;
   if(ENum<100000)time_div=10000;
-  int nmix = 5;//Num of mix
+  int nmix = 1;//Num of mix
   double mass,mm;
   TLorentzVector L_4vec;
   TLorentzVector R_4vec;
@@ -274,8 +283,12 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
     	else mix_region5 = false;
     	if(abs(ct-6.0*rf_bunch)<1.0) mix_region6 = true;
     	else mix_region6 = false;
+		//TEventList check
 		if(mix_region1==false&&mix_region2==false&&mix_region3==false&&mix_region4==false&&mix_region5==false&&mix_region6==false)cout<<"Weird!"<<endl;
+		//tree_out (in h2all.cc) check
 		if(L_Tr==false||R_Tr==false||L_FP==false||R_FP==false)cout<<"Weird! (Tr, FP)"<<endl;
+
+
 	if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
 	else event_selection=false;
 
@@ -315,45 +328,24 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
 	    double R_E =sqrt(R_mom*R_mom + MK*MK);
 	    double L_E =sqrt(L_mom*L_mom + Me*Me);
 
-		h_test->Fill(L_E);
 
-		TLorentzVector L_4vec;
-		TLorentzVector R_4vec;
-		TLorentzVector B_4vec;
-		TLorentzVector T_4vec;
+		TLorentzVector L_4vec;//HRS-L
+		TLorentzVector R_4vec;//HRS-R
+		TLorentzVector B_4vec;//Beam
+		TLorentzVector T_4vec;//Target(H2)
 		L_4vec.SetPxPyPzE(L_px, L_py, L_pz, L_E);
         R_4vec.SetPxPyPzE(R_px, R_py, R_pz, R_E);
         B_4vec.SetPxPyPzE(0.0 ,  0.0,B_mom, B_E);
         T_4vec.SetPxPyPzE(0.0 ,  0.0,  0.0,  mt);
 
-
-        //    TVector3 L_v, R_v, B_v;
-	    //B_v.SetXYZ(0.0,0.0,B_p);
-	    //L_v.SetXYZ(L_px, L_py, L_pz);
-	    //R_v.SetXYZ(R_px, R_py, R_pz);	    
 	    R_4vec.RotateX(  13.2/180.*PI );
 	    L_4vec.RotateX( -13.2/180.*PI );
 
-	    //======= W/ Matrix & Energy Loss calibraiton ============//
-            TVector3 L_vc, R_vc, B_vc;
-	    B_vc.SetXYZ(0.0,0.0,B_p);
-	    L_vc.SetXYZ(L_px, L_py, L_pz);
-	    R_vc.SetXYZ(R_px, R_py, R_pz);
-	    R_vc.RotateX(  13.2/180.*PI );
-	    L_vc.RotateX( -13.2/180.*PI );
-	    double Eec =sqrt(B_p*B_p + Me*Me);
-	    double R_Ec =sqrt(R_p*R_p + MK*MK);
-	    double L_Ec =sqrt(L_p*L_p + Me*Me);
-	    //========================================================//
-
 		Missing = B_4vec + T_4vec - L_4vec - R_4vec;
 		mass = Missing.M();
-        //mass = sqrt( (Ee + mt - L_E - R_E)*(Ee + mt - L_E - R_E)-(B_v - L_v - R_v)*(B_v - L_v - R_v) );
 	    mm=mass - mh;//shift by ML
-		//without Matrix & Energy Loss calibration
 		if(event_selection)hmm_acc->Fill(mm);
-
-
+		double before_mm=mm;
 
 
 		/*--Electron information is saved.--*/
@@ -362,6 +354,7 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
 		T_4vec_saved = T_4vec;
 		L_tr_vz_saved  = L_tr_vz;
 		/*--Electron information is saved.--*/
+	
 		
 	for(int j=0 ; j<(int)nmix ; j++){
 	  
@@ -369,11 +362,11 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
 
 	  if(ENum_mixed<ENum){
 	    //tree->GetEntry(ENum_mixed);
-	    tree->GetEntry(elist->GetEntry(ENum_mixed));
+	    tree->GetEntry(elist->GetEntry(i+j));
 	  }
 	  else {
 	    //tree->GetEntry(ENum_mixed-ENum);
-	    tree->GetEntry(elist->GetEntry(ENum_mixed-ENum));
+	    tree->GetEntry(elist->GetEntry(i+j-ENum));
 	  }
 
 
@@ -387,6 +380,7 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
          && R_tr_th>0.17*R_tr_x-0.035
          && R_tr_th<0.40*R_tr_x+0.130 ) R_FP = true;
 
+	//Re-evaluation is unnecessary
 	//if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
 	//else event_selection=false;
 	if(event_selection_nocut){
@@ -395,11 +389,11 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
 	    double R_px = R_pz * (R_tr_tg_th );
 	    double R_py = R_pz * ( R_tr_tg_ph );
 	    double R_E =sqrt(R_mom*R_mom + MK*MK);
-		R_4vec.SetPxPyPzE(R_E, R_px, R_py, R_pz);
+		R_4vec.SetPxPyPzE(R_px, R_py, R_pz, R_E);
 	    R_4vec.RotateX(  13.2/180.*PI );
 	
 
-	
+
 	// Electron information is not changed.
 		L_4vec = L_4vec_saved;
 		B_4vec = B_4vec_saved;
@@ -407,12 +401,12 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
 
         double mass_mixed,mm_mixed;
 		Missing = B_4vec + T_4vec - L_4vec - R_4vec;
-		mass = Missing.M();
-        //mass_mixed = sqrt( (B_ene + mt - L_ene - R_ene)*(B_ene + mt - L_ene - R_ene)-(B_mom - L_mom - R_mom)*(B_mom - L_mom - R_mom) );
+		mass_mixed = Missing.M();
 	    mm_mixed=mass_mixed - mh;//shift by ML
-		//without Matrix & Energy Loss calibration
+		double test_after=mm;
 
-			hmm_mixacc_result_nocut->Fill(mm);
+			hmm_mixacc_result_nocut->Fill(mm_mixed);
+			if(ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP&&(fabs(R_tr_vz-L_tr_vz)<0.025)&&(fabs(fabs(R_tr_vz+L_tr_vz)/2.-0.12)<0.01||fabs(fabs(R_tr_vz+L_tr_vz)/2.+0.12)<0.01))hmm_mixacc_result_nocut_forAl->Fill(mm);//Al selection
 	  }//event_selection_nocut
 //Cut condition
 	if(event_selection){
@@ -421,7 +415,7 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
 	    double R_px = R_pz * (R_tr_tg_th );
 	    double R_py = R_pz * ( R_tr_tg_ph );
 	    double R_E =sqrt(R_mom*R_mom + MK*MK);
-		R_4vec.SetPxPyPzE(R_E, R_px, R_py, R_pz);
+		R_4vec.SetPxPyPzE(R_px, R_py, R_pz, R_E);
 	    R_4vec.RotateX(  13.2/180.*PI );
 	
 
@@ -433,14 +427,16 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
 
         double mass_mixed,mm_mixed;
 		Missing = B_4vec + T_4vec - L_4vec - R_4vec;
-		mass = Missing.M();
-        //mass_mixed = sqrt( (B_ene + mt - L_ene - R_ene)*(B_ene + mt - L_ene - R_ene)-(B_mom - L_mom - R_mom)*(B_mom - L_mom - R_mom) );
+		mass_mixed = Missing.M();
 	    mm_mixed=mass_mixed - mh;//shift by ML
-		//without Matrix & Energy Loss calibration
+		double after_mm=mm_mixed;
+		//cout<<"mm(Before):mm(after)="<<before_mm<<":"<<after_mm<<" (i,j)=("<<i<<","<<j<<")"<<endl;
 
-		if(mix_region1)hm2->Fill(mm);
-			hmm_mixacc->Fill(mm);
-			hmm_mixacc_result_best->Fill(mm);
+		if(mix_region1)hm2->Fill(mm_mixed);
+			hmm_mixacc->Fill(mm_mixed);
+			hmm_mixacc2->Fill(mm_mixed);
+			hmm_mixacc3->Fill(mm_mixed);
+			hmm_mixacc_result_best->Fill(mm_mixed);
 	  }//event_selection
 	}//Mix (j loop)
 
@@ -471,6 +467,8 @@ cout<<"Entries(kaon): "<<ENum_kaon<<endl;
         if( R_tr_th<0.17*R_tr_x+0.025
          && R_tr_th>0.17*R_tr_x-0.035
          && R_tr_th<0.40*R_tr_x+0.130 ) R_FP = true;
+
+
   event_selection=false;
   if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
 	event_selection_nocut=false;
@@ -504,44 +502,49 @@ cout<<"Entries(kaon): "<<ENum_kaon<<endl;
 	    double R_E =sqrt(R_mom*R_mom + MK*MK);
 	    double L_E =sqrt(L_mom*L_mom + Me*Me);
 
-		h_test->Fill(L_E);
 
 		TLorentzVector L_4vec;
 		TLorentzVector R_4vec;
 		TLorentzVector B_4vec;
 		TLorentzVector T_4vec;
+		TLorentzVector Al_4vec;
 		L_4vec.SetPxPyPzE(L_px, L_py, L_pz, L_E);
         R_4vec.SetPxPyPzE(R_px, R_py, R_pz, R_E);
         B_4vec.SetPxPyPzE(0.0 ,  0.0,B_mom, B_E);
         T_4vec.SetPxPyPzE(0.0 ,  0.0,  0.0,  mt);
+		double mAl = (26.98154/1.00797)*Mp;
+        Al_4vec.SetPxPyPzE(0.0 ,  0.0,  0.0, mAl );
 
 	    R_4vec.RotateX(  13.2/180.*PI );
 	    L_4vec.RotateX( -13.2/180.*PI );
 
-	    //======= W/ Matrix & Energy Loss calibraiton ============//
-            TVector3 L_vc, R_vc, B_vc;
-	    B_vc.SetXYZ(0.0,0.0,B_p);
-	    L_vc.SetXYZ(L_px, L_py, L_pz);
-	    R_vc.SetXYZ(R_px, R_py, R_pz);
-	    R_vc.RotateX(  13.2/180.*PI );
-	    L_vc.RotateX( -13.2/180.*PI );
-	    double Eec =sqrt(B_p*B_p + Me*Me);
-	    double R_Ec =sqrt(R_p*R_p + MK*MK);
-	    double L_Ec =sqrt(L_p*L_p + Me*Me);
-	    //========================================================//
-
 		Missing = B_4vec + T_4vec - L_4vec - R_4vec;
-		mass = Missing.M();
-        //mass = sqrt( (Ee + mt - L_E - R_E)*(Ee + mt - L_E - R_E)-(B_v - L_v - R_v)*(B_v - L_v - R_v) );
-	    mm=mass - mh;//shift by ML
-		if(event_selection)hmm_best->Fill(mm);
-		if(event_selection_nocut)hmm_nocut->Fill(mm);
+		double mass_true, mm_true;
+		mass_true = Missing.M();
+	    mm_true=mass_true - mh;//shift by ML
+		TLorentzVector Missing_Al = B_4vec + Al_4vec - L_4vec - R_4vec;
+		double mm_Al = Missing_Al.M() - ML - (25.98259/1.00797)*Mp; 
+	if(fabs(L_tr_vz-R_tr_vz)<0.025&&(fabs(fabs(R_tr_vz+L_tr_vz)/2.-0.12)<0.01||fabs(fabs(R_tr_vz+L_tr_vz)/2.+0.12)<0.01)&&ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection_Al=true;
+	else event_selection_Al=false;
+	
+		if(event_selection)hmm_best->Fill(mm_true);
+		if(event_selection_nocut)hmm_nocut->Fill(mm_true);
+		if(event_selection_Al)hmm_Al->Fill(mm_Al);
+		if(event_selection_Al)hmm_Al_2MeV->Fill(mm_Al);
+		if(event_selection_Al)hmm_Al_fake->Fill(mm_true);
+		if(event_selection_Al&&fabs(mm_true)<0.02)hmm_Al_fakeL->Fill(mm_Al);
+		if(event_selection_Al&&fabs(mm_true-MS0+ML)<0.02)hmm_Al_fakeS->Fill(mm_Al);
+		if(event_selection_Al&&fabs(mm_true)<0.02)hmm_Al_fakeL_2MeV->Fill(mm_Al);
+		if(event_selection_Al&&fabs(mm_true-MS0+ML)<0.02)hmm_Al_fakeS_2MeV->Fill(mm_Al);
+
   }//ENum_kaon
 
   double dbin = (xmax-xmin)/(double)xbin;
   double minx=-0.1,maxx=-0.02;
   int fitmin = (minx-xmin)/dbin;
   int fitmax = (maxx-xmin)/dbin;
+	cout<<"fitmin="<<fitmin<<endl;
+	cout<<"fitmax="<<fitmax<<endl;
   double num1 = hmm_best->Integral(fitmin,fitmax);
   double num2 = hmm_mixacc_result_best->Integral(fitmin,fitmax);
   double num3 = hmm_nocut->Integral(fitmin,fitmax);
@@ -556,46 +559,85 @@ cout<<"Entries(kaon): "<<ENum_kaon<<endl;
   cout<<nmix<<" x 6 bunches"<<"= "<<nmix * 6.0 <<" (" << "effective scale="<<1/mixscale<<") <-- best"<<endl;
   cout<<nmix<<" x 6 bunches"<<"= "<<nmix * 6.0 <<" (" << "effective scale="<<1/mixscale2<<") <-- nocut"<<endl;
     
-  cout << endl;
-  TH1F* hmm_mixacc_clone   = (TH1F*)hmm_mixacc->Clone();
-  //TH1F* h2_H_acc2 = (TH1F*)h2_H_acc->Clone();
-  for(int i=0 ; i<xbin ; i++){
-    hmm_mixacc_clone->SetBinContent( i+1, hmm_mixacc->GetBinContent(i+1)*mixscale);
-    hmm_mixacc_clone->SetBinError( i+1, hmm_mixacc->GetBinError(i+1)*mixscale);
-  }
-
+	//Missing Mass (L,S)
   TCanvas* c1 = new TCanvas("c1","c1");
+  hmm_best->SetLineColor(kAzure);
   hmm_best->Draw("");
+
+	//Mixed (1 bunch)
   TCanvas* c2 = new TCanvas("c2","c2");
+  hm2->SetLineColor(kAzure);
   hm2->Draw("");
+
+	//Mixed (best)
   TCanvas* c3 = new TCanvas("c3","c3");
+  hmm_mixacc_result_best->SetLineColor(kAzure);
   hmm_mixacc_result_best->Draw("");
+
+	//Mixed (nocut)
   TCanvas* c4 = new TCanvas("c4","c4");
+  hmm_mixacc_result_nocut->SetLineColor(kAzure);
   hmm_mixacc_result_nocut->Draw("");
+
+	//1 Mix vs nmix Mix
   TCanvas* c5 = new TCanvas("c5","BG + BG(MEA)");
   //h2->Draw();
   double ntemp1 = hmm_acc->GetEntries();
   double ntemp2 = hmm_mixacc->GetEntries();
   //cout << " SCALE: " << ntemp1/ntemp2/5. << endl;
 //  hmm_acc->Scale(1./5.);
+  hmm_mixacc->SetLineColor(kAzure);
   hmm_mixacc->Draw("h");
   hmm_mixacc->SetMarkerStyle(1);
-  hmm_mixacc->Scale(ntemp1/ntemp2);
+  hmm_mixacc->Scale(1./nmix);
 cout<<"ntemp1/ntemp2="<<ntemp1<<"/"<<ntemp2<<"="<<ntemp1/ntemp2<<endl;
 cout<<nmix<<" times mixed "<<"( effective scale = "<<ntemp2/ntemp1<<" )"<<endl;
 cout<<"hmm_mixacc was scaled."<<endl;
   hmm_mixacc->SetLineColor(kRed);
   hmm_acc->Draw("same");
+
+	//true bunch vs accidentals
+  TCanvas* c6 = new TCanvas("c6","c6");
   double ntemp3 = hm2->GetEntries();
-  double ntemp4 = hmm_mixacc_result_best->GetEntries();
+  double ntemp4 = hmm_mixacc2->GetEntries();
 cout<<"6 bunches used "<<"( effective scale = "<<ntemp4/ntemp3<<" )"<<endl;
-  
-  TCanvas* c6 = new TCanvas("c6","MM + BG(MEA)");
+	hm2->Draw("");
+    hmm_mixacc2->SetLineColor(kRed);
+	hmm_mixacc2->Scale(1./6.);
+	hmm_mixacc2->Draw("same");
+	
+	//MM + BG(MEA)
+  TCanvas* c7 = new TCanvas("c7","MM + BG(MEA)");
   hmm_best->Draw();
-  hmm_mixacc_clone->SetLineColor(kAzure);
-  hmm_mixacc_clone->Draw("same");
+  hmm_mixacc3->Scale(1./6./nmix);
+  hmm_mixacc3->SetLineColor(kRed);
+  hmm_mixacc3->Draw("same");
 
+  TCanvas* c8 = new TCanvas("c8","Al");
+  hmm_Al->SetLineColor(kAzure);
+  hmm_Al->Draw("");
 
+  TCanvas* c9 = new TCanvas("c9","Al (fake)");
+  hmm_Al_fake->SetLineColor(kAzure);
+  hmm_Al_fake->Draw("");
+
+  TCanvas* c10 = new TCanvas("c10","Al (fake)");
+  hmm_Al->Draw("");
+  hmm_Al_fakeL->SetLineColor(kRed);
+  hmm_Al_fakeS->SetLineColor(kViolet);
+  hmm_Al_fakeL->Draw("same");
+  hmm_Al_fakeS->Draw("same");
+
+  TCanvas* c11 = new TCanvas("c11","Al 2MeV bin");
+  hmm_Al_2MeV->SetLineColor(kAzure);
+  hmm_Al_2MeV->Draw("");
+
+  TCanvas* c12 = new TCanvas("c12","Al 2MeV bin (fake)");
+  hmm_Al_2MeV->Draw("");
+  hmm_Al_fakeL_2MeV->SetLineColor(kRed);
+  hmm_Al_fakeS_2MeV->SetLineColor(kViolet);
+  hmm_Al_fakeL_2MeV->Draw("same");
+  hmm_Al_fakeS_2MeV->Draw("same");
 /*--- Print ---*/
 cout << "Print is starting" << endl;
 	c1->Print(Form("%s[",pdfname.c_str()));
@@ -605,7 +647,13 @@ cout << "Print is starting" << endl;
 	c4->Print(Form("%s",pdfname.c_str()));
 	c5->Print(Form("%s",pdfname.c_str()));
 	c6->Print(Form("%s",pdfname.c_str()));
-	c6->Print(Form("%s]",pdfname.c_str()));
+	c7->Print(Form("%s",pdfname.c_str()));
+	c8->Print(Form("%s",pdfname.c_str()));
+	c9->Print(Form("%s",pdfname.c_str()));
+	c10->Print(Form("%s",pdfname.c_str()));
+	c11->Print(Form("%s",pdfname.c_str()));
+	c12->Print(Form("%s",pdfname.c_str()));
+	c12->Print(Form("%s]",pdfname.c_str()));
 
 
 cout << "creating new rootfile ... "<<endl;

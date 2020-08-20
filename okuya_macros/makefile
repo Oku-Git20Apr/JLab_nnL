@@ -65,6 +65,7 @@ OBJS21=   h2all.o Setting.o Tree.o ParamMan.o
 
 .PHONY: all
 all:$(TARGET13)\
+     $(TARGET14)\
      $(TARGET20)\
      $(TARGET21)
 #     $(TARGET11)

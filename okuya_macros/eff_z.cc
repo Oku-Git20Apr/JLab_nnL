@@ -798,7 +798,7 @@ void tuning::Calib(int rt, int lt ){
 
 
     //=========== Energy Loss ===================//
-    B_p     = B_p + Eloss(0.0,0,"B");
+    B_p     = B_p - Eloss(0.0,0,"B");
     R_p     = R_p + Eloss(R_tr_tg_ph[rt],R_tr_vz[rt],"R");
     L_p     = L_p + Eloss(L_tr_tg_ph[lt],L_tr_vz[lt],"L");
 
@@ -1258,7 +1258,7 @@ void tuning::PathCalib(int rhit, int lhit){
 //////////////////////////////////////////////////////////////////
 
 double tuning::Eloss(double yp,double z,char const* arm){
-
+  
   double hrs_ang=13.2*3.14159/180.;  
   double x;
   
@@ -1268,8 +1268,8 @@ double tuning::Eloss(double yp,double z,char const* arm){
   // R-HRS : right hand coordinate (Unticlockwise rotation)//
   // L-HRS : left  hand coordinate (    Clockwise rotation)//
   
-  if(*arm=='R')        x = - hrs_ang - yp; //yp : phi [rad] RHRS
-  else if(*arm=='L')   x = - hrs_ang + yp; //yp : phi [rad] LHRS
+  if(*arm=='R')        x = - hrs_ang + yp; //yp : phi [rad] RHRS
+  else if(*arm=='L')   x = - hrs_ang - yp; //yp : phi [rad] LHRS
   else x=0.0;
   double ph[3],pl[2];
   double dEloss=0.0;
@@ -1302,12 +1302,24 @@ double tuning::Eloss(double yp,double z,char const* arm){
   }else{
     dEloss_l = pl[0]*x +pl[1];    
     dEloss = dEloss_l;}
+
+if(z<-0.1){
+    if(*arm=='B')dEloss  = 0.1345;
+    if(*arm=='R')dEloss += 0.803;
+    if(*arm=='L')dEloss += 0.809;
+  }
+  else if(z>0.1){
+    if(*arm=='B')dEloss  = 0.264;
+    if(*arm=='R')dEloss += 0.313;
+    if(*arm=='L')dEloss += 0.313;
+    
+  }
   //==== thickness 0.4 mm in beam energy loss ======//
   if(*arm=='B')dEloss=0.184; //[MeV/c]
+
   dEloss=dEloss/1000.; // [GeV/c]
   return dEloss;
 
-  
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -3263,6 +3275,7 @@ if(tr.AC1_npe_sum<3.75 && 3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20. && fabs(R_tr
 			//	if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<zver[i]/1000 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1)zcut=true;
 				//if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.2 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<zver[i]/1000.)zcut=true;
 				//if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025)zcut=true;
+				if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1 && i==5)zcut=true;
 				if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1 && pL<2.12  &&i==10)zcut=true;
 				if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1&&fabs(theta_ee-0.225)<0.025&&fabs(phi_ee-1.6)<0.25&&fabs(pL-2.125)<0.025&&i==20)zcut=true;//Âç¶ã¾ú
 				//if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1&&fabs(theta_ee-0.225)<0.0125&&fabs(phi_ee-1.6)<0.125&&fabs(pL-2.125)<0.025&&i==30)zcut=true;//LambdaÂç¶ã¾ú
@@ -3764,13 +3777,13 @@ cout<<"n_pi_noZ="<<n_pi_noZ<<"n_k_noZ="<<n_k_noZ<<"n_p_noZ="<<n_p_noZ
  mean_L_noZ=fL_noZ->GetParameter(1);
  sig_L_noZ=fL_noZ->GetParameter(2);
  center_L=def_mean_L;
- range_L=2*def_sig_L;
+ range_L=2.*def_sig_L;
 
  hmm_wo_bg_fom_noZ->Fit("fS_noZ","Rq0","0",def_mean_S-3*def_sig_S,def_mean_S+3*def_sig_S);
  mean_S_noZ=fS_noZ->GetParameter(1);
  sig_S_noZ=fS_noZ->GetParameter(2);
  center_S=def_mean_S;
- range_S=2*def_sig_S;
+ range_S=2.*def_sig_S;
 
 
  //------- Fitting ----------//
@@ -3795,10 +3808,12 @@ cout<<"fmmbg fit start"<<endl;
 // fmm_noZ->SetParameter(4,e);
 // fmm_noZ->SetParameter(5,f);
 // fmm_noZ->SetParameter(6,500);
+ fmm_noZ->SetParameter(0,20.);
  fmm_noZ->SetParameter(1,def_mean_L);
  fmm_noZ->SetParLimits(1,def_mean_L-def_sig_L,def_mean_L+def_sig_L);
  fmm_noZ->SetParameter(2,def_sig_L);
  fmm_noZ->SetParLimits(2,0.,2*def_sig_L);
+ fmm_noZ->SetParameter(3,5.);
 // fmm_noZ->SetParameters(9,100);
  fmm_noZ->SetParameter(4,def_mean_S);
  fmm_noZ->SetParLimits(4,def_mean_S-def_sig_S,def_mean_S+def_sig_S);
@@ -4003,11 +4018,13 @@ cout<<"n_p["<<i<<"]["<<j<<"]["<<l<<"]="<<n_p[i][j][l]<<endl;
 // fmm[i][j][l]->SetParameter(4,e);
 // fmm[i][j][l]->SetParameter(5,f);
 // fmm[i][j][l]->SetParameter(6,500);
+ fmm[i][j][l]->SetParameter(0,20.);
  fmm[i][j][l]->SetParameter(1,def_mean_L);
  fmm[i][j][l]->SetParLimits(1,def_mean_L-def_sig_L,def_mean_L+def_sig_L);
  fmm[i][j][l]->SetParameter(2,def_sig_L);
  fmm[i][j][l]->SetParLimits(2,0.,2*def_sig_L);
 // fmm[i][j][l]->SetParameters(9,100);
+ fmm[i][j][l]->SetParameter(3,5.);
  fmm[i][j][l]->SetParameter(4,def_mean_S);
  fmm[i][j][l]->SetParLimits(4,def_mean_S-def_sig_S,def_mean_S+def_sig_S);
  fmm[i][j][l]->SetParameter(5,def_sig_S);
@@ -4135,7 +4152,8 @@ cout<<"sig_S"<<sig_S[i][j][l]<<endl;
 
 //ofstream fout(Form("SR_z_%d.dat",(int)zver[0]));
 ofstream fout("SR_z.dat");
-cout<<"AC Efficiency is filled."<<endl;
+cout<<"Z Efficiency is filled."<<endl;
+fout<<"i=5:  Bestcut"<<endl;
 fout<<"i=10: pL<2.12, Full Range (Sigma)"<<endl;
 fout<<"i=20: 2.1<pL<2.15, 6msr cut, Top(Lambda)"<<endl;
 fout<<"i=30: 2.05<pL<2.1, 6msr cut, Top(Sigma)"<<endl;
@@ -5165,9 +5183,12 @@ h_original_phcosth2->Draw("colz");
 
 
 c26->cd();
-hmm_wo_bg_fom[20][0][0]->Draw("");//top_quality
-cout<<"N(Lambda)_top"<<n_L[20][0][0]<<endl;
-cout<<"N(Sigma)_top"<<n_S[20][0][0]<<endl;
+hmm_wo_bg_fom[5][0][0]->Draw("");//Bestcut
+cout<<"N(Lambda)_best"<<n_L[5][0][0]<<endl;
+cout<<"N(Sigma)_best"<<n_S[5][0][0]<<endl;
+//hmm_wo_bg_fom[20][0][0]->Draw("");//top_quality
+//cout<<"N(Lambda)_top"<<n_L[20][0][0]<<endl;
+//cout<<"N(Sigma)_top"<<n_S[20][0][0]<<endl;
 
 c27->cd();
 hmm_wo_bg_fom_noZ->Draw("");//acceptance
