@@ -3,11 +3,6 @@ using namespace std;
 #include "ana_Lambda.h"
 #include "Param.h"
 
-#include "TApplication.h"
-#include "Tree.h"
-#include "TMath.h"
-#include "TROOT.h"//FitSlice, gROOT->FindObject
-
 bool herium   = false;
 bool pdf_out  = false;
 bool root_out = false;
@@ -23,7 +18,7 @@ string ofroot("output.root");
 #define F1TDC
 
 
-extern double Calc_ras(double a,double b,double c){return  a *b + c;};  
+extern  double Calc_ras(double a,double b,double c){return  a *b + c;};  
 extern double calcf2t_ang(double* P,double xf, double xpf, double yf, double fpf,double z);
 extern double calcf2t_zt(double* P, double xf, double xpf, double yf, double ypf);
 extern double calcf2t_mom(double* P, double xf, double xpf, double yf, double ypf, double zt);
@@ -69,16 +64,7 @@ void ana::matrix(string mtparam){
     s++;
   }
 
-  cout<<endl;
   for(int i=0;i<12;i++)MT_p[i]=false;
-
-  MTParam_R();cout<<" Input RHRS Matrix parameter "<<endl;
-  MTParam_L();cout<<" Input LHRS Matrix parameter "<<endl;
-  MTParam_G();cout<<"Input Gogami parameter "<<endl;
-  MTP_mom();cout<<"Input Mom parameter "<<endl;
-
-
-
 
   //======= Tuning selection flag =====================//
   //--------- RHRS ------------------------//
@@ -101,6 +87,13 @@ void ana::matrix(string mtparam){
   //  MT_p[11] = true; // LHRS path length correction
   MT_p[11] = false; // LHRS path length correction
   MT_p[10] = false; // RHRS path length correction  
+  cout<<endl;
+  MTParam_R();cout<<" Input RHRS Matrix parameter "<<endl;
+  MTParam_L();cout<<" Input LHRS Matrix parameter "<<endl;
+  MTParam_G();cout<<"Input Gogami parameter "<<endl;
+  MTP_mom();cout<<"Input Mom parameter "<<endl;
+
+
   cout<<endl;
   
   cout<<"======== Correction Parameters ========="<<endl;
@@ -386,11 +379,8 @@ void ana::MTParam_G(){
 
 void ana::Calib(int rt, int lt ){
 
-  // ==== Initialization ======//
-  R_p = 0.0;
-  L_p = 0.0;
 
-  
+
   //======= Nomalization ==================//
   R_tr_x[rt]    = (R_tr_x[rt]-XFPm)/XFPr;
   R_tr_th[rt]   = (R_tr_th[rt]-XpFPm)/XpFPr;
@@ -400,8 +390,7 @@ void ana::Calib(int rt, int lt ){
   R_tr_tg_th[rt]= (R_tr_tg_th[rt] - Xptm)/Xptr;
   R_tr_tg_ph[rt]= (R_tr_tg_ph[rt] - Yptm)/Yptr;
 
-  //  R_p = (R_p - PRm)/PRr;
-  R_p = (R_tr_p[rt] - PRm)/PRr;
+  R_p = (R_p - PRm)/PRr;
 
   L_tr_x[lt]    = (L_tr_x[lt]-XFPm)/XFPr; 
   L_tr_th[lt]   = (L_tr_th[lt]-XpFPm)/XpFPr;
@@ -411,8 +400,7 @@ void ana::Calib(int rt, int lt ){
   L_tr_tg_th[lt]= (L_tr_tg_th[lt] - Xptm)/Xptr;
   L_tr_tg_ph[lt]= (L_tr_tg_ph[lt] - Yptm)/Yptr;  
 
-  //  L_p = (L_p - PLm)/PLr;
-  L_p = (L_tr_p[lt] - PLm)/PLr;
+  L_p = (L_p - PLm)/PLr;
 
   //========================================//
   
@@ -477,7 +465,7 @@ void ana::Calib(int rt, int lt ){
 
 
     //=========== Energy Loss ===================//
-    B_p     = B_p - Eloss(0.0,0,"B");
+    B_p     = B_p + Eloss(0.0,0,"B");
     R_p     = R_p + Eloss(R_tr_tg_ph[rt],R_tr_vz[rt],"R");
     L_p     = L_p + Eloss(L_tr_tg_ph[lt],L_tr_vz[lt],"L");
 
@@ -528,6 +516,7 @@ void ana::CoinCalc(int RS2_seg, int LS2_seg, int rhit, int lhit){
   double Beta_R=R_tr_p[rhit]/sqrt(R_tr_p[rhit]*R_tr_p[rhit]+MK*MK);
   double Beta_L=L_tr_p[lhit]/sqrt(L_tr_p[lhit]*L_tr_p[lhit]+Me*Me);
   
+ 
 
   double tof_r  = RS2_F1time[RS2_seg] - R_pathl/(Beta_R*LightVelocity);
   double tof_l  = LS2_F1time[LS2_seg] - L_pathl/(Beta_L*LightVelocity);
@@ -585,7 +574,6 @@ void ana::CoinCalc(int RS2_seg, int LS2_seg, int rhit, int lhit){
 
   tr.ct_g=-1000.;
   tr.ct_gb=-1000.;
-  tr.ct_g_wo_cor=-1000.;
   tr.ct_g=CoinCalc_gogami(RS2_seg,LS2_seg,rhit,lhit);
 
   
@@ -838,10 +826,8 @@ double ana::Eloss(double yp,double z,char* arm){
   // R-HRS : right hand coordinate (Unticlockwise rotation)//
   // L-HRS : left  hand coordinate (    Clockwise rotation)//
   
-  //  if(arm=="R")        x = - hrs_ang - yp; //yp : phi [rad] RHRS
-  //  else if(arm=="L")   x = - hrs_ang + yp; //yp : phi [rad] LHRS
-  if(arm=="R")        x = - hrs_ang + yp; //yp : phi [rad] RHRS
-  else if(arm=="L")   x = - hrs_ang - yp; //yp : phi [rad] LHRS
+  if(arm=="R")        x = - hrs_ang - yp; //yp : phi [rad] RHRS
+  else if(arm=="L")   x = - hrs_ang + yp; //yp : phi [rad] LHRS
   else x=0.0;
   double ph[3],pl[2];
   double dEloss=0.0;
@@ -876,22 +862,6 @@ double ana::Eloss(double yp,double z,char* arm){
     dEloss = dEloss_l;}
   //==== thickness 0.4 mm in beam energy loss ======//
   if(arm=="B")dEloss=0.184; //[MeV/c]
-
-  //======== Al Flame Energy Loss ========//
-  // Upstream && Downsream //
-  // thickness 0.4 mm //
-  if(z<-0.1){
-    if(arm=="B")dEloss  = 0.1345;
-    if(arm=="R")dEloss += 0.803;
-    if(arm=="L")dEloss += 0.809;
-  }
-  else if(z>0.1){
-    if(arm=="B")dEloss  = 0.264;
-    if(arm=="R")dEloss += 0.313;
-    if(arm=="L")dEloss += 0.313;
-    
-  }
-
   dEloss=dEloss/1000.; // [GeV/c]
   return dEloss;
 
@@ -1320,10 +1290,10 @@ void ana::Loop(){
           if( R_tr_th[rt]<0.17*R_tr_x[rt]+0.025
            && R_tr_th[rt]>0.17*R_tr_x[rt]-0.035
            && R_tr_th[rt]<0.40*R_tr_x[rt]+0.130 ) R_FP = true;
-	  //	  if( R_a1_asum_p<400 && R_a2_asum_p>1000 && R_a2_asum_p<4000) Kaon = true;
+	  	  if( R_a1_asum_p<200 && R_a2_asum_p>1000 && R_a2_asum_p<4000) Kaon = true;
 	  // if( R_a1_asum_p<a1_th && R_a2_asum_p>a2_th) Kaon = true;
 	  //	  if( R_a1_asum_p<1.0 && R_a2_asum_p>3.0 && R_a2_asum_p<7.0) Kaon = true;	  
-	  if( tr.AC1_npe_sum < a1_th && tr.AC2_npe_sum > a2_th_min && L_cer_asum_c>2000.) Kaon = true;
+//	  if( tr.AC1_npe_sum < a1_th && tr.AC2_npe_sum > a2_th_min) Kaon = true;
 	  //	  if(fabs(R_tr_vz[rt])<0.1
 	  //         && fabs(L_tr_vz[lt])<0.1 && fabs(R_tr_vz[rt] - L_tr_vz[lt])<0.03)zcut=true;
 
@@ -1340,32 +1310,33 @@ void ana::Loop(){
 
 
 
+	    B_p     = HALLA_p/1000.0;// [GeV/c]	    
+	    L_p     = L_tr_p[lt];
+	    R_p     = R_tr_p[rt];
 	    
 	    //==== Energy Loss calibration ======//
 
-	    double B_pb,R_pb,L_pb;
+	    double B_pc,R_pc,L_pc;
 
-	    B_pb=0.0;
-	    R_pb=0.0;
-	    L_pb=0.0;
 	    tr.dpe     = Eloss(0.0,R_tr_vz[0],"B");
 	    tr.dpk[rt] = Eloss(R_tr_tg_ph[rt],R_tr_vz[rt],"R");
 	    tr.dpe_[lt]= Eloss(L_tr_tg_ph[lt],L_tr_vz[lt],"L");
 	    
-	    R_pb = R_tr_p[rt] + tr.dpk[rt];
-	    L_pb = L_tr_p[lt] + tr.dpe_[lt];
-	    B_pb = HALLA_p/1000.0 - tr.dpe;
+	    R_pc = R_p + tr.dpk[rt];
+	    L_pc = L_p + tr.dpe_[lt];
+	    B_pc = B_p - tr.dpe;
 
 	    //===================================//	    
 	    double B_E     = sqrt( Me*Me + B_p*B_p );
             int L_s2pad = (int)L_s2_trpad[lt];
             double L_E     = sqrt( Me*Me + L_p*L_p );
-            double L_betae = L_pb / sqrt(Me*Me + L_p*L_p);
+            double L_betae = L_p / sqrt(Me*Me + L_p*L_p);
             int R_s2pad    = (int)R_s2_trpad[rt];
-            double R_E     = sqrt( MK*MK + R_pb*R_pb );
-	    double R_Epi   = sqrt( Mpi*Mpi + R_pb*R_pb );
-            double R_betaK = R_pb / sqrt(MK*MK + R_pb*R_pb);
-	    double R_betaPi =R_pb/ sqrt(Mpi*Mpi + R_pb*R_pb);
+            double R_E     = sqrt( MK*MK + R_p*R_p );
+	    double R_Epi   = sqrt( Mpi*Mpi + R_p*R_p );
+            double R_betaK = R_p / sqrt(MK*MK + R_p*R_p);
+	    double R_betaPi =R_p/ sqrt(Mpi*Mpi + R_p*R_p);
+
 
 	    CoinCalc(R_s2pad,L_s2pad,rt,lt);
 	    //	     double test =CoinCalc_c(R_s2pad,L_s2pad,rt,lt);
@@ -1404,25 +1375,25 @@ void ana::Loop(){
 	    
 	    h_Rth->Fill(R_tr_tg_th[rt]);
 	    h_Rph->Fill(R_tr_tg_ph[rt]);
-	    h_Rp->Fill(R_tr_p[rt]);
+	    h_Rp->Fill(R_p);
 	    h_Lz->Fill(L_tr_vz[lt]);
 	    h_Lth->Fill(L_tr_tg_th[lt]);	    	    
 	    h_Lph->Fill(L_tr_tg_ph[lt]);	    	    
-	    h_Lp->Fill(L_tr_p[lt]);	    
+	    h_Lp->Fill(L_p);	    
 
 	     
 	    //======== w/o momentum correction ============//
 
- 	    double Ee_b = sqrt( Me*Me + B_pb*B_pb );
-	    double L_Eb = sqrt( Me*Me + L_pb*L_pb );
-	    double R_Eb = sqrt( MK*MK + R_pb*R_pb );
+ 	    double Ee_b = sqrt( Me*Me + B_p*B_p );
+	    double L_Eb = sqrt( Me*Me + L_p*L_p );
+	    double R_Eb = sqrt( MK*MK + R_p*R_p );
 	    
 	    //==== Right Hand Coordinate ========//
 
-	    double R_pz_b=R_pb/sqrt(1.0*1.0 + pow(R_tr_tg_th[rt], 2.0) + pow( R_tr_tg_ph[rt],2.0));
+	    double R_pz_b=R_p/sqrt(1.0*1.0 + pow(R_tr_tg_th[rt], 2.0) + pow( R_tr_tg_ph[rt],2.0));
 	    double R_px_b=R_pz_b * R_tr_tg_th[rt];
 	    double R_py_b=R_pz_b * R_tr_tg_ph[rt];
-	    double L_pz_b=L_pb/sqrt(1.0*1.0 + pow(L_tr_tg_th[lt], 2.0) + pow( L_tr_tg_ph[lt],2.0));
+	    double L_pz_b=L_p/sqrt(1.0*1.0 + pow(L_tr_tg_th[lt], 2.0) + pow( L_tr_tg_ph[lt],2.0));
 	    double L_px_b=L_pz_b * L_tr_tg_th[lt];
 	    double L_py_b=L_pz_b * L_tr_tg_ph[lt];
 
@@ -1536,7 +1507,7 @@ void ana::Loop(){
 	    mm=mass - mh;
             mm2=mass2 - mh;
 
-	    //mm = mm*1000.; // GeV -> MeV
+	    mm = mm*1000.; // GeV -> MeV
 	    mm2 = mm2*100.; // GeV ->MeV 
 
 	    //=== w/ matrix tuning ======//
@@ -1548,7 +1519,7 @@ void ana::Loop(){
 	   mm_L = mm_L*1000.;
 	    // nnL Mass //
            mass_nnL = sqrt( (Ee + MT - L_E - R_E)*(Ee + MT - L_E - R_E)
-                             - (B_v - L_v - R_v)*(B_v - L_v - R_v) );
+                              - (B_v - L_v - R_v)*(B_v - L_v - R_v) );
 	   mm_nnL=mass_nnL - MnnL;
 	   mm_nnL = mm_nnL*1000.;
 	    // H3L Mass //
@@ -1587,9 +1558,7 @@ void ana::Loop(){
 	    if( Kaon && fabs(ct)<1.0){
 	      
               h_mmall ->Fill( mm );
-	      //              if( fabs( L_tr_vz[lt] + 0.125 ) < 0.015 || fabs( L_tr_vz[lt] - 0.125 ) < 0.015  && fabs(L_tr_vz[lt] -R_tr_vz[rt])<0.025){ 
-              if( fabs( L_tr_vz[lt] + R_tr_vz[rt] )/2.0 >0.1
-		  && fabs(L_tr_vz[lt] -R_tr_vz[rt])<0.025){ 
+              if( fabs( L_tr_vz[lt] + 0.125 ) < 0.015 || fabs( L_tr_vz[lt] - 0.125 ) < 0.015 ){ 
 		tr.missing_mass_Al=mm_Al;
 		tr.missing_mass_MgL=mm_MgL;
 		
@@ -1665,77 +1634,81 @@ void ana::Loop(){
 				    
 
               if(Kaon && fabs(ct)<1.0 && ((-0.15<(L_tr_vz[lt]) && (L_tr_vz[lt])<-0.1) || ( 0.1<(L_tr_vz[lt]) && (L_tr_vz[lt])<0.15) &&  fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025) 
-		 && ((-0.15<(R_tr_vz[rt]) && (R_tr_vz[rt])<-0.1) ||( 0.1<(R_tr_vz[rt]) && (R_tr_vz[rt])<0.15)  && fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025))h_mm_MgL->Fill(mm_MgL);//h_mm_Al->Fill(mm_Al);
+		 && ((-0.15<(R_tr_vz[rt]) && (R_tr_vz[rt])<-0.1) ||( 0.1<(R_tr_vz[rt]) && (R_tr_vz[rt])<0.15)))h_mm_MgL->Fill(mm_MgL);//h_mm_Al->Fill(mm_Al);
 
 	      if(Kaon && ((-35<ct && ct<-15.0) || (15.0<ct && ct<35)) 
-                 && fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs( L_tr_vz[lt] + R_tr_vz[rt] )/2.0 >0.1) {
+                 && ((-0.15<(L_tr_vz[lt]) && (L_tr_vz[lt])<-0.1) || ( 0.1<(L_tr_vz[lt]) && (L_tr_vz[lt])<0.15) && fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025) 
+		 && ((-0.15<(R_tr_vz[rt]-0.01) && (R_tr_vz[rt])<-0.1) ||( 0.1<(R_tr_vz[rt]) && (R_tr_vz[rt])<0.15))){
 		tr.missing_mass_MgL_acc=mm_MgL;
+		
 		h_mm_MgL_acc->Fill(mm_MgL);
 	      }
 
 	      
 	      if( Kaon && ((-35<ct && ct<-15.0) || (15.0<ct && ct<35)) && zcut){
+		 //		 fabs( L_tr_vz[lt] ) < 0.1 && fabs( R_tr_vz[rt] ) < 0.1 &&fabs( L_tr_vz[lt] ) < 0.1){
                 h_acc_nnL     ->Fill(mm_nnL);
 		h_acc_H3L     ->Fill(mm_H3L);
                 h_acc_L       ->Fill(mm_L);
                 h_ct_wK_z_acc ->Fill( ct );
 	     }
 
-	  	 
+	 
               double ctime=-1000.;
 	     //--------------------------------------------------------------------------------//
               if( Kaon && zcut){
+		  //		  fabs( L_tr_vz[lt] ) < 0.1 && fabs( R_tr_vz[rt] ) < 0.1 &&fabs( L_tr_vz[lt] ) < 0.1){
                h_ct_wK_z_all->Fill(ct);
-	       
-	       
-	       if((-35<ct && ct <-15) || (15<ct && ct<35)){
-		 
-		 ctime=ct;
-		 
-		 while(1){
-		   if(-1.0<ctime && ctime<1.0){
-		     h_ct_acc->Fill(ctime);
-		     h_ct_acc->Fill(ctime-36);
-		     break;}
-		   else if(ctime<-1.0){ctime=ctime+2;}
-		   else if(1.0<ctime){ctime=ctime-2;}
-		 }
-	       }
-	      }
-	      
-	      
-	      tr.missing_mass = mm          ; tr.coin_time =ct         ;
-	      tr.momR         = R_tr_p[0]  ; tr.momL      =L_tr_p[0] ;
-	      tr.zR           = R_tr_vz[0] ; tr.zL        =L_tr_vz[0];
-	      //	     tr.AC1_sum      = R_a1_asum_p/400. ; tr.AC2_sum   =R_a2_asum_p/400.;
-	      tr.AC1_sum      = R_a1_asum_p ; tr.AC2_sum   =R_a2_asum_p;
-	      tr.ct_acc=ctime;
-	      //	     tree_out->Fill();
-	      
-    	      //--------------------------------------------------------------------------------------//
-	      
+            
 
-	      //	     if( fabs( L_tr_vz[lt]  ) < 0.1 && fabs( R_tr_vz[rt]  ) < 0.1 &&fabs(ct)<1.0)
-	      if( zcut && fabs(ct)<1.0)
-		h_mm->Fill( mm ); //No Kaon Cut
-	      //	     if( fabs( L_tr_vz[lt]  ) < 0.1 && fabs( R_tr_vz[rt]  ) < 0.1 && 2.0<ct && ct<4.0)
-	      if( zcut && 2.0<ct && ct<4.0)
-		h_mm_pi->Fill( mm ); //No Kaon Cut
-	      //	     if( fabs( L_tr_vz[lt]  ) < 0.1 && fabs( R_tr_vz[rt]  ) < 0.1
-	      if(Kaon &&  zcut && ((-35<ct && ct<-15.0) || (15.0<ct && ct<35))){
-		h_mm_acc->Fill( mm ); //with Kaon Cut
-		tr.missing_mass_acc=mm;
+              if((-35<ct && ct <-15) || (15<ct && ct<53)){
+	     
+	       ctime=ct;
+	       
+              while(1){
+	       if(-1.0<ctime && ctime<1.0){
+		 h_ct_acc->Fill(ctime);
+                 h_ct_acc->Fill(ctime-36);
+		 break;}
+	       else if(ctime<-1.0){ctime=ctime+2;}
+	       else if(1.0<ctime){ctime=ctime-2;}
 	      }
+	      }
+	      }
+	
+	
+             tr.missing_mass = mm          ; tr.coin_time =ct         ;
+	     tr.momR         = R_tr_p[0]  ; tr.momL      =L_tr_p[0] ;
+	     tr.zR           = R_tr_vz[0] ; tr.zL        =L_tr_vz[0];
+	     //	     tr.AC1_sum      = R_a1_asum_p/400. ; tr.AC2_sum   =R_a2_asum_p/400.;
+	     tr.AC1_sum      = R_a1_asum_p ; tr.AC2_sum   =R_a2_asum_p;
+	     tr.ct_acc=ctime;
+	     //	     tree_out->Fill();
+	  
+    	      //--------------------------------------------------------------------------------------//
+
+
+	     //	     if( fabs( L_tr_vz[lt]  ) < 0.1 && fabs( R_tr_vz[rt]  ) < 0.1 &&fabs(ct)<1.0)
+	     if( zcut && fabs(ct)<1.0)
+	       h_mm->Fill( mm ); //No Kaon Cut
+	     //	     if( fabs( L_tr_vz[lt]  ) < 0.1 && fabs( R_tr_vz[rt]  ) < 0.1 && 2.0<ct && ct<4.0)
+	     if( zcut && 2.0<ct && ct<4.0)
+	       h_mm_pi->Fill( mm ); //No Kaon Cut
+	     //	     if( fabs( L_tr_vz[lt]  ) < 0.1 && fabs( R_tr_vz[rt]  ) < 0.1
+	     if(  zcut && ((-35<ct && ct<-15.0) || (15.0<ct && ct<35))){
+	       h_mm_acc->Fill( mm ); //No Kaon Cut
+	       tr.missing_mass_acc=mm;
+	     }
           } // if L_Tr && L_FP && R_Tr && R_FP
 	  tree_out->Fill();
-	  
-	  
-	  
+
+
+
 	  
         } // for NRtr
       } // for NLtr
     } // if LHRS && RHRS
-    
+
  
  			    
 			     
@@ -1761,7 +1734,7 @@ void ana::Loop(){
     h_mmallbg->Scale(1./20.);
     h_mmfoilbg->Scale(1./20.);
     h_ct_acc->Scale(2.0/40.);
-    tr.acc=2./40.;
+
     int nAl=h_mm_Al_bg->GetEntries();
     h_mm_Al_bg->Scale(BG_Al(nAl));
 
@@ -2093,7 +2066,6 @@ void ana::MakeHist(){
   tree_out ->Branch("mm_MgL",&tr.missing_mass_MgL ,"missing_mass_MgL/D");
   tree_out ->Branch("mm_MgL_acc",&tr.missing_mass_MgL_acc ,"missing_mass_MgL_acc/D");
   tree_out ->Branch("mm_acc",&tr.missing_mass_acc ,"missing_mass_acc/D");
-  tree_out ->Branch("acc",&tr.acc ,"acc/D");
   tree_out ->Branch("runnum",&runnum ,"runnum/I");
   tree_out ->Branch("ct_b",&tr.ct_b ,"ct_b/D");
   tree_out ->Branch("ct_c",&tr.ct_c ,"ct_c/D");
@@ -2102,7 +2074,6 @@ void ana::MakeHist(){
   tree_out ->Branch("ctimecorR",&tr.ctimecorR ,"ctimecorR/D");
   tree_out ->Branch("ctimecorL",&tr.ctimecorL ,"ctimecorL/D");
   tree_out ->Branch("ct_gb",&tr.ct_gb ,"ct_gb/D");
-  tree_out ->Branch("ct_g_wo_cor",&tr.ct_g_wo_cor ,"ct_g_wo_cor/D");
   tree_out ->Branch("rtof"        ,tr.Rtof      ,"rtof[16]/D"     );
   tree_out ->Branch("ltof"        ,tr.Ltof      ,"ltof[16]/D"     );  
   tree_out ->Branch("RS2T"        ,tr.RS2T_F1      ,"RS2T_F1[16]/D"     );
@@ -2386,11 +2357,11 @@ void ana::MakeHist(){
 /////////////////////
 //// Coincidence ////
 /////////////////////
-  h_ct       = new TH1D("h_ct"      ,"h_ct"      ,4000, -80, 80);//to adjust offset
+  h_ct       = new TH1D("h_ct"      ,"h_ct"      ,1000, -20, 20);//to adjust offset
   h_Rs2      = new TH1D("h_Rs2"      ,"h_Rs2"      ,4000, -100, 100);
   h_Ls2      = new TH1D("h_Ls2"      ,"h_Ls2"      ,4000, -100, 100);
   h_ct_acc       = new TH1D("h_ct_acc"  ,"h_ct_acc"   ,4000, -80, 80);//to adjust offset 
-  h_ct_wK    = new TH1D("h_ct_wK"   ,"h_ct_wK"   ,4000, -80, 80); 
+  h_ct_wK    = new TH1D("h_ct_wK"   ,"h_ct_wK"   ,1000, -20, 20); 
   h_ct_wK_z  = new TH1D("h_ct_wK_z" ,"h_ct_wK_z" ,4000, -80, 80); 
   h_ct_wK_z_all  = new TH1D("h_ct_wK_z_all" ,"h_ct_wK_z_all",4000, -80, 80); 
   h_ct_wK_acc    = new TH1D("h_ct_wK_acc"   ,"h_ct_wK_acc"   ,4000, -80, 80); 
@@ -2598,8 +2569,7 @@ void ana::GetACParam(){
   cout<<"========== GetACParam ============="<<endl;
   cout<<"==================================="<<endl;
   // taken by /ac/param/offset_ac.dat 
-  string pname="/data/41a/ELS/okuyama/JLab_nnL/ac/param/offset_ac.dat";
-
+  string pname="../ac/param/offset_ac.dat";
   ifstream ifp(pname.c_str(),ios::in);
   if (ifp.fail()){ cerr << "failed open files" <<pname.c_str()<<endl; exit(1);}
   cout<<" Param file : "<<pname.c_str()<<endl;
@@ -2804,7 +2774,7 @@ int main(int argc, char** argv){
 
 
   gSystem->Exit(1);
-  theApp.Run();
+  theApp->Run();
   return 0;
 
 }

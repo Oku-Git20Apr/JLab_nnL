@@ -24,7 +24,7 @@ void Tree::pack_tree()
   tree->SetBranchStatus("*" ,0);
   //tree->SetBranchStatus("fEvtHdr.fRun"               ,1);  tree->SetBranchAddress("fEvtHdr.fRun", &runnum    );
   //  tree->SetBranchStatus("fEvtHdr.fEvtNu"               ,1);   tree->SetBranchAddress("fEvtHdr.fEvtNum", &evid    );
-//  tree->SetBranchStatus("runnum"               ,1);  tree->SetBranchAddress("runnum", &runnum );
+  tree->SetBranchStatus("runnum"               ,1);  tree->SetBranchAddress("runnum", &runnum );
   tree->SetBranchStatus("HALLA_p"               ,1);  tree->SetBranchAddress("HALLA_p", &HALLA_p );
   tree->SetBranchStatus("L.tr.n"               ,1);  tree->SetBranchAddress("L.tr.n"               ,&L_tr_n              );
   tree->SetBranchStatus("R.tr.n"               ,1);  tree->SetBranchAddress("R.tr.n"               ,&R_tr_n              );

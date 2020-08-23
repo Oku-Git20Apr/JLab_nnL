@@ -30,7 +30,6 @@ struct TreeBranch{
   double momR, momL;
   double momRz, momLz;
   double momRz_c, momLz_c;
-  double acc;
   double zR, zL;
   double AC1_sum, AC2_sum;
   double AC1_npe_sum,AC2_npe_sum;
@@ -38,7 +37,7 @@ struct TreeBranch{
   double yp_cor;
   double ctimecorR,ctimecorL;
   double ct_acc,ct_b,ct_c; 
-  double ct_g,ct_gb,ct_g_wo_cor;
+  double ct_g,ct_gb;
   double Rs0ra_p,Rs0la_p,Rs0a_p;
   double Rs2ra_p[16],Rs2la_p[16],Rs2a_p[16];
   double Ls2ra_p[16],Ls2la_p[16],Ls2a_p[16];

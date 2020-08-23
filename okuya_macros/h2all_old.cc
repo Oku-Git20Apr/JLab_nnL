@@ -62,7 +62,7 @@ double  LS2_off_H1[16]={-25335,-25385.6,-25367,-25392.1,-25391.7,-25386.4,-25422
 
   return s2f1_offset;
 
-}//s2f1_off()
+}
 
 
 
@@ -114,7 +114,7 @@ double calcf2t_mom(double* P, double xf, double xpf,
 
   return Y; 
   
-}//calcf2t_mom()
+}
 
 
 
@@ -165,7 +165,7 @@ double calcf2t_ang(double* P, double xf, double xpf,
 
   return Y; 
   
-}//calcf2t_ang()
+}
       	
 
 
@@ -213,7 +213,7 @@ double calcf2t_zt(double* P, double xf, double xpf,
   }
   
   return Y;
-}//calcf2t_zt
+}
 
 
 
@@ -251,7 +251,7 @@ void tuning::GetACParam(){
 
   }
 
-  }//GetACParam()
+  }
 
 
 
@@ -276,7 +276,7 @@ double tuning::AC_npe(int nac, int seg, double adc){
   else if(nac==2)  npe=(adc)/(ac_1pe - ac_off);
     // in this case, we need scale gain parameter 2 times
   return npe;  
-}//AC_npe
+}
 
 
 
@@ -323,7 +323,7 @@ double calcf_pathl(double* P, double xf, double xpf, double yf, double ypf, doub
     }
   }
   return Y;  
-}//calcf_pathl
+}
 
 
 //////////////////////////////////////////////////
@@ -372,7 +372,7 @@ double calcf2t_3rd(double* P, double xf, double xpf,
   
   return Y; 
   
-}//calcf2t_3rd()
+}
 
 ///////////////////////////////////////////////////////////////////////////
 void tuning::matrix(string mtparam){
@@ -457,7 +457,7 @@ void tuning::matrix(string mtparam){
 
   cout<<endl;
   
-}//matrix()
+}
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -542,7 +542,7 @@ void tuning::MTParam_R(){
   Mpl.close();    
   }
   
-}//MTParam_R()
+};
 //////////////////////////////////////////////////////////////
 
 void tuning::MTParam_L(){
@@ -628,7 +628,7 @@ void tuning::MTParam_L(){
 
   }
 
-}//MTParam_L()
+}
 
 //========================================================//
 
@@ -666,8 +666,9 @@ void tuning::MTP_mom(){
     Opt_par[i+nParamTp]=par;  // Both momentum paramters
    }
   Mpt_L.close();
+
   
-}//MTP_mom()
+}
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -703,7 +704,9 @@ void tuning::MTParam_G(){
   MctimeR.close();
 
 
-}//MTParam_G()
+}
+
+
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -807,16 +810,14 @@ void tuning::Calib(int rt, int lt ){
 
 
     
-}//Calib()
+}
 ////////////////////////////////////////////////////////////////
 
-//Constructer
 tuning::tuning(){
   set= new Setting();
   set->Initialize();
-}//tuning()
+}
 
-//Destructer
 tuning::~tuning(){}
 
 void tuning::SetRunList(string ifname){
@@ -839,8 +840,7 @@ void tuning::SetRunList(string ifname){
   pack_tree();
   readtreeHRSR();
   readtreeHRSL();
-}//SetRunList()
-
+}
 void tuning::ReadParam(string name){
 
   param = new ParamMan(name.c_str());
@@ -852,8 +852,7 @@ void tuning::ReadParam(string name){
   coin_shift=param->GetF1ShiftOffset();
   coin_shift = coin_shift*tdc_time;
   cout<<"coin shift : "<<coin_shift<<endl;
-}//ReadParam()
-
+}
 ////////////////////////////////////////////////////////////////////////////
 void tuning::CoinCalc(int RS2_seg, int LS2_seg, int rhit, int lhit){
 
@@ -931,7 +930,7 @@ void tuning::CoinCalc(int RS2_seg, int LS2_seg, int rhit, int lhit){
 
 //Changed
   
-}//CoinCalc()
+}
 
 
 ////////////////////////////////////////////////////////////////////////////
@@ -1067,7 +1066,7 @@ tr.ct_orig=ctime;
  return ctime;
 
 
-}//CoinCalc_gogami
+}
 
 ///////////////////////////////////////////////////////////////////////////
 double tuning::CoinCalc_c(int RS2_seg, int LS2_seg, int rhit, int lhit){
@@ -1106,7 +1105,7 @@ double tuning::CoinCalc_c(int RS2_seg, int LS2_seg, int rhit, int lhit){
   
   return cointime;
   
-}//CoinCalc_c
+}
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -1169,7 +1168,7 @@ void tuning::PathCalib(int rhit, int lhit){
 
 
 
-}//PathCalib()
+}
 
 
 //////////////////////////////////////////////////////////////////
@@ -1238,358 +1237,522 @@ if(z<-0.1){
   return dEloss;
 
   
-}//Eloss()
+}
 
 void tuning::SetParam(){
 
 	mt = Mp;//target mass
 	mh = ML;//hypernuclei
-cout << "mt (target) = " << mt << endl;
-cout << "mh (hyper) = " << mh << endl;
-     //----------------Histogram parameters---------------//
-	 min_Lp = 1.8;
-	 max_Lp = 2.8;
-     min_coin_c=-20.0;
-     max_coin_c=20.0;
-     min_mm=-0.1;//GeV/c^2
-     max_mm=0.2;//GeV/c^2
-     bin_mm=(max_mm-min_mm)/0.001; //Counts/2 MeV
-     bin_mm=(int)bin_mm;
-	 iter_ac1=30;//iteration number
-     min_s2=-10;
-     max_s2=5000;
-     bin_s2=max_s2-min_s2;
-     bin_coin_c=(int)((max_coin_c-min_coin_c)/tdc_time);
-cout<<"tdc"<<tdc_time<<endl;
-cout<<"max coin"<<max_coin_c<<endl;
-cout<<"min coin"<<min_coin_c<<endl;
-cout<<"bin coin"<<bin_coin_c<<endl;
+cout << "mt = " << mt << endl;
 
-     //----------------ana_Lambda's Notation---------------//
-	 th1_max=2.0;
-     th2_max=20.0;
-     th2_min=0.0;
+	min_Lp = 1.8;
+	max_Lp = 2.8;
 
-     //----------------Cut parameters---------------//
+   //min_coin=-10;
+   min_coin=-20.0;
+   max_coin=20.0;
+   //min_coin_c=-10;
+   min_coin_c=-20.0;
+   max_coin_c=20.0;
+   //min_coin_c=-200.0;
+   //max_coin_c=200.0;
+//change
+//   min_coin_c=-100;
+//   max_coin_c=1000.0;
+ min_ac1=0.0;
+ max_ac1=5000.;
+ min_ac2=0.0;
+ max_ac2=20000.;
+ min_adc=-500.0;
+ max_adc=20000.;
+
+	//=== AC Threshold variable ===//
+	 //th1_max=2000.;
+	 //ac1_adc[0]=400.;
+	 //ac1_adc[1]=420.;
+	 //ac1_adc[2]=440.;
+	 //ac1_adc[3]=460.;
+	 //ac1_adc[4]=480.;
+	 //ac1_adc[5]=500.;
+	 //ac1_adc[6]=520.;
+	 //ac1_adc[7]=540.;
+	 //ac1_adc[8]=560.;
+	 //ac1_adc[9]=580.;
+
+     //th2_max=6000.;
+     //ac2l_adc[0]=600.;
+     //ac2l_adc[1]=650.;
+     //ac2l_adc[2]=700.;
+     //ac2l_adc[3]=750.;
+     //ac2l_adc[4]=800.;
+     //ac2l_adc[5]=850.;
+     //ac2l_adc[6]=900.;
+     //ac2l_adc[7]=950.;
+     //ac2l_adc[8]=1000.;
+     //ac2l_adc[9]=1050.;
+
+     //ac2u_adc[0]=1500.;
+     //ac2u_adc[1]=1600.;
+     //ac2u_adc[2]=1700.;
+     //ac2u_adc[3]=1800.;
+     //ac2u_adc[4]=1900.;
+     //ac2u_adc[5]=2000.;
+     //ac2u_adc[6]=2500.;
+     //ac2u_adc[7]=3000.;
+     //ac2u_adc[8]=3500.;
+     //ac2u_adc[9]=4000.;
+     //----------------NPE---------------//
 	 zver[0]=0.;
 	 for(int i=1; i<nth; i++) zver[i]=zver[i-1]+0.005;//SUM
+	 //for(int i=1; i<nth; i++) zver[i]=zver[i-1]+5.;//Diff
+	 th1_max=2.0;
+
 	 ac1_adc[0]=0.0;
 	 for(int i=1; i<nth; i++) ac1_adc[i]=ac1_adc[i-1]+0.25;
+	 //for(int i=1; i<nth; i++) ac1_adc[i]=ac1_adc[i-1]+2.;
+	 //ac1_adc[1]=0.4;
+	 //ac1_adc[2]=0.6;
+	 //ac1_adc[3]=0.8;
+	 //ac1_adc[4]=1.0;
+	 //ac1_adc[5]=1.2;
+	 //ac1_adc[6]=1.4;
+	 //ac1_adc[7]=1.6;
+	 //ac1_adc[8]=1.8;
+	 //ac1_adc[9]=2.0;
+
+     th2_max=20.0;
+     th2_min=0.0;
      ac2l_adc[0]=0.0;//best = 3.0? ac2l[30]
 	 for(int i=1; i<nth; i++) ac2l_adc[i]=ac2l_adc[i-1]+0.2;
+	 //for(int i=1; i<nth; i++) ac2l_adc[i]=ac2l_adc[i-1]+1;
+//     ac2l_adc[0]=0.4;
+     //ac2l_adc[1]=0.8;
+     //ac2l_adc[2]=1.2;
+     //ac2l_adc[3]=1.6;
+     //ac2l_adc[4]=2.0;
+     //ac2l_adc[5]=2.4;
+     //ac2l_adc[6]=2.8;
+     //ac2l_adc[7]=3.2;
+     //ac2l_adc[8]=3.6;
+     //ac2l_adc[9]=4.0;
+
      ac2u_adc[0]=0.0;//best = 18? ac2u[16]
 	 for(int i=1; i<nth; i++) ac2u_adc[i]=ac2u_adc[i-1]+0.5;
-	 //---Kaon Cut ----//
- 	 ac1_kcut=100.;
- 	 ac2_kcut_min=1000.;
- 	 ac2_kcut_max=5000.;
+	 //for(int i=1; i<nth; i++) ac2u_adc[i]=ac2u_adc[i-1]+3;
+//     ac2u_adc[0]=14.0;
+     //ac2u_adc[1]=15.0;
+     //ac2u_adc[2]=16.0;
+     //ac2u_adc[3]=17.0;
+     //ac2u_adc[4]=18.0;
+     //ac2u_adc[5]=19.0;
+     //ac2u_adc[6]=20.0;
+     //ac2u_adc[7]=21.0;
+     //ac2u_adc[8]=22.0;
+     //ac2u_adc[9]=23.0;
+	// th1_max=2.0;
+
+	// ac1_adc[0]=0.;
+	// ac1_adc[1]=0.5;
+	// ac1_adc[2]=1.0;
+	// ac1_adc[3]=1.5;
+	// ac1_adc[4]=2.0;
+	// ac1_adc[5]=2.5;
+	// ac1_adc[6]=3.0;
+	// ac1_adc[7]=3.5;
+	// ac1_adc[8]=4.0;
+	// ac1_adc[9]=4.5;
+
+    // th2_max=6.0;
+    // th2_min=2.0;
+    // ac2l_adc[0]=0.;
+    // ac2l_adc[1]=0.4;
+    // ac2l_adc[2]=0.8;
+    // ac2l_adc[3]=1.2;
+    // ac2l_adc[4]=1.6;
+    // ac2l_adc[5]=2.0;
+    // ac2l_adc[6]=2.4;
+    // ac2l_adc[7]=2.8;
+    // ac2l_adc[8]=3.2;
+    // ac2l_adc[9]=3.6;
+
+    // ac2u_adc[0]=4.0;
+    // ac2u_adc[1]=5.0;
+    // ac2u_adc[2]=6.0;
+    // ac2u_adc[3]=7.0;
+    // ac2u_adc[4]=8.0;
+    // ac2u_adc[5]=9.0;
+    // ac2u_adc[6]=10.0;
+    // ac2u_adc[7]=11.0;
+    // ac2u_adc[8]=12.0;
+    // ac2u_adc[9]=13.0;
+     //-----------tuning_ac_oku_10.pdf--------------//
+	 //ac1_adc[0]=0.;
+	 //ac1_adc[1]=0.1;
+	 //ac1_adc[2]=0.2;
+	 //ac1_adc[3]=0.3;
+	 //ac1_adc[4]=0.4;
+	 //ac1_adc[5]=0.5;
+	 //ac1_adc[6]=0.6;
+	 //ac1_adc[7]=0.7;
+	 //ac1_adc[8]=0.8;
+	 //ac1_adc[9]=0.9;
+
+     //th2_max=6.0;
+     //th2_min=2.0;
+     //ac2l_adc[0]=0.;
+     //ac2l_adc[1]=0.4;
+     //ac2l_adc[2]=0.8;
+     //ac2l_adc[3]=1.2;
+     //ac2l_adc[4]=0.6;
+     //ac2l_adc[5]=2.0;
+     //ac2l_adc[6]=2.4;
+     //ac2l_adc[7]=2.8;
+     //ac2l_adc[8]=3.2;
+     //ac2l_adc[9]=3.6;
+
+     //ac2u_adc[0]=6.0;
+     //ac2u_adc[1]=6.2;
+     //ac2u_adc[2]=6.4;
+     //ac2u_adc[3]=6.6;
+     //ac2u_adc[4]=6.8;
+     //ac2u_adc[5]=7.0;
+     //ac2u_adc[6]=7.2;
+     //ac2u_adc[7]=7.4;
+     //ac2u_adc[8]=7.6;
+     //ac2u_adc[9]=7.8;
+	//---Kaon Cut ----//
+ 	ac1_kcut=100.;
+ 	ac2_kcut_min=1000.;
+ 	ac2_kcut_max=5000.;
 
 
-}//SetParam()
+}
 ////////////////////////////////////////////////////////////
 
 void tuning::MakeHist(){
   cout<<"Make Hist "<<endl;
-	file_out = new TFile("h2all.root","recreate");
-	tree_out = new TTree("tree_out","tree_out");
-	//`tree_out ->Branch("branch name",variable ,"branch name/type");
-	
-	tree_out ->Branch("pid_cut"        ,&tr.pid_cut      ,"pid_cut/I"     );
-	tree_out ->Branch("ct_cut"        ,&tr.ct_cut      ,"ct_cut/I"     );
-	tree_out ->Branch("z_cut"        ,&tr.z_cut      ,"z_cut/I"     );
-    tree_out ->Branch("nrun"        ,&tr.nrun      ,"nrun/I"     );
-    tree_out ->Branch("nev"        ,&tr.nev      ,"nev/I"     );
-    tree_out ->Branch("runnum",&runnum ,"runnum/I");
-	//  tree_out ->Branch("ntr_r",&tr.ntrack_r ,"ntr_r/I");
-	//  tree_out ->Branch("ntr_l",&tr.ntrack_l ,"ntr_l/I");
-	tree_out ->Branch("mm",&tr.missing_mass ,"missing_mass/D");
-	tree_out ->Branch("mm_b",&tr.missing_mass_b ,"missing_mass_b/D");
-	tree_out ->Branch("mm_L",&tr.missing_mass_L ,"missing_mass_L/D");
-	tree_out ->Branch("mm_nnL",&tr.missing_mass_nnL ,"missing_mass_nnL/D");
-	tree_out ->Branch("mm_H3L",&tr.missing_mass_H3L ,"missing_mass_H3L/D");
-	tree_out ->Branch("mm_cut",&tr.missing_mass_cut ,"missing_mass_cut/D");
-	tree_out ->Branch("mm_MgL",&tr.missing_mass_MgL ,"missing_mass_MgL/D");
-	tree_out ->Branch("mm_MgL_acc",&tr.missing_mass_MgL_acc ,"missing_mass_MgL_acc/D");
-	tree_out ->Branch("mm_acc",&tr.missing_mass_acc ,"missing_mass_acc/D");
-	tree_out ->Branch("ct_b",&tr.ct_b ,"ct_b/D");
-	tree_out ->Branch("ct_c",&tr.ct_c ,"ct_c/D");
-	tree_out ->Branch("ct_g",&tr.ct_g ,"ct_g/D");
-	tree_out ->Branch("ct_gb",&tr.ct_gb ,"ct_gb/D");
-	tree_out ->Branch("yp_cor",&tr.yp_cor ,"yp_cor/D");
-	tree_out ->Branch("ctimecorR",&tr.ctimecorR ,"ctimecorR/D");
-	tree_out ->Branch("ctimecorL",&tr.ctimecorL ,"ctimecorL/D");
-	tree_out ->Branch("rtof"        ,tr.Rtof      ,"rtof[16]/D"     );
-	tree_out ->Branch("ltof"        ,tr.Ltof      ,"ltof[16]/D"     );  
-	tree_out ->Branch("RS2T"        ,tr.RS2T_F1      ,"RS2T_F1[16]/D"     );
-	tree_out ->Branch("RS2B"        ,tr.RS2B_F1      ,"RS2B_F1[16]/D"     );
-	tree_out ->Branch("LS2T"        ,tr.LS2T_F1      ,"LS2T_F1[16]/D"     );
-	tree_out ->Branch("LS2B"        ,tr.LS2B_F1      ,"LS2B_F1[16]/D"     );
-	tree_out ->Branch("RS2T_c"        ,tr.RS2T_F1_c      ,"RS2T_F1_c[16]/D"     );
-	tree_out ->Branch("RS2B_c"        ,tr.RS2B_F1_c      ,"RS2B_F1_c[16]/D"     );
-	tree_out ->Branch("LS2T_c"        ,tr.LS2T_F1_c      ,"LS2T_F1_c[16]/D"     );
-	tree_out ->Branch("LS2B_c"        ,tr.LS2B_F1_c      ,"LS2B_F1_c[16]/D"     );
-	tree_out ->Branch("RS2T_b"        ,tr.RS2T_F1_b      ,"RS2T_F1_b[16]/D"     );
-	tree_out ->Branch("RS2B_b"        ,tr.RS2B_F1_b      ,"RS2B_F1_b[16]/D"     );
-	tree_out ->Branch("LS2T_b"        ,tr.LS2T_F1_b      ,"LS2T_F1_b[16]/D"     );
-	tree_out ->Branch("LS2B_b"        ,tr.LS2B_F1_b      ,"LS2B_F1_b[16]/D"     );      
-	tree_out ->Branch("RS2T_ref"        ,&tr.RS2T_ref   ,"RS2T_ref/D"     );
-	tree_out ->Branch("RS2B_ref"        ,&tr.RS2B_ref   ,"RS2B_ref/D"     );
-	tree_out ->Branch("LS2T_ref"        ,&tr.LS2T_ref   ,"LS2T_ref/D"     );
-	tree_out ->Branch("LS2B_ref"        ,&tr.LS2B_ref   ,"LS2B_ref/D"     );  
-	tree_out ->Branch("momR"        ,&tr.momR      ,"momR/D"     );
-	tree_out ->Branch("momL"        ,&tr.momL      ,"momL/D"     );
-	tree_out ->Branch("Rs2_pad",tr.Rs2_pad,"Rs2_pad[100]/I");
-	tree_out ->Branch("Ls2_pad",tr.Ls2_pad,"Ls2_pad[100]/I");
-	
-	tree_out ->Branch("Rth_fp"          ,&tr.RXpFP        ,"RXpFP/D"       );  
-	tree_out ->Branch("Lth_fp"          ,&tr.LXpFP        ,"LXpFP/D"       );  
-	tree_out ->Branch("Rph_fp"          ,&tr.RYpFP        ,"RYpFP/D"       );  
-	tree_out ->Branch("Lph_fp"          ,&tr.LYpFP        ,"LYpFP/D"       );
-	tree_out ->Branch("Rx_fp"          ,&tr.RXFP        ,"RXFP/D"       );
-	tree_out ->Branch("Lx_fp"          ,&tr.LXFP        ,"LXFP/D"       );  
-	tree_out ->Branch("Ry_fp"          ,&tr.RYFP        ,"RYFP/D"       );  
-	tree_out ->Branch("Ly_fp"          ,&tr.LYFP        ,"LYFP/D"       );
-	  
-	tree_out ->Branch("Rth"          ,&tr.RXpt        ,"RXpt/D"       );  
-	tree_out ->Branch("Lth"          ,&tr.LXpt        ,"LXpt/D"       );  
-	tree_out ->Branch("Rph"          ,&tr.RYpt        ,"RYpt/D"       );  
-	tree_out ->Branch("Lph"          ,&tr.LYpt        ,"LYpt/D"       );
-	tree_out ->Branch("Rx"          ,&tr.RXt        ,"RXt/D"       );
-	tree_out ->Branch("Lx"          ,&tr.LXt        ,"LXt/D"       );  
-	tree_out ->Branch("Ry"          ,&tr.RYt        ,"RYt/D"       );
-	tree_out ->Branch("Ly"          ,&tr.LYt        ,"LYt/D"       );    
-	tree_out ->Branch("Rz"          ,&tr.zR        ,"zR/D"       );
-	tree_out ->Branch("Lz"          ,&tr.zL        ,"zL/D"       );
-	
-	tree_out ->Branch("ac1_sum"     ,&tr.AC1_sum   ,"AC1_sum/D"  );
-	tree_out ->Branch("ac2_sum"     ,&tr.AC2_sum   ,"AC2_sum/D"  );
-	tree_out ->Branch("ac1_npe_sum"     ,&tr.AC1_npe_sum   ,"AC1_npe_sum/D"  );
-	tree_out ->Branch("ac2_npe_sum"     ,&tr.AC2_npe_sum   ,"AC2_npe_sum/D"  );
-	tree_out ->Branch("ac1_npe"     ,tr.AC1_npe   ,"AC1_npe[24]/D"  );
-	tree_out ->Branch("ac2_npe"     ,tr.AC2_npe   ,"AC2_npe[26]/D"  );    
-	tree_out ->Branch("ct_acc"     ,&tr.ct_acc   ,"ct_acc/D"  );
-	tree_out ->Branch("Rs0ra_p"     ,&tr.Rs0ra_p   ,"Rs0ra_p/D"  );
-	tree_out ->Branch("Rs0la_p"     ,&tr.Rs0la_p   ,"Rs0la_p/D"  );
-	tree_out ->Branch("Rs2ra_p"     ,tr.Rs2ra_p   ,"Rs2ra_p[16]/D"  );
-	tree_out ->Branch("Rs2la_p"     ,tr.Rs2la_p   ,"Rs2la_p[16]/D"  );
-	tree_out ->Branch("Ls2ra_p"     ,tr.Ls2ra_p   ,"Ls2ra_p[16]/D"  );
-	tree_out ->Branch("Ls2la_p"     ,tr.Ls2la_p   ,"Ls2la_p[16]/D"  );  
-	tree_out->Branch("Bp_c"     ,&tr.Bp_c   ,"Bp_c/D"  );
-	tree_out->Branch("Lp_c"     ,&tr.Lp_c   ,"Lp_c/D"  );
-	tree_out->Branch("Rp_c"     ,&tr.Rp_c   ,"Rp_c/D"  );
-	tree_out->Branch("Bp_before"     ,&tr.Bp_before   ,"Bp_before/D"  );
-	tree_out->Branch("Lp_before"     ,&tr.Lp_before   ,"Lp_before/D"  );
-	tree_out->Branch("Rp_before"     ,&tr.Rp_before   ,"Rp_before/D"  );
-	tree_out ->Branch("trig"     ,&tr.trig   ,"trig/D"  );
-	tree_out->Branch("dpe"     ,&tr.dpe   ,"dpe/D"  );
-	tree_out->Branch("dpe_"     ,tr.dpe_   ,"dpe_[10]/D"  );
-	tree_out->Branch("dpk"     ,tr.dpk   ,"dpk[10]/D"  );
-	tree_out->Branch("ct_orig"     ,&tr.ct_orig   ,"ct_orig/D"  );
-	tree_out->Branch("ct_itabashi"     ,&tr.ct_itabashi   ,"ct_itabashi/D"  );
-	tree_out->Branch("tr.ntrack_l"  ,&tr.ntrack_l   ,"tr.ntrack_l/I"  );
-	tree_out->Branch("tr.ntrack_r"  ,&tr.ntrack_r   ,"tr.ntrack_r/I"  );
+  file_out = new TFile("h2all.root","recreate");
+  tree_out = new TTree("tree_out","tree_out");
+  //`tree_out ->Branch("branch name",variable ,"branch name/type");
+
+  tree_out ->Branch("pid_cut"        ,&tr.pid_cut      ,"pid_cut/I"     );
+  tree_out ->Branch("ct_cut"        ,&tr.ct_cut      ,"ct_cut/I"     );
+  tree_out ->Branch("z_cut"        ,&tr.z_cut      ,"z_cut/I"     );
+//  tree_out ->Branch("ntr_r",&tr.ntrack_r ,"ntr_r/I");
+//  tree_out ->Branch("ntr_l",&tr.ntrack_l ,"ntr_l/I");
+  tree_out ->Branch("mm",&tr.missing_mass ,"missing_mass/D");
+  tree_out ->Branch("mm_b",&tr.missing_mass_b ,"missing_mass_b/D");
+  tree_out ->Branch("mm_L",&tr.missing_mass_L ,"missing_mass_L/D");
+  tree_out ->Branch("mm_nnL",&tr.missing_mass_nnL ,"missing_mass_nnL/D");
+  tree_out ->Branch("mm_H3L",&tr.missing_mass_H3L ,"missing_mass_H3L/D");
+  tree_out ->Branch("mm_cut",&tr.missing_mass_cut ,"missing_mass_cut/D");
+  tree_out ->Branch("mm_MgL",&tr.missing_mass_MgL ,"missing_mass_MgL/D");
+  tree_out ->Branch("mm_MgL_acc",&tr.missing_mass_MgL_acc ,"missing_mass_MgL_acc/D");
+  tree_out ->Branch("mm_acc",&tr.missing_mass_acc ,"missing_mass_acc/D");
+  tree_out ->Branch("ct_b",&tr.ct_b ,"ct_b/D");
+  tree_out ->Branch("ct_c",&tr.ct_c ,"ct_c/D");
+  tree_out ->Branch("ct_g",&tr.ct_g ,"ct_g/D");
+  tree_out ->Branch("ct_gb",&tr.ct_gb ,"ct_gb/D");
+  tree_out ->Branch("yp_cor",&tr.yp_cor ,"yp_cor/D");
+  tree_out ->Branch("ctimecorR",&tr.ctimecorR ,"ctimecorR/D");
+  tree_out ->Branch("ctimecorL",&tr.ctimecorL ,"ctimecorL/D");
+  tree_out ->Branch("rtof"        ,tr.Rtof      ,"rtof[16]/D"     );
+  tree_out ->Branch("ltof"        ,tr.Ltof      ,"ltof[16]/D"     );  
+  tree_out ->Branch("RS2T"        ,tr.RS2T_F1      ,"RS2T_F1[16]/D"     );
+  tree_out ->Branch("RS2B"        ,tr.RS2B_F1      ,"RS2B_F1[16]/D"     );
+  tree_out ->Branch("LS2T"        ,tr.LS2T_F1      ,"LS2T_F1[16]/D"     );
+  tree_out ->Branch("LS2B"        ,tr.LS2B_F1      ,"LS2B_F1[16]/D"     );
+  tree_out ->Branch("RS2T_c"        ,tr.RS2T_F1_c      ,"RS2T_F1_c[16]/D"     );
+  tree_out ->Branch("RS2B_c"        ,tr.RS2B_F1_c      ,"RS2B_F1_c[16]/D"     );
+  tree_out ->Branch("LS2T_c"        ,tr.LS2T_F1_c      ,"LS2T_F1_c[16]/D"     );
+  tree_out ->Branch("LS2B_c"        ,tr.LS2B_F1_c      ,"LS2B_F1_c[16]/D"     );
+  tree_out ->Branch("RS2T_b"        ,tr.RS2T_F1_b      ,"RS2T_F1_b[16]/D"     );
+  tree_out ->Branch("RS2B_b"        ,tr.RS2B_F1_b      ,"RS2B_F1_b[16]/D"     );
+  tree_out ->Branch("LS2T_b"        ,tr.LS2T_F1_b      ,"LS2T_F1_b[16]/D"     );
+  tree_out ->Branch("LS2B_b"        ,tr.LS2B_F1_b      ,"LS2B_F1_b[16]/D"     );      
+  tree_out ->Branch("RS2T_ref"        ,&tr.RS2T_ref   ,"RS2T_ref/D"     );
+  tree_out ->Branch("RS2B_ref"        ,&tr.RS2B_ref   ,"RS2B_ref/D"     );
+  tree_out ->Branch("LS2T_ref"        ,&tr.LS2T_ref   ,"LS2T_ref/D"     );
+  tree_out ->Branch("LS2B_ref"        ,&tr.LS2B_ref   ,"LS2B_ref/D"     );  
+  tree_out ->Branch("momR"        ,&tr.momR      ,"momR/D"     );
+  tree_out ->Branch("momL"        ,&tr.momL      ,"momL/D"     );
+  tree_out ->Branch("Rs2_pad",tr.Rs2_pad,"Rs2_pad[100]/I");
+  tree_out ->Branch("Ls2_pad",tr.Ls2_pad,"Ls2_pad[100]/I");
+
+  tree_out ->Branch("Rth_fp"          ,&tr.RXpFP        ,"RXpFP/D"       );  
+  tree_out ->Branch("Lth_fp"          ,&tr.LXpFP        ,"LXpFP/D"       );  
+  tree_out ->Branch("Rph_fp"          ,&tr.RYpFP        ,"RYpFP/D"       );  
+  tree_out ->Branch("Lph_fp"          ,&tr.LYpFP        ,"LYpFP/D"       );
+  tree_out ->Branch("Rx_fp"          ,&tr.RXFP        ,"RXFP/D"       );
+  tree_out ->Branch("Lx_fp"          ,&tr.LXFP        ,"LXFP/D"       );  
+  tree_out ->Branch("Ry_fp"          ,&tr.RYFP        ,"RYFP/D"       );  
+  tree_out ->Branch("Ly_fp"          ,&tr.LYFP        ,"LYFP/D"       );
+    
+  tree_out ->Branch("Rth"          ,&tr.RXpt        ,"RXpt/D"       );  
+  tree_out ->Branch("Lth"          ,&tr.LXpt        ,"LXpt/D"       );  
+  tree_out ->Branch("Rph"          ,&tr.RYpt        ,"RYpt/D"       );  
+  tree_out ->Branch("Lph"          ,&tr.LYpt        ,"LYpt/D"       );
+  tree_out ->Branch("Rx"          ,&tr.RXt        ,"RXt/D"       );
+  tree_out ->Branch("Lx"          ,&tr.LXt        ,"LXt/D"       );  
+  tree_out ->Branch("Ry"          ,&tr.RYt        ,"RYt/D"       );
+  tree_out ->Branch("Ly"          ,&tr.LYt        ,"LYt/D"       );    
+  tree_out ->Branch("Rz"          ,&tr.zR        ,"zR/D"       );
+  tree_out ->Branch("Lz"          ,&tr.zL        ,"zL/D"       );
+
+  tree_out ->Branch("ac1_sum"     ,&tr.AC1_sum   ,"AC1_sum/D"  );
+  tree_out ->Branch("ac2_sum"     ,&tr.AC2_sum   ,"AC2_sum/D"  );
+  tree_out ->Branch("ac1_npe_sum"     ,&tr.AC1_npe_sum   ,"AC1_npe_sum/D"  );
+  tree_out ->Branch("ac2_npe_sum"     ,&tr.AC2_npe_sum   ,"AC2_npe_sum/D"  );
+  tree_out ->Branch("ac1_npe"     ,tr.AC1_npe   ,"AC1_npe[24]/D"  );
+  tree_out ->Branch("ac2_npe"     ,tr.AC2_npe   ,"AC2_npe[26]/D"  );    
+  tree_out ->Branch("ct_acc"     ,&tr.ct_acc   ,"ct_acc/D"  );
+  tree_out ->Branch("Rs0ra_p"     ,&tr.Rs0ra_p   ,"Rs0ra_p/D"  );
+  tree_out ->Branch("Rs0la_p"     ,&tr.Rs0la_p   ,"Rs0la_p/D"  );
+  tree_out ->Branch("Rs2ra_p"     ,tr.Rs2ra_p   ,"Rs2ra_p[16]/D"  );
+  tree_out ->Branch("Rs2la_p"     ,tr.Rs2la_p   ,"Rs2la_p[16]/D"  );
+  tree_out ->Branch("Ls2ra_p"     ,tr.Ls2ra_p   ,"Ls2ra_p[16]/D"  );
+  tree_out ->Branch("Ls2la_p"     ,tr.Ls2la_p   ,"Ls2la_p[16]/D"  );  
+  tree_out->Branch("Bp_c"     ,&tr.Bp_c   ,"Bp_c/D"  );
+  tree_out->Branch("Lp_c"     ,&tr.Lp_c   ,"Lp_c/D"  );
+  tree_out->Branch("Rp_c"     ,&tr.Rp_c   ,"Rp_c/D"  );
+  tree_out->Branch("Bp_before"     ,&tr.Bp_before   ,"Bp_before/D"  );
+  tree_out->Branch("Lp_before"     ,&tr.Lp_before   ,"Lp_before/D"  );
+  tree_out->Branch("Rp_before"     ,&tr.Rp_before   ,"Rp_before/D"  );
+  tree_out ->Branch("trig"     ,&tr.trig   ,"trig/D"  );
+  tree_out->Branch("dpe"     ,&tr.dpe   ,"dpe/D"  );
+  tree_out->Branch("dpe_"     ,tr.dpe_   ,"dpe_[10]/D"  );
+  tree_out->Branch("dpk"     ,tr.dpk   ,"dpk[10]/D"  );
+  tree_out->Branch("ct_orig"     ,&tr.ct_orig   ,"ct_orig/D"  );
+  tree_out->Branch("ct_itabashi"     ,&tr.ct_itabashi   ,"ct_itabashi/D"  );
+  tree_out->Branch("tr.ntrack_l"  ,&tr.ntrack_l   ,"tr.ntrack_l/I"  );
+  tree_out->Branch("tr.ntrack_r"  ,&tr.ntrack_r   ,"tr.ntrack_r/I"  );
 
 //ADD 2020/8/12
-    tree_out->Branch("L.tr.chi2"  ,&tr.chi2_l   ,"L.tr.chi2/D"  );
-    tree_out->Branch("L.tr.x"  ,&tr.x_l   ,"L.tr.x/D"  );
-    tree_out->Branch("L.tr.y"  ,&tr.y_l   ,"L.tr.y/D"  );
-    tree_out->Branch("L.tr.th"  ,&tr.th_l   ,"L.tr.th/D"  );
-    tree_out->Branch("L.tr.ph"  ,&tr.ph_l   ,"L.tr.ph/D"  );
-    tree_out->Branch("L.tr.p"  ,&tr.mom_l   ,"L.tr.p/D"  );
-    tree_out->Branch("L.tr.tg_th"  ,&tr.tg_th_l   ,"L.tr.tg_th/D"  );
-    tree_out->Branch("L.tr.tg_ph"  ,&tr.tg_ph_l   ,"L.tr.tg_ph/D"  );
-    tree_out->Branch("L.tr.vz"  ,&tr.vz_l   ,"L.tr.vz/D"  );
+  tree_out->Branch("L.tr.chi2"  ,&tr.chi2_l   ,"L.tr.chi2/D"  );
+  tree_out->Branch("L.tr.x"  ,&tr.x_l   ,"L.tr.x/D"  );
+  tree_out->Branch("L.tr.y"  ,&tr.y_l   ,"L.tr.y/D"  );
+  tree_out->Branch("L.tr.th"  ,&tr.th_l   ,"L.tr.th/D"  );
+  tree_out->Branch("L.tr.ph"  ,&tr.ph_l   ,"L.tr.ph/D"  );
+  tree_out->Branch("L.tr.p"  ,&tr.mom_l   ,"L.tr.p/D"  );
+  tree_out->Branch("L.tr.tg_th"  ,&tr.tg_th_l   ,"L.tr.tg_th/D"  );
+  tree_out->Branch("L.tr.tg_ph"  ,&tr.tg_ph_l   ,"L.tr.tg_ph/D"  );
+  tree_out->Branch("L.tr.vz"  ,&tr.vz_l   ,"L.tr.vz/D"  );
 
-    tree_out->Branch("R.tr.chi2"  ,&tr.chi2_r   ,"R.tr.chi2/D"  );
-    tree_out->Branch("R.tr.x"  ,&tr.x_r   ,"R.tr.x/D"  );
-    tree_out->Branch("R.tr.y"  ,&tr.y_r   ,"R.tr.y/D"  );
-    tree_out->Branch("R.tr.th"  ,&tr.th_r   ,"R.tr.th/D"  );
-    tree_out->Branch("R.tr.ph"  ,&tr.ph_r   ,"R.tr.ph/D"  );
-    tree_out->Branch("R.tr.p"  ,&tr.mom_r   ,"R.tr.p/D"  );
-    tree_out->Branch("R.tr.tg_th"  ,&tr.tg_th_r   ,"R.tr.tg_th/D"  );
-    tree_out->Branch("R.tr.tg_ph"  ,&tr.tg_ph_r   ,"R.tr.tg_ph/D"  );
-    tree_out->Branch("R.tr.vz"  ,&tr.vz_r   ,"R.tr.vz/D"  );
+  tree_out->Branch("R.tr.chi2"  ,&tr.chi2_r   ,"R.tr.chi2/D"  );
+  tree_out->Branch("R.tr.x"  ,&tr.x_r   ,"R.tr.x/D"  );
+  tree_out->Branch("R.tr.y"  ,&tr.y_r   ,"R.tr.y/D"  );
+  tree_out->Branch("R.tr.th"  ,&tr.th_r   ,"R.tr.th/D"  );
+  tree_out->Branch("R.tr.ph"  ,&tr.ph_r   ,"R.tr.ph/D"  );
+  tree_out->Branch("R.tr.p"  ,&tr.mom_r   ,"R.tr.p/D"  );
+  tree_out->Branch("R.tr.tg_th"  ,&tr.tg_th_r   ,"R.tr.tg_th/D"  );
+  tree_out->Branch("R.tr.tg_ph"  ,&tr.tg_ph_r   ,"R.tr.tg_ph/D"  );
+  tree_out->Branch("R.tr.vz"  ,&tr.vz_r   ,"R.tr.vz/D"  );
 
+//////////////
+//Parameters//
+//////////////
+
+  min_mm=-0.1;//GeV/c^2
+  max_mm=0.2;//GeV/c^2
+  bin_mm=(max_mm-min_mm)/0.001; //Counts/2 MeV
+  bin_mm=(int)bin_mm;
+	iter_ac1=30;//iteration number
+ min_s2=-10;
+ max_s2=5000;
+ bin_s2=max_s2-min_s2;
+        bin_coin=(int)(max_coin-min_coin)/tdc_time;
+        bin_coin_c=(int)((max_coin_c-min_coin_c)/tdc_time);
+cout<<"tdc"<<tdc_time<<endl;
+cout<<"max coin"<<max_coin_c<<endl;
+cout<<"min coin"<<min_coin_c<<endl;
+cout<<"bin coin"<<bin_coin_c<<endl;
+//        bin_coin_c=(int)(max_coin_c-min_coin_c)/tdc_time;
+//        bin_coin_c=(int)750;
+//////////////////////////////////////////////////////////////should be changed
+//        bin_beta=6000;
+//	bin_adc=(int)max_adc-min_adc;
+//	bin_ac1=(int)(max_ac1-min_ac1)*3; 
+//	bin_ac2=(int)(max_ac2-min_ac2)*3; 
 
 /////////////
 //// Z  /////
 /////////////
 
-	npe_sum_a1 = new TH1F("npe_sum_a1","NPE SUM A1",2000,0.,40.);
+	  npe_sum_a1 = new TH1F("npe_sum_a1","NPE SUM A1",2000,0.,40.);
 //	  npe_sum_a2 = new TH1F("npe_sum_a2","NPE SUM A2",4000,0.,80.);
-	npe_sum_a2 = new TH1F("npe_sum_a2","NPE SUM A2 (Kaon)",300,0.,30.);
+	  npe_sum_a2 = new TH1F("npe_sum_a2","NPE SUM A2 (Kaon)",300,0.,30.);
 ////--------------------------------------------//
   
 /////////////
 //// BPM ////
 /////////////
-    h_rbay_rbax = new TH2D("h_rbay_rbax","h_rbay_rbax",200,-4,4,200,-3,7);
-    h_rbby_rbbx = new TH2D("h_rbby_rbbx","h_rbby_rbbx",200,-4,4,200,-3,7);
-    h_rby_rbx   = new TH2D("h_rby_rbx"  ,"h_rby_rbx"  ,200,-6,4,200,-6,4);
-    set->SetTH2(h_rbay_rbax,"BPM A"         ,"X","Y");
-    set->SetTH2(h_rbby_rbbx,"BPM B"         ,"X","Y");
-    set->SetTH2(h_rby_rbx  ,"Raster Pattern","X","Y");
+  h_rbay_rbax = new TH2D("h_rbay_rbax","h_rbay_rbax",200,-4,4,200,-3,7);
+  h_rbby_rbbx = new TH2D("h_rbby_rbbx","h_rbby_rbbx",200,-4,4,200,-3,7);
+  h_rby_rbx   = new TH2D("h_rby_rbx"  ,"h_rby_rbx"  ,200,-6,4,200,-6,4);
+  set->SetTH2(h_rbay_rbax,"BPM A"         ,"X","Y");
+  set->SetTH2(h_rbby_rbbx,"BPM B"         ,"X","Y");
+  set->SetTH2(h_rby_rbx  ,"Raster Pattern","X","Y");
 
 //////////////
 //// LHRS ////
 //////////////
 cout<<"LHRS Set TH"<<endl;
-    h_L_trig = new TH1D("h_L_trig","h_L_trig",10,0,10);
-    set->SetTH1(h_L_trig,"Trigger Flag","Trig No.","Counts");
+  h_L_trig = new TH1D("h_L_trig","h_L_trig",10,0,10);
+  set->SetTH1(h_L_trig,"Trigger Flag","Trig No.","Counts");
 
-    h_L_tr_n      = new TH1D("h_L_tr_n"     ,"h_L_tr_n"     ,15 ,    0,  15);
-    h_L_tr_ch2    = new TH1D("h_L_tr_ch2"   ,"h_L_tr_ch2"   ,400,    0,0.03);
-    h_L_p         = new TH1D("h_L_p"        ,"h_L_p"        ,400,  1.9, 2.3);
-    h_L_pathl     = new TH1D("h_L_pathl"    ,"h_L_pathl"    ,400, 25.2,26.3);
-    h_L_px        = new TH1D("h_L_px"       ,"h_L_px"       ,400, 0.35, 0.6);
-    h_L_py        = new TH1D("h_L_py"       ,"h_L_py"       ,400, -0.2, 0.2);
-    h_L_pz        = new TH1D("h_L_pz"       ,"h_L_pz"       ,400, 1.85,2.25);
-    h_L_tgy       = new TH1D("h_L_tgy"      ,"h_L_tgy"      ,400,-0.06,0.06);
-    h_L_tgth      = new TH1D("h_L_tgth"     ,"h_L_tgth"     ,400, -0.1, 0.1);
-    h_L_tgph      = new TH1D("h_L_tgph"     ,"h_L_tgph"     ,400,-0.06,0.06);
-    h_L_vx        = new TH1D("h_L_vx"       ,"h_L_vx"       ,400,-0.005,0.002);
-    h_L_vy        = new TH1D("h_L_vy"       ,"h_L_vy"       ,400,-0.004,0.003);
-    h_L_vz        = new TH1D("h_L_vz"       ,"h_L_vz"       ,400,-0.25,0.25);
-    h_L_vz2       = new TH1D("h_L_vz2"      ,"h_L_vz2"      ,400,-0.25,0.25);
-    h_L_y_x       = new TH2D("h_L_y_x"      ,"h_L_y_x"      ,200,   -1,  1 ,200,-0.1,0.1);
-    h_L_th_x      = new TH2D("h_L_th_x"     ,"h_L_th_x"     ,200,   -1,  1 ,200,-0.2,0.2);
-    h_L_ph_y      = new TH2D("h_L_ph_y"     ,"h_L_ph_y"     ,200, -0.1, 0.1,200,-0.1,0.1);
-    h_L_tgph_tgth = new TH2D("h_L_tgph_tgth","L_th : L_ph (w/ theta_ee Cut)",200, -0.1, 0.1,200,-0.06,0.06);
-//    h_L_tgph_tgth2 = new TH2D("h_L_tgph_tgth2","L_th : L_ph (w/ Z, AC, Kaon(ct) Cut)",200, -0.1, 0.1,200,-0.06,0.06);
-    h_L_tgph_tgth2 = new TH2D("h_L_tgph_tgth2","L_th : L_ph (w/ VP Flux Cut)",200, -0.1, 0.1,200,-0.06,0.06);
-    h_L_tgph_tgth3 = new TH2D("h_L_tgph_tgth3","L_th : L_ph (w/ Z Cut)",200, -0.1, 0.1,200,-0.06,0.06);
-    h_L_tgph_tgth4 = new TH2D("h_L_tgph_tgth4","L_th : L_ph (w/ AC Cut)",200, -0.1, 0.1,200,-0.06,0.06);
-    h_L_tgph_tgth5 = new TH2D("h_L_tgph_tgth5","L_th : L_ph (w/ Z, AC Cut)",200, -0.1, 0.1,200,-0.06,0.06);
-    h_L_tgph_tgth6 = new TH2D("h_L_tgph_tgth6","L_th : L_ph (w/ ZZ_zone1 Cut)",200, -0.1, 0.1,200,-0.06,0.06);
-    h_L_tgph_tgth7 = new TH2D("h_L_tgph_tgth7","L_th : L_ph (w/ ZZ_zone2 Cut)",200, -0.1, 0.1,200,-0.06,0.06);
-    h_L_tgph_tgth8 = new TH2D("h_L_tgph_tgth8","L_th : L_ph (w/ ZZ_zone3 Cut)",200, -0.1, 0.1,200,-0.06,0.06);
-    h_L_tgph_tgth9 = new TH2D("h_L_tgph_tgth9","L_th : L_ph (w/ ZZ_zone4 Cut)",200, -0.1, 0.1,200,-0.06,0.06);
-    h_L_tgph_tgth10 = new TH2D("h_L_tgph_tgth10","L_th : L_ph (Al front)",200, -0.1, 0.1,200,-0.06,0.06);
-    h_L_tgph_tgth11 = new TH2D("h_L_tgph_tgth11","L_th : L_ph (Al back)",200, -0.1, 0.1,200,-0.06,0.06);
-    h_L_tgph_tgth12 = new TH2D("h_L_tgph_tgth12","L_th : L_ph (No Cut)",200, -0.1, 0.1,200,-0.06,0.06);
-    h_LHRS_phth = new TH2D("h_LHRS_phth","L_th : L_ph (LHRS frame), No Cut",200, 0., 0.1,200,0.,2*PI);
-    h_LHRS_phth2 = new TH2D("h_LHRS_phth2","L_th : L_ph (LHRS frame), w/ Z, AC",200, 0., 0.1,200,0.,2*PI);
-    h_original_phth = new TH2D("h_original_phth","L_th : L_ph (original frame), No Cut",200, 0.1, 0.35,200,1.,2.);
-    h_original_phcosth = new TH2D("h_original_phcosth","L_th : L_ph (original frame), 2.1<pL<2.15",200, 0.95, 1.,200,1.,2.);
-    h_original_phcosth2 = new TH2D("h_original_phcosth2","L_th : L_ph (original frame), pL>2.16",200, 0.95, 1.,200,1.,2.);
-    h_original_phth2 = new TH2D("h_original_phth2","L_th : L_ph (original frame), w/ Z, AC Cut",200, 0.1, 0.35,200,1.,2.);
-    h_original_phth3 = new TH2D("h_original_phth3","L_th : L_ph (original frame), top quality",200, 0.1, 0.35,200,1.,2.);
-    h_original_phth4 = new TH2D("h_original_phth4","L_th : L_ph (original frame), w/ Z Cut",200, 0.1, 0.35,200,1.,2.);
-    h_original_phth5 = new TH2D("h_original_phth5","L_th : L_ph (original frame), w/ Z Cut, p>2.18",200, 0.1, 0.35,200,1.,2.);
-    h_original_phth6 = new TH2D("h_original_phth6","L_th : L_ph (original frame), w/ Z Cut, 2.1<p<2.16",200, 0.1, 0.35,200,1.,2.);
-    h_original_phth7 = new TH2D("h_original_phth7","L_th : L_ph (original frame), w/ Z Cut, 2.10<p<2.12",200, 0.1, 0.35,200,1.,2.);
-    h_original_phth8 = new TH2D("h_original_phth8","L_th : L_ph (original frame), w/ Z Cut, 2.12<p<2.14",200, 0.1, 0.35,200,1.,2.);
-    h_original_phth9 = new TH2D("h_original_phth9","L_th : L_ph (original frame), w/ Z Cut, 2.18<p<2.2",200, 0.1, 0.35,200,1.,2.);
-    h_original_phth10 = new TH2D("h_original_phth10","L_th : L_ph (original frame), w/ Z Cut, 2.2<p<2.22",200, 0.1, 0.35,200,1.,2.);
-    h_L_z_x       = new TH2D("h_L_z_x"      ,"h_L_z_x"      ,200,   -1.,1.,  200,-0.25,0.25);
-    h_L_z_y       = new TH2D("h_L_z_y"      ,"h_L_z_y"      ,200,   -0.1,0.1,  200,-0.25,0.25);
-    h_L_th_y      = new TH2D("h_L_th_y"     ,"h_L_th_y"     ,200,   -0.1,  0.1 ,200,-0.1,0.1);
-    h_L_ph_x      = new TH2D("h_L_ph_x"     ,"h_L_ph_x"     ,200, -1., 1.,200,-0.1,0.1);
-    h_L_th_z      = new TH2D("h_L_th_z"      ,"h_L_th_z"      ,200,   -0.25,  0.25 ,200,-0.1,0.1);
-    h_L_ph_z      = new TH2D("h_L_ph_z"      ,"h_L_ph_z"      ,200,   -0.25,  0.25 ,200,-0.1,0.1);
-    h_L_tgth_x      = new TH2D("h_L_tgth_x"     ,"h_L_tgth_x"     ,200,   -1,  1 ,200,-0.1,0.1);
-    h_L_tgph_y      = new TH2D("h_L_tgph_y"     ,"h_L_tgph_y"     ,200, -0.1, 0.1,200,-0.1,0.1);
-    h_L_tgth_y      = new TH2D("h_L_tgth_y"     ,"h_L_tgth_y"     ,200,   -0.1,  0.1 ,200,-0.1,0.1);
-    h_L_tgph_x      = new TH2D("h_L_tgph_x"     ,"h_L_tgph_x"     ,200, -1., 1.,200,-0.1,0.1);
-    h_L_tgth_z      = new TH2D("h_L_tgth_z"      ,"h_L_tgth_z"      ,200,   -0.25,  0.25 ,200,-0.1,0.1);
-    h_L_tgph_z      = new TH2D("h_L_tgph_z"      ,"h_L_tgph_z"      ,200,   -0.25,  0.25 ,200,-0.1,0.1);
-    h_L_corR_tgth   = new TH2D("h_L_corR_tgth",	"h_L_corR_tgth",	200, -0.1, 0.1, 200, -5., 5.);	
-    h_L_corR_tgph   = new TH2D("h_L_corR_tgph",	"h_L_corR_tgph",	200, -0.1, 0.1, 200, -5., 5.);	
-    h_L_corR_th   = new TH2D("h_L_corR_th",	"h_L_corR_th",	200, -0.1, 0.1, 200, -5., 5.);	
-    h_L_corR_ph   = new TH2D("h_L_corR_ph",	"h_L_corR_ph",	200, -0.1, 0.1, 200, -5., 5.);	
-    h_L_corR_x   = new TH2D("h_L_corR_x",	"h_L_corR_x",	200, -1., 1., 200, -5., 5.);	
-    h_L_corR_y   = new TH2D("h_L_corR_y",	"h_L_corR_y",	200, -0.1, 0.1, 200, -5., 5.);	
-    h_L_corR_z   = new TH2D("h_L_corR_z",	"h_L_corR_z",	200, -0.25, 0.25, 200, -5., 5.);	
-    h_L_corR_zdiff   = new TH2D("h_L_corR_zdiff",	"h_L_corR_zdiff",	200, -0.25, 0.25, 200, -5., 5.);	
-    h_L_corL_tgth   = new TH2D("h_L_corL_tgth",	"h_L_corL_tgth",	200, -0.1, 0.1, 200, -5., 5.);	
-    h_L_corL_tgph   = new TH2D("h_L_corL_tgph",	"h_L_corL_tgph",	200, -0.1, 0.1, 200, -5., 5.);	
-    h_L_corL_th   = new TH2D("h_L_corL_th",	"h_L_corL_th",	200, -0.1, 0.1, 200, -5., 5.);	
-    h_L_corL_ph   = new TH2D("h_L_corL_ph",	"h_L_corL_ph",	200, -0.1, 0.1, 200, -5., 5.);	
-    h_L_corL_x   = new TH2D("h_L_corL_x",	"h_L_corL_x",	200, -1., 1., 200, -5., 5.);	
-    h_L_corL_y   = new TH2D("h_L_corL_y",	"h_L_corL_y",	200, -0.1, 0.1, 200, -5., 5.);	
-    h_L_corL_z   = new TH2D("h_L_corL_z",	"h_L_corL_z",	200, -0.25, 0.25, 200, -5., 5.);	
-    h_L_corL_zdiff   = new TH2D("h_L_corL_zdiff",	"h_L_corL_zdiff",	200, -0.25, 0.25, 200, -5., 5.);	
-    h_L_ct_zdiff   = new TH2D("h_L_ct_zdiff",	"h_L_ct_zdiff",	200, -0.25, 0.25, bin_coin_c, min_coin_c, max_coin_c);	
-    h_L_corsum_zdiff   = new TH2D("h_L_corsum_zdiff",	"h_L_corsum_zdiff",	200, -0.25, 0.25, 200, -5., 5.);	
-    h_L_cordiff_zdiff   = new TH2D("h_L_cordiff_zdiff",	"h_L_cordiff_zdiff",	200, -0.25, 0.25, 200, -5., 5.);	
-    h_L_corL_corR   = new TH2D("h_L_corL_corR",	"h_L_corL_corR",	200, -5., 5., 200, -5., 5.);	
+  h_L_tr_n      = new TH1D("h_L_tr_n"     ,"h_L_tr_n"     ,15 ,    0,  15);
+  h_L_tr_ch2    = new TH1D("h_L_tr_ch2"   ,"h_L_tr_ch2"   ,400,    0,0.03);
+  h_L_p         = new TH1D("h_L_p"        ,"h_L_p"        ,400,  1.9, 2.3);
+  h_L_pathl     = new TH1D("h_L_pathl"    ,"h_L_pathl"    ,400, 25.2,26.3);
+  h_L_px        = new TH1D("h_L_px"       ,"h_L_px"       ,400, 0.35, 0.6);
+  h_L_py        = new TH1D("h_L_py"       ,"h_L_py"       ,400, -0.2, 0.2);
+  h_L_pz        = new TH1D("h_L_pz"       ,"h_L_pz"       ,400, 1.85,2.25);
+  h_L_tgy       = new TH1D("h_L_tgy"      ,"h_L_tgy"      ,400,-0.06,0.06);
+  h_L_tgth      = new TH1D("h_L_tgth"     ,"h_L_tgth"     ,400, -0.1, 0.1);
+  h_L_tgph      = new TH1D("h_L_tgph"     ,"h_L_tgph"     ,400,-0.06,0.06);
+  h_L_vx        = new TH1D("h_L_vx"       ,"h_L_vx"       ,400,-0.005,0.002);
+  h_L_vy        = new TH1D("h_L_vy"       ,"h_L_vy"       ,400,-0.004,0.003);
+  h_L_vz        = new TH1D("h_L_vz"       ,"h_L_vz"       ,400,-0.25,0.25);
+  h_L_vz2       = new TH1D("h_L_vz2"      ,"h_L_vz2"      ,400,-0.25,0.25);
+  h_L_y_x       = new TH2D("h_L_y_x"      ,"h_L_y_x"      ,200,   -1,  1 ,200,-0.1,0.1);
+  h_L_th_x      = new TH2D("h_L_th_x"     ,"h_L_th_x"     ,200,   -1,  1 ,200,-0.2,0.2);
+  h_L_ph_y      = new TH2D("h_L_ph_y"     ,"h_L_ph_y"     ,200, -0.1, 0.1,200,-0.1,0.1);
+  h_L_tgph_tgth = new TH2D("h_L_tgph_tgth","L_th : L_ph (w/ theta_ee Cut)",200, -0.1, 0.1,200,-0.06,0.06);
+//  h_L_tgph_tgth2 = new TH2D("h_L_tgph_tgth2","L_th : L_ph (w/ Z, AC, Kaon(ct) Cut)",200, -0.1, 0.1,200,-0.06,0.06);
+  h_L_tgph_tgth2 = new TH2D("h_L_tgph_tgth2","L_th : L_ph (w/ VP Flux Cut)",200, -0.1, 0.1,200,-0.06,0.06);
+  h_L_tgph_tgth3 = new TH2D("h_L_tgph_tgth3","L_th : L_ph (w/ Z Cut)",200, -0.1, 0.1,200,-0.06,0.06);
+  h_L_tgph_tgth4 = new TH2D("h_L_tgph_tgth4","L_th : L_ph (w/ AC Cut)",200, -0.1, 0.1,200,-0.06,0.06);
+  h_L_tgph_tgth5 = new TH2D("h_L_tgph_tgth5","L_th : L_ph (w/ Z, AC Cut)",200, -0.1, 0.1,200,-0.06,0.06);
+  h_L_tgph_tgth6 = new TH2D("h_L_tgph_tgth6","L_th : L_ph (w/ ZZ_zone1 Cut)",200, -0.1, 0.1,200,-0.06,0.06);
+  h_L_tgph_tgth7 = new TH2D("h_L_tgph_tgth7","L_th : L_ph (w/ ZZ_zone2 Cut)",200, -0.1, 0.1,200,-0.06,0.06);
+  h_L_tgph_tgth8 = new TH2D("h_L_tgph_tgth8","L_th : L_ph (w/ ZZ_zone3 Cut)",200, -0.1, 0.1,200,-0.06,0.06);
+  h_L_tgph_tgth9 = new TH2D("h_L_tgph_tgth9","L_th : L_ph (w/ ZZ_zone4 Cut)",200, -0.1, 0.1,200,-0.06,0.06);
+  h_L_tgph_tgth10 = new TH2D("h_L_tgph_tgth10","L_th : L_ph (Al front)",200, -0.1, 0.1,200,-0.06,0.06);
+  h_L_tgph_tgth11 = new TH2D("h_L_tgph_tgth11","L_th : L_ph (Al back)",200, -0.1, 0.1,200,-0.06,0.06);
+  h_L_tgph_tgth12 = new TH2D("h_L_tgph_tgth12","L_th : L_ph (No Cut)",200, -0.1, 0.1,200,-0.06,0.06);
+  h_LHRS_phth = new TH2D("h_LHRS_phth","L_th : L_ph (LHRS frame), No Cut",200, 0., 0.1,200,0.,2*PI);
+  h_LHRS_phth2 = new TH2D("h_LHRS_phth2","L_th : L_ph (LHRS frame), w/ Z, AC",200, 0., 0.1,200,0.,2*PI);
+  h_original_phth = new TH2D("h_original_phth","L_th : L_ph (original frame), No Cut",200, 0.1, 0.35,200,1.,2.);
+  h_original_phcosth = new TH2D("h_original_phcosth","L_th : L_ph (original frame), 2.1<pL<2.15",200, 0.95, 1.,200,1.,2.);
+  h_original_phcosth2 = new TH2D("h_original_phcosth2","L_th : L_ph (original frame), pL>2.16",200, 0.95, 1.,200,1.,2.);
+  h_original_phth2 = new TH2D("h_original_phth2","L_th : L_ph (original frame), w/ Z, AC Cut",200, 0.1, 0.35,200,1.,2.);
+  h_original_phth3 = new TH2D("h_original_phth3","L_th : L_ph (original frame), top quality",200, 0.1, 0.35,200,1.,2.);
+  h_original_phth4 = new TH2D("h_original_phth4","L_th : L_ph (original frame), w/ Z Cut",200, 0.1, 0.35,200,1.,2.);
+  h_original_phth5 = new TH2D("h_original_phth5","L_th : L_ph (original frame), w/ Z Cut, p>2.18",200, 0.1, 0.35,200,1.,2.);
+  h_original_phth6 = new TH2D("h_original_phth6","L_th : L_ph (original frame), w/ Z Cut, 2.1<p<2.16",200, 0.1, 0.35,200,1.,2.);
+  h_original_phth7 = new TH2D("h_original_phth7","L_th : L_ph (original frame), w/ Z Cut, 2.10<p<2.12",200, 0.1, 0.35,200,1.,2.);
+  h_original_phth8 = new TH2D("h_original_phth8","L_th : L_ph (original frame), w/ Z Cut, 2.12<p<2.14",200, 0.1, 0.35,200,1.,2.);
+  h_original_phth9 = new TH2D("h_original_phth9","L_th : L_ph (original frame), w/ Z Cut, 2.18<p<2.2",200, 0.1, 0.35,200,1.,2.);
+  h_original_phth10 = new TH2D("h_original_phth10","L_th : L_ph (original frame), w/ Z Cut, 2.2<p<2.22",200, 0.1, 0.35,200,1.,2.);
+  h_L_z_x       = new TH2D("h_L_z_x"      ,"h_L_z_x"      ,200,   -1.,1.,  200,-0.25,0.25);
+  h_L_z_y       = new TH2D("h_L_z_y"      ,"h_L_z_y"      ,200,   -0.1,0.1,  200,-0.25,0.25);
+  h_L_th_y      = new TH2D("h_L_th_y"     ,"h_L_th_y"     ,200,   -0.1,  0.1 ,200,-0.1,0.1);
+  h_L_ph_x      = new TH2D("h_L_ph_x"     ,"h_L_ph_x"     ,200, -1., 1.,200,-0.1,0.1);
+  h_L_th_z      = new TH2D("h_L_th_z"      ,"h_L_th_z"      ,200,   -0.25,  0.25 ,200,-0.1,0.1);
+  h_L_ph_z      = new TH2D("h_L_ph_z"      ,"h_L_ph_z"      ,200,   -0.25,  0.25 ,200,-0.1,0.1);
+  h_L_tgth_x      = new TH2D("h_L_tgth_x"     ,"h_L_tgth_x"     ,200,   -1,  1 ,200,-0.1,0.1);
+  h_L_tgph_y      = new TH2D("h_L_tgph_y"     ,"h_L_tgph_y"     ,200, -0.1, 0.1,200,-0.1,0.1);
+  h_L_tgth_y      = new TH2D("h_L_tgth_y"     ,"h_L_tgth_y"     ,200,   -0.1,  0.1 ,200,-0.1,0.1);
+  h_L_tgph_x      = new TH2D("h_L_tgph_x"     ,"h_L_tgph_x"     ,200, -1., 1.,200,-0.1,0.1);
+  h_L_tgth_z      = new TH2D("h_L_tgth_z"      ,"h_L_tgth_z"      ,200,   -0.25,  0.25 ,200,-0.1,0.1);
+  h_L_tgph_z      = new TH2D("h_L_tgph_z"      ,"h_L_tgph_z"      ,200,   -0.25,  0.25 ,200,-0.1,0.1);
+  h_L_corR_tgth   = new TH2D("h_L_corR_tgth",	"h_L_corR_tgth",	200, -0.1, 0.1, 200, -5., 5.);	
+  h_L_corR_tgph   = new TH2D("h_L_corR_tgph",	"h_L_corR_tgph",	200, -0.1, 0.1, 200, -5., 5.);	
+  h_L_corR_th   = new TH2D("h_L_corR_th",	"h_L_corR_th",	200, -0.1, 0.1, 200, -5., 5.);	
+  h_L_corR_ph   = new TH2D("h_L_corR_ph",	"h_L_corR_ph",	200, -0.1, 0.1, 200, -5., 5.);	
+  h_L_corR_x   = new TH2D("h_L_corR_x",	"h_L_corR_x",	200, -1., 1., 200, -5., 5.);	
+  h_L_corR_y   = new TH2D("h_L_corR_y",	"h_L_corR_y",	200, -0.1, 0.1, 200, -5., 5.);	
+  h_L_corR_z   = new TH2D("h_L_corR_z",	"h_L_corR_z",	200, -0.25, 0.25, 200, -5., 5.);	
+  h_L_corR_zdiff   = new TH2D("h_L_corR_zdiff",	"h_L_corR_zdiff",	200, -0.25, 0.25, 200, -5., 5.);	
+  h_L_corL_tgth   = new TH2D("h_L_corL_tgth",	"h_L_corL_tgth",	200, -0.1, 0.1, 200, -5., 5.);	
+  h_L_corL_tgph   = new TH2D("h_L_corL_tgph",	"h_L_corL_tgph",	200, -0.1, 0.1, 200, -5., 5.);	
+  h_L_corL_th   = new TH2D("h_L_corL_th",	"h_L_corL_th",	200, -0.1, 0.1, 200, -5., 5.);	
+  h_L_corL_ph   = new TH2D("h_L_corL_ph",	"h_L_corL_ph",	200, -0.1, 0.1, 200, -5., 5.);	
+  h_L_corL_x   = new TH2D("h_L_corL_x",	"h_L_corL_x",	200, -1., 1., 200, -5., 5.);	
+  h_L_corL_y   = new TH2D("h_L_corL_y",	"h_L_corL_y",	200, -0.1, 0.1, 200, -5., 5.);	
+  h_L_corL_z   = new TH2D("h_L_corL_z",	"h_L_corL_z",	200, -0.25, 0.25, 200, -5., 5.);	
+  h_L_corL_zdiff   = new TH2D("h_L_corL_zdiff",	"h_L_corL_zdiff",	200, -0.25, 0.25, 200, -5., 5.);	
+  h_L_ct_zdiff   = new TH2D("h_L_ct_zdiff",	"h_L_ct_zdiff",	200, -0.25, 0.25, bin_coin_c, min_coin_c, max_coin_c);	
+  h_L_corsum_zdiff   = new TH2D("h_L_corsum_zdiff",	"h_L_corsum_zdiff",	200, -0.25, 0.25, 200, -5., 5.);	
+  h_L_cordiff_zdiff   = new TH2D("h_L_cordiff_zdiff",	"h_L_cordiff_zdiff",	200, -0.25, 0.25, 200, -5., 5.);	
+  h_L_corL_corR   = new TH2D("h_L_corL_corR",	"h_L_corL_corR",	200, -5., 5., 200, -5., 5.);	
 
-    
+  
  
-    set->SetTH1(h_L_tr_n     ,"No. of Tracks"           ,"No. of Tracks"   ,"Counts");
-    set->SetTH1(h_L_tr_ch2   ,"Tracking #chi^{2}"       ,"#chi^{2}"        ,"Counts");
-    set->SetTH1(h_L_p        ,"Track Momentum"          ,"p (GeV/#it{c})"  ,"Counts");
-    set->SetTH1(h_L_pathl    ,"Track Path Length"       ,"l (m)"           ,"Counts");
-    set->SetTH1(h_L_px       ,"Momentum X"              ,"px (GeV/#it{c})" ,"Counts");
-    set->SetTH1(h_L_py       ,"Momentum Y"              ,"py (GeV/#it{c})" ,"Counts");
-    set->SetTH1(h_L_pz       ,"Momentum Z"              ,"pz (GeV/#it{c})" ,"Counts");
-    set->SetTH1(h_L_tgy      ,"Target Plane Y"          ,"y_{t} (m)"       ,"Counts");
-    set->SetTH1(h_L_tgth     ,"Target Plane #theta"     ,"#theta_{t} (rad)","Counts");
-    set->SetTH1(h_L_tgph     ,"Target Plane #phi"       ,"#phi_{t} (rad)"  ,"Counts");
-    set->SetTH1(h_L_vx       ,"Vertex X"                ,"x_{v} (m)"       ,"Counts");
-    set->SetTH1(h_L_vy       ,"Vertex Y"                ,"y_{v} (m)"       ,"Counts");
-    set->SetTH1(h_L_vz       ,"Vertex Z"                ,"z_{v} (m)"       ,"Counts");
-    set->SetTH2(h_L_y_x      ,"Focal Plane Y v.s X"     ,"X (m)"           ,"Y (m)");
-    set->SetTH2(h_L_z_x      ,"Focal Plane Z v.s X"     ,"X (m)"           ,"Z (m)");
-    set->SetTH2(h_L_z_y      ,"Focal Plane Z v.s Y"     ,"Y (m)"           ,"Z (m)");
-    set->SetTH2(h_L_th_x     ,"Focal Plane #theta v.s X","X (m)"           ,"#theta (rad)");
-    set->SetTH2(h_L_ph_y     ,"Focal Plane #phi v.s Y"  ,"Y (m)"           ,"#phi (rad)");
-    set->SetTH2(h_L_th_y     ,"Focal Plane #theta v.s Y","Y (m)"           ,"#theta (rad)");
-    set->SetTH2(h_L_ph_x     ,"Focal Plane #phi v.s X"  ,"X (m)"           ,"#phi (rad)");
-    set->SetTH2(h_L_th_z     ,"Focal Plane #theta v.s Z","Z (m)"           ,"#theta (rad)");
-    set->SetTH2(h_L_ph_z     ,"Focal Plane #phi v.s Z"  ,"Z (m)"           ,"#phi (rad)");
-    set->SetTH2(h_L_tgph_tgth,"Target #phi v.s #theta (w/ theta_ee Cut)"  ,"#theta_{t} (rad)","#phi_{t} (rad)");
+  set->SetTH1(h_L_tr_n     ,"No. of Tracks"           ,"No. of Tracks"   ,"Counts");
+  set->SetTH1(h_L_tr_ch2   ,"Tracking #chi^{2}"       ,"#chi^{2}"        ,"Counts");
+  set->SetTH1(h_L_p        ,"Track Momentum"          ,"p (GeV/#it{c})"  ,"Counts");
+  set->SetTH1(h_L_pathl    ,"Track Path Length"       ,"l (m)"           ,"Counts");
+  set->SetTH1(h_L_px       ,"Momentum X"              ,"px (GeV/#it{c})" ,"Counts");
+  set->SetTH1(h_L_py       ,"Momentum Y"              ,"py (GeV/#it{c})" ,"Counts");
+  set->SetTH1(h_L_pz       ,"Momentum Z"              ,"pz (GeV/#it{c})" ,"Counts");
+  set->SetTH1(h_L_tgy      ,"Target Plane Y"          ,"y_{t} (m)"       ,"Counts");
+  set->SetTH1(h_L_tgth     ,"Target Plane #theta"     ,"#theta_{t} (rad)","Counts");
+  set->SetTH1(h_L_tgph     ,"Target Plane #phi"       ,"#phi_{t} (rad)"  ,"Counts");
+  set->SetTH1(h_L_vx       ,"Vertex X"                ,"x_{v} (m)"       ,"Counts");
+  set->SetTH1(h_L_vy       ,"Vertex Y"                ,"y_{v} (m)"       ,"Counts");
+  set->SetTH1(h_L_vz       ,"Vertex Z"                ,"z_{v} (m)"       ,"Counts");
+  set->SetTH2(h_L_y_x      ,"Focal Plane Y v.s X"     ,"X (m)"           ,"Y (m)");
+  set->SetTH2(h_L_z_x      ,"Focal Plane Z v.s X"     ,"X (m)"           ,"Z (m)");
+  set->SetTH2(h_L_z_y      ,"Focal Plane Z v.s Y"     ,"Y (m)"           ,"Z (m)");
+  set->SetTH2(h_L_th_x     ,"Focal Plane #theta v.s X","X (m)"           ,"#theta (rad)");
+  set->SetTH2(h_L_ph_y     ,"Focal Plane #phi v.s Y"  ,"Y (m)"           ,"#phi (rad)");
+  set->SetTH2(h_L_th_y     ,"Focal Plane #theta v.s Y","Y (m)"           ,"#theta (rad)");
+  set->SetTH2(h_L_ph_x     ,"Focal Plane #phi v.s X"  ,"X (m)"           ,"#phi (rad)");
+  set->SetTH2(h_L_th_z     ,"Focal Plane #theta v.s Z","Z (m)"           ,"#theta (rad)");
+  set->SetTH2(h_L_ph_z     ,"Focal Plane #phi v.s Z"  ,"Z (m)"           ,"#phi (rad)");
+  set->SetTH2(h_L_tgph_tgth,"Target #phi v.s #theta (w/ theta_ee Cut)"  ,"#theta_{t} (rad)","#phi_{t} (rad)");
 
-    h_L_beta        = new TH1D("h_L_beta"       ,"h_L_beta"       ,400,   0,  2); 
-    //h_L_m2          = new TH1D("h_L_m2"         ,"h_L_m2"         ,400,-0.5,2.5); 
-    h_L_m2          = new TH1D("h_L_m2"         ,"h_L_m2"         ,400,-0.5,1.5); 
-    h_L_beta_p      = new TH2D("h_L_beta_p"     ,"h_L_beta_p"     ,200, 1.9,2.3,200,   0,  2); 
-    h_L_beta_m2     = new TH2D("h_L_beta_m2"    ,"h_L_beta_m2"    ,200,-0.5,  2,200,   0,  2); 
-    h_L_dedx_p      = new TH2D("h_L_dedx_p"     ,"h_L_dedx_p"     ,200, 1.9,2.3,200,   0, 10); 
-    h_L_dedx_m2     = new TH2D("h_L_dedx_m2"    ,"h_L_dedx_m2"    ,200,-0.5,  2,200,   0, 10); 
-    h_L_s0_dedx     = new TH1D("h_L_s0_dedx"    ,"h_L_s0_dedx"    ,400,   0, 10); 
-    h_L_s0_beta_x   = new TH2D("h_L_s0_beta_x"  ,"h_L_s0_beta_x"  ,200,  -1,  1,200,   0,  2); 
-    h_L_s0_dedx_x   = new TH2D("h_L_s0_dedx_x"  ,"h_L_s0_dedx_x"  ,200,  -1,  1,200,   0, 10); 
-    h_L_s2_pad      = new TH1D("h_L_s2_pad"     ,"h_L_s2_pad"     , 18,  -1, 17); 
-    h_L_s2_dedx     = new TH1D("h_L_s2_dedx"    ,"h_L_s2_dedx"    ,400,   0, 10); 
-    h_L_s2_beta_x   = new TH2D("h_L_s2_beta_x"  ,"h_L_s2_beta_x"  ,200,  -1,  1,200,   0,  2); 
-    h_L_s2_dedx_x   = new TH2D("h_L_s2_dedx_x"  ,"h_L_s2_dedx_x"  ,200,  -1,  1,200,   0, 10); 
-    h_L_s2_beta_pad = new TH2D("h_L_s2_beta_pad","h_L_s2_beta_pad", 16,  0, 16,200,    0,  2); 
-    h_L_s2_dedx_pad = new TH2D("h_L_s2_dedx_pad","h_L_s2_dedx_pad", 16,  0, 16,200,    0, 10); 
-    set->SetTH1(h_L_beta       ,"Track beta"                    ,"#beta"                ,"Counts");
-    set->SetTH1(h_L_m2         ,"Mass Square"                   ,"M^{2} (GeV^{2}/c^{4})","Counts");
-    set->SetTH2(h_L_beta_p     ,"#beta v.s Momentum"            ,"p (GeV/c)"            ,"#beta",0.0);
-    set->SetTH2(h_L_beta_m2    ,"#beta v.s Mass Square"         ,"M^{2} (GeV^{2}/c^{4})","#beta");
-    set->SetTH2(h_L_dedx_p     ,"Energy Deposit v.s Momentum"   ,"p (GeV/c)"            ,"dE/dx ()");
-    set->SetTH2(h_L_dedx_m2    ,"Energy Deposit v.s Mass Square","M^{2} (GeV^{2}/c^{4})","dE/dx ()");
-    set->SetTH1(h_L_s0_dedx    ,"Energy Deposit (S0)"           ,"dE/dx"                ,"Counts");
-    set->SetTH2(h_L_s0_beta_x  ,"#beta v.s X-pos (S0)"          ,"X (m)"                ,"#beta");
-    set->SetTH2(h_L_s0_dedx_x  ,"Energy Deposit (S0) v.s X-pos" ,"X (m)"                ,"dE/dx ()");
-    set->SetTH1(h_L_s2_pad     ,"Hit Paddle (S2)"               ,"Paddle No."           ,"Counts");
-    set->SetTH1(h_L_s2_dedx    ,"Energy Deposit (S2)"           ,"dE/dx"                ,"Counts");
-    set->SetTH2(h_L_s2_beta_x  ,"#beta v.s X-pos (S2)"          ,"X (m)"                ,"#beta");
-    set->SetTH2(h_L_s2_dedx_x  ,"Energy Deposit (S2) v.s X-pos" ,"X (m)"                ,"dE/dx ()");
-    set->SetTH2(h_L_s2_beta_pad,"#beta v.s Paddle (S2)"         ,"Paddle No."           ,"#beta");
-    set->SetTH2(h_L_s2_dedx_pad,"Energy Deposit (S2) v.s Paddle","Paddle No."           ,"dE/dx ()");
+  h_L_beta        = new TH1D("h_L_beta"       ,"h_L_beta"       ,400,   0,  2); 
+  //h_L_m2          = new TH1D("h_L_m2"         ,"h_L_m2"         ,400,-0.5,2.5); 
+  h_L_m2          = new TH1D("h_L_m2"         ,"h_L_m2"         ,400,-0.5,1.5); 
+  h_L_beta_p      = new TH2D("h_L_beta_p"     ,"h_L_beta_p"     ,200, 1.9,2.3,200,   0,  2); 
+  h_L_beta_m2     = new TH2D("h_L_beta_m2"    ,"h_L_beta_m2"    ,200,-0.5,  2,200,   0,  2); 
+  h_L_dedx_p      = new TH2D("h_L_dedx_p"     ,"h_L_dedx_p"     ,200, 1.9,2.3,200,   0, 10); 
+  h_L_dedx_m2     = new TH2D("h_L_dedx_m2"    ,"h_L_dedx_m2"    ,200,-0.5,  2,200,   0, 10); 
+  h_L_s0_dedx     = new TH1D("h_L_s0_dedx"    ,"h_L_s0_dedx"    ,400,   0, 10); 
+  h_L_s0_beta_x   = new TH2D("h_L_s0_beta_x"  ,"h_L_s0_beta_x"  ,200,  -1,  1,200,   0,  2); 
+  h_L_s0_dedx_x   = new TH2D("h_L_s0_dedx_x"  ,"h_L_s0_dedx_x"  ,200,  -1,  1,200,   0, 10); 
+  h_L_s2_pad      = new TH1D("h_L_s2_pad"     ,"h_L_s2_pad"     , 18,  -1, 17); 
+  h_L_s2_dedx     = new TH1D("h_L_s2_dedx"    ,"h_L_s2_dedx"    ,400,   0, 10); 
+  h_L_s2_beta_x   = new TH2D("h_L_s2_beta_x"  ,"h_L_s2_beta_x"  ,200,  -1,  1,200,   0,  2); 
+  h_L_s2_dedx_x   = new TH2D("h_L_s2_dedx_x"  ,"h_L_s2_dedx_x"  ,200,  -1,  1,200,   0, 10); 
+  h_L_s2_beta_pad = new TH2D("h_L_s2_beta_pad","h_L_s2_beta_pad", 16,  0, 16,200,    0,  2); 
+  h_L_s2_dedx_pad = new TH2D("h_L_s2_dedx_pad","h_L_s2_dedx_pad", 16,  0, 16,200,    0, 10); 
+  set->SetTH1(h_L_beta       ,"Track beta"                    ,"#beta"                ,"Counts");
+  set->SetTH1(h_L_m2         ,"Mass Square"                   ,"M^{2} (GeV^{2}/c^{4})","Counts");
+  set->SetTH2(h_L_beta_p     ,"#beta v.s Momentum"            ,"p (GeV/c)"            ,"#beta",0.0);
+  set->SetTH2(h_L_beta_m2    ,"#beta v.s Mass Square"         ,"M^{2} (GeV^{2}/c^{4})","#beta");
+  set->SetTH2(h_L_dedx_p     ,"Energy Deposit v.s Momentum"   ,"p (GeV/c)"            ,"dE/dx ()");
+  set->SetTH2(h_L_dedx_m2    ,"Energy Deposit v.s Mass Square","M^{2} (GeV^{2}/c^{4})","dE/dx ()");
+  set->SetTH1(h_L_s0_dedx    ,"Energy Deposit (S0)"           ,"dE/dx"                ,"Counts");
+  set->SetTH2(h_L_s0_beta_x  ,"#beta v.s X-pos (S0)"          ,"X (m)"                ,"#beta");
+  set->SetTH2(h_L_s0_dedx_x  ,"Energy Deposit (S0) v.s X-pos" ,"X (m)"                ,"dE/dx ()");
+  set->SetTH1(h_L_s2_pad     ,"Hit Paddle (S2)"               ,"Paddle No."           ,"Counts");
+  set->SetTH1(h_L_s2_dedx    ,"Energy Deposit (S2)"           ,"dE/dx"                ,"Counts");
+  set->SetTH2(h_L_s2_beta_x  ,"#beta v.s X-pos (S2)"          ,"X (m)"                ,"#beta");
+  set->SetTH2(h_L_s2_dedx_x  ,"Energy Deposit (S2) v.s X-pos" ,"X (m)"                ,"dE/dx ()");
+  set->SetTH2(h_L_s2_beta_pad,"#beta v.s Paddle (S2)"         ,"Paddle No."           ,"#beta");
+  set->SetTH2(h_L_s2_dedx_pad,"Energy Deposit (S2) v.s Paddle","Paddle No."           ,"dE/dx ()");
 
-    h_L_tgt       = new TH1D("h_L_tgt"      ,"h_L_tgt"       ,40000,-2000,2000);
-    h_L_s2pad_tgt = new TH2D("h_L_s2pad_tgt","h_L_s2pad_tgt" ,200,-1000,1000, 16,    0,  16);
-    h_L_p_tgt     = new TH2D("h_L_p_tgt"    ,"h_L_p_tgt"     ,200,-1000,1000,200,  1.9, 2.3);
-    h_L_pathl_tgt = new TH2D("h_L_pathl_tgt","h_L_pathl_tgt" ,200,-1000,1000,200, 25.2,26.3);
-    h_L_tgy_tgt   = new TH2D("h_L_tgy_tgt"  ,"h_L_tgy_tgt"   ,200,-1000,1000,200,-0.06,0.06);
-    h_L_tgth_tgt  = new TH2D("h_L_tgth_tgt" ,"h_L_tgth_tgt"  ,200,-1000,1000,200, -0.1, 0.1);
-    h_L_tgph_tgt  = new TH2D("h_L_tgph_tgt" ,"h_L_tgph_tgt"  ,200,-1000,1000,200,-0.06,0.06);
-    h_L_x_tgt     = new TH2D("h_L_x_tgt"    ,"h_L_x_tgt"     ,200,-1000,1000,200,   -1,   1);
-    h_L_y_tgt     = new TH2D("h_L_y_tgt"    ,"h_L_y_tgt"     ,200,-1000,1000,200, -0.1, 0.1);
-    set->SetTH1(h_L_tgt      ,"Time at Target (S2-RF)","Time (ns)"         ,"Counts");
-    set->SetTH2(h_L_s2pad_tgt,"S2 Paddle v.s Time at Target (S2-RF)"       ,"Time (ns)","Paddle No.");
-    set->SetTH2(h_L_p_tgt    ,"Momentum v.s Time at Target (S2-RF)"        ,"Time (ns)","Momentum (GeV/c)");
-    set->SetTH2(h_L_pathl_tgt,"Path Length v.s Time at Target (S2-RF)"     ,"Time (ns)","L (m)");
-    set->SetTH2(h_L_tgy_tgt  ,"Y at Target v.s Time at Target (S2-RF)"     ,"Time (ns)","Y_{t}");
-    set->SetTH2(h_L_tgth_tgt ,"#theta at Target v.s Time at Target (S2-RF)","Time (ns)","#theta_{t}");
-    set->SetTH2(h_L_tgph_tgt ,"#phi at Target v.s Time at Target (S2-RF)"  ,"Time (ns)","#phi_{t}");
-    set->SetTH2(h_L_x_tgt    ,"X at FP v.s Time at Target (S2-RF)"         ,"Time (ns)","X");
-    set->SetTH2(h_L_y_tgt    ,"Y at FP v.s Time at Target (S2-RF)"         ,"Time (ns)","Y");
+  h_L_tgt       = new TH1D("h_L_tgt"      ,"h_L_tgt"       ,40000,-2000,2000);
+  h_L_s2pad_tgt = new TH2D("h_L_s2pad_tgt","h_L_s2pad_tgt" ,200,-1000,1000, 16,    0,  16);
+  h_L_p_tgt     = new TH2D("h_L_p_tgt"    ,"h_L_p_tgt"     ,200,-1000,1000,200,  1.9, 2.3);
+  h_L_pathl_tgt = new TH2D("h_L_pathl_tgt","h_L_pathl_tgt" ,200,-1000,1000,200, 25.2,26.3);
+  h_L_tgy_tgt   = new TH2D("h_L_tgy_tgt"  ,"h_L_tgy_tgt"   ,200,-1000,1000,200,-0.06,0.06);
+  h_L_tgth_tgt  = new TH2D("h_L_tgth_tgt" ,"h_L_tgth_tgt"  ,200,-1000,1000,200, -0.1, 0.1);
+  h_L_tgph_tgt  = new TH2D("h_L_tgph_tgt" ,"h_L_tgph_tgt"  ,200,-1000,1000,200,-0.06,0.06);
+  h_L_x_tgt     = new TH2D("h_L_x_tgt"    ,"h_L_x_tgt"     ,200,-1000,1000,200,   -1,   1);
+  h_L_y_tgt     = new TH2D("h_L_y_tgt"    ,"h_L_y_tgt"     ,200,-1000,1000,200, -0.1, 0.1);
+  set->SetTH1(h_L_tgt      ,"Time at Target (S2-RF)","Time (ns)"         ,"Counts");
+  set->SetTH2(h_L_s2pad_tgt,"S2 Paddle v.s Time at Target (S2-RF)"       ,"Time (ns)","Paddle No.");
+  set->SetTH2(h_L_p_tgt    ,"Momentum v.s Time at Target (S2-RF)"        ,"Time (ns)","Momentum (GeV/c)");
+  set->SetTH2(h_L_pathl_tgt,"Path Length v.s Time at Target (S2-RF)"     ,"Time (ns)","L (m)");
+  set->SetTH2(h_L_tgy_tgt  ,"Y at Target v.s Time at Target (S2-RF)"     ,"Time (ns)","Y_{t}");
+  set->SetTH2(h_L_tgth_tgt ,"#theta at Target v.s Time at Target (S2-RF)","Time (ns)","#theta_{t}");
+  set->SetTH2(h_L_tgph_tgt ,"#phi at Target v.s Time at Target (S2-RF)"  ,"Time (ns)","#phi_{t}");
+  set->SetTH2(h_L_x_tgt    ,"X at FP v.s Time at Target (S2-RF)"         ,"Time (ns)","X");
+  set->SetTH2(h_L_y_tgt    ,"Y at FP v.s Time at Target (S2-RF)"         ,"Time (ns)","Y");
 
 
 
@@ -1597,287 +1760,304 @@ cout<<"LHRS Set TH"<<endl;
 //// RHRS ////
 //////////////
 cout<<"RHRS Set TH"<<endl;
-    h_R_trig = new TH1D("h_R_trig","h_R_trig",10,0,10);
-    set->SetTH1(h_R_trig,"Trigger Flag","Trig No.","Counts");
+  h_R_trig = new TH1D("h_R_trig","h_R_trig",10,0,10);
+  set->SetTH1(h_R_trig,"Trigger Flag","Trig No.","Counts");
 
-    h_R_tr_n      = new TH1D("h_R_tr_n"     ,"h_R_tr_n"     ,15 ,    0,  15);
-    h_R_tr_ch2    = new TH1D("h_R_tr_ch2"   ,"h_R_tr_ch2"   ,400,    0,0.03);
-    h_R_p         = new TH1D("h_R_p"        ,"h_R_p"        ,400,  1.7,1.95);
-    h_R_pathl     = new TH1D("h_R_pathl"    ,"h_R_pathl"    ,400, 25.2,26.3);
-    h_R_px        = new TH1D("h_R_px"       ,"h_R_px"       ,400, -0.5,-0.3);
-    h_R_py        = new TH1D("h_R_py"       ,"h_R_py"       ,400, -0.2, 0.2);
-    h_R_pz        = new TH1D("h_R_pz"       ,"h_R_pz"       ,400,  1.6,1.95);
-    h_R_tgy       = new TH1D("h_R_tgy"      ,"h_R_tgy"      ,400,-0.06,0.06);
-    h_R_tgth      = new TH1D("h_R_tgth"     ,"h_R_tgth"     ,400, -0.1, 0.1);
-    h_R_tgph      = new TH1D("h_R_tgph"     ,"h_R_tgph"     ,400,-0.06,0.06);
-    h_R_vx        = new TH1D("h_R_vx"       ,"h_R_vx"       ,400,-0.005,0.002);
-    h_R_vy        = new TH1D("h_R_vy"       ,"h_R_vy"       ,400,-0.004,0.003);
-    h_R_vz        = new TH1D("h_R_vz"       ,"h_R_vz"       ,400,-0.25,0.25);
-    h_R_vz2       = new TH1D("h_R_vz2"      ,"h_R_vz2"      ,400,-0.25,0.25);
-    h_R_y_x       = new TH2D("h_R_y_x"      ,"h_R_y_x"      ,200,   -1,  1 ,200,-0.1,0.1);
-    h_R_th_x      = new TH2D("h_R_th_x"     ,"h_R_th_x"     ,200,   -1,  1 ,200,-0.2,0.2);
-    h_R_ph_y      = new TH2D("h_R_ph_y"     ,"h_R_ph_y"     ,200, -0.1, 0.1,200,-0.1,0.1);
-    h_R_tgph_tgth = new TH2D("h_R_tgph_tgth","h_R_tgph_tgth",200, -0.1, 0.1,200,-0.06,0.06);
-    set->SetTH1(h_R_tr_n  ,"No. of Tracks"           ,"No. of Tracks"   ,"Counts");
-    set->SetTH1(h_R_tr_ch2,"Tracking #chi^{2}"       ,"#chi^{2}"        ,"Counts");
-    set->SetTH1(h_R_p     ,"Track Momentum"          ,"p (GeV/#it{c})"  ,"Counts");
-    set->SetTH1(h_R_pathl ,"Track Path Length"       ,"l (m)"           ,"Counts");
-    set->SetTH1(h_R_px    ,"Momentum X"              ,"px (GeV/#it{c})" ,"Counts");
-    set->SetTH1(h_R_py    ,"Momentum Y"              ,"py (GeV/#it{c})" ,"Counts");
-    set->SetTH1(h_R_pz    ,"Momentum Z"              ,"pz (GeV/#it{c})" ,"Counts");
-    set->SetTH1(h_R_tgy   ,"Target Plane Y"          ,"y_{t} (m)"       ,"Counts");
-    set->SetTH1(h_R_tgth  ,"Target Plane #theta"     ,"#theta_{t} (rad)","Counts");
-    set->SetTH1(h_R_tgph  ,"Target Plane #phi"       ,"#phi_{t} (rad)"  ,"Counts");
-    set->SetTH1(h_R_vx    ,"Vertex X"                ,"x_{v} (m)"       ,"Counts");
-    set->SetTH1(h_R_vy    ,"Vertex Y"                ,"y_{v} (m)"       ,"Counts");
-    set->SetTH1(h_R_vz    ,"Vertex Z"                ,"z_{v} (m)"       ,"Counts");
-    set->SetTH2(h_R_y_x   ,"Focal Plane Y v.s X"     ,"X (m)"           ,"Y (m)");
-    set->SetTH2(h_R_th_x  ,"Focal Plane #theta v.s X","X (m)"           ,"#theta (rad)");
-    set->SetTH2(h_R_ph_y  ,"Focal Plane #phi v.s Y"  ,"Y (m)"           ,"#phi (rad)");
-    set->SetTH2(h_R_tgph_tgth,"Target #phi v.s #theta"  ,"#theta_{t} (rad)","#phi_{t} (rad)");
+  h_R_tr_n      = new TH1D("h_R_tr_n"     ,"h_R_tr_n"     ,15 ,    0,  15);
+  h_R_tr_ch2    = new TH1D("h_R_tr_ch2"   ,"h_R_tr_ch2"   ,400,    0,0.03);
+  h_R_p         = new TH1D("h_R_p"        ,"h_R_p"        ,400,  1.7,1.95);
+  h_R_pathl     = new TH1D("h_R_pathl"    ,"h_R_pathl"    ,400, 25.2,26.3);
+  h_R_px        = new TH1D("h_R_px"       ,"h_R_px"       ,400, -0.5,-0.3);
+  h_R_py        = new TH1D("h_R_py"       ,"h_R_py"       ,400, -0.2, 0.2);
+  h_R_pz        = new TH1D("h_R_pz"       ,"h_R_pz"       ,400,  1.6,1.95);
+  h_R_tgy       = new TH1D("h_R_tgy"      ,"h_R_tgy"      ,400,-0.06,0.06);
+  h_R_tgth      = new TH1D("h_R_tgth"     ,"h_R_tgth"     ,400, -0.1, 0.1);
+  h_R_tgph      = new TH1D("h_R_tgph"     ,"h_R_tgph"     ,400,-0.06,0.06);
+  h_R_vx        = new TH1D("h_R_vx"       ,"h_R_vx"       ,400,-0.005,0.002);
+  h_R_vy        = new TH1D("h_R_vy"       ,"h_R_vy"       ,400,-0.004,0.003);
+  h_R_vz        = new TH1D("h_R_vz"       ,"h_R_vz"       ,400,-0.25,0.25);
+  h_R_vz2       = new TH1D("h_R_vz2"      ,"h_R_vz2"      ,400,-0.25,0.25);
+  h_R_y_x       = new TH2D("h_R_y_x"      ,"h_R_y_x"      ,200,   -1,  1 ,200,-0.1,0.1);
+  h_R_th_x      = new TH2D("h_R_th_x"     ,"h_R_th_x"     ,200,   -1,  1 ,200,-0.2,0.2);
+  h_R_ph_y      = new TH2D("h_R_ph_y"     ,"h_R_ph_y"     ,200, -0.1, 0.1,200,-0.1,0.1);
+  h_R_tgph_tgth = new TH2D("h_R_tgph_tgth","h_R_tgph_tgth",200, -0.1, 0.1,200,-0.06,0.06);
+  set->SetTH1(h_R_tr_n  ,"No. of Tracks"           ,"No. of Tracks"   ,"Counts");
+  set->SetTH1(h_R_tr_ch2,"Tracking #chi^{2}"       ,"#chi^{2}"        ,"Counts");
+  set->SetTH1(h_R_p     ,"Track Momentum"          ,"p (GeV/#it{c})"  ,"Counts");
+  set->SetTH1(h_R_pathl ,"Track Path Length"       ,"l (m)"           ,"Counts");
+  set->SetTH1(h_R_px    ,"Momentum X"              ,"px (GeV/#it{c})" ,"Counts");
+  set->SetTH1(h_R_py    ,"Momentum Y"              ,"py (GeV/#it{c})" ,"Counts");
+  set->SetTH1(h_R_pz    ,"Momentum Z"              ,"pz (GeV/#it{c})" ,"Counts");
+  set->SetTH1(h_R_tgy   ,"Target Plane Y"          ,"y_{t} (m)"       ,"Counts");
+  set->SetTH1(h_R_tgth  ,"Target Plane #theta"     ,"#theta_{t} (rad)","Counts");
+  set->SetTH1(h_R_tgph  ,"Target Plane #phi"       ,"#phi_{t} (rad)"  ,"Counts");
+  set->SetTH1(h_R_vx    ,"Vertex X"                ,"x_{v} (m)"       ,"Counts");
+  set->SetTH1(h_R_vy    ,"Vertex Y"                ,"y_{v} (m)"       ,"Counts");
+  set->SetTH1(h_R_vz    ,"Vertex Z"                ,"z_{v} (m)"       ,"Counts");
+  set->SetTH2(h_R_y_x   ,"Focal Plane Y v.s X"     ,"X (m)"           ,"Y (m)");
+  set->SetTH2(h_R_th_x  ,"Focal Plane #theta v.s X","X (m)"           ,"#theta (rad)");
+  set->SetTH2(h_R_ph_y  ,"Focal Plane #phi v.s Y"  ,"Y (m)"           ,"#phi (rad)");
+  set->SetTH2(h_R_tgph_tgth,"Target #phi v.s #theta"  ,"#theta_{t} (rad)","#phi_{t} (rad)");
 
-    h_R_beta      = new TH1D("h_R_beta"     ,"h_R_beta"     ,400,   0,  2); 
-    h_R_m2        = new TH1D("h_R_m2"       ,"h_R_m2"       ,400,-0.5,2.5); 
-    h_R_beta_p    = new TH2D("h_R_beta_p"   ,"h_R_beta_p"   ,200, 1.7,1.95,200,   0,   2); 
-    h_R_beta_m2   = new TH2D("h_R_beta_m2"  ,"h_R_beta_m2"  ,200,-0.5,   2,200,   0,   2); 
-    h_R_dedx_p    = new TH2D("h_R_dedx_p"   ,"h_R_dedx_p"   ,200, 1.7,1.95,200,   0,  10); 
-    h_R_dedx_m2   = new TH2D("h_R_dedx_m2"  ,"h_R_dedx_m2"  ,200,-0.5,   2,200,   0,  10); 
-    h_R_s0_dedx   = new TH1D("h_R_s0_dedx"  ,"h_R_s0_dedx"  ,400,   0,  10); 
-    h_R_s0_beta_x = new TH2D("h_R_s0_beta_x","h_R_s0_beta_x",200,  -1,   1,200,   0,  10); 
-    h_R_s0_dedx_x = new TH2D("h_R_s0_dedx_x","h_R_s0_dedx_x",200,  -1,   1,200,   0,   2); 
-    h_R_s2_pad      = new TH1D("h_R_s2_pad"     ,"h_R_s2_pad"     , 18,  -1, 18); 
-    h_R_s2_dedx     = new TH1D("h_R_s2_dedx"    ,"h_R_s2_dedx"    ,400,   0, 10); 
-    h_R_s2_beta_x   = new TH2D("h_R_s2_beta_x"  ,"h_R_s2_beta_x"  ,200,  -1,  1,200,   0,  2); 
-    h_R_s2_dedx_x   = new TH2D("h_R_s2_dedx_x"  ,"h_R_s2_dedx_x"  ,200,  -1,  1,200,   0, 10); 
-    h_R_s2_beta_pad = new TH2D("h_R_s2_beta_pad","h_R_s2_beta_pad", 16,  0, 16,200,   0,  2); 
-    h_R_s2_dedx_pad = new TH2D("h_R_s2_dedx_pad","h_R_s2_dedx_pad", 16,  0, 16,200,   0, 10); 
-    h_R_a1_sum    = new TH1D("h_R_a1_sum"   ,"h_R_a1_sum"   ,400,   0,6000);
-    h_R_a1_sum_x  = new TH2D("h_R_a1_sum_x" ,"h_R_a1_sum_x" ,200,  -1,   1,200,   0,6000); 
-    h_R_a1_sum_p  = new TH2D("h_R_a1_sum_p" ,"h_R_a1_sum_p" ,200, 1.7,1.95,200,   0,6000); 
-    h_R_a1_sum_m2 = new TH2D("h_R_a1_sum_m2","h_R_a1_sum_m2",200,-0.5, 2.5,200,   0,6000); 
-    h_R_a2_sum    = new TH1D("h_R_a2_sum"   ,"h_R_a2_sum"   ,400,   0,30000);
-    h_R_a2_sum_x  = new TH2D("h_R_a2_sum_x" ,"h_R_a2_sum_x" ,200,  -1,   1,200,   0,30000); 
-    h_R_a2_sum_p  = new TH2D("h_R_a2_sum_p" ,"h_R_a2_sum_p" ,200, 1.7,1.95,200,   0,30000); 
-    h_R_a2_sum_m2 = new TH2D("h_R_a2_sum_m2","h_R_a2_sum_m2",200,-0.5, 2.5,200,   0,30000); 
-    set->SetTH1(h_R_beta       ,"Track beta"                        ,"#beta"               ,"Counts");
-    set->SetTH1(h_R_m2         ,"Mass Square"                       ,"M^{2} (GeV^{2}/c^{4}","Counts");
-    set->SetTH2(h_R_beta_p     ,"#beta v.s Momentum"                ,"p (GeV/c)"           ,"#beta");
-    set->SetTH2(h_R_beta_m2    ,"#beta v.s Mass Square"             ,"M^{2} (GeV^{2}/c^{4}","#beta");
-    set->SetTH2(h_R_dedx_p     ,"Energy Deposit v.s Momentum"       ,"p (GeV/c)"           ,"dE/dx ()");
-    set->SetTH2(h_R_dedx_m2    ,"Energy Deposit v.s Mass Square"    ,"M^{2} (GeV^{2}/c^{4}","dE/dx ()");
-    set->SetTH1(h_R_s0_dedx    ,"Energy Deposit (S0)"               ,"dE/dx"               ,"Counts");
-    set->SetTH2(h_R_s0_beta_x  ,"#beta v.s X-pos (S0)"              ,"X (m)"               ,"#beta");
-    set->SetTH2(h_R_s0_dedx_x  ,"Energy Deposit (S0) v.s X-pos"     ,"X (m)"               ,"dE/dx ()");
-    set->SetTH1(h_R_s2_pad     ,"Hit Paddle (S2)"                   ,"Paddle No."          ,"Counts");
-    set->SetTH1(h_R_s2_dedx    ,"Energy Deposit (S2)"               ,"dE/dx"               ,"Counts");
-    set->SetTH2(h_R_s2_beta_x  ,"#beta v.s X-pos (S2)"              ,"X (m)"               ,"#beta");
-    set->SetTH2(h_R_s2_dedx_x  ,"Energy Deposit (S2) v.s X-pos"     ,"X (m)"               ,"dE/dx ()");
-    set->SetTH2(h_R_s2_beta_pad,"#beta v.s Paddle (S2)"             ,"Paddle No."          ,"#beta");
-    set->SetTH2(h_R_s2_dedx_pad,"Energy Deposit (S2) v.s Paddle"    ,"Paddle No."          ,"dE/dx ()");
-    set->SetTH1(h_R_a1_sum     ,"Cherenkov SUM (A1)"                ,""                    ,"Counts");
-    set->SetTH2(h_R_a1_sum_x   ,"Cherenkov SUM v.s X-pos (A1)"      ,"X (m)"               ,"");
-    set->SetTH2(h_R_a1_sum_p   ,"Cherenkov SUM v.s Momentum (A1)"   ,"p (GeV/c)"           ,"");
-    set->SetTH2(h_R_a1_sum_m2  ,"Cherenkov SUM v.s Mass Square (A1)","M^{2} (GeV^{2}/c^{4}","");
-    set->SetTH1(h_R_a2_sum     ,"Cherenkov SUM (A2)"                ,""                    ,"Counts");
-    set->SetTH2(h_R_a2_sum_x   ,"Cherenkov SUM v.s X-pos (A2)"      ,"X (m)"               ,"");
-    set->SetTH2(h_R_a2_sum_p   ,"Cherenkov SUM v.s Momentum (A2)"   ,"p (GeV/c)"           ,"");
-    set->SetTH2(h_R_a2_sum_m2  ,"Cherenkov SUM v.s Mass Square (A2)","M^{2} (GeV^{2}/c^{4}","");
+  h_R_beta      = new TH1D("h_R_beta"     ,"h_R_beta"     ,400,   0,  2); 
+  h_R_m2        = new TH1D("h_R_m2"       ,"h_R_m2"       ,400,-0.5,2.5); 
+  h_R_beta_p    = new TH2D("h_R_beta_p"   ,"h_R_beta_p"   ,200, 1.7,1.95,200,   0,   2); 
+  h_R_beta_m2   = new TH2D("h_R_beta_m2"  ,"h_R_beta_m2"  ,200,-0.5,   2,200,   0,   2); 
+  h_R_dedx_p    = new TH2D("h_R_dedx_p"   ,"h_R_dedx_p"   ,200, 1.7,1.95,200,   0,  10); 
+  h_R_dedx_m2   = new TH2D("h_R_dedx_m2"  ,"h_R_dedx_m2"  ,200,-0.5,   2,200,   0,  10); 
+  h_R_s0_dedx   = new TH1D("h_R_s0_dedx"  ,"h_R_s0_dedx"  ,400,   0,  10); 
+  h_R_s0_beta_x = new TH2D("h_R_s0_beta_x","h_R_s0_beta_x",200,  -1,   1,200,   0,  10); 
+  h_R_s0_dedx_x = new TH2D("h_R_s0_dedx_x","h_R_s0_dedx_x",200,  -1,   1,200,   0,   2); 
+  h_R_s2_pad      = new TH1D("h_R_s2_pad"     ,"h_R_s2_pad"     , 18,  -1, 18); 
+  h_R_s2_dedx     = new TH1D("h_R_s2_dedx"    ,"h_R_s2_dedx"    ,400,   0, 10); 
+  h_R_s2_beta_x   = new TH2D("h_R_s2_beta_x"  ,"h_R_s2_beta_x"  ,200,  -1,  1,200,   0,  2); 
+  h_R_s2_dedx_x   = new TH2D("h_R_s2_dedx_x"  ,"h_R_s2_dedx_x"  ,200,  -1,  1,200,   0, 10); 
+  h_R_s2_beta_pad = new TH2D("h_R_s2_beta_pad","h_R_s2_beta_pad", 16,  0, 16,200,   0,  2); 
+  h_R_s2_dedx_pad = new TH2D("h_R_s2_dedx_pad","h_R_s2_dedx_pad", 16,  0, 16,200,   0, 10); 
+  h_R_a1_sum    = new TH1D("h_R_a1_sum"   ,"h_R_a1_sum"   ,400,   0,6000);
+  h_R_a1_sum_x  = new TH2D("h_R_a1_sum_x" ,"h_R_a1_sum_x" ,200,  -1,   1,200,   0,6000); 
+  h_R_a1_sum_p  = new TH2D("h_R_a1_sum_p" ,"h_R_a1_sum_p" ,200, 1.7,1.95,200,   0,6000); 
+  h_R_a1_sum_m2 = new TH2D("h_R_a1_sum_m2","h_R_a1_sum_m2",200,-0.5, 2.5,200,   0,6000); 
+  h_R_a2_sum    = new TH1D("h_R_a2_sum"   ,"h_R_a2_sum"   ,400,   0,30000);
+  h_R_a2_sum_x  = new TH2D("h_R_a2_sum_x" ,"h_R_a2_sum_x" ,200,  -1,   1,200,   0,30000); 
+  h_R_a2_sum_p  = new TH2D("h_R_a2_sum_p" ,"h_R_a2_sum_p" ,200, 1.7,1.95,200,   0,30000); 
+  h_R_a2_sum_m2 = new TH2D("h_R_a2_sum_m2","h_R_a2_sum_m2",200,-0.5, 2.5,200,   0,30000); 
+  set->SetTH1(h_R_beta       ,"Track beta"                        ,"#beta"               ,"Counts");
+  set->SetTH1(h_R_m2         ,"Mass Square"                       ,"M^{2} (GeV^{2}/c^{4}","Counts");
+  set->SetTH2(h_R_beta_p     ,"#beta v.s Momentum"                ,"p (GeV/c)"           ,"#beta");
+  set->SetTH2(h_R_beta_m2    ,"#beta v.s Mass Square"             ,"M^{2} (GeV^{2}/c^{4}","#beta");
+  set->SetTH2(h_R_dedx_p     ,"Energy Deposit v.s Momentum"       ,"p (GeV/c)"           ,"dE/dx ()");
+  set->SetTH2(h_R_dedx_m2    ,"Energy Deposit v.s Mass Square"    ,"M^{2} (GeV^{2}/c^{4}","dE/dx ()");
+  set->SetTH1(h_R_s0_dedx    ,"Energy Deposit (S0)"               ,"dE/dx"               ,"Counts");
+  set->SetTH2(h_R_s0_beta_x  ,"#beta v.s X-pos (S0)"              ,"X (m)"               ,"#beta");
+  set->SetTH2(h_R_s0_dedx_x  ,"Energy Deposit (S0) v.s X-pos"     ,"X (m)"               ,"dE/dx ()");
+  set->SetTH1(h_R_s2_pad     ,"Hit Paddle (S2)"                   ,"Paddle No."          ,"Counts");
+  set->SetTH1(h_R_s2_dedx    ,"Energy Deposit (S2)"               ,"dE/dx"               ,"Counts");
+  set->SetTH2(h_R_s2_beta_x  ,"#beta v.s X-pos (S2)"              ,"X (m)"               ,"#beta");
+  set->SetTH2(h_R_s2_dedx_x  ,"Energy Deposit (S2) v.s X-pos"     ,"X (m)"               ,"dE/dx ()");
+  set->SetTH2(h_R_s2_beta_pad,"#beta v.s Paddle (S2)"             ,"Paddle No."          ,"#beta");
+  set->SetTH2(h_R_s2_dedx_pad,"Energy Deposit (S2) v.s Paddle"    ,"Paddle No."          ,"dE/dx ()");
+  set->SetTH1(h_R_a1_sum     ,"Cherenkov SUM (A1)"                ,""                    ,"Counts");
+  set->SetTH2(h_R_a1_sum_x   ,"Cherenkov SUM v.s X-pos (A1)"      ,"X (m)"               ,"");
+  set->SetTH2(h_R_a1_sum_p   ,"Cherenkov SUM v.s Momentum (A1)"   ,"p (GeV/c)"           ,"");
+  set->SetTH2(h_R_a1_sum_m2  ,"Cherenkov SUM v.s Mass Square (A1)","M^{2} (GeV^{2}/c^{4}","");
+  set->SetTH1(h_R_a2_sum     ,"Cherenkov SUM (A2)"                ,""                    ,"Counts");
+  set->SetTH2(h_R_a2_sum_x   ,"Cherenkov SUM v.s X-pos (A2)"      ,"X (m)"               ,"");
+  set->SetTH2(h_R_a2_sum_p   ,"Cherenkov SUM v.s Momentum (A2)"   ,"p (GeV/c)"           ,"");
+  set->SetTH2(h_R_a2_sum_m2  ,"Cherenkov SUM v.s Mass Square (A2)","M^{2} (GeV^{2}/c^{4}","");
 
-    h_R_tgt       = new TH1D("h_R_tgt"      ,"h_R_tgt"       ,40000,-2000,2000);
-    h_R_s2pad_tgt = new TH2D("h_R_s2pad_tgt","h_R_s2pad_tgt" ,200,-1000,1000, 16,    0,  16);
-    h_R_p_tgt     = new TH2D("h_R_p_tgt"    ,"h_R_p_tgt"     ,200,-1000,1000,200,  1.7,1.95);
-    h_R_pathl_tgt = new TH2D("h_R_pathl_tgt","h_R_pathl_tgt" ,200,-1000,1000,200, 25.2,26.3);
-    h_R_tgy_tgt   = new TH2D("h_R_tgy_tgt"  ,"h_R_tgy_tgt"   ,200,-1000,1000,200,-0.06,0.06);
-    h_R_tgth_tgt  = new TH2D("h_R_tgth_tgt" ,"h_R_tgth_tgt"  ,200,-1000,1000,200,-0.1,0.1);
-    h_R_tgph_tgt  = new TH2D("h_R_tgph_tgt" ,"h_R_tgph_tgt"  ,200,-1000,1000,200,-0.06,0.06);
-    h_R_x_tgt     = new TH2D("h_R_x_tgt"    ,"h_R_x_tgt"     ,200,-1000,1000,200,  -1,  1);
-    h_R_y_tgt     = new TH2D("h_R_y_tgt"    ,"h_R_y_tgt"     ,200,-1000,1000,200,-0.1,0.1);
-    set->SetTH1(h_R_tgt      ,"Time at Target (S2-RF)","Time (ns)"         ,"Counts");
-    set->SetTH2(h_R_s2pad_tgt,"S2 Paddle v.s Time at Target (S2-RF)"       ,"Time (ns)","Paddle No.");
-    set->SetTH2(h_R_p_tgt    ,"Momentum v.s Time at Target (S2-RF)"        ,"Time (ns)","Momentum (GeV/c)");
-    set->SetTH2(h_R_pathl_tgt,"Path Length v.s Time at Target (S2-RF)"     ,"Time (ns)","L (m)");
-    set->SetTH2(h_R_tgy_tgt  ,"Y at Target v.s Time at Target (S2-RF)"     ,"Time (ns)","Y_{t}");
-    set->SetTH2(h_R_tgth_tgt ,"#theta at Target v.s Time at Target (S2-RF)","Time (ns)","#theta_{t}");
-    set->SetTH2(h_R_tgph_tgt ,"#phi at Target v.s Time at Target (S2-RF)"  ,"Time (ns)","#phi_{t}");
-    set->SetTH2(h_R_x_tgt    ,"X at FP v.s Time at Target (S2-RF)"         ,"Time (ns)","X");
-    set->SetTH2(h_R_y_tgt    ,"Y at FP v.s Time at Target (S2-RF)"         ,"Time (ns)","Y");
+  h_R_tgt       = new TH1D("h_R_tgt"      ,"h_R_tgt"       ,40000,-2000,2000);
+  h_R_s2pad_tgt = new TH2D("h_R_s2pad_tgt","h_R_s2pad_tgt" ,200,-1000,1000, 16,    0,  16);
+  h_R_p_tgt     = new TH2D("h_R_p_tgt"    ,"h_R_p_tgt"     ,200,-1000,1000,200,  1.7,1.95);
+  h_R_pathl_tgt = new TH2D("h_R_pathl_tgt","h_R_pathl_tgt" ,200,-1000,1000,200, 25.2,26.3);
+  h_R_tgy_tgt   = new TH2D("h_R_tgy_tgt"  ,"h_R_tgy_tgt"   ,200,-1000,1000,200,-0.06,0.06);
+  h_R_tgth_tgt  = new TH2D("h_R_tgth_tgt" ,"h_R_tgth_tgt"  ,200,-1000,1000,200,-0.1,0.1);
+  h_R_tgph_tgt  = new TH2D("h_R_tgph_tgt" ,"h_R_tgph_tgt"  ,200,-1000,1000,200,-0.06,0.06);
+  h_R_x_tgt     = new TH2D("h_R_x_tgt"    ,"h_R_x_tgt"     ,200,-1000,1000,200,  -1,  1);
+  h_R_y_tgt     = new TH2D("h_R_y_tgt"    ,"h_R_y_tgt"     ,200,-1000,1000,200,-0.1,0.1);
+  set->SetTH1(h_R_tgt      ,"Time at Target (S2-RF)","Time (ns)"         ,"Counts");
+  set->SetTH2(h_R_s2pad_tgt,"S2 Paddle v.s Time at Target (S2-RF)"       ,"Time (ns)","Paddle No.");
+  set->SetTH2(h_R_p_tgt    ,"Momentum v.s Time at Target (S2-RF)"        ,"Time (ns)","Momentum (GeV/c)");
+  set->SetTH2(h_R_pathl_tgt,"Path Length v.s Time at Target (S2-RF)"     ,"Time (ns)","L (m)");
+  set->SetTH2(h_R_tgy_tgt  ,"Y at Target v.s Time at Target (S2-RF)"     ,"Time (ns)","Y_{t}");
+  set->SetTH2(h_R_tgth_tgt ,"#theta at Target v.s Time at Target (S2-RF)","Time (ns)","#theta_{t}");
+  set->SetTH2(h_R_tgph_tgt ,"#phi at Target v.s Time at Target (S2-RF)"  ,"Time (ns)","#phi_{t}");
+  set->SetTH2(h_R_x_tgt    ,"X at FP v.s Time at Target (S2-RF)"         ,"Time (ns)","X");
+  set->SetTH2(h_R_y_tgt    ,"Y at FP v.s Time at Target (S2-RF)"         ,"Time (ns)","Y");
 
 /////////////////////
 //// Coincidence ////
 /////////////////////
 cout<<"Coin Set TH"<<endl;
-    h_ct       = new TH1D("h_ct"      ,"h_ct"      ,1000, -20, 20);//to adjust offset
-    h_Rs2      = new TH1D("h_Rs2"      ,"h_Rs2"      ,4000, -100, 100);
-    h_Ls2      = new TH1D("h_Ls2"      ,"h_Ls2"      ,4000, -100, 100);
-    h_ct_acc       = new TH1D("h_ct_acc"  ,"h_ct_acc"   ,4000, -80, 80);//to adjust offset 
-    h_ct_wK    = new TH1D("h_ct_wK"   ,"h_ct_wK"   ,1000, -20, 20); 
-    h_ct_wK_z  = new TH1D("h_ct_wK_z" ,"h_ct_wK_z" ,4000, -80, 80); 
-    h_ct_wK_z_all  = new TH1D("h_ct_wK_z_all" ,"h_ct_wK_z_all",4000, -80, 80); 
-    h_ct_wK_acc    = new TH1D("h_ct_wK_acc"   ,"h_ct_wK_acc"   ,4000, -80, 80); 
-    h_ct_wK_z_acc  = new TH1D("h_ct_wK_z_acc" ,"h_ct_wK_z_acc" ,4000, -80, 80); 
-    h_Rs2x_ct  = new TH2D("h_Rs2x_ct" ,"h_Rs2x_ct" , 200, -20, 20,200,   -1,  1); 
-    h_ct_Rp  = new TH2D("h_ct_Rp" ,"h_ct_Rp" ,400,  1.7,1.95,4000, -80, 80);//to adjust offset 
-    h_Ls2x_ct  = new TH2D("h_Ls2x_ct" ,"h_Ls2x_ct" , 200, -20, 20,200,   -1,  1); 
-    h_a1sum_ct = new TH2D("h_a1sum_ct","h_a1sum_ct", 200, -20, 20,200,    0,6000); 
-    h_a2sum_ct = new TH2D("h_a2sum_ct","h_a2sum_ct", 200, -20, 20,200,    0,30000); 
-    
-    h_mm       = new TH1D("h_mm"      ,"h_mm"      , bin_mm,min_mm,max_mm);  //range bin=2 MeV
-    h_mm_acc   = new TH1D("h_mm_acc"  ,"h_mm_acc"  , bin_mm,min_mm,max_mm);  //range bin=2 MeV
-    h_peak_mm       = new TH1D("h_peak_mm"      ,"h_mm_peak"      , bin_mm,min_mm,max_mm); //bin=2 MeV
-    h_mm_pi       = new TH1D("h_mm_pi"      ,"h_mm_pi"      , bin_mm,min_mm,max_mm); //Lambda Pion mass range bin=2 MeV
-    h_mm_Al      = new TH1D("h_mm_Al","h_mm_Al",bin_mm,min_mm,max_mm); //Alminium mass bin=4 MeV
-    h_mm_Al_acc      = new TH1D("h_mm_Al_acc","h_mm_Al_acc",bin_mm,min_mm,max_mm); //Alminium mass bin=4 MeV
-    h_mm_Al_bg      = new TH1D("h_mm_Al_bg","h_mm_Al_bg",bin_mm,min_mm,max_mm); //Alminium mass bin=4 MeV
-    h_peak_Al      = new TH1D("h_peak_Al","h_peak_Al",bin_mm,min_mm,max_mm); //Alminium mass bin=4 MeV
+  h_ct       = new TH1D("h_ct"      ,"h_ct"      ,1000, -20, 20);//to adjust offset
+  h_Rs2      = new TH1D("h_Rs2"      ,"h_Rs2"      ,4000, -100, 100);
+  h_Ls2      = new TH1D("h_Ls2"      ,"h_Ls2"      ,4000, -100, 100);
+  h_ct_acc       = new TH1D("h_ct_acc"  ,"h_ct_acc"   ,4000, -80, 80);//to adjust offset 
+  h_ct_wK    = new TH1D("h_ct_wK"   ,"h_ct_wK"   ,1000, -20, 20); 
+  h_ct_wK_z  = new TH1D("h_ct_wK_z" ,"h_ct_wK_z" ,4000, -80, 80); 
+  h_ct_wK_z_all  = new TH1D("h_ct_wK_z_all" ,"h_ct_wK_z_all",4000, -80, 80); 
+  h_ct_wK_acc    = new TH1D("h_ct_wK_acc"   ,"h_ct_wK_acc"   ,4000, -80, 80); 
+  h_ct_wK_z_acc  = new TH1D("h_ct_wK_z_acc" ,"h_ct_wK_z_acc" ,4000, -80, 80); 
+  h_Rs2x_ct  = new TH2D("h_Rs2x_ct" ,"h_Rs2x_ct" , 200, -20, 20,200,   -1,  1); 
+  h_ct_Rp  = new TH2D("h_ct_Rp" ,"h_ct_Rp" ,400,  1.7,1.95,4000, -80, 80);//to adjust offset 
+  h_Ls2x_ct  = new TH2D("h_Ls2x_ct" ,"h_Ls2x_ct" , 200, -20, 20,200,   -1,  1); 
+  h_a1sum_ct = new TH2D("h_a1sum_ct","h_a1sum_ct", 200, -20, 20,200,    0,6000); 
+  h_a2sum_ct = new TH2D("h_a2sum_ct","h_a2sum_ct", 200, -20, 20,200,    0,30000); 
 
-    h_mm_MgL      = new TH1D("h_mm_MgL","h_mm_MgL",bin_mm,min_mm,max_mm); //Alminium mass bin=4 MeV
-    h_mm_MgL_acc      = new TH1D("h_mm_MgL_acc","h_mm_MgL_acc",bin_mm,min_mm,max_mm); //Mg mass bin=4 MeV
-    h_peak_MgL      = new TH1D("h_peak_MgL","h_peak_MgL",bin_mm,min_mm,max_mm); //MgL mass bin=4 MeV
+  //--------- Missing mass range ---=====--------------------//
 
 
-    h_mm_L       = new TH1D("h_mm_L"      ,"h_mm_L"      , bin_mm,min_mm,max_mm ); //Lambda mass range bin=2 MeV
-    h_mm_L_ec       = new TH1D("h_mm_L_ec"      ,"h_mm_L_ec"      , bin_mm,min_mm,max_mm); //Lambda mass range bin=2 MeV  
-    h_mm_nnL       = new TH1D("h_mm_nnL"      ,"h_mm_nnL"      , bin_mm,min_mm,max_mm); //nnL mass range bin=2 MeV
-    h_mm_H3L       = new TH1D("h_mm_H3L"      ,"h_mm_H3L"      , bin_mm,min_mm,max_mm); //H3L mass range bin=2 MeV  
-    h_acc_L       = new TH1D("h_acc_L"      ,"h_acc_L"      , bin_mm,min_mm,max_mm); //Lambda mass ACC  bin=2 MeV
-    h_acc_nnL       = new TH1D("h_acc_nnL"      ,"h_acc_nnL"      , bin_mm,min_mm,max_mm); //nnL mass ACC bin=2 MeV
-    h_acc_H3L       = new TH1D("h_acc_H3L"      ,"h_acc_H3L"      , bin_mm,min_mm,max_mm); //H3L mass ACC bin=2 MeV  
-    h_peak_L       = new TH1D("h_peak_L"      ,"h_peak_L"      , bin_mm,min_mm,max_mm); //Lambda mass range bin=2 MeV
-    h_peak_nnL       = new TH1D("h_peak_nnL"      ,"h_peak_nnL"      , bin_mm,min_mm,max_mm); //nnL mass range bin=2 MeV
-    h_peak_H3L       = new TH1D("h_peak_H3L"      ,"h_peak_H3L"      , bin_mm,min_mm,max_mm); //H3L mass range bin=2 MeV  
+
+  
+  h_mm       = new TH1D("h_mm"      ,"h_mm"      , bin_mm,min_mm,max_mm);  //range bin=2 MeV
+  h_mm_acc   = new TH1D("h_mm_acc"  ,"h_mm_acc"  , bin_mm,min_mm,max_mm);  //range bin=2 MeV
+  h_peak_mm       = new TH1D("h_peak_mm"      ,"h_mm_peak"      , bin_mm,min_mm,max_mm); //bin=2 MeV
+  h_mm_pi       = new TH1D("h_mm_pi"      ,"h_mm_pi"      , bin_mm,min_mm,max_mm); //Lambda Pion mass range bin=2 MeV
+  h_mm_Al      = new TH1D("h_mm_Al","h_mm_Al",bin_mm,min_mm,max_mm); //Alminium mass bin=4 MeV
+  h_mm_Al_acc      = new TH1D("h_mm_Al_acc","h_mm_Al_acc",bin_mm,min_mm,max_mm); //Alminium mass bin=4 MeV
+  h_mm_Al_bg      = new TH1D("h_mm_Al_bg","h_mm_Al_bg",bin_mm,min_mm,max_mm); //Alminium mass bin=4 MeV
+  h_peak_Al      = new TH1D("h_peak_Al","h_peak_Al",bin_mm,min_mm,max_mm); //Alminium mass bin=4 MeV
+
+  h_mm_MgL      = new TH1D("h_mm_MgL","h_mm_MgL",bin_mm,min_mm,max_mm); //Alminium mass bin=4 MeV
+  h_mm_MgL_acc      = new TH1D("h_mm_MgL_acc","h_mm_MgL_acc",bin_mm,min_mm,max_mm); //Mg mass bin=4 MeV
+  h_peak_MgL      = new TH1D("h_peak_MgL","h_peak_MgL",bin_mm,min_mm,max_mm); //MgL mass bin=4 MeV
 
 
-    h_Rz     = new TH1D("h_Rz", "h_Rz",1000,-0.2,0.2);
-    h_Rz2     = new TH1D("h_Rz2", "h_Rz2",1000,-0.2,0.2);
-    h_Rz_c   = new TH1D("h_Rz_c", "h_Rz_c",1000,-0.2,0.2);
-    h_Rz_cut   = new TH1D("h_Rz_cut", "h_Rz_cut",1000,-0.2,0.2);
-    h_Lz     = new TH1D("h_Lz", "h_Lz",1000,-0.2,0.2);
-    h_Lz2     = new TH1D("h_Lz2", "h_Lz2",1000,-0.2,0.2);
-    h_Lz_c   = new TH1D("h_Lz_c", "h_Lz_c",1000,-0.2,0.2);
-
-    h_Rth     = new TH1D("h_Rth", "h_Rth",1000,-0.1,0.1);
-    h_Rth_c   = new TH1D("h_Rth_c", "h_Rth_c",1000,-0.1,0.1);
-    h_Lth     = new TH1D("h_Lth", "h_Lth",1000,-0.1,0.1);
-    h_Lth_c   = new TH1D("h_Lth_c", "h_Lth_c",1000,-0.1,0.1);
-
-    h_Rph     = new TH1D("h_Rph", "h_Rph",1000,-0.1,0.1);
-    h_Rph_c   = new TH1D("h_Rph_c", "h_Rph_c",1000,-0.1,0.1);
-    h_Lph     = new TH1D("h_Lph", "h_Lph",1000,-0.1,0.1);
-    h_Lph_c   = new TH1D("h_Lph_c", "h_Lph_c",1000,-0.1,0.1);
-
-    h_Rp     = new TH1D("h_Rp", "h_Rp",1000,1.5,2.5);
-    h_Rp_c   = new TH1D("h_Rp_c", "h_Rp_c",1000,1.5,2.5);
-    h_Lp     = new TH1D("h_Lp", "h_Lp",1000,1.8,2.8);
-    h_Lp_c   = new TH1D("h_Lp_c", "h_Lp_c",1000,1.8,2.8);
-    h_Lp_top   = new TH1D("h_Lp_top", "mom_L (w/ Lambda Cut)",1000,1.9,2.3);
-    
-    h_theta_ee = new TH1D("h_theta_ee", "theta_ee",1000,0.1,0.35);
-    h_theta_ee2 = new TH1D("h_theta_ee2", "theta_ee (w/ Z_Diff Cut)",1000,0.1,0.35);
-    h_theta_ee3 = new TH1D("h_theta_ee3", "theta_ee (w/ Z Cut)",1000,0.1,0.35);
-    h_theta_ee4 = new TH1D("h_theta_ee4", "theta_ee (w/ Z, AC Cut)",1000,0.1,0.35);
-    h_phi_ee = new TH1D("h_phi_ee", "phi_ee",1000,0.,2*PI);
-    h_phi_ee2 = new TH1D("h_phi_ee2", "phi_ee (w/ Z_Diff Cut)",1000,0.,2*PI);
-    h_phi_ee3 = new TH1D("h_phi_ee3", "phi_ee (w/ Z Cut)",1000,0.,2*PI);
-    h_phi_ee4 = new TH1D("h_phi_ee4", "phi_ee (w/ Z, AC Cut)",1000,0.,2*PI);
-    h_theta_ek = new TH1D("h_theta_ek", "theta_ek",1000,0.1,0.35);
-    h_phi_ek = new TH1D("h_phi_ek", "phi_ek",1000,3*PI/2-1.,3*PI/2+1.);
-    h_theta_g = new TH1D("h_theta_g", "theta_g",1000,0.1,0.35);
-    h_phi_g = new TH1D("h_phi_g", "phi_g",1000,3*PI/2-1.,3*PI/2+1.);
-    h_theta_gk_lab = new TH1D("h_theta_gk_lab", "theta_gk_lab",1000,0.,0.2);
-    h_theta_gk_cm = new TH1D("h_theta_gk_cm", "theta_gk_cm",1000,0.,0.3);
-    h_cos_gk_lab = new TH1D("h_cos_gk_lab", "cos_gk_lab",1000,0.97,1.0);
-    h_cos_gk_cm = new TH1D("h_cos_gk_cm", "cos_gk_cm",1000,0.8,1.0);
-    h_mom_g = new TH1D("h_mom_g", "mom_g",1000,1.8,2.5);
-    h_qsq = new TH1D("h_qsq", "Q^2",1000,0.,0.8);
-    h_w = new TH1D("h_w", "W",1000,0.,0.8);
-    h_pL_pR = new TH2D("h_pL_pR", "pR:pL",30,1.73,1.93,30,1.95,2.25);
-    h_pL_pR2 = new TH2D("h_pL_pR2", "pR:pL (bestcut)",30,1.73,1.93,30,1.95,2.25);
-    h_pL_pR3 = new TH2D("h_pL_pR3", "pR:pL (top-quality)",30,1.73,1.93,30,1.95,2.25);
-    h_thph_ek = new TH2D("h_thph_ek", "theta_ek:phi_ek" ,1000,0.1,0.35,1000,3*PI/2-1.,3*PI/2+1.);
-    h_thph_g = new TH2D("h_thph_g", "theta_g:phi_g" ,1000,0.1,0.35,1000,3*PI/2-1.,3*PI/2+1.);
-    h_theta_ee_p = new TH2D("h_theta_ee_p", "theta_ee:mom (w/ theta_ee Cut)",1000,0.1,0.35,1000,2.0,2.25);
-    h_theta_ee_p2 = new TH2D("h_theta_ee_p2", "theta_ee:mom (w/ VP Flux Cut)",1000,0.1,0.35,1000,2.0,2.25);
-    //h_theta_ee_p2 = new TH2D("h_theta_ee_p2", "theta_ee:mom (w/ Z_Diff Cut)",1000,0.1,0.35,1000,2.0,2.25);
-    h_theta_ee_p3 = new TH2D("h_theta_ee_p3", "theta_ee:mom (w/ Z Cut)",1000,0.1,0.35,1000,2.0,2.25);
-    h_theta_ee_p4 = new TH2D("h_theta_ee_p4", "theta_ee:mom (w/ Z, AC Cut)",1000,0.1,0.35,1000,2.0,2.25);
-    h_phi_ee_p = new TH2D("h_phi_ee_p", "phi_ee:mom (w/ Z Cut)",1000,1.0,2.0,1000,2.0,2.25);
-    h_vpflux = new TH1D("h_vpflux", "VP Flux [/GeV/sr] (top quality)",1000,0.001,0.006);
-    h_vpflux2 = new TH1D("h_vpflux2", "VP Flux [/GeV/sr] (acceptance)",1000,0.001,0.006);
-    h_vpflux3 = new TH1D("h_vpflux3", "VP Flux [/GeV/sr] (w/ Z Cut)",1000,0.001,0.006);
-    h_vpflux4 = new TH1D("h_vpflux4", "VP Flux [/GeV/sr] (w/ Z, AC Cut)",1000,0.001,0.006);
-
-    h_Lp_mm    = new TH2D("h_Lp_mm"   ,"h_Lp_mm"   , bin_mm,min_mm,max_mm,bin_Lp,min_Lp,max_Lp); 
-    //h_mmall    = new TH1D("h_mmall"   ,"h_mmall"   , 100,-1,1); 
-    h_mmall    = new TH1D("h_mmall"   ,"h_mmall"   , bin_mm,min_mm,max_mm); 
-    h_mmfoil   = new TH1D("h_mmfoil"  ,"h_mmfoil"  , bin_mm,min_mm,max_mm); 
-    h_mmbg     = new TH1D("h_mmbg"    ,"h_mmbg"    , bin_mm,min_mm,max_mm); 
-    h_mmallbg  = new TH1D("h_mmallbg" ,"h_mmallbg" , bin_mm,min_mm,max_mm); 
-    h_mmfoilbg = new TH1D("h_mmfoilbg","h_mmfoilbg", bin_mm,min_mm,max_mm); 
-
-    h_Ll_mm    = new TH2D("h_Ll_mm"   ,"h_Ll_mm"   , bin_mm,min_mm,max_mm,200,  25.2, 26.3); 
-    h_Ltgy_mm  = new TH2D("h_Ltgy_mm" ,"h_Ltgy_mm" , bin_mm,min_mm,max_mm,200, -0.06, 0.06); 
-    h_Ltgth_mm = new TH2D("h_Ltgth_mm","h_Ltgth_mm", bin_mm,min_mm,max_mm,200,  -0.1,  0.1); 
-    h_Ltgph_mm = new TH2D("h_Ltgph_mm","h_Ltgph_mm", bin_mm,min_mm,max_mm,200, -0.06, 0.06); 
-    h_Lvx_mm   = new TH2D("h_Lvx_mm"  ,"h_Lvx_mm"  , bin_mm,min_mm,max_mm,200,-0.005,0.002); 
-    h_Lvy_mm   = new TH2D("h_Lvy_mm"  ,"h_Lvy_mm"  , bin_mm,min_mm,max_mm,200,-0.004,0.003); 
-    h_Lvz_mm   = new TH2D("h_Lvz_mm"  ,"h_Lvz_mm"  , bin_mm,min_mm,max_mm,200, -0.25, 0.25); 
-    h_Lx_mm    = new TH2D("h_Lx_mm"   ,"h_Lx_mm"   , bin_mm,min_mm,max_mm,200,    -1,   1); 
-    h_Ly_mm    = new TH2D("h_Ly_mm"   ,"h_Ly_mm"   , bin_mm,min_mm,max_mm,200,  -0.1, 0.1); 
-    h_Lth_mm   = new TH2D("h_Lth_mm"  ,"h_Lth_mm"  , bin_mm,min_mm,max_mm,200,  -0.2, 0.2); 
-    h_Lph_mm   = new TH2D("h_Lph_mm"  ,"h_Lph_mm"  , bin_mm,min_mm,max_mm,200,  -0.1, 0.1); 
-    h_Rp_mm    = new TH2D("h_Rp_mm"   ,"h_Rp_mm"   , bin_mm,min_mm,max_mm,200,   1.7, 1.95); 
-    h_Rl_mm    = new TH2D("h_Rl_mm"   ,"h_Rl_mm"   , bin_mm,min_mm,max_mm,200,  25.2, 26.3); 
-    h_Rtgy_mm  = new TH2D("h_Rtgy_mm" ,"h_Rtgy_mm" , bin_mm,min_mm,max_mm,200, -0.06, 0.06); 
-    h_Rtgth_mm = new TH2D("h_Rtgth_mm","h_Rtgth_mm", bin_mm,min_mm,max_mm,200,  -0.1,  0.1); 
-    h_Rtgph_mm = new TH2D("h_Rtgph_mm","h_Rtgph_mm", bin_mm,min_mm,max_mm,200, -0.06, 0.06); 
-    h_Rvx_mm   = new TH2D("h_Rvx_mm"  ,"h_Rvx_mm"  , bin_mm,min_mm,max_mm,200,-0.005,0.002); 
-    h_Rvy_mm   = new TH2D("h_Rvy_mm"  ,"h_Rvy_mm"  , bin_mm,min_mm,max_mm,200,-0.004,0.003); 
-    h_Rvz_mm   = new TH2D("h_Rvz_mm"  ,"h_Rvz_mm"  , bin_mm,min_mm,max_mm,200, -0.25, 0.25); 
-    h_Rx_mm    = new TH2D("h_Rx_mm"   ,"h_Rx_mm"   , bin_mm,min_mm,max_mm,200,    -1,    1); 
-    h_Ry_mm    = new TH2D("h_Ry_mm"   ,"h_Ry_mm"   , bin_mm,min_mm,max_mm,200,  -0.1,  0.1); 
-    h_Rth_mm   = new TH2D("h_Rth_mm"  ,"h_Rth_mm"  , bin_mm,min_mm,max_mm,200,  -0.2,  0.2); 
-    h_Rph_mm   = new TH2D("h_Rph_mm"  ,"h_Rph_mm"  , bin_mm,min_mm,max_mm,200,  -0.1,  0.1); 
-    h_Rp_Lp    = new TH2D("h_Rp_Lp"   ,"h_Rp_Lp"   , bin_Lp,min_Lp,max_Lp,200,   1.7, 1.95); 
-    h_m2_mm    = new TH2D("h_m2_mm"   ,"h_m2_mm"   , 100,  -0.4, 1.4,bin_mm,min_mm,max_mm); 
-	// h_m2_mm    = new TH2D("h_m2_mm"   ,"h_m2_mm"   ,bin_mm,min_mm,max_mm,400,0.,20.); 
-    h_m2_ac    = new TH2D("h_m2_ac"   ,"h_m2_ac"   , 100,-0.4,1.4,400,  0., 20.); 
-    h_zz    = new TH2D("h_zz"   ,"h_zz"   , 400,-0.25,0.25,400,  -0.25, 0.25); 
+  h_mm_L       = new TH1D("h_mm_L"      ,"h_mm_L"      , bin_mm,min_mm,max_mm ); //Lambda mass range bin=2 MeV
+  h_mm_L_ec       = new TH1D("h_mm_L_ec"      ,"h_mm_L_ec"      , bin_mm,min_mm,max_mm); //Lambda mass range bin=2 MeV  
+  h_mm_nnL       = new TH1D("h_mm_nnL"      ,"h_mm_nnL"      , bin_mm,min_mm,max_mm); //nnL mass range bin=2 MeV
+  h_mm_H3L       = new TH1D("h_mm_H3L"      ,"h_mm_H3L"      , bin_mm,min_mm,max_mm); //H3L mass range bin=2 MeV  
+  h_acc_L       = new TH1D("h_acc_L"      ,"h_acc_L"      , bin_mm,min_mm,max_mm); //Lambda mass ACC  bin=2 MeV
+  h_acc_nnL       = new TH1D("h_acc_nnL"      ,"h_acc_nnL"      , bin_mm,min_mm,max_mm); //nnL mass ACC bin=2 MeV
+  h_acc_H3L       = new TH1D("h_acc_H3L"      ,"h_acc_H3L"      , bin_mm,min_mm,max_mm); //H3L mass ACC bin=2 MeV  
+  h_peak_L       = new TH1D("h_peak_L"      ,"h_peak_L"      , bin_mm,min_mm,max_mm); //Lambda mass range bin=2 MeV
+  h_peak_nnL       = new TH1D("h_peak_nnL"      ,"h_peak_nnL"      , bin_mm,min_mm,max_mm); //nnL mass range bin=2 MeV
+  h_peak_H3L       = new TH1D("h_peak_H3L"      ,"h_peak_H3L"      , bin_mm,min_mm,max_mm); //H3L mass range bin=2 MeV  
 
 
-    set->SetTH1(h_ct      ,"Coincidence Time"                      ,"Cointime (ns)"           ,"Counts");
-    h_ct->SetMinimum(0.8);
-    set->SetTH1(h_ct_wK   ,"Coincidence Time (w/ K cut)"           ,"Cointime (ns)"           ,"Counts",1,3001,3);
-    set->SetTH1(h_ct_wK_z ,"Coincidence Time (w/ K cut & Gas)"     ,"Cointime (ns)"           ,"Counts",1,3001,5);
-    set->SetTH1(h_ct_wK_z_all ,"Coincidence Time (w/ K cut & Gas)"     ,"Cointime (ns)"           ,"Counts",1,3001,5);
-    set->SetTH1(h_ct_wK_acc   ,"Coincidence Time ACC (w/ K cut)"           ,"Cointime (ns)"           ,"Counts",1,3001,3);
-    set->SetTH1(h_ct_wK_z_acc ,"Coincidence Time ACC(w/ K cut & Gas)"     ,"Cointime (ns)"           ,"Counts",1,3001,5);
-    set->SetTH2(h_Rs2x_ct ,"RHRS S2 X-pos v.s Cointime"            ,"Cointime (ns)"           ,"X (m)");
-    set->SetTH2(h_Ls2x_ct ,"LHRS S2 X-pos v.s Cointime"            ,"Cointime (ns)"           ,"X (m)");
-    set->SetTH2(h_a1sum_ct,"RHRS A1 SUM v.s Cointime"              ,"Cointime (ns)"           ,"");
-    set->SetTH2(h_a2sum_ct,"RHRS A2 SUM v.s Cointime"              ,"Cointime (ns)"           ,"");
-    set->SetTH1(h_mm      ,"Lambda Binding Energy w/o AC cut"          ,"Missing mass [GeV/c^2]","Counts/2 MeV");
-    set->SetTH1(h_mm_acc   ,"Lambda Binding Energy ACC"          ,"Missing mass [GeV/c^2]","Counts/2 MeV");
-    set->SetTH1(h_mm_Al_acc  ,"#Alminium Missing Mass(ACC)"          ,"Missing mass [GeV/c^2]","Counts/2 MeV");
-    set->SetTH1(h_mm_Al_bg  ,"#Missing Mass( Al Back Ground)"          ,"Missing mass [GeV/c^2]","Counts/2 MeV");
+  h_Rz     = new TH1D("h_Rz", "h_Rz",1000,-0.2,0.2);
+  h_Rz2     = new TH1D("h_Rz2", "h_Rz2",1000,-0.2,0.2);
+  h_Rz_c   = new TH1D("h_Rz_c", "h_Rz_c",1000,-0.2,0.2);
+  h_Rz_cut   = new TH1D("h_Rz_cut", "h_Rz_cut",1000,-0.2,0.2);
+  h_Lz     = new TH1D("h_Lz", "h_Lz",1000,-0.2,0.2);
+  h_Lz2     = new TH1D("h_Lz2", "h_Lz2",1000,-0.2,0.2);
+  h_Lz_c   = new TH1D("h_Lz_c", "h_Lz_c",1000,-0.2,0.2);
+
+  h_Rth     = new TH1D("h_Rth", "h_Rth",1000,-0.1,0.1);
+  h_Rth_c   = new TH1D("h_Rth_c", "h_Rth_c",1000,-0.1,0.1);
+  h_Lth     = new TH1D("h_Lth", "h_Lth",1000,-0.1,0.1);
+  h_Lth_c   = new TH1D("h_Lth_c", "h_Lth_c",1000,-0.1,0.1);
+
+  h_Rph     = new TH1D("h_Rph", "h_Rph",1000,-0.1,0.1);
+  h_Rph_c   = new TH1D("h_Rph_c", "h_Rph_c",1000,-0.1,0.1);
+  h_Lph     = new TH1D("h_Lph", "h_Lph",1000,-0.1,0.1);
+  h_Lph_c   = new TH1D("h_Lph_c", "h_Lph_c",1000,-0.1,0.1);
+
+  h_Rp     = new TH1D("h_Rp", "h_Rp",1000,1.5,2.5);
+  h_Rp_c   = new TH1D("h_Rp_c", "h_Rp_c",1000,1.5,2.5);
+  h_Lp     = new TH1D("h_Lp", "h_Lp",1000,1.8,2.8);
+  h_Lp_c   = new TH1D("h_Lp_c", "h_Lp_c",1000,1.8,2.8);
+  h_Lp_top   = new TH1D("h_Lp_top", "mom_L (w/ Lambda Cut)",1000,1.9,2.3);
+  
+  h_theta_ee = new TH1D("h_theta_ee", "theta_ee",1000,0.1,0.35);
+  h_theta_ee2 = new TH1D("h_theta_ee2", "theta_ee (w/ Z_Diff Cut)",1000,0.1,0.35);
+  h_theta_ee3 = new TH1D("h_theta_ee3", "theta_ee (w/ Z Cut)",1000,0.1,0.35);
+  h_theta_ee4 = new TH1D("h_theta_ee4", "theta_ee (w/ Z, AC Cut)",1000,0.1,0.35);
+  h_phi_ee = new TH1D("h_phi_ee", "phi_ee",1000,0.,2*PI);
+  h_phi_ee2 = new TH1D("h_phi_ee2", "phi_ee (w/ Z_Diff Cut)",1000,0.,2*PI);
+  h_phi_ee3 = new TH1D("h_phi_ee3", "phi_ee (w/ Z Cut)",1000,0.,2*PI);
+  h_phi_ee4 = new TH1D("h_phi_ee4", "phi_ee (w/ Z, AC Cut)",1000,0.,2*PI);
+  h_theta_ek = new TH1D("h_theta_ek", "theta_ek",1000,0.1,0.35);
+  h_phi_ek = new TH1D("h_phi_ek", "phi_ek",1000,3*PI/2-1.,3*PI/2+1.);
+  h_theta_g = new TH1D("h_theta_g", "theta_g",1000,0.1,0.35);
+  h_phi_g = new TH1D("h_phi_g", "phi_g",1000,3*PI/2-1.,3*PI/2+1.);
+  h_theta_gk_lab = new TH1D("h_theta_gk_lab", "theta_gk_lab",1000,0.,0.2);
+  h_theta_gk_cm = new TH1D("h_theta_gk_cm", "theta_gk_cm",1000,0.,0.3);
+  h_cos_gk_lab = new TH1D("h_cos_gk_lab", "cos_gk_lab",1000,0.97,1.0);
+  h_cos_gk_cm = new TH1D("h_cos_gk_cm", "cos_gk_cm",1000,0.8,1.0);
+  h_mom_g = new TH1D("h_mom_g", "mom_g",1000,1.8,2.5);
+  h_qsq = new TH1D("h_qsq", "Q^2",1000,0.,0.8);
+  h_w = new TH1D("h_w", "W",1000,0.,0.8);
+  h_pL_pR = new TH2D("h_pL_pR", "pR:pL",30,1.73,1.93,30,1.95,2.25);
+  h_pL_pR2 = new TH2D("h_pL_pR2", "pR:pL (bestcut)",30,1.73,1.93,30,1.95,2.25);
+  h_pL_pR3 = new TH2D("h_pL_pR3", "pR:pL (top-quality)",30,1.73,1.93,30,1.95,2.25);
+  h_thph_ek = new TH2D("h_thph_ek", "theta_ek:phi_ek" ,1000,0.1,0.35,1000,3*PI/2-1.,3*PI/2+1.);
+  h_thph_g = new TH2D("h_thph_g", "theta_g:phi_g" ,1000,0.1,0.35,1000,3*PI/2-1.,3*PI/2+1.);
+  h_theta_ee_p = new TH2D("h_theta_ee_p", "theta_ee:mom (w/ theta_ee Cut)",1000,0.1,0.35,1000,2.0,2.25);
+  h_theta_ee_p2 = new TH2D("h_theta_ee_p2", "theta_ee:mom (w/ VP Flux Cut)",1000,0.1,0.35,1000,2.0,2.25);
+  //h_theta_ee_p2 = new TH2D("h_theta_ee_p2", "theta_ee:mom (w/ Z_Diff Cut)",1000,0.1,0.35,1000,2.0,2.25);
+  h_theta_ee_p3 = new TH2D("h_theta_ee_p3", "theta_ee:mom (w/ Z Cut)",1000,0.1,0.35,1000,2.0,2.25);
+  h_theta_ee_p4 = new TH2D("h_theta_ee_p4", "theta_ee:mom (w/ Z, AC Cut)",1000,0.1,0.35,1000,2.0,2.25);
+  h_phi_ee_p = new TH2D("h_phi_ee_p", "phi_ee:mom (w/ Z Cut)",1000,1.0,2.0,1000,2.0,2.25);
+  h_vpflux = new TH1D("h_vpflux", "VP Flux [/GeV/sr] (top quality)",1000,0.001,0.006);
+  h_vpflux2 = new TH1D("h_vpflux2", "VP Flux [/GeV/sr] (acceptance)",1000,0.001,0.006);
+  h_vpflux3 = new TH1D("h_vpflux3", "VP Flux [/GeV/sr] (w/ Z Cut)",1000,0.001,0.006);
+  h_vpflux4 = new TH1D("h_vpflux4", "VP Flux [/GeV/sr] (w/ Z, AC Cut)",1000,0.001,0.006);
+
+  h_Lp_mm    = new TH2D("h_Lp_mm"   ,"h_Lp_mm"   , bin_mm,min_mm,max_mm,bin_Lp,min_Lp,max_Lp); 
+  //h_mmall    = new TH1D("h_mmall"   ,"h_mmall"   , 100,-1,1); 
+  h_mmall    = new TH1D("h_mmall"   ,"h_mmall"   , bin_mm,min_mm,max_mm); 
+  h_mmfoil   = new TH1D("h_mmfoil"  ,"h_mmfoil"  , bin_mm,min_mm,max_mm); 
+  h_mmbg     = new TH1D("h_mmbg"    ,"h_mmbg"    , bin_mm,min_mm,max_mm); 
+  h_mmallbg  = new TH1D("h_mmallbg" ,"h_mmallbg" , bin_mm,min_mm,max_mm); 
+  h_mmfoilbg = new TH1D("h_mmfoilbg","h_mmfoilbg", bin_mm,min_mm,max_mm); 
+
+  h_Ll_mm    = new TH2D("h_Ll_mm"   ,"h_Ll_mm"   , bin_mm,min_mm,max_mm,200,  25.2, 26.3); 
+  h_Ltgy_mm  = new TH2D("h_Ltgy_mm" ,"h_Ltgy_mm" , bin_mm,min_mm,max_mm,200, -0.06, 0.06); 
+  h_Ltgth_mm = new TH2D("h_Ltgth_mm","h_Ltgth_mm", bin_mm,min_mm,max_mm,200,  -0.1,  0.1); 
+  h_Ltgph_mm = new TH2D("h_Ltgph_mm","h_Ltgph_mm", bin_mm,min_mm,max_mm,200, -0.06, 0.06); 
+  h_Lvx_mm   = new TH2D("h_Lvx_mm"  ,"h_Lvx_mm"  , bin_mm,min_mm,max_mm,200,-0.005,0.002); 
+  h_Lvy_mm   = new TH2D("h_Lvy_mm"  ,"h_Lvy_mm"  , bin_mm,min_mm,max_mm,200,-0.004,0.003); 
+  h_Lvz_mm   = new TH2D("h_Lvz_mm"  ,"h_Lvz_mm"  , bin_mm,min_mm,max_mm,200, -0.25, 0.25); 
+  h_Lx_mm    = new TH2D("h_Lx_mm"   ,"h_Lx_mm"   , bin_mm,min_mm,max_mm,200,    -1,   1); 
+  h_Ly_mm    = new TH2D("h_Ly_mm"   ,"h_Ly_mm"   , bin_mm,min_mm,max_mm,200,  -0.1, 0.1); 
+  h_Lth_mm   = new TH2D("h_Lth_mm"  ,"h_Lth_mm"  , bin_mm,min_mm,max_mm,200,  -0.2, 0.2); 
+  h_Lph_mm   = new TH2D("h_Lph_mm"  ,"h_Lph_mm"  , bin_mm,min_mm,max_mm,200,  -0.1, 0.1); 
+  h_Rp_mm    = new TH2D("h_Rp_mm"   ,"h_Rp_mm"   , bin_mm,min_mm,max_mm,200,   1.7, 1.95); 
+  h_Rl_mm    = new TH2D("h_Rl_mm"   ,"h_Rl_mm"   , bin_mm,min_mm,max_mm,200,  25.2, 26.3); 
+  h_Rtgy_mm  = new TH2D("h_Rtgy_mm" ,"h_Rtgy_mm" , bin_mm,min_mm,max_mm,200, -0.06, 0.06); 
+  h_Rtgth_mm = new TH2D("h_Rtgth_mm","h_Rtgth_mm", bin_mm,min_mm,max_mm,200,  -0.1,  0.1); 
+  h_Rtgph_mm = new TH2D("h_Rtgph_mm","h_Rtgph_mm", bin_mm,min_mm,max_mm,200, -0.06, 0.06); 
+  h_Rvx_mm   = new TH2D("h_Rvx_mm"  ,"h_Rvx_mm"  , bin_mm,min_mm,max_mm,200,-0.005,0.002); 
+  h_Rvy_mm   = new TH2D("h_Rvy_mm"  ,"h_Rvy_mm"  , bin_mm,min_mm,max_mm,200,-0.004,0.003); 
+  h_Rvz_mm   = new TH2D("h_Rvz_mm"  ,"h_Rvz_mm"  , bin_mm,min_mm,max_mm,200, -0.25, 0.25); 
+  h_Rx_mm    = new TH2D("h_Rx_mm"   ,"h_Rx_mm"   , bin_mm,min_mm,max_mm,200,    -1,    1); 
+  h_Ry_mm    = new TH2D("h_Ry_mm"   ,"h_Ry_mm"   , bin_mm,min_mm,max_mm,200,  -0.1,  0.1); 
+  h_Rth_mm   = new TH2D("h_Rth_mm"  ,"h_Rth_mm"  , bin_mm,min_mm,max_mm,200,  -0.2,  0.2); 
+  h_Rph_mm   = new TH2D("h_Rph_mm"  ,"h_Rph_mm"  , bin_mm,min_mm,max_mm,200,  -0.1,  0.1); 
+  h_Rp_Lp    = new TH2D("h_Rp_Lp"   ,"h_Rp_Lp"   , bin_Lp,min_Lp,max_Lp,200,   1.7, 1.95); 
+  h_m2_mm    = new TH2D("h_m2_mm"   ,"h_m2_mm"   , 100,  -0.4, 1.4,bin_mm,min_mm,max_mm); 
+ // h_m2_mm    = new TH2D("h_m2_mm"   ,"h_m2_mm"   ,bin_mm,min_mm,max_mm,400,0.,20.); 
+  h_m2_ac    = new TH2D("h_m2_ac"   ,"h_m2_ac"   , 100,-0.4,1.4,400,  0., 20.); 
+  h_zz    = new TH2D("h_zz"   ,"h_zz"   , 400,-0.25,0.25,400,  -0.25, 0.25); 
+
+
+  set->SetTH1(h_ct      ,"Coincidence Time"                      ,"Cointime (ns)"           ,"Counts");
+  h_ct->SetMinimum(0.8);
+  set->SetTH1(h_ct_wK   ,"Coincidence Time (w/ K cut)"           ,"Cointime (ns)"           ,"Counts",1,3001,3);
+  set->SetTH1(h_ct_wK_z ,"Coincidence Time (w/ K cut & Gas)"     ,"Cointime (ns)"           ,"Counts",1,3001,5);
+  set->SetTH1(h_ct_wK_z_all ,"Coincidence Time (w/ K cut & Gas)"     ,"Cointime (ns)"           ,"Counts",1,3001,5);
+  set->SetTH1(h_ct_wK_acc   ,"Coincidence Time ACC (w/ K cut)"           ,"Cointime (ns)"           ,"Counts",1,3001,3);
+  set->SetTH1(h_ct_wK_z_acc ,"Coincidence Time ACC(w/ K cut & Gas)"     ,"Cointime (ns)"           ,"Counts",1,3001,5);
+  set->SetTH2(h_Rs2x_ct ,"RHRS S2 X-pos v.s Cointime"            ,"Cointime (ns)"           ,"X (m)");
+  set->SetTH2(h_Ls2x_ct ,"LHRS S2 X-pos v.s Cointime"            ,"Cointime (ns)"           ,"X (m)");
+  set->SetTH2(h_a1sum_ct,"RHRS A1 SUM v.s Cointime"              ,"Cointime (ns)"           ,"");
+  set->SetTH2(h_a2sum_ct,"RHRS A2 SUM v.s Cointime"              ,"Cointime (ns)"           ,"");
+  set->SetTH1(h_mm      ,"Lambda Binding Energy w/o AC cut"          ,"Missing mass [GeV/c^2]","Counts/2 MeV");
+  set->SetTH1(h_mm_acc   ,"Lambda Binding Energy ACC"          ,"Missing mass [GeV/c^2]","Counts/2 MeV");
+  set->SetTH1(h_mm_Al_acc  ,"#Alminium Missing Mass(ACC)"          ,"Missing mass [GeV/c^2]","Counts/2 MeV");
+  set->SetTH1(h_mm_Al_bg  ,"#Missing Mass( Al Back Ground)"          ,"Missing mass [GeV/c^2]","Counts/2 MeV");
     set->SetTH1(h_mm_MgL_acc  ,"#Mg27L Missing Mass(ACC)"          ,"Missing mass [GeV/c^2]","Counts/2 MeV");
-    set->SetTH1(h_mm_pi     ,"Lambda(Pi mass) Binding Energy w/o AC cut"          ,"Missing mass [GeV/c^2]","Counts/2 MeV");
-    set->SetTH1(h_mm_pi,"Lambda (Pi mass) Binding Energy w/o AC cut","Missing mass [GeV/c^2]","Counts/2 MeV");
-    set->SetTH2(h_Ly_mm   ,"LHRS FP Y v.s B_{Lambda}"             ,"-B_{Lambda} (GeV/c^{2})","Y_{FP} (m)");
-    set->SetTH2(h_Lth_mm  ,"LHRS FP theta v.s B_{Lambda}"        ,"-B_{Lambda} (GeV/c^{2})","theta_{FP} (rad)");
-    set->SetTH2(h_Lph_mm  ,"LHRS FP phi v.s B_{Lambda}"          ,"-B_{Lambda} (GeV/c^{2})","phi_{FP} (rad)");
-    set->SetTH2(h_Rp_Lp   ,"RHRS momentum v.s LHRS momentum"       ,"Lp (GeV/c)"              ,"Rp (GeV/c)");
+  set->SetTH1(h_mm_pi     ,"Lambda(Pi mass) Binding Energy w/o AC cut"          ,"Missing mass [GeV/c^2]","Counts/2 MeV");
+  set->SetTH1(h_mm_pi,"Lambda (Pi mass) Binding Energy w/o AC cut","Missing mass [GeV/c^2]","Counts/2 MeV");
+  set->SetTH2(h_Ly_mm   ,"LHRS FP Y v.s B_{Lambda}"             ,"-B_{Lambda} (GeV/c^{2})","Y_{FP} (m)");
+  set->SetTH2(h_Lth_mm  ,"LHRS FP theta v.s B_{Lambda}"        ,"-B_{Lambda} (GeV/c^{2})","theta_{FP} (rad)");
+  set->SetTH2(h_Lph_mm  ,"LHRS FP phi v.s B_{Lambda}"          ,"-B_{Lambda} (GeV/c^{2})","phi_{FP} (rad)");
+  set->SetTH2(h_Rp_Lp   ,"RHRS momentum v.s LHRS momentum"       ,"Lp (GeV/c)"              ,"Rp (GeV/c)");
 
+//  TF1* fAl_R=new TF1("fAl_R","gausn(0)",-0.135,-0.115);
+
+
+// min_vdc=-0.2e-6;
+// max_vdc= 1.2e-6;
+// bin_vdc=(max_vdc-min_vdc)/tdc_time*1.0e6;
+// bin_vdc=(int)bin_vdc;
+// min_s0=-10;
+// max_s0=10000;
+// bin_s0=int(max_s0-min_s0);
+//
+//
 
 cout<<"Others Set TH"<<endl;
-    hcoin_tc=new TH1F("hcoin_tc","Coincidence time w/ Path Length Correction  S2R-S2L[ns] ",bin_coin_c,min_coin_c,max_coin_c);
-		for (int i=0;i<nth;i++){
-			hcoin_t2[i]=new TH1F(Form("hcoin_t2[%d]",i), Form("Coincidence %lf<AC2<%lf  cut",ac1_adc[i],th2_max),bin_coin_c,min_coin_c,max_coin_c);
-    		set->SetTH1(hcoin_t2[i],"Coincidence time ","","");
-    		hcoin_k_ac1[i]=new TH1F(Form("hcoin_k_ac1[%d]",i), Form("Cointime (Kaon) AC1<%lf  cut",ac1_adc[i]),bin_coin_c,min_coin_c,max_coin_c);
-    		set->SetTH1(hcoin_k_ac1[i],Form("Cointime (Kaon) AC1<%lf  cut",ac1_adc[i]),"","");
-    		hcoin_k_ac2[i]=new TH1F(Form("hcoin_k_ac2[%d]",i), Form("Cointime (Kaon) 1000<AC2<%lf  cut",ac2l_adc[i]),bin_coin_c,min_coin_c,max_coin_c);
-    		set->SetTH1(hcoin_k_ac2[i],Form("Cointime (Kaon) %lf<AC2<4000  cut",ac2l_adc[i]),"","");
-		}
+ hcoin_tc=new TH1F("hcoin_tc","Coincidence time w/ Path Length Correction  S2R-S2L[ns] ",bin_coin_c,min_coin_c,max_coin_c);
+for (int i=0;i<nth;i++){
+ hcoin_t2[i]=new TH1F(Form("hcoin_t2[%d]",i), Form("Coincidence %lf<AC2<%lf  cut",ac1_adc[i],th2_max),bin_coin_c,min_coin_c,max_coin_c);
+   set->SetTH1(hcoin_t2[i],"Coincidence time ","","");
+ hcoin_k_ac1[i]=new TH1F(Form("hcoin_k_ac1[%d]",i), Form("Cointime (Kaon) AC1<%lf  cut",ac1_adc[i]),bin_coin_c,min_coin_c,max_coin_c);
+   set->SetTH1(hcoin_k_ac1[i],Form("Cointime (Kaon) AC1<%lf  cut",ac1_adc[i]),"","");
+ hcoin_k_ac2[i]=new TH1F(Form("hcoin_k_ac2[%d]",i), Form("Cointime (Kaon) 1000<AC2<%lf  cut",ac2l_adc[i]),bin_coin_c,min_coin_c,max_coin_c);
+   set->SetTH1(hcoin_k_ac2[i],Form("Cointime (Kaon) %lf<AC2<4000  cut",ac2l_adc[i]),"","");
+ }
 
 
     //-------No Z cut------------//
@@ -1908,67 +2088,65 @@ cout<<"Others Set TH"<<endl;
 	set->SetTH1(hmm_Al_fom_best,"w/ Z cut (Al Selected)","","");
 
     //-------Z vertex test------------//
-    h_zz1    = new TH2D("h_zz1"   ,"h_zz1"   ,bin_coin_c,min_coin_c,max_coin_c,bin_mm,min_mm,max_mm); 
-    h_zz2    = new TH2D("h_zz2"   ,"h_zz2"   ,bin_coin_c,min_coin_c,max_coin_c,bin_mm,min_mm,max_mm); 
-    h_zz3    = new TH2D("h_zz3"   ,"h_zz3"   ,bin_coin_c,min_coin_c,max_coin_c,bin_mm,min_mm,max_mm); 
-    h_zz4    = new TH2D("h_zz4"   ,"h_zz4"   ,bin_coin_c,min_coin_c,max_coin_c,bin_mm,min_mm,max_mm); 
-    h_z1        = new TH1D("h_z1"       ,"h_z1"       ,bin_coin_c,min_coin_c,max_coin_c);
-    h_z2        = new TH1D("h_z2"       ,"h_z2"       ,bin_coin_c,min_coin_c,max_coin_c);
-    h_z3        = new TH1D("h_z3"       ,"h_z3"       ,bin_coin_c,min_coin_c,max_coin_c);
-    h_z4        = new TH1D("h_z4"       ,"h_z4"       ,bin_coin_c,min_coin_c,max_coin_c);
-    h_z11        = new TH1D("h_z11"       ,"h_z11"       ,bin_mm,min_mm,max_mm);
-    h_z22        = new TH1D("h_z22"       ,"h_z22"       ,bin_mm,min_mm,max_mm);
-    h_z33        = new TH1D("h_z33"       ,"h_z33"       ,bin_mm,min_mm,max_mm);
-    h_z44        = new TH1D("h_z44"       ,"h_z44"       ,bin_mm,min_mm,max_mm);
-    hcoin_k_fom_Zdiff=new TH1F("hcoin_k_fom_Zdiff", "Zdiff cut",bin_coin_c,min_coin_c,max_coin_c);
-    set->SetTH1(hcoin_k_fom_Zdiff,"No Z cut","","");
-    hmm_L_fom_Zdiff=new TH1F("hmm_L_fom_Zdiff", "Zdiff cut",bin_mm,min_mm,max_mm);
-    set->SetTH1(hmm_L_fom_Zdiff,"Zdiff cut","","");
-    hcoin_k_fom_Zsum=new TH1F("hcoin_k_fom_Zsum", "Zsum cut",bin_coin_c,min_coin_c,max_coin_c);
-    set->SetTH1(hcoin_k_fom_Zsum,"No Z cut","","");
-    hmm_L_fom_Zsum=new TH1F("hmm_L_fom_Zsum", "Zsum cut",bin_mm,min_mm,max_mm);
-    set->SetTH1(hmm_L_fom_Zsum,"Zsum cut","","");
-    hct_test=new TH1F("hct_test", "Cointime_before",bin_coin_c,min_coin_c,max_coin_c);
-    set->SetTH1(hct_test,"Cointime_before","","");
-    hct_test2=new TH1F("hct_test2", "Cointime_after",bin_coin_c,min_coin_c,max_coin_c);
-    set->SetTH1(hct_test2,"Cointime_after","","");
-    hct_test3=new TH1F("hct_test3", "Itabashi_Cointime",bin_coin_c,min_coin_c,max_coin_c);
-    set->SetTH1(hct_test3,"Itabashi_Cointime","","");
-    h_ctct    = new TH2F("h_ctct"   ,"ct(w/o corr.):ct(w/ corr.)"  ,7145 ,-200.,200.,7145,-200.,200.); 
-    h_ct_x    = new TH2F("h_ct_x"   ,"Cointime vs X"  ,bin_coin_c,min_coin_c,max_coin_c,200,-1.,1.); 
-    h_ct_y    = new TH2F("h_ct_y"   ,"Cointime vs Y"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.1,0.1); 
-    h_ct_th    = new TH2F("h_ct_th"   ,"Cointime vs theta"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.1,0.1); 
-    h_ct_ph    = new TH2F("h_ct_ph"   ,"Cointime vs phi"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.1,0.1); 
-    h_ct_xy    = new TH2F("h_ct_xy"   ,"Cointime vs XY"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.05,0.05); 
-    h_ct_xth    = new TH2F("h_ct_xth"   ,"Cointime vs X*theta"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.01,0.05); 
-    h_ct_yth    = new TH2F("h_ct_yth"   ,"Cointime vs Y*theta"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.002,0.002); 
-    h_ct_xph    = new TH2F("h_ct_xph"   ,"Cointime vs X*phi"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.02,0.02); 
-    h_ct_yph    = new TH2F("h_ct_yph"   ,"Cointime vs Y*phi"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.002,0.002); 
-    h_ct_thph    = new TH2F("h_ct_thph"   ,"Cointime vs theta*phi"  ,bin_coin_c,min_coin_c,max_coin_c,20,-0.002,0.002); 
-    h_ct_tgth    = new TH2F("h_ct_tgth"   ,"Cointime vs theta_t"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.1,0.1); 
-    h_ct_tgph    = new TH2F("h_ct_tgph"   ,"Cointime vs phi_t"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.1,0.1); 
-    h_ct_vz    = new TH2F("h_ct_vz"   ,"Cointime vs vertex_z"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.15,0.15); 
-    h_ct_tgthtgph    = new TH2F("h_ct_tgthtgph"   ,"Cointime vs theta_t*phi_t"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.005,0.005); 
-    h_ct_tgthz    = new TH2F("h_ct_tgthz"   ,"Cointime vs theta_t*vertex_z"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.015,0.015); 
-    h_ct_tgphz    = new TH2F("h_ct_tgphz"   ,"Cointime vs phi_t*vertex_z"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.015,0.005); 
+  h_zz1    = new TH2D("h_zz1"   ,"h_zz1"   ,bin_coin_c,min_coin_c,max_coin_c,bin_mm,min_mm,max_mm); 
+  h_zz2    = new TH2D("h_zz2"   ,"h_zz2"   ,bin_coin_c,min_coin_c,max_coin_c,bin_mm,min_mm,max_mm); 
+  h_zz3    = new TH2D("h_zz3"   ,"h_zz3"   ,bin_coin_c,min_coin_c,max_coin_c,bin_mm,min_mm,max_mm); 
+  h_zz4    = new TH2D("h_zz4"   ,"h_zz4"   ,bin_coin_c,min_coin_c,max_coin_c,bin_mm,min_mm,max_mm); 
+  h_z1        = new TH1D("h_z1"       ,"h_z1"       ,bin_coin_c,min_coin_c,max_coin_c);
+  h_z2        = new TH1D("h_z2"       ,"h_z2"       ,bin_coin_c,min_coin_c,max_coin_c);
+  h_z3        = new TH1D("h_z3"       ,"h_z3"       ,bin_coin_c,min_coin_c,max_coin_c);
+  h_z4        = new TH1D("h_z4"       ,"h_z4"       ,bin_coin_c,min_coin_c,max_coin_c);
+  h_z11        = new TH1D("h_z11"       ,"h_z11"       ,bin_mm,min_mm,max_mm);
+  h_z22        = new TH1D("h_z22"       ,"h_z22"       ,bin_mm,min_mm,max_mm);
+  h_z33        = new TH1D("h_z33"       ,"h_z33"       ,bin_mm,min_mm,max_mm);
+  h_z44        = new TH1D("h_z44"       ,"h_z44"       ,bin_mm,min_mm,max_mm);
+  hcoin_k_fom_Zdiff=new TH1F("hcoin_k_fom_Zdiff", "Zdiff cut",bin_coin_c,min_coin_c,max_coin_c);
+  set->SetTH1(hcoin_k_fom_Zdiff,"No Z cut","","");
+  hmm_L_fom_Zdiff=new TH1F("hmm_L_fom_Zdiff", "Zdiff cut",bin_mm,min_mm,max_mm);
+  set->SetTH1(hmm_L_fom_Zdiff,"Zdiff cut","","");
+  hcoin_k_fom_Zsum=new TH1F("hcoin_k_fom_Zsum", "Zsum cut",bin_coin_c,min_coin_c,max_coin_c);
+  set->SetTH1(hcoin_k_fom_Zsum,"No Z cut","","");
+  hmm_L_fom_Zsum=new TH1F("hmm_L_fom_Zsum", "Zsum cut",bin_mm,min_mm,max_mm);
+  set->SetTH1(hmm_L_fom_Zsum,"Zsum cut","","");
+  hct_test=new TH1F("hct_test", "Cointime_before",bin_coin_c,min_coin_c,max_coin_c);
+  set->SetTH1(hct_test,"Cointime_before","","");
+  hct_test2=new TH1F("hct_test2", "Cointime_after",bin_coin_c,min_coin_c,max_coin_c);
+  set->SetTH1(hct_test2,"Cointime_after","","");
+  hct_test3=new TH1F("hct_test3", "Itabashi_Cointime",bin_coin_c,min_coin_c,max_coin_c);
+  set->SetTH1(hct_test3,"Itabashi_Cointime","","");
+  h_ctct    = new TH2F("h_ctct"   ,"ct(w/o corr.):ct(w/ corr.)"  ,7145 ,-200.,200.,7145,-200.,200.); 
+  h_ct_x    = new TH2F("h_ct_x"   ,"Cointime vs X"  ,bin_coin_c,min_coin_c,max_coin_c,200,-1.,1.); 
+  h_ct_y    = new TH2F("h_ct_y"   ,"Cointime vs Y"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.1,0.1); 
+  h_ct_th    = new TH2F("h_ct_th"   ,"Cointime vs theta"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.1,0.1); 
+  h_ct_ph    = new TH2F("h_ct_ph"   ,"Cointime vs phi"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.1,0.1); 
+  h_ct_xy    = new TH2F("h_ct_xy"   ,"Cointime vs XY"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.05,0.05); 
+  h_ct_xth    = new TH2F("h_ct_xth"   ,"Cointime vs X*theta"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.01,0.05); 
+  h_ct_yth    = new TH2F("h_ct_yth"   ,"Cointime vs Y*theta"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.002,0.002); 
+  h_ct_xph    = new TH2F("h_ct_xph"   ,"Cointime vs X*phi"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.02,0.02); 
+  h_ct_yph    = new TH2F("h_ct_yph"   ,"Cointime vs Y*phi"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.002,0.002); 
+  h_ct_thph    = new TH2F("h_ct_thph"   ,"Cointime vs theta*phi"  ,bin_coin_c,min_coin_c,max_coin_c,20,-0.002,0.002); 
+  h_ct_tgth    = new TH2F("h_ct_tgth"   ,"Cointime vs theta_t"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.1,0.1); 
+  h_ct_tgph    = new TH2F("h_ct_tgph"   ,"Cointime vs phi_t"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.1,0.1); 
+  h_ct_vz    = new TH2F("h_ct_vz"   ,"Cointime vs vertex_z"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.15,0.15); 
+  h_ct_tgthtgph    = new TH2F("h_ct_tgthtgph"   ,"Cointime vs theta_t*phi_t"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.005,0.005); 
+  h_ct_tgthz    = new TH2F("h_ct_tgthz"   ,"Cointime vs theta_t*vertex_z"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.015,0.015); 
+  h_ct_tgphz    = new TH2F("h_ct_tgphz"   ,"Cointime vs phi_t*vertex_z"  ,bin_coin_c,min_coin_c,max_coin_c,200,-0.015,0.005); 
 
-	h_gbetaR = new TH1D("h_gbetaR", "h_gbetaR", 1000, 0.995,1.0);
-	h_gbetaL = new TH1D("h_gbetaL", "h_gbetaL", 1000, 0.998,1.003);
-	h_gLenR = new TH1D("h_gLenR", "LenR [m]", 1000, 24., 28.);
-	h_gLenL = new TH1D("h_gLenL", "LenL [m]", 1000, 24., 28.);
-	h_gpR = new TH1D("h_gpR", "R_tr_p[rt] [GeV/c]", 1000, 1.6, 2.0);
-	h_gpL = new TH1D("h_gpL", "L_tr_p[lt] [GeV/c]", 1000, 1.9, 2.3);
-	h_gcorR = new TH1D("h_gcorR", "cor_R", 1000, 70., 80.);
-	h_gcorL = new TH1D("h_gcorL", "cor_L", 1000, 70., 80.);
-	h_gcorLR = new TH2D("h_gcorLR", "cor_L:cor_R", 1000, 73., 77., 1000, 73., 77.);
-	h_gtref_R = new TH1D("hgtref_R", "tref_R", 1000, -1000., 4000.);
-	h_gtimeR_R = new TH1D("h_gtimeR_R", "timeR_R", 1000, -1000., 4000.);
-	h_gtimeL_R = new TH1D("h_gtimeL_R", "timeL_R", 1000, -1000., 4000.);
-	h_gmeantime = new TH1D("h_gmeantime", "meantime_R", 1000, -200., 200.);
-	h_gctcorR = new TH1D("h_gctcorR", "ctimecorR", 1000, -10., 10.);
-	h_gctcorL = new TH1D("h_gctcorL", "ctimecorL", 1000, -10., 10.);
-
-
+		h_gbetaR = new TH1D("h_gbetaR", "h_gbetaR", 1000, 0.995,1.0);
+		h_gbetaL = new TH1D("h_gbetaL", "h_gbetaL", 1000, 0.998,1.003);
+		h_gLenR = new TH1D("h_gLenR", "LenR [m]", 1000, 24., 28.);
+		h_gLenL = new TH1D("h_gLenL", "LenL [m]", 1000, 24., 28.);
+		h_gpR = new TH1D("h_gpR", "R_tr_p[rt] [GeV/c]", 1000, 1.6, 2.0);
+		h_gpL = new TH1D("h_gpL", "L_tr_p[lt] [GeV/c]", 1000, 1.9, 2.3);
+		h_gcorR = new TH1D("h_gcorR", "cor_R", 1000, 70., 80.);
+		h_gcorL = new TH1D("h_gcorL", "cor_L", 1000, 70., 80.);
+		h_gcorLR = new TH2D("h_gcorLR", "cor_L:cor_R", 1000, 73., 77., 1000, 73., 77.);
+		h_gtref_R = new TH1D("hgtref_R", "tref_R", 1000, -1000., 4000.);
+		h_gtimeR_R = new TH1D("h_gtimeR_R", "timeR_R", 1000, -1000., 4000.);
+		h_gtimeL_R = new TH1D("h_gtimeL_R", "timeL_R", 1000, -1000., 4000.);
+		h_gmeantime = new TH1D("h_gmeantime", "meantime_R", 1000, -200., 200.);
+		h_gctcorR = new TH1D("h_gctcorR", "ctimecorR", 1000, -10., 10.);
+		h_gctcorL = new TH1D("h_gctcorL", "ctimecorL", 1000, -10., 10.);
 	for (int i=0;i<nth;i++){
 //		for (int j=0;j<nth;j++){
 //			for (int l=0;l<nth;l++){
@@ -1994,7 +2172,7 @@ cout<<"Others Set TH"<<endl;
 				hmm_pi_wobg_fom[i][j][l]=new TH1F(Form("hmm_pi_wobg_fom[%d][%d][%d]",i,j,l), Form("Missing Mass AC1<%lf, %lf<AC2<%lf  cut",ac1_adc[i],ac2l_adc[j],ac2u_adc[l]),bin_mm,min_mm,max_mm);
 				set->SetTH1(hmm_pi_wobg_fom[i][j][l],Form("Missing Mass AC1<%lf, %lf<AC2<%lf  cut",ac1_adc[i],ac2l_adc[j],ac2u_adc[l]),"","");
 
-				hcoin_pi[i][j][l]=new TH1F(Form("hcoin_pi[%d][%d][%d]",i,j,l),"Coincidence time (Pion Regenerated) ",bin_coin_c,min_coin_c,max_coin_c);
+ hcoin_pi[i][j][l]=new TH1F(Form("hcoin_pi[%d][%d][%d]",i,j,l),"Coincidence time (Pion Regenerated) ",bin_coin_c,min_coin_c,max_coin_c);
 //			}//for l
 //		}//for j
 	}//for i
@@ -2002,30 +2180,34 @@ cout<<"Others Set TH"<<endl;
 
 
 
-    hmm=new TH1F("hmm","hcoin",bin_mm,min_mm,max_mm);
-	set->SetTH1(hmm,"Mass w/o AC tuning","Mass [GeV]","Counts/2 MeV"); 
-    hmm->GetXaxis()->SetRangeUser(1.0,1.3);
-    hmm->GetYaxis()->SetRangeUser(0.0,450.0);
+ hmm=new TH1F("hmm","hcoin",bin_mm,min_mm,max_mm);
+ set->SetTH1(hmm,"Mass w/o AC tuning","Mass [GeV]","Counts/2 MeV"); 
+      hmm->GetXaxis()->SetRangeUser(1.0,1.3);
+      hmm->GetYaxis()->SetRangeUser(0.0,450.0);
 
-    hcoin_k=new TH1F("hcoin_k","Coincidence time w/ Correction Kaon Cut  S2R-S2L[ns] ",bin_coin_c,min_coin_c,max_coin_c);
-    //hcoin_pi=new TH1F("hcoin_pi","Coincidence time w/ Correction Pion  Cut S2R-S2L[ns] ",bin_coin_c,min_coin_c,max_coin_c);
-    hcoin_p=new TH1F("hcoin_p","Coincidence time w/ Correction Proton  Cut S2R-S2L[ns] ",bin_coin_c,min_coin_c,max_coin_c);
-    hcoin_pi_noZ=new TH1F("hcoin_pi_noZ","Coincidence time (Pion Regenerated) ",bin_coin_c,min_coin_c,max_coin_c);
+ hcoin_k=new TH1F("hcoin_k","Coincidence time w/ Correction Kaon Cut  S2R-S2L[ns] ",bin_coin_c,min_coin_c,max_coin_c);
+ //hcoin_pi=new TH1F("hcoin_pi","Coincidence time w/ Correction Pion  Cut S2R-S2L[ns] ",bin_coin_c,min_coin_c,max_coin_c);
+ hcoin_p=new TH1F("hcoin_p","Coincidence time w/ Correction Proton  Cut S2R-S2L[ns] ",bin_coin_c,min_coin_c,max_coin_c);
+ hcoin_pi_noZ=new TH1F("hcoin_pi_noZ","Coincidence time (Pion Regenerated) ",bin_coin_c,min_coin_c,max_coin_c);
  
-//    facc_kc=new TF1("facc_kc","[0]",min_coin_c,max_coin_c);
-//    facc_kc->SetNpx(2000);
-//    fk_kc=new TF1("fk_kc","gausn(0)+pol0(3)",min_coin_c,max_coin_c);
-//    fk_kc->SetNpx(2000);
-//    fpi_pic=new TF1("fpi_pic","gausn(0)+pol0(3)",min_coin_c,max_coin_c);
-//    fpi_pic->SetNpx(2000);
-//    fp_pc=new TF1("fp_pc","gausn(0)+pol0(3)",min_coin_c,max_coin_c);
-//    fp_pc->SetNpx(2000);
-    for(int i=0;i<nth;i++){
-    fac[i]=new TF1(Form("fac[%d]",i),"[0]",min_coin_c,max_coin_c);
-    fac[i]->SetNpx(2000);
-    fkk[i]=new TF1(Form("fkk[%d]",i),"gausn(0)+pol0(3)",min_coin_c,max_coin_c);
-    fkk[i]->SetNpx(2000);
-	}
+
+
+
+
+// facc_kc=new TF1("facc_kc","[0]",min_coin_c,max_coin_c);
+// facc_kc->SetNpx(2000);
+// fk_kc=new TF1("fk_kc","gausn(0)+pol0(3)",min_coin_c,max_coin_c);
+// fk_kc->SetNpx(2000);
+// fpi_pic=new TF1("fpi_pic","gausn(0)+pol0(3)",min_coin_c,max_coin_c);
+// fpi_pic->SetNpx(2000);
+// fp_pc=new TF1("fp_pc","gausn(0)+pol0(3)",min_coin_c,max_coin_c);
+// fp_pc->SetNpx(2000);
+ for(int i=0;i<nth;i++){
+ fac[i]=new TF1(Form("fac[%d]",i),"[0]",min_coin_c,max_coin_c);
+ fac[i]->SetNpx(2000);
+ fkk[i]=new TF1(Form("fkk[%d]",i),"gausn(0)+pol0(3)",min_coin_c,max_coin_c);
+ fkk[i]->SetNpx(2000);
+}
 } // MakeHist()
 
 ////////////////////////////////////////////////////////////
@@ -2037,13 +2219,18 @@ void tuning::Filling(){
 	time(&start);
 //--------------------------//
 
+//////////////////////////////
+/////mode = H, kine = 1 ////// in hrs_tuning.h
+//////////////////////////////
+// pathl_off=0.0;
+// pathl_off=-498.+30.-3.0+0.5;
+// s2_offset=-500.0+25.;
+// coin_offset=-41.35+498.;
+
 	int ev = 0;
 	for(int k=0;k<ENum;k++){
+		//T->GetEntry(k);
 		tree->GetEntry(k);
-
-        tr.trig=R_evtype;//trigget 5 (Coin.)
-        tr.nrun=(int)runnum;//runnum --> tritium???????.root
-        tr.nev=k;//Entry
 
 	if(k==ev*100000){
 cout << "Event (Fill) : " << k << "/" << ENum << endl;
@@ -2060,20 +2247,135 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
   bool zcut = false; // z-vertex cut
   bool LHRS = true;  // do LHRS analysis 
   bool RHRS = true;  // do RHRS analysis
+//////////////
+//// LHRS ////
+//////////////
+#ifdef F1TDC
+      convertF1TDCL(param);
+        L_s0_t = LS0_F1time[0];
+      for(int i=0;i<16;i++){
+        if(LS2_F1time[i]>-9999.)L_s2_t[i] =  LS2_F1time[i];
+        else L_s2_t[i] = -99.;
+      }
+#endif
+    
+      int NLtr = (int)L_tr_n;  if(NLtr>MAX) NLtr = MAX;
+      h_L_tr_n->Fill( L_tr_n );
+      h_L_trig->Fill( L_evtype);
+      tr.ntrack_l=NLtr;
+
+      for(int t=0;t<NLtr;t++){	
+        L_Tr = L_FP = false;
+        // FP and chi2 cuts
+        if( L_tr_chi2[t]<0.01 ) L_Tr = true;
+        if( L_tr_th[t]<0.17*L_tr_x[t]+0.025
+         && L_tr_th[t]>0.17*L_tr_x[t]-0.035
+         && L_tr_th[t]<0.4 *L_tr_x[t]+0.13 ) L_FP = true;
+	
+
+    tr.LXFP=L_tr_x[0];
+    tr.LXpFP=L_tr_th[0];
+    tr.LYFP=L_tr_y[0];
+    tr.LYpFP=L_tr_ph[0];
+    tr.LXt=L_tr_vx[0];
+    tr.LYt=L_tr_vy[0];
+    tr.LXpt=L_tr_tg_th[0];
+    tr.LYpt=L_tr_tg_ph[0];
+
+	int s2pad = (int)L_s2_trpad[t];
+	tr.Ls2ra_p[s2pad]=L_s2_ra_p[s2pad];
+	tr.Ls2la_p[s2pad]=L_s2_la_p[s2pad];
+	tr.Ls2_pad[t]=(int)L_s2_trpad[t];
+//        double p    = L_tr_p[t];
+//        double path = L_s2_trpath[t] - L_s0_trpath[t];
+//        double beta = -99;
+		//double m2 = -99;
+        if( L_s2_t[s2pad]>0 && L_s0_t>0 && s2pad>=0 ){
+//          beta = path / ( L_s2_t[s2pad] - L_s0_t ) / c;
+//          m2 = ( 1./beta/beta - 1. ) * p * p;
+        }
+//        double betae = p / sqrt(Me*Me + p*p);
+
+        h_L_tr_ch2   ->Fill( L_tr_chi2[t] );
+      
+        if( L_Tr && L_FP && s2pad>=0 ){
+        } // if L_Tr && L_FP
+      } // for NLtr
+
+//////////////
+//// RHRS ////
+//////////////
+#ifdef F1TDC
+      convertF1TDCR(param);
+      R_s0_t = RS0_F1time[0];
+      for(int i=0;i<16;i++){
+        if(RS2_F1time[i]>-9999.)R_s2_t[i] =  RS2_F1time[i];
+        else R_s2_t[i] = -99.;
+      }
+#endif
+
+    if(RHRS){
+      int NRtr = (int)R_tr_n;  if(NRtr>MAX) NRtr = MAX;
+      h_R_trig->Fill( R_evtype);
+      tr.ntrack_r=NRtr;
+
+
+      h_R_tr_n->Fill( R_tr_n );
+      for(int t=0;t<NRtr;t++){
+        R_Tr = R_FP = false;
+        // FP and chi2 cuts
+        if( R_tr_chi2[t]<0.01 ) R_Tr = true;
+        if( R_tr_th[t]<0.17*R_tr_x[t]+0.025
+         && R_tr_th[t]>0.17*R_tr_x[t]-0.035
+         && R_tr_th[t]<0.4 *R_tr_x[t]+0.13 ) R_FP = true;
+	
+        int s2pad = (int)R_s2_trpad[t];
+	if(s2pad<0)break;
+        tr.Rs2_pad[t] =(int)R_s2_trpad[t];
+//	    double p    = R_tr_p[t];
+//        double path = R_s2_trpath[t] - R_s0_trpath[t];
+//        double beta = 0;
+//		double m2 = 0;
+
+
+	
+    tr.Rs2ra_p[s2pad]=R_s2_ra_p[s2pad];
+    tr.Rs2la_p[s2pad]=R_s2_la_p[s2pad];
+    tr.Rs0ra_p=R_s0_ra_p[0];
+    tr.Rs0la_p=R_s0_la_p[0];
+    tr.RXFP=R_tr_x[0];
+    tr.RXpFP=R_tr_th[0];
+    tr.RYFP=R_tr_y[0];
+    tr.RYpFP=R_tr_ph[0];
+    tr.RXt=R_tr_vx[0];
+    tr.RYt=R_tr_vy[0];
+    tr.RXpt=R_tr_tg_th[0];
+    tr.RYpt=R_tr_tg_ph[0];
+        if( R_s2_t[s2pad]>0 && R_s0_t>0 && s2pad>=0 ){
+//          beta = path / ( R_s2_t[s2pad] - R_s0_t ) / c;
+//          m2 = ( 1./beta/beta - 1. ) * p * p;
+        } 
+//        double betaK = p / sqrt(MK*MK + p*p);
+	
+        if( R_Tr && R_FP && s2pad>=0 ){
+        } // if R_Tr && R_FP
+      } // for NRtr
+    } // if RHRS
+
 /////////////////////
 //// Coincidence ////
 /////////////////////
 
 
+	   
+
+
     if(LHRS && RHRS && R_evtype==5){
       int NLtr = (int)L_tr_n;  if(NLtr>MAX) NLtr = MAX;
       int NRtr = (int)R_tr_n;  if(NRtr>MAX) NRtr = MAX;
-      tr.ntrack_l=NLtr;
-      tr.ntrack_r=NRtr;
       
       for(int lt=0;lt<NLtr;lt++){
         L_Tr = L_FP = false;
-        // FP and chi2 cuts
         if( L_tr_chi2[lt]<0.01 ) L_Tr = true;
         if( L_tr_th[lt]<0.17*L_tr_x[lt]+0.025
          && L_tr_th[lt]>0.17*L_tr_x[lt]-0.035
@@ -2095,6 +2397,8 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
         else R_s2_t[i] = -99.;
       }
 #endif
+	  Kaon = false; // Kaon cut 
+	  zcut = false; // z-vertex cut
 	  
   
 	    //---- Initialization ----//
@@ -2206,18 +2510,46 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 	  }    
 	  
 	  npe_sum_a1->Fill(tr.AC1_npe_sum);
-	  npe_sum_a2->Fill(tr.AC2_npe_sum);
+	  //npe_sum_a2->Fill(tr.AC2_npe_sum);
 
-	  Kaon = false; // Kaon cut 
-	  zcut=false; // Vertex Z cut
-	  cut_ac1=false;  //AC1 cut
-	  cut_ac2=false;  //AC2 cut
-	  bestcut=false;  //Z cut && AC cut
+	
+	  //==== tree_out for mixed event analysis =======//
+		tr.chi2_l = L_tr_chi2[lt];
+		tr.x_l    = L_tr_x[lt];
+		tr.y_l    = L_tr_y[lt];
+		tr.th_l   = L_tr_th[lt];
+		tr.ph_l   = L_tr_ph[lt];
+		tr.mom_l  = L_tr_p[lt];
+		tr.tg_th_l= L_tr_tg_th[lt];
+		tr.tg_ph_l= L_tr_tg_ph[lt];
+		tr.vz_l   = L_tr_vz[lt];
+
+		tr.chi2_r = R_tr_chi2[rt];
+		tr.x_r    = R_tr_x[rt];
+		tr.y_r    = R_tr_y[rt];
+		tr.th_r   = R_tr_th[rt];
+		tr.ph_r   = R_tr_ph[rt];
+		tr.mom_r  = R_tr_p[rt];
+		tr.tg_th_r= R_tr_tg_th[rt];
+		tr.tg_ph_r= R_tr_tg_ph[rt];
+		tr.vz_r   = R_tr_vz[rt];
+
+          //Kaon = true; // Without AC CUT
+//2020 Okuyama	  	  if( R_a1_asum_p<200 && R_a2_asum_p>1000 && R_a2_asum_p<4000) Kaon = true;
+	  // if( R_a1_asum_p<a1_th && R_a2_asum_p>a2_th) Kaon = true;
+	  //	  if( R_a1_asum_p<1.0 && R_a2_asum_p>3.0 && R_a2_asum_p<7.0) Kaon = true;	  
 	  if( tr.AC1_npe_sum < th1_max && tr.AC2_npe_sum > th2_min) Kaon = true;
+	  //	  if(fabs(R_tr_vz[rt])<0.1
+	  //         && fabs(L_tr_vz[lt])<0.1 && fabs(R_tr_vz[rt] - L_tr_vz[lt])<0.03)zcut=true;
+
+
+
+
+	    
 	  if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1)zcut=true;
-	  if(tr.AC1_npe_sum<3.75)cut_ac1=true;
-	  if(3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20.)cut_ac2=true;
-	  if(tr.AC1_npe_sum<3.75 && 3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20. && fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1)bestcut=true;
+
+	  
+
 
 	  if( L_Tr && L_FP && R_Tr && R_FP ){
 
@@ -2253,6 +2585,8 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
             double R_betaK = R_p / sqrt(MK*MK + R_p*R_p);
 //	    double R_betaPi =R_p/ sqrt(Mpi*Mpi + R_p*R_p);
 
+bestcut=false;
+if(tr.AC1_npe_sum<3.75 && 3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20. && fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1)bestcut=true;
 
 	    CoinCalc(R_s2pad,L_s2pad,rt,lt);
 	    //	     double test =CoinCalc_c(R_s2pad,L_s2pad,rt,lt);
@@ -2436,7 +2770,6 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 	    double mass_pc, mass_H3L,mm_H3L,mm_MgL;
 
 	    
-		//Missing mass calc.
             mass = sqrt( (Ee + mt - L_E - R_E)*(Ee + mt - L_E - R_E)
                               - (B_v - L_v - R_v)*(B_v - L_v - R_v) );
 
@@ -2444,16 +2777,11 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 	    h_Rz->Fill(R_tr_vz[rt]);
 	    if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025)h_Lz->Fill((L_tr_vz[lt]+R_tr_vz[rt])/2.);
 
-//================================================================//
-//======== KINEMATICS START ======================================//
-//========   --> smart way is perfomed in kinematics.C ===========//
-//================================================================//
-//================================================================//
 
         int s2pad = (int)R_s2_trpad[rt];
         double beta = -99.;
 		double m2=-99.;
-//        if( R_s2_t[s2pad]>0 && R_s0_t>0 && s2pad>=0 )
+//        if( R_s2_t[s2pad]>0 && R_s0_t>0 && s2pad>=0 ){
 	    double p    = R_tr_p[rt];//GeV
         double path = R_s2_trpath[rt] - R_s0_trpath[rt];//m
         beta = path / ( R_s2_t[s2pad] - R_s0_t ) / c;
@@ -2544,20 +2872,19 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 		double a3=((Einc+Escat)*(Einc+Escat)/(4*Einc*Einc))/(omega*omega/(4*Einc*Escat)+sinterm);
 		double vpflux=(a1-a2-a3)/(137*4*PI*PI*omega);
 		Ng_det+=vpflux;
-//cout test
-		//if(k%100000==0){
-		//cout<<"Me="<<Me<<endl;
-		//cout<<"Einc="<<Einc<<endl;
-		//cout<<"Escat="<<Escat<<endl;
-		//cout<<"omega="<<omega<<endl;
-		//cout<<"theta="<<theta_ee*180/PI<<endl;
-		//cout<<"A="<<A<<endl;
-		//cout<<"sinterm="<<sinterm<<endl;
-		//cout<<"a1="<<a1<<endl;
-		//cout<<"a2="<<a2<<endl;
-		//cout<<"a3="<<a3<<endl;
-		//cout<<"vpflux="<<vpflux<<endl;
-		//}
+		if(k%100000==0){
+		cout<<"Me="<<Me<<endl;
+		cout<<"Einc="<<Einc<<endl;
+		cout<<"Escat="<<Escat<<endl;
+		cout<<"omega="<<omega<<endl;
+		cout<<"theta="<<theta_ee*180/PI<<endl;
+		cout<<"A="<<A<<endl;
+		cout<<"sinterm="<<sinterm<<endl;
+		cout<<"a1="<<a1<<endl;
+		cout<<"a2="<<a2<<endl;
+		cout<<"a3="<<a3<<endl;
+		cout<<"vpflux="<<vpflux<<endl;
+		}
 		h_L_tgph_tgth12->Fill(theta,phi);//No Cut
 		h_original_phth->Fill(theta_ee,phi_ee);//No Cut
 		h_LHRS_phth->Fill(theta_L,phi_L);//No Cut
@@ -2666,9 +2993,14 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 //			double beta2 = R_v*R_v/(R_E*R_E);//beta^2
 //			m2 = R_v*R_v*(1./beta2-1.);
 		}
-//================================================================//
-//kinematics calc. and kinematical cut were performed.
-//================================================================//
+
+   
+//            mass2= sqrt( (Ee + mt - L_E - R_Epi)*(Ee + mt - L_E - R_Epi)
+//                              - (B_v - L_v - R_v)*(B_v - L_v - R_v) );
+
+	    
+            mass_pc = sqrt( (Eec + mt - L_Ec - R_Ec)*(Eec + mt - L_Ec - R_Ec)
+                              - (B_vc - L_vc - R_vc)*(B_vc - L_vc - R_vc) );
 
 
 	    
@@ -2678,10 +3010,53 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 	   // mm = mm*1000.; // GeV -> MeV
 	    //mm2 = mm2*100.; // GeV ->MeV 
 
+	    //=== w/ matrix tuning ======//
+	    
+	    // Lambda Mass //
+           mass_L = sqrt( (Ee + Mp - L_E - R_E)*(Ee + Mp - L_E - R_E)
+                              - (B_v - L_v - R_v)*(B_v - L_v - R_v) );
+	   mm_L=mass_L - ML;
+	   mm_L = mm_L*1000.;
+	    // nnL Mass //
+           mass_nnL = sqrt( (Ee + MT - L_E - R_E)*(Ee + MT - L_E - R_E)
+                              - (B_v - L_v - R_v)*(B_v - L_v - R_v) );
+	   mm_nnL=mass_nnL - MnnL;
+	   mm_nnL = mm_nnL*1000.;
+	    // H3L Mass //
+           mass_H3L = sqrt( (Ee + MHe3 - L_E - R_E)*(Ee + MHe3 - L_E - R_E)
+                              - (B_v - L_v - R_v)*(B_v - L_v - R_v) );
+	   mm_H3L=mass_H3L - MH3L;	   
+	   mm_H3L = mm_H3L*1000.;
+	   
+	    // Alminium Mass //
+           mass_Al = sqrt( (Ee + MAl - L_E - R_E)*(Ee + MAl - L_E - R_E)
+                              - (B_v - L_v - R_v)*(B_v - L_v - R_v) );
+	   mm_Al=mass_Al - MAl;
+	   mm_Al = mm_Al*1000.;
+	   
+	   // Mg27L Mass //
+           mass_MgL = sqrt( (Ee + MAl - L_E - R_E)*(Ee + MAl - L_E - R_E)
+                              - (B_v - L_v - R_v)*(B_v - L_v - R_v) );
+	   mm_MgL=mass_MgL - MMgL;	   
+	   mm_MgL = mm_MgL*1000.;
+	   
+	    
+	    if( Kaon && (fabs(ct-30.)<10. || fabs(ct+30.)<10.) ){
+              h_mmallbg->Fill( mm );
+              if( fabs( L_tr_vz[lt] + 0.125 ) < 0.015 || fabs( L_tr_vz[lt] - 0.125 ) < 0.015 ){ 
+                h_mmfoilbg->Fill( mm );
+              }
+	      //              if( fabs( L_tr_vz[lt] ) < 0.1 ){
+	      if(zcut ){ 
+                h_mmbg->Fill( mm );
+              }
+		  //}
+	    }
 
 //-------------------------------------------//
-//-----Cointime correlation------------------//
 //-------------------------------------------//
+
+
 		//if(bestcut){
 		h_ct_x->Fill(ct,L_tr_x[lt]);	
 		h_ct_y->Fill(ct,L_tr_y[lt]);	
@@ -2700,8 +3075,6 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 		h_ct_tgthz->Fill(ct,L_tr_tg_th[lt]*L_tr_vz[lt]);	
 		h_ct_tgphz->Fill(ct,L_tr_tg_ph[lt]*L_tr_vz[lt]);	
 		//}
-//-------------------------------------------//
-//-------------------------------------------//
 
 
  double ctimecorR = calcf2t_3rd(PctimeR, R_tr_x[rt],R_tr_th[rt],R_tr_y[rt],R_tr_ph[rt],R_tr_vz[rt]);
@@ -2710,9 +3083,6 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 		//if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + 0.12)<0.02 && fabs(L_tr_vz[lt] + 0.12)<0.02)//Al front
 		//if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] - 0.12)<0.02 && fabs(L_tr_vz[lt] - 0.12)<0.02)//Al back
 		//if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025 && fabs(R_tr_vz[rt] + 0.12)<0.02 && fabs(L_tr_vz[lt] + 0.12)<0.02 && fabs(ct-3.1)<0.7)//Al front && pion
-//-------------------------------------------//
-//-----FP Correlation------------------------//
-//-------------------------------------------//
 		if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025){
 		h_L_y_x->Fill(L_tr_x[lt],L_tr_y[lt]);
 		h_L_z_x->Fill(L_tr_x[lt],L_tr_vz[lt]);
@@ -2752,11 +3122,6 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
    	    h_L_cordiff_zdiff->Fill(R_tr_vz[rt]-L_tr_vz[lt],ctimecorR-ctimecorL);
 		h_L_corL_corR->Fill(ctimecorR,ctimecorL);
 		}
-//-------------------------------------------//
-//-----FP Correlation------------------------//
-//-------------------------------------------//
-
-
 
 		if(fabs(mm)<0.008){
 		h_Lp_top->Fill(pL);
@@ -2765,7 +3130,8 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 //-------------------------------------------//
 //-------------No Z cut at all--------------//
 //-------------------------------------------//
-	if(cut_ac1 && cut_ac2){//no Z cut
+	zcut=true;
+	if(tr.AC1_npe_sum<3.75 && tr.AC2_npe_sum>3. && tr.AC2_npe_sum<20. && zcut){//no Z cut
 //	if(tr.AC1_npe_sum<3.75 && tr.AC2_npe_sum>3. && tr.AC2_npe_sum<20. && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<0.1)//no Z cut,w/ diff cut
 
 	hcoin_k_fom_noZ->Fill(ct);
@@ -2817,13 +3183,16 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 	}//No Z Cut, w/ AC Cut
 
 
+				cut_ac1=false;
+				cut_ac2=false;
+				if(tr.AC1_npe_sum<3.75)cut_ac1=true;
+		    	if(3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20.)cut_ac2=true;
 
 
 
 
 
 //-------------------------------------------------------------------//
-//--------------(i,j,l) running--------------------------------------//
 //-------------------------------------------------------------------//
 	for (int i=0;i<nth;i++){
 //		for (int j=0;j<nth;j++){
@@ -2890,6 +3259,7 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 
 
 					if(fabs(ct)<1.){
+				if(l==30)npe_sum_a2->Fill(tr.AC2_npe_sum);
 					//if(fabs(ct-mean_k[i][j][l])<sig_k[i][j][l]){
 						hmm_L_fom[i][j][l]->Fill(mm);
 					}//cointime
@@ -2906,62 +3276,7 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 //-------------------------------------------//
 //-------------------------------------------//
 
-				    
 
-    	//--------------------------From ana_Lambda.cc----------------------------------------//
-    	//------------------------------------------------------------------------------------//
-    	//------------------------------------------------------------------------------------//
-    	//-----------------------Okuyama doesn't use these.-----------------------------------//
-
-   
-//            mass2= sqrt( (Ee + mt - L_E - R_Epi)*(Ee + mt - L_E - R_Epi)
-//                              - (B_v - L_v - R_v)*(B_v - L_v - R_v) );
-
-	    
-            mass_pc = sqrt( (Eec + mt - L_Ec - R_Ec)*(Eec + mt - L_Ec - R_Ec)
-                              - (B_vc - L_vc - R_vc)*(B_vc - L_vc - R_vc) );
-	    //=== w/ matrix tuning ======//
-	    
-	    // Lambda Mass //
-           mass_L = sqrt( (Ee + Mp - L_E - R_E)*(Ee + Mp - L_E - R_E)
-                              - (B_v - L_v - R_v)*(B_v - L_v - R_v) );
-	   mm_L=mass_L - ML;
-	   mm_L = mm_L*1000.;
-	    // nnL Mass //
-           mass_nnL = sqrt( (Ee + MT - L_E - R_E)*(Ee + MT - L_E - R_E)
-                              - (B_v - L_v - R_v)*(B_v - L_v - R_v) );
-	   mm_nnL=mass_nnL - MnnL;
-	   mm_nnL = mm_nnL*1000.;
-	    // H3L Mass //
-           mass_H3L = sqrt( (Ee + MHe3 - L_E - R_E)*(Ee + MHe3 - L_E - R_E)
-                              - (B_v - L_v - R_v)*(B_v - L_v - R_v) );
-	   mm_H3L=mass_H3L - MH3L;	   
-	   mm_H3L = mm_H3L*1000.;
-	   
-	    // Alminium Mass //
-           mass_Al = sqrt( (Ee + MAl - L_E - R_E)*(Ee + MAl - L_E - R_E)
-                              - (B_v - L_v - R_v)*(B_v - L_v - R_v) );
-	   mm_Al=mass_Al - MAl;
-	   mm_Al = mm_Al*1000.;
-	   
-	   // Mg27L Mass //
-           mass_MgL = sqrt( (Ee + MAl - L_E - R_E)*(Ee + MAl - L_E - R_E)
-                              - (B_v - L_v - R_v)*(B_v - L_v - R_v) );
-	   mm_MgL=mass_MgL - MMgL;	   
-	   mm_MgL = mm_MgL*1000.;
-	   
-	    
-	    if( Kaon && (fabs(ct-30.)<10. || fabs(ct+30.)<10.) ){
-              h_mmallbg->Fill( mm );
-              if( fabs( L_tr_vz[lt] + 0.125 ) < 0.015 || fabs( L_tr_vz[lt] - 0.125 ) < 0.015 ){ 
-                h_mmfoilbg->Fill( mm );
-              }
-	      //              if( fabs( L_tr_vz[lt] ) < 0.1 ){
-	      if(zcut ){ 
-                h_mmbg->Fill( mm );
-              }
-		  //}
-	    }
 	    if( Kaon && fabs(ct)<1. ){	      
               h_mmall ->Fill( mm );
               if( fabs( L_tr_vz[lt] + 0.125 ) < 0.015 || fabs( L_tr_vz[lt] - 0.125 ) < 0.015 ){ 
@@ -3038,6 +3353,9 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 
 	    
 	    } // if Kaon
+
+				    
+
               if((Kaon && fabs(ct)<1.0) && ((-0.15<(L_tr_vz[lt]) && (L_tr_vz[lt])<-0.1) || (( 0.1<(L_tr_vz[lt])) && (L_tr_vz[lt])<0.15)) &&  (fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025) && ((-0.15<(R_tr_vz[rt]) && (R_tr_vz[rt])<-0.1) ||( 0.1<(R_tr_vz[rt]) && (R_tr_vz[rt])<0.15)))h_mm_MgL->Fill(mm_MgL);//h_mm_Al->Fill(mm_Al);
 
 	      if((Kaon) && (((-35<ct) && (ct<-15.0)) || ((15.0<ct) && (ct<35))) && (((-0.15<(L_tr_vz[lt])) && ((L_tr_vz[lt])<-0.1)) || ( (0.1<(L_tr_vz[lt])) && ((L_tr_vz[lt])<0.15))) && (fabs(R_tr_vz[rt]-L_tr_vz[lt])<0.025) && (((-0.15<(R_tr_vz[rt]-0.01)) && ((R_tr_vz[rt])<-0.1)) ||( (0.1<(R_tr_vz[rt])) && ((R_tr_vz[rt])<0.15)))){
@@ -3059,7 +3377,7 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 	 
               double ctime=-1000.;
 	     //--------------------------------------------------------------------------------//
-          if( Kaon && zcut){
+              if( Kaon && zcut){
 		  //		  fabs( L_tr_vz[lt] ) < 0.1 && fabs( R_tr_vz[rt] ) < 0.1 &&fabs( L_tr_vz[lt] ) < 0.1){
                h_ct_wK_z_all->Fill(ct);
             
@@ -3080,6 +3398,18 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 	      //}
 	      }
 	
+	
+             tr.missing_mass = mm;
+	     tr.momR         = R_tr_p[0]  ; tr.momL      =L_tr_p[0] ;
+	     tr.zR           = R_tr_vz[0] ; tr.zL        =L_tr_vz[0];
+	     //	     tr.AC1_sum      = R_a1_asum_p/400. ; tr.AC2_sum   =R_a2_asum_p/400.;
+	     tr.AC1_sum      = R_a1_asum_p ; tr.AC2_sum   =R_a2_asum_p;
+	     tr.ct_acc=ctime;
+	    	    // tree_out->Fill();
+	  
+    	      //--------------------------------------------------------------------------------------//
+
+
 	     //	     if( fabs( L_tr_vz[lt]  ) < 0.1 && fabs( R_tr_vz[rt]  ) < 0.1 &&fabs(ct)<1.0)
 	     if( zcut && fabs(ct)<1.0)
 	       h_mm->Fill( mm ); //No Kaon Cut
@@ -3091,48 +3421,62 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 	       h_mm_acc->Fill( mm ); //No Kaon Cut
 	       tr.missing_mass_acc=mm;
 	     }
-		 if(ct<1.0 && -1.0<ct) hmm->Fill(mm);
-    	//------------------------------------------------------------------------------------//
-    	//--------------------------From ana_Lambda.cc----------------------------------------//
 
 
-	  //==== tree_out for mixed event analysis =======//
-	 	 tr.chi2_l = L_tr_chi2[lt];
-	 	 tr.x_l    = L_tr_x[lt];
-	 	 tr.y_l    = L_tr_y[lt];
-	 	 tr.th_l   = L_tr_th[lt];
-	 	 tr.ph_l   = L_tr_ph[lt];
-	 	 tr.mom_l  = L_tr_p[lt];
-	 	 tr.tg_th_l= L_tr_tg_th[lt];
-	 	 tr.tg_ph_l= L_tr_tg_ph[lt];
-	 	 tr.vz_l   = L_tr_vz[lt];
 
-	 	 tr.chi2_r = R_tr_chi2[rt];
-	 	 tr.x_r    = R_tr_x[rt];
-	 	 tr.y_r    = R_tr_y[rt];
-	 	 tr.th_r   = R_tr_th[rt];
-	 	 tr.ph_r   = R_tr_ph[rt];
-	 	 tr.mom_r  = R_tr_p[rt];
-	 	 tr.tg_th_r= R_tr_tg_th[rt];
-	 	 tr.tg_ph_r= R_tr_tg_ph[rt];
-	 	 tr.vz_r   = R_tr_vz[rt];
-	
-         tr.missing_mass = mm;
-	     tr.momR         = R_tr_p[0];
-		 tr.momL         = L_tr_p[0];
-	     tr.zR           = R_tr_vz[0] ; 
-		 tr.zL           = L_tr_vz[0];
-	     tr.AC1_sum      = R_a1_asum_p ;
-         tr.AC2_sum      = R_a2_asum_p;
-	     tr.ct_acc		 = ctime;
+	  
+ 
+
+//
+//        // Cuts
+//        if( R_tr_chi2[rt]<0.01 ) R_Tr = true;
+//        if( R_tr_th[rt]<0.17*R_tr_x[rt]+0.025
+//         && R_tr_th[rt]>0.17*R_tr_x[rt]-0.035
+//         && R_tr_th[rt]<0.4 *R_tr_x[rt]+0.13 ) R_FP = true;
+//	
+//        int s2pad = (int)R_s2_trpad[rt];
+//	if(s2pad<0)break;
+//        tr.Rs2_pad[rt] =(int)R_s2_trpad[rt];
+//	    double p    = R_tr_p[rt];
+//        double path = R_s2_trpath[rt] - R_s0_trpath[rt];
+//        double beta = 0, m2 = 0;
+//
+//	    double B_E     = sqrt( Me*Me + B_p*B_p );
+//            int L_s2pad = (int)L_s2_trpad[lt];
+//            double L_E     = sqrt( Me*Me + L_p*L_p );
+//            double L_betae = L_p / sqrt(Me*Me + L_p*L_p);
+//            int R_s2pad    = (int)R_s2_trpad[rt];
+//            double R_E     = sqrt( MK*MK + R_p*R_p );
+//	    double R_Epi   = sqrt( Mpi*Mpi + R_p*R_p );
+//            double R_betaK = R_p / sqrt(MK*MK + R_p*R_p);
+//	    double R_betaPi =R_p/ sqrt(Mpi*Mpi + R_p*R_p);
+//
+//	    //CoinCalc(R_s2pad,L_s2pad,rt,lt);
+//
+//	 Rs2_off=s2f1_off(Rs2pads,"R",mode,kine);
+//	 Ls2_off=s2f1_off(Ls2pads,"L",mode,kine);
+//	 tof_r=(((-RF1[48+Rs2pads]+RF1[46]-RF1[16+Rs2pads]+RF1[9]+Rs2_off)/2.0))*tdc_time;
+//	 tof_l=((-LF1[Ls2pads]+LF1[30]-LF1[Ls2pads+48]+LF1[37]+Ls2_off)/2.0)*tdc_time;
+//	  coin_t=tof_r-tof_l-coin_offset-s2_offset; //coin time
+//	  coin_tc=tof_r-tof_l+rpath_corr-lpath_corr-pathl_off-coin_offset; //  coin Path & Offset  correction 
+// 
+//
+//
+//
+//
+//
+
+////MISSING MASS w/o cut////////////
+	if(ct<1.0 && -1.0<ct) hmm->Fill(mm);
 
 
-	     tree_out->Fill();//Entry <--> Coin. Tracking
 
+
+	    	     tree_out->Fill();
           } // if L_Tr && L_FP && R_Tr && R_FP
         } // for NRtr
       } // for NLtr
-	  //tree_out->Fill();//Entry <--> Single Tracking
+	  //tree_out->Fill();
     } // if LHRS && RHRS
     if(k%100000==0){
       end = time(NULL);
@@ -3144,7 +3488,7 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
   } // for ENum
 
 
-}//Filling()
+}
 
 
 
@@ -3651,7 +3995,7 @@ for(int i=0;i<nth;i++){
 
 
 
-}//ACtune()
+}
 
 ///////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
@@ -4563,7 +4907,7 @@ hct_test2->Draw("");
 hct_test3->Draw("same");
 hct_test->Draw("same");
 
-}//Draw()
+}
 //////////////////////////////////////////////////////////
 
 
@@ -4616,14 +4960,158 @@ void tuning::Print(string ofname){
  c38->Print(Form("%s",ofname.c_str()));
  c39->Print(Form("%s",ofname.c_str()));
  c39->Print(Form("%s]",ofname.c_str()));
+//      cout<<"c18 is done"<<endl;       
+// c21->Print(Form("%s",ofname.c_str()));  
+// c22->Print(Form("%s",ofname.c_str())); 
+// c23->Print(Form("%s",ofname.c_str()));
+// c24->Print(Form("%s",ofname.c_str()));
+// c25->Print(Form("%s",ofname.c_str())); 
+// c30->Print(Form("%s",ofname.c_str()));
+// c30->Print(Form("%s]",ofname.c_str()));
+//// c32->Print(Form("%s",ofname.c_str()));
+//// c32->Print(Form("%s]",ofname.c_str()));
+ 
     
  cout<<"Print is done "<<endl;
-}//Print()
+   
+
+
+}
 
 
 ///////////////////////////////////////////////////////////////
 
 void tuning::Write(){
+
+
+// gL_ac1[fom_max_th2]->SetName(Form("gL_ac1_%d",fom_max_th2));
+// gL_ac1[fom_max_th2]->Write();
+// gS_ac1[fom_max_th2]->SetName(Form("gS_ac1_%d",fom_max_th2)); 
+// gS_ac1[fom_max_th2]->Write();
+// gL_FOM_ac1[fom_max_th2]->SetName(Form("gL_FOM_ac1_%d",fom_max_th2));
+// gL_FOM_ac1[fom_max_th2]->Write();
+// 
+// gL_ac2[fom_max_th1]->SetName(Form("gL_ac2_%d",fom_max_th1));  
+// gL_ac2[fom_max_th1]->Write();
+// gS_ac2[fom_max_th1]->SetName(Form("gS_ac2_%d",fom_max_th1)); 
+// gS_ac2[fom_max_th1]->Write();  
+// gL_FOM_ac2[fom_max_th1]->SetName(Form("gL_FOM_ac2_%d",fom_max_th1));
+// gL_FOM_ac2[fom_max_th1]->Write();  
+//
+ //for(int i=0;i<3;i++){
+// gSN_k_ac1[i][i]->SetFillColor(i+1);
+// gSN_k_ac1[i][i]->SetMarkerColor(i+1);
+// gSN_k_ac1[i][i]->SetFillStyle(3005);
+// gSN_k_ac2[i][i]->SetFillColor(i+1);
+// gSN_k_ac2[i][i]->SetMarkerColor(i+1);
+// gSN_k_ac2[i][i]->SetFillStyle(3005);
+// // TGraphErrors* gsum_k_ac1[100][100];
+// gsum_k_ac1[i][i]->SetFillColor(i+1);
+// gsum_k_ac1[i][i]->SetMarkerColor(i+1);
+// gsum_k_ac1[i][i]->SetFillStyle(3005);
+// gsum_k_ac2[i][i]->SetFillColor(i+1);
+// gsum_k_ac2[i][i]->SetMarkerColor(i+1);
+// gsum_k_ac2[i][i]->SetFillStyle(3005); 
+// grate_k_ac1[i][i]->SetFillColor(i+1);
+// grate_k_ac1[i][i]->SetMarkerColor(i+1);
+// grate_k_ac1[i][i]->SetFillStyle(3005);
+// grate_k_ac2[i][i]->SetFillColor(i+1);
+// grate_k_ac2[i][i]->SetMarkerColor(i+1);
+// grate_k_ac2[i][i]->SetFillStyle(3005);
+//  //----- Pion -----------//
+// grate_pi_ac1[i][i]->SetFillColor(i+1);
+// grate_pi_ac1[i][i]->SetMarkerColor(i+1);
+// grate_pi_ac1[i][i]->SetFillStyle(3005);
+// grate_pi_ac2[i][i]->SetFillColor(i+1);
+// grate_pi_ac2[i][i]->SetMarkerColor(i+1);
+// grate_pi_ac2[i][i]->SetFillStyle(3005);  
+//
+//  //----- Proton -----------//
+// grate_p_ac1[i][i]->SetFillColor(i+1);
+// grate_p_ac1[i][i]->SetMarkerColor(i+1);
+// grate_p_ac1[i][i]->SetFillStyle(3005);
+// grate_p_ac2[i][i]->SetFillColor(i+1);
+// grate_p_ac2[i][i]->SetMarkerColor(i+1);
+// grate_p_ac2[i][i]->SetFillStyle(3005);  
+// 
+// 
+// gSN_k_ac1[i][i]->SetName(Form("gSN_k_ac1_%d",i));
+// gSN_k_ac1[i][i]->Write(); 
+// gSN_k_ac2[i][i]->SetName(Form("gSN_k_ac2_%d",i)); 
+// gSN_k_ac2[i][i]->Write(); 
+// grate_k_ac1[i][i]->SetName(Form("grate_k_ac1_%d",i));
+// grate_k_ac1[i][i]->Write(); 
+// grate_k_ac2[i][i]->SetName(Form("grate_k_ac2_%d",i)); 
+// grate_k_ac2[i][i]->Write();
+// gsum_k_ac1[i][i]->SetName(Form("gsum_k_ac1_%d",i));
+// gsum_k_ac1[i][i]->Write(); 
+// gsum_k_ac2[i][i]->SetName(Form("gsum_k_ac2_%d",i)); 
+// gsum_k_ac2[i][i]->Write();
+//
+// //---- proton ----//
+// grate_p_ac1[i][i]->SetName(Form("grate_p_ac1_%d",i));
+// grate_p_ac1[i][i]->Write(); 
+// grate_p_ac2[i][i]->SetName(Form("grate_p_ac2_%d",i)); 
+// grate_p_ac2[i][i]->Write(); 
+//
+// //---- pion ----//
+// grate_pi_ac1[i][i]->SetName(Form("grate_pi_ac1_%d",i));
+// grate_pi_ac1[i][i]->Write(); 
+// grate_pi_ac2[i][i]->SetName(Form("grate_pi_ac2_%d",i)); 
+// grate_pi_ac2[i][i]->Write(); 
+// 
+// 
+// hcoin_t1[i]->Write();
+// hcoin_t2[i]->Write();
+// 
+// }
+//
+//
+// gSN_k_ac1[fom_max_th2][fom_max_th2]->SetName(Form("gSN_k_ac1_%d",fom_max_th2));
+// gSN_k_ac1[fom_max_th2][fom_max_th2]->Write(); 
+// gSN_k_ac2[fom_max_th1][fom_max_th1]->SetName(Form("gSN_k_ac2_%d",fom_max_th1)); 
+// gSN_k_ac2[fom_max_th1][fom_max_th1]->Write(); 
+// grate_k_ac1[fom_max_th2][fom_max_th2]->SetName(Form("grate_k_ac1_%d",fom_max_th2));
+// grate_k_ac1[fom_max_th2][fom_max_th2]->Write(); 
+// grate_k_ac2[fom_max_th1][fom_max_th1]->SetName(Form("grate_k_ac2_%d",fom_max_th1)); 
+// grate_k_ac2[fom_max_th1][fom_max_th1]->Write(); 
+// 
+// facc_kc->Write();
+// fk_kc->Write();
+// fpi_pic->Write();
+// fp_pc->Write();
+// set->SetTH1(hmm_ac1_all_p[fom_th1][fom_max_th2],"hmm_ac1_all_p","Mass [GeV]","Counts/2 MeV");
+// hmm_ac1_all_p[fom_th1][fom_max_th2]->Write();
+// set->SetTH1(hmm_ac2_all_p[fom_th2][fom_max_th1],"hmm_ac2_all_p","Mass [GeV]","Counts/2 MeV"); 
+// hmm_ac2_all_p[fom_th2][fom_max_th1]->Write();
+// hmm->Write();
+// hmm_acc->Write(); 
+// hmm_p->Write();
+// fL_all->Write();
+// fL_p->Write();
+// fS_all->Write();
+// fS_p->Write(); 
+// 
+// hmm_fom->Write();
+// hmm_fom_acc->Write();
+// hmm_fom_p->Write();
+// fL_fom->Write();
+// fL_fom_p->Write();
+// fS_fom->Write();
+// fS_fom_p->Write(); 
+//
+// hmm_ac1_all_p[fom_th1][fom_max_th2]->Write();
+// hmm_ac2_all_p[fom_th2][fom_max_th1]->Write();
+//
+// fLam[fom_th1][fom_max_th2][0]->Write();
+// fSig[fom_th1][fom_max_th2][0]->Write();
+// fLam_p->SetParameters(L0[fom_th1][fom_max_th2][0],L1[fom_th1][fom_max_th2][0],L2[fom_th1][fom_max_th2][0]);
+// fSig_p->SetParameters(S0[fom_th1][fom_max_th2][0],S1[fom_th1][fom_max_th2][0],S2[fom_th1][fom_max_th2][0]);
+// fLam_p->Write();
+// fSig_p->Write(); 
+// fk_fom->Write();
+// 
+// tnew->Write();
 cout<<"before tree_out"<<endl;
  tree_out->Write();
 cout<<"before file_out"<<endl;
@@ -4631,8 +5119,48 @@ cout<<"before file_out"<<endl;
 cout<<"between file_out"<<endl;
  file_out->Close();
 cout<<"after file_out"<<endl;
+//pEff1->Write();
+//pEff2->Write();
+//pEff3->Write();
+//pEff4->Write();
+//pEff5->Write();
+//pEff6->Write();
+//pEff7->Write();
+//pEff8->Write();
+//pEff9->Write();
+//h_pisr1->Write();
+//h_ksr1->Write();
+//h_psr1->Write();
+//h_pisr2l->Write();
+//h_ksr2l->Write();
+//h_psr2l->Write();
+//h_pisr2u->Write();
+//h_ksr2u->Write();
+//h_psr2u->Write();
+//h_pitot1->Write();
+//h_ktot1->Write();
+//h_ptot1->Write();
+//h_pitot2l->Write();
+//h_ktot2l->Write();
+//h_ptot2l->Write();
+//h_pitot2u->Write();
+//h_ktot2u->Write();
+//h_ptot2u->Write();
+//npe_sum_a1->Write();
+//npe_sum_a2->Write();
+
+
+
+// hAC->Write();
+// hAC2->Write(); 
+// hcoin_tc->Write();
+// hcoin_fom->Write();
+// hRu1_time_s->Write(); 
+// hRu1_time_c->Write();
+//
+// 
 //fnew->Close();
-}//Write()
+}
 
 
 
@@ -4645,49 +5173,174 @@ cout<<"after file_out"<<endl;
 int main(int argc, char** argv){
 
 	cout<<"nth = "<<nth<<endl;
-//  string ifname = "../small.list";//Run111157~111220
-  string ifname = "../small2.list";//Run111157~111220 & Run111480~111542
-//    string ifname = "../test.list";//for debug
-    string pname = "./Lambda_H1.param";
-    string mtparam = "../matrix/matrix_new.list";
-    string print_name = "./test_print.pdf";
-    bool print_flag = false;//.pdf
-    bool root_flag  = true;//.root
-    bool draw_flag  = false;//Draw canvas
+//  gStyle->SetOptFit(111111111);
+//  int ch;
+  //string ifname = "/adaqfs/home/a-onl/tritium_work/itabashi/nnL/HallA-Online-Tritium/replay/scripts/ita_scripts/run_list/Lambda_test.list";
+  //string ofname = "/pdf/hydro1_AC_eff_test.pdf";
+// string ifname = "../small.list";//Run111157~111220
+// string ifname = "../small2.list";//Run111157~111220 & Run111480~111542
+  string ifname = "../test.list";//for debug
+//	string ifname = "../tyoudo.list";//Run111157~Run111167
+//  string runlistname;
+  string pname = "./Lambda_H1.param";
+  string mtparam = "../matrix/matrix_new.list";
+//  string root_init;
+//  string root_end;
+//  string pdf_init;
+//  string pdf_end;
+//  string ofname = "./test.pdf";
+  string root_name = "./test_mea.root";
+  string print_name = "./test_print.pdf";
+ // bool output_flag = false;
+ // bool output_tree_flag = false;
+ // bool draw_flag  = true;
+ // bool coin_flag  = false;
+  bool print_flag = true;
+  bool root_flag  = true;
+ // //  bool ac2_min=true;
+ // string itel;  
+ // string pngname;
 
   
-    tuning* AC=new tuning();
-    TApplication theApp("App", &argc, argv);
-cout << "Start SetRunList" << endl;
-    AC->matrix(mtparam);
-cout << "Start SetBranch" << endl;
-//    AC->SetBranch();
-    AC->GetACParam();
-cout << "Start SetParam" << endl;
-    AC->SetParam();
-cout << "Start MakeHist" << endl;
-    AC->MakeHist();
-    AC->ReadParam(pname);
-cout << "Start SetParam" << endl;
-    AC->SetRunList(ifname);
-cout << "Start Fill" << endl;
-    AC->Filling();
-cout << "AC->Fill() is done" << endl;
-    AC->Fitting();
-cout << "AC->Fitting() is done" << endl;
-    AC->ACtune();
-cout << "AC->ACtune() is done" << endl;
-    if(draw_flag)AC->Draw();
-    if(print_flag)AC->Print(print_name);
-    if(root_flag)AC->Write();
+//  extern char *optarg;
+//  while((ch=getopt(argc,argv,"h:f:w:s:n:r:i:o:bcop:GHT12"))!=-1){
+//    switch(ch){
+//    case 'f':
+//      ifname = optarg;
+//      cout<<"input filename : "<<ifname<<endl;
+//      break;
+//    case 's':
+//      ifname = optarg;
+//      cout<<"input filename : "<<ifname<<endl;
+//      root_flag = true;
+//      draw_flag = false;            
+//      break;
+//
+//      
+//    case 'w':
+//      print_flag = true;
+//       draw_flag = false;
+//      print_name = optarg;
+//      cout<<"output PDF filename : "<<print_name<<endl;
+//      break;
+//
+//
+//    case 'r':
+//      root_flag = true;
+//      draw_flag = false;      
+//      root_name = optarg;
+//      cout<<"output root filename : "<<root_name<<endl;      
+//      break;
+//
+//    case 'o':
+//      root_flag=true;
+//      draw_flag=false;
+//      print_flag=true;
+//      ofname = optarg;
+//      root_name="./../rootfiles/ACtuning/" + ofname + ".root";
+//      print_name="./../pdf/ACtuning/" +ofname + ".pdf";
+//      break;
+//      
+//    case 'i':
+//      itel= optarg;
+//      nth= atoi(itel.c_str());
+//      break;
+//
+//      
+//    case 'b':
+//      draw_flag = false;
+//      cout<<"BACH MODE!"<<endl;
+//      break;
+//  
+//    case 'G':
+//    mode="G";
+//      break;
+//  
+//    case 'H':
+//    mode="H";
+//      break;
+//
+//    case 'T':
+//      mode="T";    
+//	break;
+//
+//    case 'U':
+//      ac2_min=false;    
+//	break;
+//
+//  case '1':
+//    tdc_time=56.23e-3;//[ns]
+//    kine=1;
+//      break;
+//
+//  case '2':
+//    tdc_time=58e-3;//[ns]
+//    kine=2;
+//      break;
+//
+//
+//    case 'h':
+//      cout<<"-f : input root filename"<<endl;
+//      cout<<"-w : output pdf filename"<<endl;
+//      cout<<"-r : output root filename"<<endl;      
+//      cout<<"-o : output pdf & root  filename"<<endl;
+//      cout<<"-1 : F1TDC resolution 56 ns"<<endl;
+//      cout<<"-2 : F1TDC resolution 58 ns"<<endl;      
+//      cout<<"-T or H or G : Mode of root"<<endl;      
+//      return 0;
+//      break;
+//    case '?':
+//      cout<<"unknown option...."<<endl;
+//      return 0;
+//      break;
+//    default:
+//      cout<<"type -h to see help!!"<<endl;
+//      return 0;
+//    }
+//  }
+
+//mode = "H";
+//kine = 1;
+    //tdc_time=56.23e-3;//[ns]
+
   
-cout<<"=========== Output files ============="<<endl;
-cout<<"output rootfile: h2all.root"<<endl;
+  tuning* AC=new tuning();
+  TApplication theApp("App", &argc, argv);
+cout << "Start SetRunList" << endl;
+  AC->matrix(mtparam);
+//  if(root_flag)AC->SetRoot(root_name);//root_name?
+//cout << "Start SetBranch" << endl;
+//  AC->SetBranch();
+  AC->GetACParam();
+cout << "Start SetParam" << endl;
+  AC->SetParam();
+cout << "Start MakeHist" << endl;
+  AC->MakeHist();
+  AC->ReadParam(pname);
+cout << "Start SetParam" << endl;
+  AC->SetRunList(ifname);
+cout << "Start Fill" << endl;
+  AC->Filling();
+	cout << "AC->Fill() is done" << endl;
+  AC->Fitting();
+	cout << "AC->Fitting() is done" << endl;
+  AC->ACtune();
+	cout << "AC->ACtune() is done" << endl;
+  //AC->Draw();
+  //if(print_flag)AC->Print(print_name);
+  if(root_flag)AC->Write();
+//  AC->Comment();
+  
+  cout<<"=========== Output files ============="<<endl;
+  //cout<<"output rootfile: "<<root_name<<endl;
+  cout<<"output rootfile: h2all.root"<<endl;
   
   
 	
-   if(draw_flag==0)gROOT->SetBatch(1);
-   if(draw_flag==0)gSystem->Exit(1);
-   if(root_flag)theApp.Run();
-   return 0;
-}//main
+// if(draw_flag==0)gROOT->SetBatch(1);
+// if(draw_flag==0)gSystem->Exit(1);
+ if(root_flag)theApp.Run();
+ return 0;
+
+
+}

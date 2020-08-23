@@ -23,7 +23,7 @@ void kinematics(){
 	string pdfname = "kinematics.pdf";
 cout << "Output pdf file name is " << pdfname << endl;
   
-  TFile *file = new TFile("h2all2.root","read");//input file (default: h2all1.root)
+  TFile *file = new TFile("h2all_test.root","read");//input file (default: h2all1.root)
   TFile *file_new = new TFile("kinematics.root","recreate");//new root
  // TTree *tree_old = (TTree*)file->Get("tree_out");
 //cout<<"Please wait a moment. CloneTree() is working..."<<endl;
@@ -171,6 +171,9 @@ const double PI=3.14159265359;
   TH2D* h_thph_ee = new TH2D("h_thph_ee", "theta_ee:phi_ee" ,1000,0.1,0.35,1000,PI/2-1.,PI/2+1.);
   TH2D* h_thph_ek = new TH2D("h_thph_ek", "theta_ek:phi_ek" ,1000,0.1,0.35,1000,3*PI/2-1.,3*PI/2+1.);
   TH2D* h_thph_g = new TH2D("h_thph_g", "theta_g:phi_g" ,1000,0.1,0.35,1000,3*PI/2-1.,3*PI/2+1.);
+  TH1D* h_pR_lab = new TH1D("h_pR_lab", "h_pR_lab" ,1000,1.7,1.95);
+  TH1D* h_pR_cm = new TH1D("h_pR_cm", "h_pR_cm" ,1000,0.0,1.0);
+  TH2D* h2_pR_lab_cm = new TH2D("h_pR_lab_cm", "h_pR_lab_cm" ,1000,1.7,1.95,1000,0.0,1.0);
   
   h1 ->SetLineColor(2);
   h1->SetLineWidth(2);
@@ -326,7 +329,8 @@ cout<<"Entries: "<<ENum<<endl;
 		double phi_ek = R_4vec.Phi()+2*PI;//original frame
 
 		G_4vec = B_4vec - L_4vec;
-		double mom_g = G_4vec.Rho();
+		//double mom_g = G_4vec.Rho();
+		double mom_g=sqrt(G_4vec.Px()*G_4vec.Px()+G_4vec.Py()*G_4vec.Py()+G_4vec.Pz()*G_4vec.Pz());
 		double Qsq = G_4vec.M()*G_4vec.M();
 		double phi_g = G_4vec.Phi()+2*PI;
 		double theta_g = G_4vec.Theta();
@@ -338,6 +342,7 @@ cout<<"Entries: "<<ENum<<endl;
 		boost=GT_4vec.BoostVector();
 		R_4vec.Boost(-boost);
 		double theta_gk_cm = G_4vec.Angle(R_4vec.Vect());
+		double pR_cm=sqrt(R_4vec.Px()*R_4vec.Px()+R_4vec.Py()*R_4vec.Py()+R_4vec.Pz()*R_4vec.Pz());
 
 
 
@@ -357,6 +362,9 @@ cout<<"Entries: "<<ENum<<endl;
 		h_theta_gk_cm->Fill(theta_gk_cm);
 		h_cos_gk_lab->Fill(cos(theta_gk_lab));
 		h_cos_gk_cm->Fill(cos(theta_gk_cm));
+		h_pR_lab->Fill(pR);
+		h_pR_cm->Fill(pR_cm);
+		h2_pR_lab_cm->Fill(pR,pR_cm);
 		}
 
 		}//NRtr
@@ -401,6 +409,14 @@ cout<<"Entries: "<<ENum<<endl;
 	h_cos_gk_lab->Draw("");
 	c6->cd(4);
 	h_cos_gk_cm->Draw("");
+	TCanvas* c7 = new TCanvas("c7","c7");
+	c7->Divide(2,2);
+	c7->cd(1);
+	h_pR_lab->Draw("");
+	c7->cd(2);
+	h_pR_cm->Draw("");
+	c7->cd(3);
+	h2_pR_lab_cm->Draw("colz");
 
 /*--- Print ---*/
 cout << "Print is starting" << endl;
@@ -411,7 +427,8 @@ cout << "Print is starting" << endl;
 	c4->Print(Form("%s",pdfname.c_str()));
 	c5->Print(Form("%s",pdfname.c_str()));
 	c6->Print(Form("%s",pdfname.c_str()));
-	c6->Print(Form("%s]",pdfname.c_str()));
+	c7->Print(Form("%s",pdfname.c_str()));
+	c7->Print(Form("%s]",pdfname.c_str()));
 
 
 cout << "Well done!" << endl;

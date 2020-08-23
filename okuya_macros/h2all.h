@@ -1,41 +1,3 @@
-//const double c=299792458e-9;// [m/ns]
-//const double mk=493.7e-3;// Kaon mass [GeV/c^2]
-//const double me=0.511e-3;// electron mass [GeV/c^2] 
-//const double ml=1115.7e-3;//Lambda mass [GeV/c^2]
-//const double mn=939.6e-3; // neutron mass [GeV/c^2]
-//const double mpi=139.6e-3;// pion mass [GeV/c^2]
-//#include <iostream>
-//#include <fstream>
-//#include <math.h>
-//#include <string>
-//#include <time.h>
-//#include <stdio.h>
-//#include <unistd.h>
-//#include <sstream>
-//using namespace std;
-//#include "TApplication.h"
-//#include "TH1F.h"
-//#include "TH2F.h"
-//#include "TF1.h"
-//#include "TFile.h"
-//#include "TLeaf.h"
-//#include "TTree.h"
-//#include "TCut.h"
-//#include "TChain.h"
-//#include "TCanvas.h"
-//#include "TVector3.h"
-//#include "TGraph.h"
-//#include "TLine.h"
-//#include "TLatex.h"
-//#include "TText.h"
-//#include "TStyle.h"
-//#include "TROOT.h"
-//#include "TGraphErrors.h"
-//#include "TProfile.h"
-//#include "TSystem.h"
-//#include "TColor.h"
-//#include "TPaveText.h"
-//#include "TRandom.h"
 #include "Setting.h"
 #include "Param.h"
 #include "ParamMan.h"
@@ -73,6 +35,7 @@ struct TreeBranch{
   double ct_acc,ct_b,ct_c; 
   double ct_g,ct_gb;
   double ct_orig;
+  double ct_itabashi;
   double Rs0ra_p,Rs0la_p,Rs0a_p;
   double Rs2ra_p[16],Rs2la_p[16],Rs2a_p[16];
   double Ls2ra_p[16],Ls2la_p[16],Ls2a_p[16];
@@ -83,6 +46,7 @@ struct TreeBranch{
   double LXFP,LYFP,LXpFP,LYpFP;
   double LXt,LYt,LXpt,LYpt;
   double Lp_c,Rp_c,Bp_c;  
+  double Lp_before,Rp_before,Bp_before;  
   double dpe,dpe_[100],dpk[100];
   int Rs2_pad[100],Ls2_pad[100];
   double RS2T_F1[16],RS2B_F1[16],RS2T_ref,RS2B_ref,RS2T_F1_c[16],RS2B_F1_c[16],RS2T_F1_b[16],RS2B_F1_b[16];
@@ -90,7 +54,7 @@ struct TreeBranch{
   double Rtof[100],Ltof[100];
   int ntrack_r,ntrack_l;
   double Rpathl,Lpathl,Rpathl_c,Lpathl_c;
-  //int runnum;
+  int runnum;
   double ct_den, ctbg_den, mm_den, mmbg_den, cut_par[100], ct_eff[100], ctbg_eff[100], mm_eff[100], mmbg_eff[100];//Okuyama
   double chi2_l;
   double x_l;
@@ -127,7 +91,7 @@ bool ac2_min = true;
 class tuning : public Tree
 {
 
- public:
+	public:
   tuning();//constructer
   ~tuning();//destructer
   void SetRunList(string ifname);
@@ -157,17 +121,17 @@ class tuning : public Tree
 
 
 
-	//This is my old version. 	
-    void matrix(string mtparam);
-    void MTParam_R();
-    void MTParam_L();
-    void MTParam_G();
-    void MTP_mom();
-	//Matrix elements are picked up form "mtparam"
-	//These four MT functions are called in this matrix(mtparam) function.
+  //This is my old version. 	
+  void matrix(string mtparam);
+  void MTParam_R();
+  void MTParam_L();
+  void MTParam_G();
+  void MTP_mom();
+  //Matrix elements are picked up form "mtparam"
+  //These four MT functions are called in this matrix(mtparam) function.
 
   void MakeHist();
-	//Define histograms and functions. (eg. TH1D, TF1, etc.)
+	//Define histograms and functions. (e.g. TH1D, TF1, etc.)
 	//This is also used to fill into a new tree named "tree_out".
 	
   void Filling();
@@ -195,7 +159,6 @@ class tuning : public Tree
     double Eloss(double yp,double z,char const* arm);
     void CoinCalc(int RS2_seg, int LS2_seg, int rhit, int lhit);
     double CoinCalc_gogami(int RS2_seg, int LS2_seg, int rhit, int lhit);
-  //    double CoinCalc(int RS2_seg, int LS2_seg, int rhit, int lhit);
     double CoinCalc_c(int RS2_seg, int LS2_seg, int rhit, int lhit);
  private:
   TFile* fnew;
@@ -203,12 +166,11 @@ class tuning : public Tree
   Setting* set;
   ParamMan *param;
 
- public:
     TH2D *h_rbay_rbax, *h_rbby_rbbx;
     TH2D *h_rby_rbx;
     TH3D *h3_fom;
     TH2D *hProjectionxy, *hProjectionyz, *hProjectionzx;
-  TTree* tree_out;
+    TTree* tree_out;
 
 ////////////////////////////////////
 ////Define beforehand///////////////
@@ -245,8 +207,8 @@ class tuning : public Tree
   double ls2pathl[100],ls0pathl[100],ltrpathl[100];
   double trigger[100];
   double hallap;
-double Rs2tpads[100],Ls2tpads[100];
-double Rs2trpad[100],Ls2trpad[100];
+  double Rs2tpads[100],Ls2tpads[100];
+  double Rs2trpad[100],Ls2trpad[100];
   double Ru1_time[100];
   int NRu1_time;
   //---- Gogami root ---------//
@@ -256,599 +218,482 @@ double Rs2trpad[100],Ls2trpad[100];
   double Rz,Lz,Rpz,Lpz; 
   double tcoin_t;
   //------------------------//
- double mm; 
- double Ee,Ee_,Ek,Epi;
- double pe,pe_,pk,ppi;
- double coin_t,coin_tc;
- double rtof[16];
- double rbeta,rbeta_k,lbeta;
- double Rs2_off,Ls2_off; 
- double Rs2_tcorr,Ls2_tcorr;
- int Ls2pads,Rs2pads;
- bool cut_ac1,cut_ac2,cut_beta;
- int nac1,nac2,nac3,n;
- double tof_r,tof_l; 
- double rpathl,lpathl;
- double corr_R,corr_L;
- double rpath_corr,lpath_corr;
- double ct_acc; 
- double acc;
- //double ct;
- int ev;
-//
-// //===== SetParam ======//
-//
-//
- double ac1_adc[100],ac2l_adc[100],ac2u_adc[100],zver[100];
- double min_coin,max_coin,min_coin_c,max_coin_c;
- double min_ac1,max_ac1,min_ac2,max_ac2,min_adc,max_adc;
- double th1_max,th2_max,th2_min;
- double ac1_kcut,ac2_kcut_min,ac2_kcut_max;
- double th_ac2_t,th_ac2_b; 
-//
-// 
-// //===== Make Hist =======//
- TH1F* hmm;
- TH1F* hmm_acc;
- TH1F* hmm_p;
- TH1F* npe_sum_a1;
- TH1F* npe_sum_a2;
- TH1F* h_pisr1;
- TH1F* h_ksr1;
- TH1F* h_psr1;
- TH1F* h_Lsr1;
- TH1F* h_Ssr1;
- TH1F* h_pisr2l;
- TH1F* h_ksr2l;
- TH1F* h_psr2l;
- TH1F* h_Lsr2l;
- TH1F* h_Ssr2l;
- TH1F* h_pisr2u;
- TH1F* h_ksr2u;
- TH1F* h_psr2u;
- TH1F* h_Lsr2u;
- TH1F* h_Ssr2u;
- TH1F* h_pitot1;
- TH1F* h_ktot1;
- TH1F* h_ptot1;
- TH1F* h_Ltot1;
- TH1F* h_Stot1;
- TH1F* h_pitot2l;
- TH1F* h_ktot2l;
- TH1F* h_ptot2l;
- TH1F* h_Ltot2l;
- TH1F* h_Stot2l;
- TH1F* h_pitot2u;
- TH1F* h_ktot2u;
- TH1F* h_ptot2u;
- TH1F* h_Ltot2u;
- TH1F* h_Stot2u;
- TH2F* h_pisr12l;
- TH2F* h_ksr12l;
- TH2F* h_psr12l;
- TH2F* h_Lsr12l;
- TH2F* h_Ssr12l;
-// TH1F* hRu1_time_c;
-// TH1F* hRu1_time_s; 
-// TH2F* hcoin_ac1[100];
-// TH2F* hcoin_ac2[100];
-// TH2F* hcoin_ac1_acc[100];
-// TH2F* hcoin_ac2_acc[100];
-// TH2F* hvdc1_ac1[100];
-// TH2F* hvdc2_ac1[100];
-// TH2F* hvdc1_ac2[100];
-// TH2F* hvdc2_ac2[100];
-// TH2F* hs0_ac1[100];
-// TH2F* hs2_ac1[100];
-// TH2F* hs0_ac2[100];
-// TH2F* hs2_ac2[100];
-// TH1F* hcoin_t1[100];
- TH1F* hcoin_t2[100];
+  double mm; 
+  double Ee,Ee_,Ek,Epi;
+  double pe,pe_,pk,ppi;
+  double coin_t,coin_tc;
+  double rtof[16];
+  double rbeta,rbeta_k,lbeta;
+  double Rs2_off,Ls2_off; 
+  double Rs2_tcorr,Ls2_tcorr;
+  int Ls2pads,Rs2pads;
+  bool cut_ac1,cut_ac2,cut_beta;
+  int nac1,nac2,nac3,n;
+  double tof_r,tof_l; 
+  double rpathl,lpathl;
+  double corr_R,corr_L;
+  double rpath_corr,lpath_corr;
+  double ct_acc; 
+  double acc;
+  //double ct;
+  int ev;
+  double beta_R, beta_L, tref_R, LenL, LenR, cor_L, cor_R, timeL_R, timeR_R, meantime_R, ctimecorL, ctimecorR;
+
+ //===== SetParam ======//
+
+
+  double ac1_adc[100],ac2l_adc[100],ac2u_adc[100],zver[100];
+  double min_coin,max_coin,min_coin_c,max_coin_c;
+  double min_ac1,max_ac1,min_ac2,max_ac2,min_adc,max_adc;
+  double th1_max,th2_max,th2_min;
+  double ac1_kcut,ac2_kcut_min,ac2_kcut_max;
+  double th_ac2_t,th_ac2_b; 
+
+ 
+ //===== Make Hist =======//
+  TH1F* hmm;
+  TH1F* hmm_acc;
+  TH1F* hmm_p;
+  TH1F* npe_sum_a1;
+  TH1F* npe_sum_a2;
+  TH1F* h_pisr1;
+  TH1F* h_ksr1;
+  TH1F* h_psr1;
+  TH1F* h_Lsr1;
+  TH1F* h_Ssr1;
+  TH1F* h_pisr2l;
+  TH1F* h_ksr2l;
+  TH1F* h_psr2l;
+  TH1F* h_Lsr2l;
+  TH1F* h_Ssr2l;
+  TH1F* h_pisr2u;
+  TH1F* h_ksr2u;
+  TH1F* h_psr2u;
+  TH1F* h_Lsr2u;
+  TH1F* h_Ssr2u;
+  TH1F* h_pitot1;
+  TH1F* h_ktot1;
+  TH1F* h_ptot1;
+  TH1F* h_Ltot1;
+  TH1F* h_Stot1;
+  TH1F* h_pitot2l;
+  TH1F* h_ktot2l;
+  TH1F* h_ptot2l;
+  TH1F* h_Ltot2l;
+  TH1F* h_Stot2l;
+  TH1F* h_pitot2u;
+  TH1F* h_ktot2u;
+  TH1F* h_ptot2u;
+  TH1F* h_Ltot2u;
+  TH1F* h_Stot2u;
+  TH2F* h_pisr12l;
+  TH2F* h_ksr12l;
+  TH2F* h_psr12l;
+  TH2F* h_Lsr12l;
+  TH2F* h_Ssr12l;
+  TH1F* hcoin_t2[100];
 //------KID---------//
- TH1F* hcoin_k_ac1[100];
- TH1F* hcoin_k_ac2[100];
- TH1F* hcoin_k_fom[100][100][100];
- TH1F* hcoin_bg_fom[100][100][100];
- TH1F* hcoin_wo_bg_fom[100][100][100];
- TH1F* hcoin_k_fom_noZ;
- TH1F* hcoin_bg_fom_noZ;
- TH1F* hcoin_wo_bg_fom_noZ;//SR(No AC Cut, neither 1 nor 2)
- TH1F* hcoin_wo_bg_fom_noZ2;//Pion Subtracted
- TH1F* hmm_L_fom_noZ;
- TH1F* hmm_pibg_fom_noZ;
- TH1F* hmm_wo_bg_fom_noZ;
- TH1F* hmm_L_fom_Zdiff;
- TH1F* hmm_bg_fom_Zdiff;
- TH1F* hmm_wo_bg_fom_Zdiff;
- TH1F* hcoin_k_fom_Zdiff;
- TH1F* hcoin_bg_fom_Zdiff;
- TH1F* hcoin_wo_bg_fom_Zdiff;
- TH1F* hmm_L_fom_Zsum;
- TH1F* hmm_bg_fom_Zsum;
- TH1F* hmm_wo_bg_fom_Zsum;
- TH1F* hcoin_k_fom_Zsum;
- TH1F* hcoin_bg_fom_Zsum;
- TH1F* hcoin_wo_bg_fom_Zsum;
- TH1F* hmm_pi_fom_noZ;//MM if pion
- TH1F* hmm_pi_fom_best;//MM if pion
- TH1F* hmm_Al_fom_best;//MM if Al 
- TH1F* hmm_bg_fom_noZ;
- TH1F* hmm_pi_wobg_fom_noZ;
- TH1F* hct_test;
- TH1F* hct_test2;
- TH1F* hct_test3;
- TH2F* h_ctct;
- TH2F* h_ct_x;
- TH2F* h_ct_y;
- TH2F* h_ct_z;
- TH2F* h_ct_th;
- TH2F* h_ct_ph;
- TH2F* h_ct_xy;
- TH2F* h_ct_yph;
- TH2F* h_ct_xth;
- TH2F* h_ct_xph;
- TH2F* h_ct_yth;
- TH2F* h_ct_thph;
- TH2F* h_ct_tgth;
- TH2F* h_ct_tgph;
- TH2F* h_ct_vz;
- TH2F* h_ct_tgthtgph;
- TH2F* h_ct_tgthz;
- TH2F* h_ct_tgphz;
- TH1D  *h_L_vz2, *h_R_vz2;
- TH2D* h_zz;
- TH2D  *h_zz1,*h_zz2,*h_zz3,*h_zz4;
- TH1D  *h_z1,*h_z2,*h_z3,*h_z4;
- TF1   *fpi_z1,*fpi_z2,*fpi_z3,*fpi_z4;
- TF1   *fpi_slice;
- TH1D  *h_z11,*h_z22,*h_z33,*h_z44;
- TH2D* h_m2_mm;
- TH2D* h_m2_ac;
+  TH1F* hcoin_k_ac1[100];
+  TH1F* hcoin_k_ac2[100];
+  TH1F* hcoin_k_fom[100][100][100];
+  TH1F* hcoin_bg_fom[100][100][100];
+  TH1F* hcoin_wo_bg_fom[100][100][100];
+  TH1F* hcoin_k_fom_noZ;
+  TH1F* hcoin_bg_fom_noZ;
+  TH1F* hcoin_wo_bg_fom_noZ;//SR(No AC Cut, neither 1 nor 2)
+  TH1F* hcoin_wo_bg_fom_noZ2;//Pion Subtracted
+  TH1F* hmm_L_fom_noZ;
+  TH1F* hmm_pibg_fom_noZ;
+  TH1F* hmm_wo_bg_fom_noZ;
+  TH1F* hmm_L_fom_Zdiff;
+  TH1F* hmm_bg_fom_Zdiff;
+  TH1F* hmm_wo_bg_fom_Zdiff;
+  TH1F* hcoin_k_fom_Zdiff;
+  TH1F* hcoin_bg_fom_Zdiff;
+  TH1F* hcoin_wo_bg_fom_Zdiff;
+  TH1F* hmm_L_fom_Zsum;
+  TH1F* hmm_bg_fom_Zsum;
+  TH1F* hmm_wo_bg_fom_Zsum;
+  TH1F* hcoin_k_fom_Zsum;
+  TH1F* hcoin_bg_fom_Zsum;
+  TH1F* hcoin_wo_bg_fom_Zsum;
+  TH1F* hmm_pi_fom_noZ;//MM if pion
+  TH1F* hmm_pi_fom_best;//MM if pion
+  TH1F* hmm_Al_fom_best;//MM if Al 
+  TH1F* hmm_bg_fom_noZ;
+  TH1F* hmm_pi_wobg_fom_noZ;
+  TH1F* hct_test;
+  TH1F* hct_test2;
+  TH1F* hct_test3;
+  TH2F* h_ctct;
+  TH2F* h_ct_x;
+  TH2F* h_ct_y;
+  TH2F* h_ct_z;
+  TH2F* h_ct_th;
+  TH2F* h_ct_ph;
+  TH2F* h_ct_xy;
+  TH2F* h_ct_yph;
+  TH2F* h_ct_xth;
+  TH2F* h_ct_xph;
+  TH2F* h_ct_yth;
+  TH2F* h_ct_thph;
+  TH2F* h_ct_tgth;
+  TH2F* h_ct_tgph;
+  TH2F* h_ct_vz;
+  TH2F* h_ct_tgthtgph;
+  TH2F* h_ct_tgthz;
+  TH2F* h_ct_tgphz;
+  TH1D  *h_L_vz2, *h_R_vz2;
+  TH2D* h_zz;
+  TH2D  *h_zz1,*h_zz2,*h_zz3,*h_zz4;
+  TH1D  *h_z1,*h_z2,*h_z3,*h_z4;
+  TF1   *fpi_z1,*fpi_z2,*fpi_z3,*fpi_z4;
+  TF1   *fpi_slice;
+  TH1D  *h_z11,*h_z22,*h_z33,*h_z44;
+  TH2D* h_m2_mm;
+  TH2D* h_m2_ac;
 
- TH1D *h_gbetaR;
- TH1D *h_gbetaL;
- TH1D *h_gLenR;
- TH1D *h_gLenL;
- TH1D *h_gpR;
- TH1D *h_gpL; 
- TH1D *h_gcorR;
- TH1D *h_gcorL;
- TH2D *h_gcorLR;
- TH1D *h_gtref_R; 
- TH1D *h_gtimeR_R;
- TH1D *h_gtimeL_R;
- TH1D *h_gmeantime;
- TH1D *h_gctcorR; 
- TH1D *h_gctcorL; 
-double beta_R, beta_L, tref_R, LenL, LenR, cor_L, cor_R, timeL_R, timeR_R, meantime_R, ctimecorL, ctimecorR;
+  TH1D *h_gbetaR;
+  TH1D *h_gbetaL;
+  TH1D *h_gLenR;
+  TH1D *h_gLenL;
+  TH1D *h_gpR;
+  TH1D *h_gpL; 
+  TH1D *h_gcorR;
+  TH1D *h_gcorL;
+  TH2D *h_gcorLR;
+  TH1D *h_gtref_R; 
+  TH1D *h_gtimeR_R;
+  TH1D *h_gtimeL_R;
+  TH1D *h_gmeantime;
+  TH1D *h_gctcorR; 
+  TH1D *h_gctcorL; 
 
- TF1* fcoin_noZ;
- TF1* fpi_noZ;
- TF1* fk_noZ;
- TF1* fp_noZ;
- TF1* fmmbg_noZ;
- TF1* fL_noZ;
- TF1* fS_noZ;
- TF1* fmm_noZ;
- TH1F* hmm_L_fom[100][100][100];
- TH1F* hmm_bg_fom[100][100][100];
- TH1F* hmm_wo_bg_fom[100][100][100];
- TH1F* hmm_pi_fom[100][100][100];
- TH1F* hmm_pibg_fom[100][100][100];
- TH1F* hmm_pi_wobg_fom[100][100][100];
-// TH1F* hcoin_ac1_max[100];
-// TH1F* hcoin_ac2_max[100];
-// TH1F* hcoin_t3[100][100];
-// TH1F* hcoin_t;
-   TH1F* hcoin_tc;
-// TH1F* hcoin_acc_ac1[100];
-// TH1F* hcoin_acc_ac2[100];
-// TH2F* ha1_a2;
- TH1F* hcoin_k;
- TH1F* hcoin_pi[100][100][100];
- TH1F* hcoin_pi_noZ;
- TH1F* hcoin_p;
-// TH2F* hcoin_ac1_all;
-// TH2F* hcoin_ac2_all;
-// TH2F* hmm_ac1[100];
-// TH2F* hmm_ac2[100];
-// TH2F* hmm_ac1_acc[100];
-// TH2F* hmm_ac2_acc[100];
-// TH2F* hct_a1a_c[24];
-// TH2F* hct_a2a_c[26]; 
-// //----- Fill -----// 
-// TH1D* hmm_ac1_p[100][100];
-// TH1D* hmm_ac2_p[100][100];
- TF1* facc[100][100][2];
- TF1* fpi[100][100][100];
- TF1* fk[100][100][100];
- TF1* fp[100][100][100];
- TF1* fcoin[100][100][100];
- TF1* fL[100][100][100];
- TF1* fS[100][100][100];
- TF1* fmm[100][100][100];
- TF1* fmmbg[100][100][100];
-// TF1* fbg[100][100][2];
-// TF1* fbg_s[100][100][2];
-// TF1* fLam[100][100][2];
-// TF1* fSig[100][100][2];
-// TF1* fLam_p;
-// TF1* fSig_p;   
-// TH2F* hfom_ac[100][100];
-// TH2F* hAC;
-// TH2F* hAC2;
-// 
- int iter_ac1;
- int iter_ac2;
-// int iter_max;
-// TH1D* hcoin_ac1_p[100][100];
-// TH1D* hcoin_ac2_p[100][100]; 
-// TH1D* hcoin_ac1_all_p[100][100];
-// TH1D* hcoin_ac2_all_p[100][100]; 
-// TH1D* hcoin_ac1_acc_p[100][100];
-// TH1D* hcoin_ac2_acc_p[100][100]; 
-// TH1D* hmm_ac1_all_p[100][100];
-// TH1D* hmm_ac2_all_p[100][100];
-// TH1D* hmm_ac1_acc_p[100][100];
-// TH1D* hmm_ac2_acc_p[100][100];
-//
-// TGraphErrors* gsum_pi_ac1[100][100];
-// TGraphErrors* gsum_p_ac1[100][100];
-// TGraphErrors* gsum_k_ac1[100][100];
-// TGraphErrors* grate_k_ac1[100][100];
-// TGraphErrors* grate_p_ac1[100][100];
-// TGraphErrors* grate_pi_ac1[100][100];
-// TGraphErrors* gsum_pi_ac2[100][100];
-// TGraphErrors* gsum_p_ac2[100][100];
-// TGraphErrors* gsum_k_ac2[100][100];
-// TGraphErrors* grate_k_ac2[100][100];
-// TGraphErrors* grate_pi_ac2[100][100];
-// TGraphErrors* grate_p_ac2[100][100];
-// TGraphErrors* gSN_k_ac1[100][100];
-// TGraphErrors* gSN_k_ac2[100][100];
-// TGraphErrors* gfom_ac1[100];
-// TGraphErrors* gfom_ac2[100];
-// TGraphErrors* gfom;
-// TGraphErrors* gmm_SN_ac1[100];
-// TGraphErrors* gmm_SN_ac2[100];
-// TGraphErrors* gmm_S_ac1[100];
-// TGraphErrors* gmm_S_ac2[100];
-// TGraphErrors* gmm_ac2[100]; 
-// TGraphErrors* gmm_ac1[100]; 
-// TGraphErrors* gL_ac1[100];
-// TGraphErrors* gL_ac2[100];  
-// TGraphErrors* gS_ac1[100];
-// TGraphErrors* gS_ac2[100];  
-// TGraphErrors* gL_eff_ac1[100];
-// TGraphErrors* gL_eff_ac2[100];  
-// TGraphErrors* gS_eff_ac1[100];
-// TGraphErrors* gS_eff_ac2[100];  
-// TGraphErrors* gS_SN_ac1[100];
-// TGraphErrors* gS_SN_ac2[100];  
-// TGraphErrors* gL_SN_ac1[100];
-// TGraphErrors* gL_SN_ac2[100];  
-// TGraphErrors* gL_N_ac1[100];
-// TGraphErrors* gL_N_ac2[100];
-// TGraphErrors* gL_FOM_ac1[100];    
-// TGraphErrors* gL_FOM_ac2[100];  
- TGraphErrors* gcoin_pi_sr[100];  
- TGraphErrors* gcoin_k_sr[100];  
- TGraphErrors* gcoin_p_sr[100];  
-//
-//
-// TF1* facc_t1def[100][100];
-// TF1* fpi_t1def[100][100];
-// TF1* fk_t1def[100][100];
-// TF1* fcoin_t1def[100][100];
-// TF1* fp_t1def[100][100];
-// TF1* facc_t2def[100][100];
-// TF1* fpi_t2def[100][100];
-// TF1* fk_t2def[100][100];
-// TF1* fcoin_t2def[100][100];
-// TF1* fp_t2def[100][100];
-// TF1* facc_t3def[100][100];
-// TF1* fpi_t3def[100][100];
-// TF1* fk_t3def[100][100];
-// TF1* fcoin_t3def[100][100];
-// TF1* fp_t3def[100][100];
-// TF1* fcoin_t1[100][100];
-// TF1* fcoin_t2[100][100];  
-// TF1* fcoin_t3[100][100]; 
- TF1* facc_kc;
- TF1* fk_kc;
- TF1* fpi_pic;
- TF1* fp_pc;
- TF1* facc_kc2;
- TF1* fk_kc2;
- TF1* fpi_pic2;
- TF1* fp_pc2;
- TF1* facc_kc3;
- TF1* fk_kc3;
- TF1* fpi_pic3;
- TF1* fp_pc3;
- TF1* fac[100];
- TF1* fkk[100];
-//
-// //----- Tuning hist ----//
- TH1F* hcoin_fom;
- TH1F* hcoin_acc;
- TH1F* hmm_fom;//MM for FOM
- TH1F* hmm_fom_acc;
- TH1F* hmm_fom_p;
- TF1* fbg_L;
- TF1* fbg_S; 
- TF1*fL_p;    
- TF1* fS_p;  
- TF1* fL_all;
- TF1* fS_all;  
- TF1* fS_fom;
- TF1* fL_fom;
- TF1* fL_fom_bg;
- TF1* fS_fom_bg;
- TF1* fL_fom_p;
- TF1* fS_fom_p;
- TH1F* hcoin_fom_p;
- TF1* fk_fom; 
- //----- paremters ----//
- double bin_vdc,min_vdc,max_vdc;
- double min_s0,max_s0;
- int bin_s0;
- double min_s2,max_s2;
- int bin_s2;
- double bin_coin;
- double bin_coin_c;
- int bin_beta; 
- int bin_adc;
- int bin_ac1;
- int bin_ac2;
-//
-// //===== Fill ========//
+  TF1* fcoin_noZ;
+  TF1* fpi_noZ;
+  TF1* fk_noZ;
+  TF1* fp_noZ;
+  TF1* fmmbg_noZ;
+  TF1* fL_noZ;
+  TF1* fS_noZ;
+  TF1* fmm_noZ;
+  TH1F* hmm_L_fom[100][100][100];
+  TH1F* hmm_bg_fom[100][100][100];
+  TH1F* hmm_wo_bg_fom[100][100][100];
+  TH1F* hmm_pi_fom[100][100][100];
+  TH1F* hmm_pibg_fom[100][100][100];
+  TH1F* hmm_pi_wobg_fom[100][100][100];
+  TH1F* hcoin_tc;
+  TH1F* hcoin_k;
+  TH1F* hcoin_pi[100][100][100];
+  TH1F* hcoin_pi_noZ;
+  TH1F* hcoin_p;
+  //----- Fill -----// 
+  TF1* facc[100][100][2];
+  TF1* fpi[100][100][100];
+  TF1* fk[100][100][100];
+  TF1* fp[100][100][100];
+  TF1* fcoin[100][100][100];
+  TF1* fL[100][100][100];
+  TF1* fS[100][100][100];
+  TF1* fmm[100][100][100];
+  TF1* fmmbg[100][100][100];
+  int iter_ac1;
+  int iter_ac2;
+  TGraphErrors* gcoin_pi_sr[100];  
+  TGraphErrors* gcoin_k_sr[100];  
+  TGraphErrors* gcoin_p_sr[100];  
+  TF1* facc_kc;
+  TF1* fk_kc;
+  TF1* fpi_pic;
+  TF1* fp_pc;
+  TF1* facc_kc2;
+  TF1* fk_kc2;
+  TF1* fpi_pic2;
+  TF1* fp_pc2;
+  TF1* facc_kc3;
+  TF1* fk_kc3;
+  TF1* fpi_pic3;
+  TF1* fp_pc3;
+  TF1* fac[100];
+  TF1* fkk[100];
+ //----- Tuning hist ----//
+  TH1F* hcoin_fom;
+  TH1F* hcoin_acc;
+  TH1F* hmm_fom;//MM for FOM
+  TH1F* hmm_fom_acc;
+  TH1F* hmm_fom_p;
+  TF1* fbg_L;
+  TF1* fbg_S; 
+  TF1*fL_p;    
+  TF1* fS_p;  
+  TF1* fL_all;
+  TF1* fS_all;  
+  TF1* fS_fom;
+  TF1* fL_fom;
+  TF1* fL_fom_bg;
+  TF1* fS_fom_bg;
+  TF1* fL_fom_p;
+  TF1* fS_fom_p;
+  TH1F* hcoin_fom_p;
+  TF1* fk_fom; 
+//----- paremters ----//
+  double bin_vdc,min_vdc,max_vdc;
+  double min_s0,max_s0;
+  int bin_s0;
+  double min_s2,max_s2;
+  int bin_s2;
+  double bin_coin;
+  double bin_coin_c;
+  int bin_beta; 
+  int bin_adc;
+  int bin_ac1;
+  int bin_ac2;
+
+ //===== Fill ========//
 ////from ana_Lambda.h line 116//////// 
 //// LHRS ////
-    TH1D *h_L_trig;
-    TH1D* h_Rs2;
-    TH1D* h_Ls2;
-    TH1D *h_L_tr_n, *h_L_tr_ch2;
-    TH1D *h_L_p, *h_L_pathl, *h_L_px, *h_L_py, *h_L_pz;
-    TH1D *h_L_tgy, *h_L_tgth, *h_L_tgph;
-    TH1D *h_L_vx, *h_L_vy, *h_L_vz;
-    TH2D *h_L_y_x, *h_L_th_x, *h_L_ph_y;
-    TH2D *h_L_tgph_tgth;
-    TH2D *h_L_tgph_tgth2;
-    TH2D *h_L_tgph_tgth3;
-    TH2D *h_L_tgph_tgth4;
-    TH2D *h_L_tgph_tgth5;
-    TH2D *h_L_tgph_tgth6;
-    TH2D *h_L_tgph_tgth7;
-    TH2D *h_L_tgph_tgth8;
-    TH2D *h_L_tgph_tgth9;
-    TH2D *h_L_tgph_tgth10;
-    TH2D *h_L_tgph_tgth11;
-    TH2D *h_L_tgph_tgth12;
-    TH2D *h_LHRS_phth;
-    TH2D *h_LHRS_phth2;
-    TH2D *h_original_phth;
-    TH2D *h_original_phcosth;
-    TH2D *h_original_phcosth2;
-    TH2D *h_original_phth2;
-    TH2D *h_original_phth3;
-    TH2D *h_original_phth4;
-    TH2D *h_original_phth5;
-    TH2D *h_original_phth6;
-    TH2D *h_original_phth7;
-    TH2D *h_original_phth8;
-    TH2D *h_original_phth9;
-    TH2D *h_original_phth10;
-    TH2D *h_L_z_x;
-    TH2D *h_L_z_y;
-    TH2D *h_L_th_y;
-    TH2D *h_L_ph_x;
-    TH2D *h_L_th_z;
-    TH2D *h_L_ph_z;
-    TH2D *h_L_tgth_y;
-    TH2D *h_L_tgph_x;
-    TH2D *h_L_tgth_z;
-    TH2D *h_L_tgph_z;
-    TH2D *h_L_tgph_y;
-    TH2D *h_L_tgth_x;
-	TH2D *h_L_corR_tgth;
-	TH2D *h_L_corR_tgph;
-	TH2D *h_L_corR_th;
-	TH2D *h_L_corR_ph;
-	TH2D *h_L_corR_x;
-	TH2D *h_L_corR_y;
-	TH2D *h_L_corR_z;
-	TH2D *h_L_corR_zdiff;
-	TH2D *h_L_corL_tgth;
-	TH2D *h_L_corL_tgph;
-	TH2D *h_L_corL_th;
-	TH2D *h_L_corL_ph;
-	TH2D *h_L_corL_x;
-	TH2D *h_L_corL_y;
-	TH2D *h_L_corL_z;
-	TH2D *h_L_corL_zdiff;
+  TH1D *h_L_trig;
+  TH1D* h_Rs2;
+  TH1D* h_Ls2;
+  TH1D *h_L_tr_n, *h_L_tr_ch2;
+  TH1D *h_L_p, *h_L_pathl, *h_L_px, *h_L_py, *h_L_pz;
+  TH1D *h_L_tgy, *h_L_tgth, *h_L_tgph;
+  TH1D *h_L_vx, *h_L_vy, *h_L_vz;
+  TH2D *h_L_y_x, *h_L_th_x, *h_L_ph_y;
+  TH2D *h_L_tgph_tgth;
+  TH2D *h_L_tgph_tgth2;
+  TH2D *h_L_tgph_tgth3;
+  TH2D *h_L_tgph_tgth4;
+  TH2D *h_L_tgph_tgth5;
+  TH2D *h_L_tgph_tgth6;
+  TH2D *h_L_tgph_tgth7;
+  TH2D *h_L_tgph_tgth8;
+  TH2D *h_L_tgph_tgth9;
+  TH2D *h_L_tgph_tgth10;
+  TH2D *h_L_tgph_tgth11;
+  TH2D *h_L_tgph_tgth12;
+  TH2D *h_LHRS_phth;
+  TH2D *h_LHRS_phth2;
+  TH2D *h_original_phth;
+  TH2D *h_original_phcosth;
+  TH2D *h_original_phcosth2;
+  TH2D *h_original_phth2;
+  TH2D *h_original_phth3;
+  TH2D *h_original_phth4;
+  TH2D *h_original_phth5;
+  TH2D *h_original_phth6;
+  TH2D *h_original_phth7;
+  TH2D *h_original_phth8;
+  TH2D *h_original_phth9;
+  TH2D *h_original_phth10;
+  TH2D *h_L_z_x;
+  TH2D *h_L_z_y;
+  TH2D *h_L_th_y;
+  TH2D *h_L_ph_x;
+  TH2D *h_L_th_z;
+  TH2D *h_L_ph_z;
+  TH2D *h_L_tgth_y;
+  TH2D *h_L_tgph_x;
+  TH2D *h_L_tgth_z;
+  TH2D *h_L_tgph_z;
+  TH2D *h_L_tgph_y;
+  TH2D *h_L_tgth_x;
+  TH2D *h_L_corR_tgth;
+  TH2D *h_L_corR_tgph;
+  TH2D *h_L_corR_th;
+  TH2D *h_L_corR_ph;
+  TH2D *h_L_corR_x;
+  TH2D *h_L_corR_y;
+  TH2D *h_L_corR_z;
+  TH2D *h_L_corR_zdiff;
+  TH2D *h_L_corL_tgth;
+  TH2D *h_L_corL_tgph;
+  TH2D *h_L_corL_th;
+  TH2D *h_L_corL_ph;
+  TH2D *h_L_corL_x;
+  TH2D *h_L_corL_y;
+  TH2D *h_L_corL_z;
+  TH2D *h_L_corL_zdiff;
 
-	TH2D *h_L_ct_zdiff;
-	TH2D *h_L_corsum_zdiff;
-	TH2D *h_L_cordiff_zdiff;
-	TH2D *h_L_corL_corR;
-	bool bestcut=false;
-
-    TH1D *h_L_beta, *h_L_m2;
-    TH2D *h_L_beta_p , *h_L_beta_m2;
-    TH2D *h_L_dedx_p, *h_L_dedx_m2;
-    TH1D *h_L_s0_dedx;
-    TH2D *h_L_s0_dedx_x, *h_L_s0_beta_x;
-    TH1D *h_L_s2_pad;
-    TH1D *h_L_s2_dedx;
-    TH2D *h_L_s2_dedx_x, *h_L_s2_beta_x;
-    TH2D *h_L_s2_dedx_pad, *h_L_s2_beta_pad;
-
-    TH1D *h_L_tgt;
-    TH2D *h_L_s2pad_tgt;
-    TH2D *h_L_p_tgt, *h_L_pathl_tgt, *h_L_tgy_tgt, *h_L_tgth_tgt, *h_L_tgph_tgt;
-    TH2D *h_L_x_tgt, *h_L_y_tgt;
+  TH2D *h_L_ct_zdiff;
+  TH2D *h_L_corsum_zdiff;
+  TH2D *h_L_cordiff_zdiff;
+  TH2D *h_L_corL_corR;
+  bool bestcut=false;
+  
+  TH1D *h_L_beta, *h_L_m2;
+  TH2D *h_L_beta_p , *h_L_beta_m2;
+  TH2D *h_L_dedx_p, *h_L_dedx_m2;
+  TH1D *h_L_s0_dedx;
+  TH2D *h_L_s0_dedx_x, *h_L_s0_beta_x;
+  TH1D *h_L_s2_pad;
+  TH1D *h_L_s2_dedx;
+  TH2D *h_L_s2_dedx_x, *h_L_s2_beta_x;
+  TH2D *h_L_s2_dedx_pad, *h_L_s2_beta_pad;
+  
+  TH1D *h_L_tgt;
+  TH2D *h_L_s2pad_tgt;
+  TH2D *h_L_p_tgt, *h_L_pathl_tgt, *h_L_tgy_tgt, *h_L_tgth_tgt, *h_L_tgph_tgt;
+  TH2D *h_L_x_tgt, *h_L_y_tgt;
 
 //// RHRS ////
-    TH1D *h_R_trig;
+  TH1D *h_R_trig;
+  
+  TH1D *h_R_tr_n, *h_R_tr_ch2;
+  TH1D *h_R_p, *h_R_pathl, *h_R_px, *h_R_py, *h_R_pz;
+  TH1D *h_R_tgy, *h_R_tgth, *h_R_tgph;
+  TH1D *h_R_vx, *h_R_vy, *h_R_vz;
+  TH2D *h_R_y_x, *h_R_th_x, *h_R_ph_y;
+  TH2D *h_R_tgph_tgth;
 
-    
-    TH1D *h_R_tr_n, *h_R_tr_ch2;
-    TH1D *h_R_p, *h_R_pathl, *h_R_px, *h_R_py, *h_R_pz;
-    TH1D *h_R_tgy, *h_R_tgth, *h_R_tgph;
-    TH1D *h_R_vx, *h_R_vy, *h_R_vz;
-    TH2D *h_R_y_x, *h_R_th_x, *h_R_ph_y;
-    TH2D *h_R_tgph_tgth;
+  TH1D *h_R_beta, *h_R_m2;
+  TH2D *h_R_beta_p , *h_R_beta_m2;
+  TH2D *h_R_dedx_p, *h_R_dedx_m2;
+  TH1D *h_R_s0_dedx;
+  TH2D *h_R_s0_dedx_x, *h_R_s0_beta_x;
+  TH1D *h_R_s2_pad;
+  TH1D *h_R_s2_dedx;
+  TH2D *h_R_s2_dedx_x, *h_R_s2_beta_x;
+  TH2D *h_R_s2_dedx_pad, *h_R_s2_beta_pad;
+  TH1D *h_R_a1_sum, *h_R_a2_sum;
+  TH2D *h_R_a1_sum_x, *h_R_a2_sum_x;
+  TH2D *h_R_a1_sum_p, *h_R_a2_sum_p;
+  TH2D *h_R_a1_sum_m2, *h_R_a2_sum_m2;
 
-    TH1D *h_R_beta, *h_R_m2;
-    TH2D *h_R_beta_p , *h_R_beta_m2;
-    TH2D *h_R_dedx_p, *h_R_dedx_m2;
-    TH1D *h_R_s0_dedx;
-    TH2D *h_R_s0_dedx_x, *h_R_s0_beta_x;
-    TH1D *h_R_s2_pad;
-    TH1D *h_R_s2_dedx;
-    TH2D *h_R_s2_dedx_x, *h_R_s2_beta_x;
-    TH2D *h_R_s2_dedx_pad, *h_R_s2_beta_pad;
-    TH1D *h_R_a1_sum, *h_R_a2_sum;
-    TH2D *h_R_a1_sum_x, *h_R_a2_sum_x;
-    TH2D *h_R_a1_sum_p, *h_R_a2_sum_p;
-    TH2D *h_R_a1_sum_m2, *h_R_a2_sum_m2;
+  TH1D *h_R_tgt;
+  TH2D *h_R_s2pad_tgt;
+  TH2D *h_R_p_tgt, *h_R_pathl_tgt, *h_R_tgy_tgt, *h_R_tgth_tgt, *h_R_tgph_tgt;
+  TH2D *h_R_x_tgt, *h_R_y_tgt;
 
-    TH1D *h_R_tgt;
-    TH2D *h_R_s2pad_tgt;
-    TH2D *h_R_p_tgt, *h_R_pathl_tgt, *h_R_tgy_tgt, *h_R_tgth_tgt, *h_R_tgph_tgt;
-    TH2D *h_R_x_tgt, *h_R_y_tgt;
+// Coin ////
+  TH1D *h_ct;
+  TH1D *h_ct_wK, *h_ct_wK_z;
+  TH2D* h_ct_Rp;
+  TH1D *h_ct_wK_acc, *h_ct_wK_z_acc;
+  TH2D *h_Ls2x_ct;
+  TH2D *h_Rs2x_ct;
+  TH2D *h_a1sum_ct, *h_a2sum_ct;
+  TH1D *h_mm, *h_mmall, *h_mmfoil;
+  TH1D *h_mmbg, *h_mmallbg, *h_mmfoilbg;
+  TH2D *h_Lp_mm, *h_Ll_mm, *h_Ltgy_mm, *h_Ltgth_mm, *h_Ltgph_mm;
+  TH2D *h_Lvx_mm, *h_Lvy_mm, *h_Lvz_mm;
+  TH2D *h_Lx_mm, *h_Ly_mm, *h_Lth_mm, *h_Lph_mm;
+  TH2D *h_Rp_mm, *h_Rl_mm, *h_Rtgy_mm, *h_Rtgth_mm, *h_Rtgph_mm;
+  TH2D *h_Rvx_mm, *h_Rvy_mm, *h_Rvz_mm;
+  TH2D *h_Rx_mm, *h_Ry_mm, *h_Rth_mm, *h_Rph_mm;
+  TH2D *h_Rp_Lp;
+  TH1D *h_mm_L;
+  TH1D *h_mm_L_ec;
+  TH1D *h_mm_nnL;
+  TH1D *h_acc_L;
+  TH1D *h_acc_nnL;
+  TH1D *h_mm_H3L;
+  TH1D *h_acc_H3L;
+  TH1D *h_peak_H3L;  
+  TH1D *h_mm_Al;
+  TH1D *h_mm_Al_acc;
+  TH1D *h_peak_Al;
+  TH1D *h_mm_MgL;
+  TH1D *h_mm_MgL_acc;
+  TH1D *h_peak_MgL;
+  TH1D *h_peak_L;
+  TH1D *h_peak_nnL;
+  TH1D *h_acc_Al;
+  TH1D *h_mm_acc;
+  TH1D *h_peak_mm;
+  TH1D *h_mm_pi;
+  TH1D* h_ct_wK_z_all;
+  TH1D* h_ct_acc;
+  TH1D* h_mm_Al_bg;
+  /// Added by itabashi ///
+  TH1D*h_Rz;
+  TH1D*h_Rz_cut;
+  TH1D*h_Rth;
+  TH1D*h_Rph;
+  TH1D*h_Rp;
+  TH1D*h_Lz;
+  TH1D*h_Lth;
+  TH1D*h_Lph;
+  TH1D*h_Lp;
+  TH1D*h_Rz_c;
+  TH1D*h_Rth_c;
+  TH1D*h_Rph_c;
+  TH1D*h_Rp_c;
+  TH1D*h_Lz_c;
+  TH1D*h_Lth_c;
+  TH1D*h_Lph_c;
+  TH1D*h_Lp_c;    
+  /// Added by Okuyama ///
+  TH1D* h_Lz2;
+  TH1D* h_Rz2;
+  TH1D* h_Lp_top;    
+  TH1D* h_theta_ee;
+  TH1D* h_theta_ee2;
+  TH1D* h_theta_ee3;
+  TH1D* h_theta_ee4;
+  TH1D* h_phi_ee;
+  TH1D* h_phi_ee2;
+  TH1D* h_phi_ee3;
+  TH1D* h_phi_ee4;
+  TH1D* h_vpflux;
+  TH1D* h_vpflux2;
+  TH1D* h_vpflux3;
+  TH1D* h_vpflux4;
+  double Ng_det=0.;//Ngamma(detected)
+  double Ng_det_top=0.;//Ngamma(detected)
+  double Ng_det_acc=0.;//Ngamma(detected)
+  TH2D* h_theta_ee_p;
+  TH2D* h_theta_ee_p2;
+  TH2D* h_theta_ee_p3;
+  TH2D* h_theta_ee_p4;
+  TH2D* h_phi_ee_p;
+  TH2D* h_pL_pR;
+  TH2D* h_pL_pR2;
+  TH2D* h_pL_pR3;
+  TH1D* h_theta_ek;
+  TH1D* h_phi_ek;
+  TH1D* h_theta_g;
+  TH1D* h_phi_g;
+  TH1D* h_theta_gk_lab;
+  TH1D* h_theta_gk_cm;
+  TH1D* h_cos_gk_lab;
+  TH1D* h_cos_gk_cm;
+  TH1D* h_mom_g;
+  TH1D* h_qsq;
+  TH1D* h_w;
+  TH2D* h_thph_ek;
+  TH2D* h_thph_g;
 
-//// Coin ////
-    TH1D *h_ct;
-    TH1D *h_ct_wK, *h_ct_wK_z;
-    TH2D* h_ct_Rp;
-    TH1D *h_ct_wK_acc, *h_ct_wK_z_acc;
-    TH2D *h_Ls2x_ct;
-    TH2D *h_Rs2x_ct;
-    TH2D *h_a1sum_ct, *h_a2sum_ct;
-    TH1D *h_mm, *h_mmall, *h_mmfoil;
-    TH1D *h_mmbg, *h_mmallbg, *h_mmfoilbg;
-    TH2D *h_Lp_mm, *h_Ll_mm, *h_Ltgy_mm, *h_Ltgth_mm, *h_Ltgph_mm;
-    TH2D *h_Lvx_mm, *h_Lvy_mm, *h_Lvz_mm;
-    TH2D *h_Lx_mm, *h_Ly_mm, *h_Lth_mm, *h_Lph_mm;
-    TH2D *h_Rp_mm, *h_Rl_mm, *h_Rtgy_mm, *h_Rtgth_mm, *h_Rtgph_mm;
-    TH2D *h_Rvx_mm, *h_Rvy_mm, *h_Rvz_mm;
-    TH2D *h_Rx_mm, *h_Ry_mm, *h_Rth_mm, *h_Rph_mm;
-    TH2D *h_Rp_Lp;
-    TH1D *h_mm_L;
-    TH1D *h_mm_L_ec;
-    TH1D *h_mm_nnL;
-    TH1D *h_acc_L;
-    TH1D *h_acc_nnL;
-    TH1D *h_mm_H3L;
-    TH1D *h_acc_H3L;
-    TH1D *h_peak_H3L;  
-    TH1D *h_mm_Al;
-    TH1D *h_mm_Al_acc;
-    TH1D *h_peak_Al;
-    TH1D *h_mm_MgL;
-    TH1D *h_mm_MgL_acc;
-    TH1D *h_peak_MgL;
-    TH1D *h_peak_L;
-    TH1D *h_peak_nnL;
-    TH1D *h_acc_Al;
-    TH1D *h_mm_acc;
-    TH1D *h_peak_mm;
-    TH1D *h_mm_pi;
-    TH1D* h_ct_wK_z_all;
-    TH1D* h_ct_acc;
-    TH1D* h_mm_Al_bg;
-    /// Added by itabashi ///
-    TH1D*h_Rz;
-    TH1D*h_Rz_cut;
-    TH1D*h_Rth;
-    TH1D*h_Rph;
-    TH1D*h_Rp;
-    TH1D*h_Lz;
-    TH1D*h_Lth;
-    TH1D*h_Lph;
-    TH1D*h_Lp;
-    TH1D*h_Rz_c;
-    TH1D*h_Rth_c;
-    TH1D*h_Rph_c;
-    TH1D*h_Rp_c;
-    TH1D*h_Lz_c;
-    TH1D*h_Lth_c;
-    TH1D*h_Lph_c;
-    TH1D*h_Lp_c;    
-    /// Added by Okuyama ///
-    TH1D* h_Lz2;
-    TH1D* h_Rz2;
-    TH1D* h_Lp_top;    
-    TH1D* h_theta_ee;
-    TH1D* h_theta_ee2;
-    TH1D* h_theta_ee3;
-    TH1D* h_theta_ee4;
-    TH1D* h_phi_ee;
-    TH1D* h_phi_ee2;
-    TH1D* h_phi_ee3;
-    TH1D* h_phi_ee4;
-    TH1D* h_vpflux;
-    TH1D* h_vpflux2;
-    TH1D* h_vpflux3;
-    TH1D* h_vpflux4;
-	double Ng_det=0.;//Ngamma(detected)
-	double Ng_det_top=0.;//Ngamma(detected)
-	double Ng_det_acc=0.;//Ngamma(detected)
-    TH2D* h_theta_ee_p;
-    TH2D* h_theta_ee_p2;
-    TH2D* h_theta_ee_p3;
-    TH2D* h_theta_ee_p4;
-    TH2D* h_phi_ee_p;
-    TH2D* h_pL_pR;
-    TH2D* h_pL_pR2;
-    TH2D* h_pL_pR3;
-    TH1D* h_theta_ek;
-    TH1D* h_phi_ek;
-    TH1D* h_theta_g;
-    TH1D* h_phi_g;
-    TH1D* h_theta_gk_lab;
-    TH1D* h_theta_gk_cm;
-    TH1D* h_cos_gk_lab;
-    TH1D* h_cos_gk_cm;
-    TH1D* h_mom_g;
-    TH1D* h_qsq;
-    TH1D* h_w;
-    TH2D* h_thph_ek;
-    TH2D* h_thph_g;
-
-    TF1* fAl_R;
+  TF1* fAl_R;
 
 //----Survival Ratio-----//
-	TEfficiency* pEff1=0;
-	TEfficiency* pEff2=0;
-	TEfficiency* pEff3=0;
-	TEfficiency* pEff4=0;
-	TEfficiency* pEff5=0;
-	TEfficiency* pEff6=0;
-	TEfficiency* pEff7=0;
-	TEfficiency* pEff8=0;
-	TEfficiency* pEff9=0;
-	TEfficiency* pEff10=0;
-	TEfficiency* pEff11=0;
-	TEfficiency* pEff12=0;
-	TEfficiency* pEff13=0;
-	TEfficiency* pEff14=0;
-	TEfficiency* pEff15=0;
-
- private:
-    double L_s0l_toff    , L_s0r_toff;
-    double L_s2l_toff[16], L_s2r_toff[16];
-    double R_s0l_toff    , R_s0r_toff;
-    double R_s2l_toff[16], R_s2r_toff[16];
-
-    double L_s0l_t    , L_s0r_t    , L_s0_t;
-    double L_s2l_t[16], L_s2r_t[16], L_s2_t[16];
-    double R_s0l_t    , R_s0r_t    , R_s0_t;
-    double R_s2l_t[16], R_s2r_t[16], R_s2_t[16];
-    double R_p, L_p, B_p;
-public:
+  TEfficiency* pEff1=0;
+  TEfficiency* pEff2=0;
+  TEfficiency* pEff3=0;
+  TEfficiency* pEff4=0;
+  TEfficiency* pEff5=0;
+  TEfficiency* pEff6=0;
+  TEfficiency* pEff7=0;
+  TEfficiency* pEff8=0;
+  TEfficiency* pEff9=0;
+  TEfficiency* pEff10=0;
+  TEfficiency* pEff11=0;
+  TEfficiency* pEff12=0;
+  TEfficiency* pEff13=0;
+  TEfficiency* pEff14=0;
+  TEfficiency* pEff15=0;
+  
+  double L_s0l_toff    , L_s0r_toff;
+  double L_s2l_toff[16], L_s2r_toff[16];
+  double R_s0l_toff    , R_s0r_toff;
+  double R_s2l_toff[16], R_s2r_toff[16];
+  
+  double L_s0l_t    , L_s0r_t    , L_s0_t;
+  double L_s2l_t[16], L_s2r_t[16], L_s2_t[16];
+  double R_s0l_t    , R_s0r_t    , R_s0_t;
+  double R_s2l_t[16], R_s2r_t[16], R_s2_t[16];
+  double R_p, L_p, B_p;
   double min_mm,max_mm;
   double min_Lp,max_Lp;
   double mt;
@@ -871,192 +716,136 @@ public:
   double L_pz,L_px,L_py;
   int count=0;
   double ac1_th[24]={5249.78, 5263.03, 5244.2, 5239.62, 5276.17,  5249.84,
-		     5274.63, 5291.02, 5259.66, 5305.42, 5262.97, 5333.76, 5275.35, 5190.67, 5303.03, 5414.55, 5224.28, 5320.19, 5253.68, 5242.92, 5219.99, 5296.6, 5345.91, 5357.9};
-// 
-// //--- Coin Offset -----//
-// double pathl_off,s2_offset,coin_offset;
- double pathl_off,s2_offset;
-// //----- Cut Parameters ----------//
- double coin_cutmin=-248;
- double coin_cutmax=-244; 
- double rpathl_cutmin=28.7;
- double rpathl_cutmax=29.4;
- double lpathl_cutmin=28.6;
- double lpathl_cutmax=29.2;
- double rbeta_cutmin=0.0;
- double rbeta_cutmax=1.0;
- double lbeta_cutmin=0.9;
- double lbeta_cutmax=1.0;
- double Rvz_cutmin=-0.1;
- double Rvz_cutmax= 0.1;
- double Lvz_cutmin=-0.1;
- double Lvz_cutmax= 0.1;
- double Rx_cutmin= -0.4;
- double Rx_cutmax= 0.4;
-// //-------------------------------//
- bool cut_Rs2,cut_Ls2,cut_rpathl,cut_lpathl,cut_coin,cut_rbeta,cut_lbeta,cut_vz,cut_Rx,cut_trig,coin_trig,right_trig,cut_track,cut_s0;
-//
-//
-// //===== Fitting =========//
-//
-//
-// //--- Parameters -----//
-//  double bg_min,bg_max;
-//  double bgs_min,bgs_max;
-//  double Lfom[100][100][2],Sfom[100][100][2];
-//  double L0_err[100][100][2],L1_err[100][100][2],L2_err[100][100][2];
-//  double S0_err[100][100][2],S1_err[100][100][2],S2_err[100][100][2];
-//  double nL_err[100][100][2],nS_err[100][100][2];
-//  double bgL_ac1[100][100], bgL_ac2[100][100],bgS_ac1[100][100], bgS_ac2[100][100];
-//  double totL_ac1[100][100], totL_ac2[100][100],totS_ac1[100][100], totS_ac2[100][100];
-//  double nL[100][100][2],sigL[100][100][2],meanL[100][100][2];
-// double nS[100][100][2],sigS[100][100][2],meanS[100][100][2];
-// double kmin[100][100][2],kmax[100][100][2];
-// double inte_ktot[100][100][2], inte_ksig[100][100][2];
-// double p0_acc[100][100][2], p1_acc[100][100][2];
- double n_p[100][100][100],sig_p[100][100][100],mean_p[100][100][100];
- double n_pi[100][100][100],sig_pi[100][100][100],mean_pi[100][100][100];
- double n_k[100][100][100],sig_k[100][100][100],mean_k[100][100][100];
- double n_pi_noZ,sig_pi_noZ,mean_pi_noZ;
- double n_k_noZ,sig_k_noZ,mean_k_noZ;
- double n_p_noZ,sig_p_noZ,mean_p_noZ;
- double n_L_noZ,sig_L_noZ,mean_L_noZ;
- double n_S_noZ,sig_S_noZ,mean_S_noZ;
- double n_L[100][100][100],sig_L[100][100][100],mean_L[100][100][100];
- double n_S[100][100][100],sig_S[100][100][100],mean_S[100][100][100];
-// int bin_ac1_adc[100][100],bin_min_ac1,bin_max_ac1,bin_ac2_adc[100][100],bin_max_ac2,bin_min_ac2;
-// double sum_k[100][100][2],sum_p[100][100][2],sum_pi[100][100][2]; 
-// double sum_k_err[100][100][2],sum_p_err[100][100][2],sum_pi_err[100][100][2]; 
-// double inte_acc[100][100][2];
-// double th_ac1[100],th_ac2[100];
-// int bin_th_ac1[100][100],bin_th_ac2[100][100]; 
-// double nk[100][100][100][100][2],npi[100][100][100][100][2],np[100][100][100][100][2];
-// double max_nk[100][100][2],max_npi[100][100][2],max_np[100][100][2];
- double n_p_err[100][100][100],n_pi_err[100][100][100],n_k_err[100][100][100];
- double n_p_err_noZ,n_pi_err_noZ,n_k_err_noZ;
- double n_L_err[100][100][100],n_S_err[100][100][100];
-// double FOM_ac1[100][100],FOM_ac2[100][100];
-// double max_fom_ac1,max_fom_ac2;
-// int fom_th1,fom_th2;
-// double nLam_ac1,nLam_ac2,SNLam_ac1,SNLam_ac2;
-// int fom_max_th2,fom_max_th1;
-// double FOM_max_ac1[100],FOM_max_ac2[100],FOM_th1[100],FOM_th2[100]; 
-// 
- double def_sig_p,def_mean_p,def_sig_pi,def_mean_pi,def_sig_k,def_mean_k,def_acc;
- double def_sig_L,def_mean_L,def_mean_S,def_sig_S;
- double def_num_k,def_num_p,def_num_pi,def_acc_k,def_acc_pi,def_acc_p;
- double signal[100][100][100], noise[100][100][100], fom_L[100][100][100];
- double fom_pi1[100], fom_pi2l[100], fom_pi2u[100];
- double fom_k1[100], fom_k2l[100], fom_k2u[100];
- double fom_p1[100], fom_p2l[100], fom_p2u[100];
- double err_fom_pi1[100], err_fom_pi2l[100], err_fom_pi2u[100];
- double err_fom_k1[100], err_fom_k2l[100], err_fom_k2u[100];
- double err_fom_p1[100], err_fom_p2l[100], err_fom_p2u[100];
-//
-// double def_t1_k[100][100],def_t1_pi[100][100],def_t1_p[100][100],def_t1_acc[100][100];
-// double def_t1_k_err[100][100],def_t1_pi_err[100][100],def_t1_p_err[100][100],def_t1_acc_err[100][100];
-// double t1sig_k[100][100],t1sig_p[100][100],t1sig_pi[100][100],t1mean_p[100][100],t1mean_k[100][100],t1mean_pi[100][100];
-// double t1sum_k[100],t1sum_pi[100],t1sum_p[100];
-// double t1sum_k_err[100],t1sum_pi_err[100],t1sum_p_err[100];
-// double def_t2_k[100][100],def_t2_pi[100][100],def_t2_p[100][100],def_t2_acc[100][100];
-// double t2sig_k[100][100],t2sig_p[100][100],t2sig_pi[100][100],t2mean_p[100][100],t2mean_k[100][100],t2mean_pi[100][100];
-// double def_t2_k_err[100][100],def_t2_pi_err[100][100],def_t2_p_err[100][100],def_t2_acc_err[100][100];
-// double t2sum_k[100],t2sum_pi[100],t2sum_p[100];
-// double t2sum_k_err[100],t2sum_pi_err[100],t2sum_p_err[100];
-// double def_t3_k[100][100],def_t3_pi[100][100],def_t3_p[100][100],def_t3_acc[100][100];
-// double t3sig_k[100][100],t3sig_p[100][100],t3sig_pi[100][100],t3mean_p[100][100],t3mean_k[100][100],t3mean_pi[100][100];
-// double t3sum_k[100][100],t3sum_pi[100][100],t3sum_p[100][100];
-// double emp[100];
-//
-// double rate_k[100][100][2],rate_p[100][100][2],rate_pi[100][100][2];
-// double rate_k_err[100][100][2],rate_p_err[100][100][2],rate_pi_err[100][100][2];
-// double sum_acc[100][100][2];
-// double max_SN_ac1[100],max_SN_ac2[100];
-// int SN_ac1[100],SN_ac2[100];
-// double bg_0[100][100][2],bg_1[100][100][2],bg_2[100][100][2];
-// double bg_s0[100][100][2],bg_s1[100][100][2],bg_s2[100][100][2];
-// double L0[100][100][2],L1[100][100][2],L2[100][100][2];
-// double S0[100][100][2],S1[100][100][2],S2[100][100][2];
-// double sum_k_max=1250.;
-// double fom_max=0.0;
-// 
-//
-//
-// //====== Tuning ============//
-//
- bool ac2_up,ac2_down,ac2_flag; 
- double Lbg_fom[3],Sbg_fom[3];
- double Lam_p[3],Sig_p[3];
- double NL_err,NS_err;
- double Lam_p_err[3],Sig_p_err[3];
+	     5274.63, 5291.02, 5259.66, 5305.42, 5262.97, 5333.76, 5275.35, 5190.67, 5303.03, 5414.55, 5224.28, 5320.19, 5253.68, 5242.92, 5219.99, 5296.6, 5345.91, 5357.9};
+ 
+//--- Coin Offset -----//
+  // double pathl_off,s2_offset,coin_offset;
+  double pathl_off,s2_offset;
 
+//----- Cut Parameters ----------//
+  double coin_cutmin=-248;
+  double coin_cutmax=-244; 
+  double rpathl_cutmin=28.7;
+  double rpathl_cutmax=29.4;
+  double lpathl_cutmin=28.6;
+  double lpathl_cutmax=29.2;
+  double rbeta_cutmin=0.0;
+  double rbeta_cutmax=1.0;
+  double lbeta_cutmin=0.9;
+  double lbeta_cutmax=1.0;
+  double Rvz_cutmin=-0.1;
+  double Rvz_cutmax= 0.1;
+  double Lvz_cutmin=-0.1;
+  double Lvz_cutmax= 0.1;
+  double Rx_cutmin= -0.4;
+  double Rx_cutmax= 0.4;
+
+//----cut flag-------------------//
+  bool cut_Rs2,cut_Ls2,cut_rpathl,cut_lpathl,cut_coin,cut_rbeta,cut_lbeta,cut_vz,cut_Rx,cut_trig,coin_trig,right_trig,cut_track,cut_s0;
+
+
+ //===== Fitting =========//
+
+
+  double n_p[100][100][100],sig_p[100][100][100],mean_p[100][100][100];
+  double n_pi[100][100][100],sig_pi[100][100][100],mean_pi[100][100][100];
+  double n_k[100][100][100],sig_k[100][100][100],mean_k[100][100][100];
+  double n_pi_noZ,sig_pi_noZ,mean_pi_noZ;
+  double n_k_noZ,sig_k_noZ,mean_k_noZ;
+  double n_p_noZ,sig_p_noZ,mean_p_noZ;
+  double n_L_noZ,sig_L_noZ,mean_L_noZ;
+  double n_S_noZ,sig_S_noZ,mean_S_noZ;
+  double n_L[100][100][100],sig_L[100][100][100],mean_L[100][100][100];
+  double n_S[100][100][100],sig_S[100][100][100],mean_S[100][100][100];
+  double n_p_err[100][100][100],n_pi_err[100][100][100],n_k_err[100][100][100];
+  double n_p_err_noZ,n_pi_err_noZ,n_k_err_noZ;
+  double n_L_err[100][100][100],n_S_err[100][100][100];
+  double def_sig_p,def_mean_p,def_sig_pi,def_mean_pi,def_sig_k,def_mean_k,def_acc;
+  double def_sig_L,def_mean_L,def_mean_S,def_sig_S;
+  double def_num_k,def_num_p,def_num_pi,def_acc_k,def_acc_pi,def_acc_p;
+  double signal[100][100][100], noise[100][100][100], fom_L[100][100][100];
+  double fom_pi1[100], fom_pi2l[100], fom_pi2u[100];
+  double fom_k1[100], fom_k2l[100], fom_k2u[100];
+  double fom_p1[100], fom_p2l[100], fom_p2u[100];
+  double err_fom_pi1[100], err_fom_pi2l[100], err_fom_pi2u[100];
+  double err_fom_k1[100], err_fom_k2l[100], err_fom_k2u[100];
+  double err_fom_p1[100], err_fom_p2l[100], err_fom_p2u[100];
+
+//====== Tuning ============//
+
+  bool ac2_up,ac2_down,ac2_flag; 
+  double Lbg_fom[3],Sbg_fom[3];
+  double Lam_p[3],Sig_p[3];
+  double NL_err,NS_err;
+  double Lam_p_err[3],Sig_p_err[3];
+  
   double pbg[3];  
   double pbg_S[3];
   double pL[3],pL_err[3];
   double pS[3],pS_err[3];
   double sum_L,sum_S;
+  
+  double all_L;
+  double all_S;
+  double bg_L;
+  double bg_S;
+  double sumk_fom;
+  double meank_fom;
+  double sigk_fom;
+  double sk_fom;
+  double sk_fom_ct;
+  double nk_fom;
+  double snk_fom;
+  double fom;
 
- double all_L;
- double all_S;
- double bg_L;
- double bg_S;
- double sumk_fom;
- double meank_fom;
- double sigk_fom;
- double sk_fom;
- double sk_fom_ct;
- double nk_fom;
- double snk_fom;
- double fom;
-//
 //-- Integral Range Definition --//
-double center_pi=0., range_pi=0.;
-double center_k=0., range_k=0.;
-double center_p=0., range_p=0.;
-double center_L=0., range_L=0.;
-double center_S=0., range_S=0.;
+  double center_pi=0., range_pi=0.;
+  double center_k=0., range_k=0.;
+  double center_p=0., range_p=0.;
+  double center_L=0., range_L=0.;
+  double center_S=0., range_S=0.;
 
 
-// //====== Draw ===========//
- TCanvas* c1;
- TCanvas* c2;
- TCanvas* c3;
- TCanvas* c4;
- TCanvas* c5;
- TCanvas* c6;
- TCanvas* c7;
- TCanvas* c8;
- TCanvas* c9;
- TCanvas* c10;
- TCanvas* c11;
- TCanvas* c12;
- TCanvas* c13; 
- TCanvas* c14;
- TCanvas* c15;
- TCanvas* c16;
- TCanvas* c17;
- TCanvas* c18;
- TCanvas* c19;
- TCanvas* c20;
- TCanvas* c21;
- TCanvas* c22;
- TCanvas* c23;
- TCanvas* c24;
- TCanvas* c25; 
- TCanvas* c26; 
- TCanvas* c27; 
- TCanvas* c28; 
- TCanvas* c29; 
- TCanvas* c30;
- TCanvas* c31;
- TCanvas* c32;
- TCanvas* c33;
- TCanvas* c34;
- TCanvas* c35; 
- TCanvas* c36; 
- TCanvas* c37; 
- TCanvas* c38; 
- TCanvas* c39; 
+ //====== Draw ===========//
+  TCanvas* c1;
+  TCanvas* c2;
+  TCanvas* c3;
+  TCanvas* c4;
+  TCanvas* c5;
+  TCanvas* c6;
+  TCanvas* c7;
+  TCanvas* c8;
+  TCanvas* c9;
+  TCanvas* c10;
+  TCanvas* c11;
+  TCanvas* c12;
+  TCanvas* c13; 
+  TCanvas* c14;
+  TCanvas* c15;
+  TCanvas* c16;
+  TCanvas* c17;
+  TCanvas* c18;
+  TCanvas* c19;
+  TCanvas* c20;
+  TCanvas* c21;
+  TCanvas* c22;
+  TCanvas* c23;
+  TCanvas* c24;
+  TCanvas* c25; 
+  TCanvas* c26; 
+  TCanvas* c27; 
+  TCanvas* c28; 
+  TCanvas* c29; 
+  TCanvas* c30;
+  TCanvas* c31;
+  TCanvas* c32;
+  TCanvas* c33;
+  TCanvas* c34;
+  TCanvas* c35; 
+  TCanvas* c36; 
+  TCanvas* c37; 
+  TCanvas* c38; 
+  TCanvas* c39; 
 };
 
 

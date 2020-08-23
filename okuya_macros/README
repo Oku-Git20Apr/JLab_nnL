@@ -53,11 +53,31 @@ Efficiency Study
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%Systematic Error Study%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%
-*z_analyzer.cc
+*z_analyzer.cc --> h2all_old.cc --> h2all.cc (2020/8/24 big update)
 -taken over from eff_z.cc
 This can create rootfile including "Cointime" and "Missing Mass" with each cut conditions (Z Cut).
 If you want to study in detail for each cut conditon, you can just use this rootfile.
 That means you don't have to re-analyze all runs (run111157~111220) anymore. (only if you didn't change other cut conditions)
+
+%%% C macros (you can use these like "root kinemtacs.C")
+*kinematics.C
+-Kinematics calc. with TLorentzVector
+
+%%mea_hist_noarray.C vs mea_hist.C
+%%data structure is a little bit different
+%%I prefer "noarray mode"
+*mea_hist_noarray.C
+-Mixed Event Analysis
+
+*fit_many.C (noarray)
+-Fitting MM with 4Poly, Gauss and Voigt func.
+(Integral() range change)
+**fit_many_1sigma.C
+**fit_many_halfsigma.C
+
+*fit_resp.C (noarray)
+-taken over from fit_many.C
+-Radiative tail is taken into account (as a response func.)
 
 
 %%%%%%%%%%%%%%%%%

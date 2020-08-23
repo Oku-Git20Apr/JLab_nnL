@@ -16,6 +16,8 @@ CXXLIBS = $(ROOTLIBS)
 #TARGET1= hrs_tof_twcorr
 #OBJS1=   hrs_tof_twcorr.o 
 
+TARGET1= ana_Lambda 
+OBJS1=   ana_Lambda.o  
 #TARGET1= hrs_KID_F1_coin_run
 #OBJS1=   hrs_KID_F1_coin_run.o  
 #TARGET2= hrs_KID_F1_NOK
@@ -85,8 +87,8 @@ all:$(TARGET13)\
 $(LIBDIR)/%.o : %.cc
 	$(CXX) $(CFLAGS) -c -o $@ $< -MMD $(CXXFLAGS)
 
-#$(TARGET1): $(patsubst %,$(LIBDIR)/%,$(OBJS1))
-#	$(CXX) $(CFLAGS) -o $(BINDIR)/$@ $^ $(CXXLIBS) $(CXXFLAGS)
+$(TARGET1): $(patsubst %,$(LIBDIR)/%,$(OBJS1))
+	$(CXX) $(CFLAGS) -o $(BINDIR)/$@ $^ $(CXXLIBS) $(CXXFLAGS)
 #$(TARGET2): $(patsubst %,$(LIBDIR)/%,$(OBJS2))
 #	$(CXX) $(CFLAGS) -o $(BINDIR)/$@ $^ $(CXXLIBS) $(CXXFLAGS)
 #$(TARGET3): $(patsubst %,$(LIBDIR)/%,$(OBJS3))
