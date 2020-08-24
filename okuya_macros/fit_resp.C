@@ -87,8 +87,10 @@ double FMM_4Poly_wRes( double *x, double *par )
 	double val = par[0] * TMath::Gaus(x[0],par[1],par[2]);//Lambda Gaussian
 	val += par[3] * TMath::Gaus(x[0],par[4],par[5]);//Sigma Gaussian
     val += par[6] + par[7]*x[0] + par[8]*x[0]*x[0] + par[9]*x[0]*x[0]*x[0] + par[10]*TMath::Power(x[0],4.);//4Poly BG
-	if((x[0]-par[1]-2*par[2])>0&&(x[0]-par[4]+2*par[5])<0)val += par[11] * TMath::Power(Napier,-par[12]*(x[0]-par[13]));//Lambda Radiative tail
-	if((x[0]-par[4]-2*par[5])>0)val += par[14] * TMath::Power(Napier,-par[15]*(x[0]-par[16]));//Simga Radiative tail
+	if((x[0]-par[1])>0)val += (par[11]/2.) * TMath::Power(Napier,-par[12]*(x[0]-par[13]))*TMath::Gaus(x[0],par[13],par[16]);//Lambda Radiative tail
+	if((x[0]-par[1])>0)val += (par[11]/2.) * TMath::Power(Napier,-par[17]*(x[0]-par[18]))*TMath::Gaus(x[0],par[13],par[16]);//Lambda Radiative tail
+	//if((x[0]-par[4]-2*par[5])>0)val += par[14] * TMath::Power(Napier,-par[15]*(x[0]-par[16]));//Simga Radiative tail
+	if((x[0]-par[4]>0))val += par[14] * TMath::Power(Napier,-par[12]*(x[0]-par[15]))*TMath::Gaus(x[0],par[15],par[16]);//Simga Radiative tail//relevant to Lambda Radiative tail
 	//val += par[11] * TMath::Power(Napier,-par[12]*(x[0]-par[13]));//Lambda Radiative tail
 	//val += par[14] * TMath::Power(Napier,-par[15]*(x[0]-par[16]));//Simga Radiative tail
     return val;
@@ -98,7 +100,7 @@ void fit_resp(){
 	string pdfname = "fitting.pdf";
 cout << "Output pdf file name is " << pdfname << endl;
   
-  TFile *file = new TFile("h2all5.root","read");//input file of all H2 run(default: h2all4.root)
+  TFile *file = new TFile("h2all.root","read");//input file of all H2 run(default: h2all4.root)
 	//ACCBGの引き算はmea_hist.ccから
   TFile *file_mea = new TFile("bgmea6.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
   double nbunch = 600.;//effetive bunches (6 bunches x 5 mixtures)
@@ -389,7 +391,7 @@ cout<<"Entries: "<<ENum<<endl;
 		if(fabs(ct)<1)ct_cut=true;
 		else ct_cut=false;
 		//if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
-		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
+		if(fabs(L_tr_vz-R_tr_vz)<0.015&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
 		else event_selection=false;
 
 		event_selection_nocut=false;
@@ -563,7 +565,7 @@ cout<<"BEST CUT START"<<endl;
 /*%%%%%%%%%%%%%%%%%%%%%%%%*/
 	//--- w/ 4th Polynomial func.
 	 cout<<"4Poly MODE START"<<endl;
-	 fmm_best_4Poly=new TF1("fmm_best_4Poly",FMM_4Poly_wRes,min_mm,max_mm,17);
+	 fmm_best_4Poly=new TF1("fmm_best_4Poly",FMM_4Poly_wRes,min_mm,max_mm,19);
 	 fmmbg_best_4Poly=new TF1("fmmbg_best_4Poly","pol4",min_mm,max_mm);
 	 fmm_best_4Poly->SetNpx(2000);
 	 fmm_best_4Poly->SetTitle("Missing Mass (best)");
@@ -580,11 +582,18 @@ cout<<"BEST CUT START"<<endl;
 	 fmm_best_4Poly->SetParameter(5,sig_S_best);
 	 fmm_best_4Poly->SetParLimits(5,0.,0.01);
 	 fmm_best_4Poly->SetParameter(11,40.);//Resp. func. scale
+	 fmm_best_4Poly->SetParLimits(11,0.,100.);
 	 fmm_best_4Poly->SetParameter(12,2.);//Resp. func. att.
 	 fmm_best_4Poly->SetParameter(13,def_mean_L);//Resp. func. peak
 	 fmm_best_4Poly->SetParameter(14,10.);//Resp. func. scale 
-	 fmm_best_4Poly->SetParameter(15,2.);//Resp. func. att.
-	 fmm_best_4Poly->SetParameter(16,def_mean_S);//Resp. func. peak 
+	 fmm_best_4Poly->SetParLimits(14,0.,100.);
+	 //fmm_best_4Poly->SetParameter(15,2.);//Resp. func. att.
+	 fmm_best_4Poly->SetParameter(15,def_mean_S);//Resp. func. peak 
+	 fmm_best_4Poly->SetParameter(16,def_sig_L);//Resp. func. peak 
+//	 fmm_best_4Poly->SetParameter(17,def_sig_S);//Resp. func. peak 
+	 fmm_best_4Poly->SetParameter(17,0.5);//Resp. func. att. 
+	 fmm_best_4Poly->SetParameter(18,def_mean_L);//Resp. func. peak 
+
 //	 fmm_best_4Poly=new TF1("fmm_best_4Poly",FMM_4Poly,min_mm,max_mm,11);
 //	 fmmbg_best_4Poly=new TF1("fmmbg_best_4Poly","pol4",min_mm,max_mm);
 //	 fmm_best_4Poly->SetNpx(2000);

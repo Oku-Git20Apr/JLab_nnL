@@ -61,7 +61,7 @@ int main(int argc, char** argv){
 	// command argument //
 	//////////////////////
 	int option;
-	string filename = "test2";
+	string filename = "test2";//test2.root(500,000 events are generated)
 	bool BatchFlag = true;
 	bool PDFFlag = true;
 	while((option=getopt(argc, argv, "f:bp"))!=-1){
@@ -149,8 +149,7 @@ int main(int argc, char** argv){
 	double phimax = 1.*(centralphi + phiwidth);
 	double omega = 2.*PI* (1-cos(thetawidth))*1000.; // [msr]
 	double MAX = 0.01;
-	//double volume = omega*MAX/1000.; 
-	double volume = omega/1000.; 
+	double volume = omega*MAX/1000.; 
 	cout<< "thetamin = " << thetamin*180/PI << " [deg]" <<endl;
 	cout<< "thetamax = " << thetamax*180/PI << " [deg]" <<endl;
 	cout<< "phimin = " << phimin*180/PI << " [deg]" <<endl;
@@ -205,6 +204,9 @@ int main(int argc, char** argv){
 	TCut RP = "EVDTrig && EDCTrig"; // Reference Plane
 	TCut Zpos = "-12.5<EZt && EZt<12.5";
 	TCut top = "fabs(th-0.225)<0.025&&fabs(ph)<0.25";
+
+
+	// ======== Histogram ======== //
 	int bin_mom = 150;//expanded?
 	double min_mom = 1.8;//nnL
 	double max_mom = 2.4;//nnL
@@ -279,6 +281,9 @@ int main(int argc, char** argv){
 	const double max_mom_bin = h_mom_gen->FindBin(max_mom_gen);
 	cout <<"mom range: "<< min_mom_gen << " " << max_mom_gen << endl;
 	cout <<"mom_bin: "<< min_mom_bin << " " << max_mom_bin << endl;
+
+
+
 //----------------------------//
 //------------Fill------------//
 //----------------------------//
@@ -310,6 +315,8 @@ int main(int argc, char** argv){
     tree->SetBranchStatus("EVDTrig" ,1);tree->SetBranchAddress("EVDTrig" ,&evdtrig);
     tree->SetBranchStatus("EDCTrig" ,1);tree->SetBranchAddress("EDCTrig" ,&edctrig);
     ENum = tree->GetEntries();
+
+//event loop to find "n_acpt"
   for(int i=0;i<ENum;i++){
     tree->GetEntry(i);
     if(i%100000==0)cout<<i<<" / "<<ENum<<endl;
@@ -320,7 +327,9 @@ int main(int argc, char** argv){
 	if((sqrt(x_q1i*x_q1i+y_q1i*y_q1i)<11.959969) &&
 	   (sqrt(x_q2i*x_q2i+y_q2i*y_q2i)<30.) &&
 	   (sqrt(x_q3i*x_q3i+y_q3i*y_q3i)<30.) &&	
-		evdtrig && edctrig){
+		evdtrig && edctrig){//Cut conditon for nnL
+
+
 	double Einc  = 4.3;//[GeV]
 	//double Escat = 2.1;//[GeV]
 	double Escat = mom;//[GeV]
@@ -340,26 +349,27 @@ int main(int argc, char** argv){
 	double vpflux=Escat*kg/(137*2*PI*PI*Einc*Qsq*(1-eps));
 	double k = MAX*gRandom->Uniform();
 //cout<<"vpflux vs k = "<<vpflux<<" : "<<k<<endl;
+
+
 		//if(fabs(cos(th)-0.9808)<0.003&&fabs(ph-0.25)<0.125){
 	//	if(mom>2.1&&mom<2.15){
 		h_mom_result->Fill(mom);
 		h_th_ph->Fill(th,ph);
 		h_costh_ph->Fill(cos(th),ph);
 	 //if(vpflux>k&&fabs(th-0.225)<0.025&&fabs(ph)<0.25){//new top-quality (6msr)
-	 //if(vpflux>k){//Full
+	 if(vpflux>k){//Full
 		h_vp_mom->Fill(mom);
-		//h_vp_mom->SetBinContent(h_vp_mom->FindBin(mom),vpflux);
 		//if(fabs(mom-2.125)<0.025){//new top-quality (Lambda)
 		//if(fabs(mom-2.075)<0.025){//new top-quality (Sigma)
 		if(mom>2.1){//Full (Lambda)
 		//if(mom<2.12){//Full (Sigma)
-		h_vp_mom2->SetBinContent((h_vp_mom2->FindBin(mom)),vpflux);
+		h_vp_mom2->Fill(mom);
 		h_vp_th->Fill(th);
 	 //}//Full_S
 	 }//Full_L
 	 //}//Top_S
 	 //}//Top_L
-	//}//VP Flux
+	}//VP Flux
 	 //}//6msr
 	 //}//HRS-R acceptance
 	 //}//6msr (w/ cos(th) cut)
@@ -372,6 +382,8 @@ double vpflux_tot_th=0.;
 double n1_tot=0.;
 double n2_tot=0.;
 double n1n2_tot=0.;
+
+
 	for(int i=0; i<bin_mom; i++){
 		n1 = 0;
 		n1 = (int)h_mom_gen->GetBinContent(i+1);
@@ -471,6 +483,8 @@ double n1n2_tot=0.;
 		cout<<"Cov(n1,n2)="<<ave_n1n2-ave_n1*ave_n2<<endl;
 		cout<<"rho(n1,n2)="<<(ave_n1n2-ave_n1*ave_n2)/(sqrt(n1_tot*n2_tot))<<endl;
 
+
+
 	// ========= Solid angle vs. theta ===========
 	TH1D *h_sa_th_q1 = new TH1D("h_sa_th_q1", "", bin_th, min_th, max_th);
 	TH1D *h_sa_th_q2 = new TH1D("h_sa_th_q2", "", bin_th, min_th, max_th);
@@ -481,10 +495,12 @@ double n1n2_tot=0.;
 
 	const double min_th_gen = h_th_gen->GetBinCenter(h_th_gen->FindFirstBinAbove()) - 0.02;
 	const double max_th_gen = h_th_gen->GetBinCenter(h_th_gen->FindLastBinAbove()) + 0.02;
+	const double max_th_gen_y = h_mom_gen->GetBinContent(h_mom_gen->FindBin(centralmom))*1.1;
 	const double min_th_bin = h_th_gen->FindBin(min_th_gen);
 	const double max_th_bin = h_th_gen->FindBin(max_th_gen);
 	cout <<"th range: "<< min_th_gen << " " << max_th_gen << endl;
 	cout <<"th bin: "<< min_th_bin << " " << max_th_bin << endl;
+
 
 	for(int i=0; i<bin_th; i++){
 		n1 = 0;
@@ -584,9 +600,16 @@ double n1n2_tot=0.;
 			h_sa_costh_ph->SetBinContent(i+1, j+1, val);
 		}
 	}
+
+
+
+//////////////////////////////
+// VP Flux Integral Results //
+//////////////////////////////
 cout<<"vpflux_tot_mom="<<vpflux_tot_mom<<endl;
 cout<<"vpflux_tot_mom_err="<<sqrt(vpflux_tot_mom_err)<<endl;
 cout<<"vpflux_tot_th="<<vpflux_tot_th<<endl;
+
 	
 ////////////////////
 // Draw histgrams //
@@ -617,21 +640,18 @@ cout<<"vpflux_tot_th="<<vpflux_tot_th<<endl;
 //	c1->RedrawAxis();
 
 	c1->cd(2);
-	hframe = (TH1D*)gPad->DrawFrame( min_mom_gen, 0., max_mom_gen, omega + 0.5);
 	SetTitle(hframe, "Solid Angle vs. Momentum at Q2 Entrance", "Momentum [GeV/c]", "Solid Angle [msr]");
 	h_sa_mom_q2->Draw("same");
 	lmom->Draw("same");
 //	c1->RedrawAxis();
 
 	c1->cd(3);
-	hframe = (TH1D*)gPad->DrawFrame( min_mom_gen, 0., max_mom_gen, omega + 0.5);
 	SetTitle(hframe, "Solid Angle vs. Momentum at Q3 Entrance", "Momentum [GeV/c]", "Solid Angle [msr]");
 	h_sa_mom_q3->Draw("same");
 	lmom->Draw("same");
 //	c1->RedrawAxis();
 
 	c1->cd(4);
-	hframe = (TH1D*)gPad->DrawFrame( min_mom_gen, 0., max_mom_gen, omega + 0.5);
 	SetTitle(hframe, "Solid Angle vs. Momentum (w/ EVDTrig, EDCTrig", "Momentum [GeV/c]", "Solid Angle [msr]");
 	h_sa_mom_rp->Draw("same");
 	lmom->Draw("same");
@@ -641,34 +661,32 @@ cout<<"vpflux_tot_th="<<vpflux_tot_th<<endl;
 	c2->Divide(2,2);
 //	gPad->SetGrid();
 	c2->cd(1);
-	hframe = (TH1D*)gPad->DrawFrame( min_th_gen, 0., max_th_gen, omega + 0.5);
 	SetTitle(hframe, "Solid Angle vs. Theta at Q1 Entrance", "Theta [rad]", "Solid Angle [msr]");
 	h_sa_th_q1->Draw("same");
 	lth->Draw("same");
 //	c2->RedrawAxis();
 
 	c2->cd(2);
-	hframe = (TH1D*)gPad->DrawFrame( min_th_gen, 0., max_th_gen, omega + 0.5);
 	SetTitle(hframe, "Solid Angle vs. Theta at Q2 Entrance", "Theta [rad]", "Solid Angle [msr]");
 	h_sa_th_q2->Draw("same");
 	lth->Draw("same");
 //	c2->RedrawAxis();
 
 	c2->cd(3);
-	hframe = (TH1D*)gPad->DrawFrame( min_th_gen, 0., max_th_gen, omega + 0.5);
 	SetTitle(hframe, "Solid Angle vs. Theta at Q3 Entrance", "Theta [rad]", "Solid Angle [msr]");
 	h_sa_th_q3->Draw("same");
 	lth->Draw("same");
 //	c2->RedrawAxis();
 
 	c2->cd(4);
-	hframe = (TH1D*)gPad->DrawFrame( min_th_gen, 0., max_th_gen, omega + 0.5);
 	SetTitle(hframe, "Solid Angle vs. Theta (w/ EVDTrig, EDCTrig", "Theta [rad]", "Solid Angle [msr]");
 	h_sa_th_rp->Draw("same");
 	lth->Draw("same");
 //	c2->RedrawAxis();
 
-	//======= Momentum Acceptance Expansion ======
+
+
+	//======= Momentum Acceptance Result ======
 	c3->Divide(2,2);
 	c3->cd(1);
 //	hframe = (TH1D*)gPad->DrawFrame( min_mom_gen, 0., max_mom_gen, omega + 0.5);
@@ -692,10 +710,9 @@ cout<<"vpflux_tot_th="<<vpflux_tot_th<<endl;
 	h_mom_result->SetLineColor(kAzure);
 	h_mom_result->Draw("same");
 
-	//======= Angular Acceptance Expansion ======
+	//======= Angular Acceptance Result======
 	c4->Divide(2,2);
 	c4->cd(1);
-//	hframe = (TH1D*)gPad->DrawFrame( min_th_gen, 0., max_th_gen, omega + 0.5);
 	SetTitle(h_sa_th_result, "Solid Angle vs. Theta (w/ all Cuts)", "Theta [rad]", "Solid Angle [msr]");
 //	h_sa_th_result->GetXaxis()->SetNdivisions(506, kFALSE);
 	h_sa_th_result->GetXaxis()->SetNdivisions(505, kFALSE);
@@ -704,12 +721,21 @@ cout<<"vpflux_tot_th="<<vpflux_tot_th<<endl;
 //	lth->Draw("same");
 	c4->cd(2);
 	SetTitle(h_th_gen, "Solid Angle vs. Theta (generated)", "Theta [rad]", "Solid Angle [msr]");
+	hframe = (TH1D*)gPad->DrawFrame( min_th_gen, 0., max_th_gen, max_th_gen_y);
+	hframe->Draw();
 	h_th_gen->GetXaxis()->SetNdivisions(505, kFALSE);
-	h_th_gen->Draw();
+	h_th_gen->Draw("same");
 	c4->cd(3);
 	SetTitle(h_th_result, "Solid Angle vs. Theta (cut)", "Theta [rad]", "Solid Angle [msr]");
 	h_th_result->GetXaxis()->SetNdivisions(505, kFALSE);
 	h_th_result->Draw();
+	c4->cd(4);
+	hframe->Draw();
+	h_th_gen->Draw("same");
+	h_th_result->SetLineColor(kAzure);
+	h_th_result->Draw("same");
+
+
 
 	//======= Theta vs. Momentum  ======
 	c5->cd();
@@ -721,7 +747,10 @@ cout<<"vpflux_tot_th="<<vpflux_tot_th<<endl;
 //	h_sa_mom_th->Draw("samecolz");
 	h_sa_mom_th->Draw("colz");
 
-	//======= Theta vs. Momentum  ======
+
+
+
+	//======= cos(Theta) vs. Phi  ======
 	c6->cd();
 //	hframe = (TH1D*)gPad->DrawFrame( min_mom_gen, max_th_gen, max_mom_gen, max_th_gen);
 	SetTitle(h_sa_costh_ph, "cos(#theta_{e}) vs. #phi_{e} (w/ all cuts)",  "cos(#theta_{e})", "#phi_{e} [rad]");
@@ -731,12 +760,15 @@ cout<<"vpflux_tot_th="<<vpflux_tot_th<<endl;
 //	h_sa_costh_ph->Draw("samecolz");
 	h_sa_costh_ph->Draw("colz");
 
+
+
+
 	//======= VP Flux  ======
 	c7->Divide(2,2);
 	c7->cd(1);
 	//SetTitle(h_vp_mom_result, "Integrated VP Flux vs. Momentum (w/ all Cuts)", "Momentum [GeV/c]", "Integrated VP Flux [/GeV]");
-	h_vp_mom_result->Sumw2();
-	h_vp_mom_result2->Sumw2();
+//	h_vp_mom_result->Sumw2();
+//	h_vp_mom_result2->Sumw2();
 	h_vp_mom_result->Scale(bin_mom);
 	h_vp_mom_result2->Scale(bin_mom);
 	h_vp_mom_result->GetXaxis()->SetNdivisions(505, kFALSE);
@@ -759,6 +791,8 @@ cout<<"vpflux_tot_th="<<vpflux_tot_th<<endl;
 	h_vp_mom->Draw();
 	c7->cd(4);
 	h_vp_th->Draw();
+
+
 
 	if(!BatchFlag){
 		theApp.Run();

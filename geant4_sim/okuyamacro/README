@@ -1,0 +1,23 @@
+If you want to get "Acceptance", every vpflux***.cc will work. same program.
+If you want to get "VP Flux Integral", you need to care its algorithm.
+
+
+vpflux_mc.cc
+- Monte Carlo Integral
+
+vpflux.cc
+- Monte Carlo (Acceptance) & Function integration by quadrature
+- Gamma(omega,theta) x (Delta p) x (Delta Omega ~10msr)
+- Solid angle is not divided into bins.
+
+vpflux_improved
+- Monte Carlo (Acceptance) & Function integration by quadrature
+- Solid angle can be divided into bins.
+- More realistic function integration
+
+
+
+//---For more information---//
+See ELS#100(Okuyama)
+Monte Carlo method is the best, maybe.(2020/8/7)
+I recommend using vpflux_mc.cc

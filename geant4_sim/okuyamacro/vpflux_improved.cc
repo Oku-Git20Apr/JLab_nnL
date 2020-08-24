@@ -214,9 +214,9 @@ int main(int argc, char** argv){
 	double min_ph = -0.4292;//default=0.57
 	double max_ph = 0.4292;
 	int bin_2D_mom = 50;
-	int bin_2D_th = 50;
+	int bin_2D_th = 20;
 	int bin_2D_costh =100;
-	int bin_2D_ph =1;
+	int bin_2D_ph =20;
 
 	TH1D *h_mom_gen = new TH1D( "h_mom_gen", "", bin_mom, min_mom, max_mom);
 	TH1D *h_mom_q1 = new TH1D( "h_mom_q1", "", bin_mom, min_mom, max_mom);
