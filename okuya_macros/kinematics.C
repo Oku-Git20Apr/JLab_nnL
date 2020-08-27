@@ -173,6 +173,8 @@ const double PI=3.14159265359;
   TH2D* h_thph_g = new TH2D("h_thph_g", "theta_g:phi_g" ,1000,0.1,0.35,1000,3*PI/2-1.,3*PI/2+1.);
   TH1D* h_pR_lab = new TH1D("h_pR_lab", "h_pR_lab" ,1000,1.7,1.95);
   TH1D* h_pR_cm = new TH1D("h_pR_cm", "h_pR_cm" ,1000,0.0,1.0);
+  TH1D* h_pL_cm = new TH1D("h_pL_cm", "h_pL_cm" ,1000,0.0,1.5);
+  TH1D* h_pB_cm = new TH1D("h_pB_cm", "h_pB_cm" ,1000,1.0,2.5);
   TH2D* h2_pR_lab_cm = new TH2D("h_pR_lab_cm", "h_pR_lab_cm" ,1000,1.7,1.95,1000,0.0,1.0);
   
   h1 ->SetLineColor(2);
@@ -335,14 +337,37 @@ cout<<"Entries: "<<ENum<<endl;
 		double phi_g = G_4vec.Phi()+2*PI;
 		double theta_g = G_4vec.Theta();
 		double theta_gk_lab = G_4vec.Angle(R_4vec.Vect());
+		double omega=G_4vec.E();
+		double beta=mom_g/(omega+Mp);
 	
 		TVector3 boost;
 		TLorentzVector GT_4vec;
 		GT_4vec=G_4vec+T_4vec;
 		boost=GT_4vec.BoostVector();
 		R_4vec.Boost(-boost);
+		L_4vec.Boost(-boost);
+		B_4vec.Boost(-boost);
 		double theta_gk_cm = G_4vec.Angle(R_4vec.Vect());
 		double pR_cm=sqrt(R_4vec.Px()*R_4vec.Px()+R_4vec.Py()*R_4vec.Py()+R_4vec.Pz()*R_4vec.Pz());
+		double pL_cm=sqrt(L_4vec.Px()*L_4vec.Px()+L_4vec.Py()*L_4vec.Py()+L_4vec.Pz()*L_4vec.Pz());
+		double pB_cm=sqrt(B_4vec.Px()*B_4vec.Px()+B_4vec.Py()*B_4vec.Py()+B_4vec.Pz()*B_4vec.Pz());
+
+		double n = MK/ML;
+		double p_cm=sqrt(GT_4vec.Px()*GT_4vec.Px()+GT_4vec.Py()*GT_4vec.Py()+GT_4vec.Pz()*GT_4vec.Pz());
+		double E_cm = GT_4vec.E();
+beta=2.3/(2.2+Mp);
+pR_cm=0.65;
+theta_gk_cm=0.12;
+		double gamma=1./sqrt(1-beta*beta);
+		double ER_cm=sqrt(pR_cm*pR_cm+MK*MK);
+//cout<<"beta="<<beta<<endl;
+//cout<<"gamma="<<gamma<<endl;
+
+		double labtocm = (gamma*pR_cm*pR_cm*(pR_cm*cos(theta_gk_cm)+beta*ER_cm))/(pow(sqrt(pR_cm*pR_cm*sin(theta_gk_cm)*sin(theta_gk_cm)+gamma*gamma*(pR_cm*cos(theta_gk_cm)+beta*ER_cm)*(pR_cm*cos(theta_gk_cm)+beta*ER_cm)),3.));
+cout<<"labtocm="<<labtocm<<endl;
+		double tan_lab1 = sin(theta_gk_cm)/(gamma*(cos(theta_gk_cm)+beta*sqrt(MK*MK+pR_cm*pR_cm)/pR_cm));
+		double tan_lab2 = sin(theta_gk_cm)/(gamma*(cos(theta_gk_cm)+(omega*Mp-Qsq*Qsq)/(omega*Mp+Mp*Mp)));
+		//if(tan_lab1!=tan_lab2)cout<<"tan1="<<atan(tan_lab1)<<", tan2="<<atan(tan_lab2)<<"theta_gk_lab="<<theta_gk_lab<<endl;
 
 
 
@@ -365,6 +390,8 @@ cout<<"Entries: "<<ENum<<endl;
 		h_pR_lab->Fill(pR);
 		h_pR_cm->Fill(pR_cm);
 		h2_pR_lab_cm->Fill(pR,pR_cm);
+		h_pL_cm->Fill(pL_cm);
+		h_pB_cm->Fill(pB_cm);
 		}
 
 		}//NRtr
@@ -416,7 +443,10 @@ cout<<"Entries: "<<ENum<<endl;
 	c7->cd(2);
 	h_pR_cm->Draw("");
 	c7->cd(3);
-	h2_pR_lab_cm->Draw("colz");
+	//h2_pR_lab_cm->Draw("colz");
+	h_pL_cm->Draw("");
+	c7->cd(4);
+	h_pB_cm->Draw("");
 
 /*--- Print ---*/
 cout << "Print is starting" << endl;

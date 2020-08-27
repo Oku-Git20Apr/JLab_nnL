@@ -85,16 +85,64 @@ double FMM_4Poly_wRes( double *x, double *par )
   {
 	double Napier = 2.7182818;
 	double val = par[0] * TMath::Gaus(x[0],par[1],par[2]);//Lambda Gaussian
+	//double val = par[0] * TMath::Landau(x[0],par[1],par[2]);//Lambda Landau 
 	val += par[3] * TMath::Gaus(x[0],par[4],par[5]);//Sigma Gaussian
     val += par[6] + par[7]*x[0] + par[8]*x[0]*x[0] + par[9]*x[0]*x[0]*x[0] + par[10]*TMath::Power(x[0],4.);//4Poly BG
-	if((x[0]-par[1])>0)val += (par[11]/2.) * TMath::Power(Napier,-par[12]*(x[0]-par[13]))*TMath::Gaus(x[0],par[13],par[16]);//Lambda Radiative tail
-	if((x[0]-par[1])>0)val += (par[11]/2.) * TMath::Power(Napier,-par[17]*(x[0]-par[18]))*TMath::Gaus(x[0],par[13],par[16]);//Lambda Radiative tail
+	if((x[0]-par[1])>0)val += (par[11]) * TMath::Power(Napier,-par[12]*(x[0]-par[13]))*TMath::Gaus(x[0],par[13],par[16]);//Lambda Radiative tail
+	//if((x[0]-par[1])>0)val += (par[11]/4.) * TMath::Power(Napier,-par[17]*(x[0]-par[18]))*TMath::Gaus(x[0],par[13],par[16]);//Lambda Radiative tail
 	//if((x[0]-par[4]-2*par[5])>0)val += par[14] * TMath::Power(Napier,-par[15]*(x[0]-par[16]));//Simga Radiative tail
 	if((x[0]-par[4]>0))val += par[14] * TMath::Power(Napier,-par[12]*(x[0]-par[15]))*TMath::Gaus(x[0],par[15],par[16]);//Simga Radiative tail//relevant to Lambda Radiative tail
 	//val += par[11] * TMath::Power(Napier,-par[12]*(x[0]-par[13]));//Lambda Radiative tail
 	//val += par[14] * TMath::Power(Napier,-par[15]*(x[0]-par[16]));//Simga Radiative tail
     return val;
   }
+
+double expgaus2(double *x, double *par, int num) {
+  //par[0]=Total area
+  //par[1]=tau of exp function
+  //par[2]=Width (sigma) of convoluted Gaussian function
+  //par[3]=Shift of Function Peak
+  double invsq2pi = 0.3989422804014;   // (2 pi)^(-1/2)
+  double np = 500.0;      // number of convolution steps
+  double sc =   8.0;      // convolution extends to +-sc Gaussian sigmas
+  double xx, fland, sum = 0.0, xlow, xupp, step, i;
+  double val;
+// Range of convolution integral
+  xlow = 0.;
+  xupp = x[0] + sc * par[num+2];
+  step = (xupp-xlow) / np;
+// Convolution integral
+  for(i=1.0; i<=np/2; i++){
+     xx = xlow + (i-0.5) * step - par[num+3];
+     fland = TMath::Gaus(xx,x[0],par[num+2]);
+     sum += fland * TMath::Exp(-xx/par[num+1]);
+     xx = xupp - (i-.5) * step - par[num+3];
+     fland = TMath::Gaus(xx,x[0],par[num+2]);
+     sum += fland * TMath::Exp(-xx/par[num+1]);
+  }
+  //val = par[2] * step * sum * invsq2pi / par[3];
+  val = par[num] * step * sum * invsq2pi / (par[num+2]*par[num+1]*exp(-par[num+3]/par[num+1]));
+  return val;
+}
+
+double FMM_Lambda_Sigma( double *x, double *par , int num)
+  {
+  double val = par[num] * TMath::Gaus(x[0],par[num+1],par[num+2]);//Lambda Gaussian
+  val += par[num+3] * TMath::Gaus(x[0],par[num+4],par[num+5]);//Sigma Gaussian
+  return val;
+}
+double FMM_Res( double *x, double *par ){
+
+	return FMM_Lambda_Sigma(x,par,0)+expgaus2(x,par,6)+expgaus2(x,par,10)+expgaus2(x,par,14);
+
+}
+double FMM_Res_Lambdaonly( double *x, double *par ){
+
+	return par[0]*TMath::Gaus(x[0],par[1],par[2])+expgaus2(x,par,3)+expgaus2(x,par,7);
+
+}
+
+
 
 void fit_resp(){
 	string pdfname = "fitting.pdf";
@@ -391,7 +439,7 @@ cout<<"Entries: "<<ENum<<endl;
 		if(fabs(ct)<1)ct_cut=true;
 		else ct_cut=false;
 		//if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
-		if(fabs(L_tr_vz-R_tr_vz)<0.015&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
+		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
 		else event_selection=false;
 
 		event_selection_nocut=false;
@@ -565,34 +613,95 @@ cout<<"BEST CUT START"<<endl;
 /*%%%%%%%%%%%%%%%%%%%%%%%%*/
 	//--- w/ 4th Polynomial func.
 	 cout<<"4Poly MODE START"<<endl;
-	 fmm_best_4Poly=new TF1("fmm_best_4Poly",FMM_4Poly_wRes,min_mm,max_mm,19);
+	 fmm_best_4Poly=new TF1("fmm_best_4Poly",FMM_Res,min_mm,max_mm,18);
 	 fmmbg_best_4Poly=new TF1("fmmbg_best_4Poly","pol4",min_mm,max_mm);
-	 fmm_best_4Poly->SetNpx(2000);
+	 fmm_best_4Poly->SetNpx(200);
 	 fmm_best_4Poly->SetTitle("Missing Mass (best)");
-	 fmm_best_4Poly->SetParLimits(0,0.,1000000.);//positive
-	 fmm_best_4Poly->SetParLimits(3,0.,1000000.);//positive
-	 fmm_best_4Poly->SetParameter(0,const_L_best);
+	 fmm_best_4Poly->SetParLimits(0,0.,1000.);//positive
+	 fmm_best_4Poly->SetParLimits(3,0.,300.);//positive
+	 fmm_best_4Poly->SetParameter(0,const_L_best*0.85);
 	 fmm_best_4Poly->SetParameter(1,mean_L_best);
-	 fmm_best_4Poly->SetParLimits(1,def_mean_L-def_sig_L,def_mean_L+def_sig_L);
+	 fmm_best_4Poly->SetParLimits(1,def_mean_L-def_sig_L*0.4,def_mean_L+def_sig_L*0.4);
 	 fmm_best_4Poly->SetParameter(2,sig_L_best);
 	 fmm_best_4Poly->SetParLimits(2,0.,0.01);
-	 fmm_best_4Poly->SetParameter(3,const_S_best);
+	 fmm_best_4Poly->SetParameter(3,const_S_best*0.85);
 	 fmm_best_4Poly->SetParameter(4,mean_S_best);
 	 fmm_best_4Poly->SetParLimits(4,def_mean_S-def_sig_S,def_mean_S+def_sig_S);
 	 fmm_best_4Poly->SetParameter(5,sig_S_best);
-	 fmm_best_4Poly->SetParLimits(5,0.,0.01);
-	 fmm_best_4Poly->SetParameter(11,40.);//Resp. func. scale
-	 fmm_best_4Poly->SetParLimits(11,0.,100.);
-	 fmm_best_4Poly->SetParameter(12,2.);//Resp. func. att.
-	 fmm_best_4Poly->SetParameter(13,def_mean_L);//Resp. func. peak
-	 fmm_best_4Poly->SetParameter(14,10.);//Resp. func. scale 
-	 fmm_best_4Poly->SetParLimits(14,0.,100.);
-	 //fmm_best_4Poly->SetParameter(15,2.);//Resp. func. att.
-	 fmm_best_4Poly->SetParameter(15,def_mean_S);//Resp. func. peak 
-	 fmm_best_4Poly->SetParameter(16,def_sig_L);//Resp. func. peak 
-//	 fmm_best_4Poly->SetParameter(17,def_sig_S);//Resp. func. peak 
-	 fmm_best_4Poly->SetParameter(17,0.5);//Resp. func. att. 
-	 fmm_best_4Poly->SetParameter(18,def_mean_L);//Resp. func. peak 
+	 fmm_best_4Poly->SetParLimits(5,0.,0.003);
+	 fmm_best_4Poly->SetParameter(6,0.7);//scale
+	 fmm_best_4Poly->SetParLimits(6,0.,2.);
+	 fmm_best_4Poly->SetParameter(7,0.04);//att.
+	 fmm_best_4Poly->SetParLimits(7,0.01,0.1);
+	 fmm_best_4Poly->SetParameter(8,0.01);//sigma
+	 fmm_best_4Poly->SetParLimits(8,0.,0.1);
+	 fmm_best_4Poly->SetParameter(9,-0.0001);//peak pos.
+	 fmm_best_4Poly->SetParLimits(9,-0.002,0.002);
+	 fmm_best_4Poly->SetParameter(10,10.);
+	 fmm_best_4Poly->SetParLimits(10,0.,20.);
+	 fmm_best_4Poly->SetParameter(11,0.04);
+	 fmm_best_4Poly->SetParLimits(11,0.01,0.1);
+	 fmm_best_4Poly->SetParameter(12,0.002);
+	 fmm_best_4Poly->SetParLimits(12,0.,0.01);
+	 fmm_best_4Poly->SetParameter(13,-0.077);
+	 fmm_best_4Poly->SetParLimits(13,-0.085,-0.065);
+	 fmm_best_4Poly->SetParameter(14,0.3);
+	 fmm_best_4Poly->SetParLimits(14,0.,1.0);
+	 fmm_best_4Poly->SetParameter(15,0.004);
+	 fmm_best_4Poly->SetParLimits(15,0.001,0.01);
+	 fmm_best_4Poly->SetParameter(16,0.002);
+	 fmm_best_4Poly->SetParLimits(16,0.,0.01);
+	 fmm_best_4Poly->SetParameter(17,0.0);
+	 fmm_best_4Poly->SetParLimits(17,-0.002,0.002);
+	 hmm_wo_bg_fom_best->Fit("fmm_best_4Poly","L","",-0.05,0.1);//Total fitting w/ 4Poly BG
+	 double chisq = fmm_best_4Poly->GetChisquare();
+	 double dof  = fmm_best_4Poly->GetNDF();
+	 cout<<"chisq="<<chisq<<endl;
+	 cout<<"dof="<<dof<<endl;
+	 cout<<"Reduced chi-square = "<<chisq/dof<<endl;
+	 TF1 *fmm_Lambdaonly_4Poly=new TF1("fmm_Lambdaonly_4Poly",FMM_Res_Lambdaonly,min_mm,max_mm,11);
+	 double p0=fmm_best_4Poly->GetParameter(0);
+	 double p1=fmm_best_4Poly->GetParameter(1);
+	 double p2=fmm_best_4Poly->GetParameter(2);
+	 double p6=fmm_best_4Poly->GetParameter(6);
+	 double p7=fmm_best_4Poly->GetParameter(7);
+	 double p8=fmm_best_4Poly->GetParameter(8);
+	 double p9=fmm_best_4Poly->GetParameter(9);
+	 double p14=fmm_best_4Poly->GetParameter(14);
+	 double p15=fmm_best_4Poly->GetParameter(15);
+	 double p16=fmm_best_4Poly->GetParameter(16);
+	 double p17=fmm_best_4Poly->GetParameter(17);
+	 fmm_Lambdaonly_4Poly->SetParameter(0,p0);
+	 fmm_Lambdaonly_4Poly->SetParameter(1,p1);
+	 fmm_Lambdaonly_4Poly->SetParameter(2,p2);
+	 fmm_Lambdaonly_4Poly->SetParameter(3,p6);
+	 fmm_Lambdaonly_4Poly->SetParameter(4,p7);
+	 fmm_Lambdaonly_4Poly->SetParameter(5,p8);
+	 fmm_Lambdaonly_4Poly->SetParameter(6,p9);
+	 fmm_Lambdaonly_4Poly->SetParameter(7,p14);
+	 fmm_Lambdaonly_4Poly->SetParameter(8,p15);
+	 fmm_Lambdaonly_4Poly->SetParameter(9,p16);
+	 fmm_Lambdaonly_4Poly->SetParameter(10,p17);
+	 double nLambda = fmm_Lambdaonly_4Poly->Integral(-0.05,0.10);
+	 nLambda = nLambda/0.001;
+	 cout<<"nLambda="<<nLambda<<endl;
+//	 fmm_best_4Poly->FixParameter(6,0.);
+//	 fmm_best_4Poly->FixParameter(7,0.);
+//	 fmm_best_4Poly->FixParameter(8,0.);
+//	 fmm_best_4Poly->FixParameter(9,0.);
+//	 fmm_best_4Poly->FixParameter(10,0.);
+//	 fmm_best_4Poly->SetParameter(11,40.);//Resp. func. scale
+//	 fmm_best_4Poly->SetParLimits(11,0.,100.);
+//	 fmm_best_4Poly->SetParameter(12,2.);//Resp. func. att.
+//	 fmm_best_4Poly->SetParameter(13,def_mean_L+def_sig_L);//Resp. func. peak
+//	 fmm_best_4Poly->SetParameter(14,10.);//Resp. func. scale 
+//	 fmm_best_4Poly->SetParLimits(14,0.,100.);
+//	 //fmm_best_4Poly->SetParameter(15,2.);//Resp. func. att.
+//	 fmm_best_4Poly->SetParameter(15,def_mean_S+def_sig_S);//Resp. func. peak 
+//	 fmm_best_4Poly->SetParameter(16,def_sig_L);//Resp. func. peak 
+////	 fmm_best_4Poly->SetParameter(17,def_sig_S);//Resp. func. peak 
+//	// fmm_best_4Poly->SetParameter(17,16.);//Resp. func. att. 
+//	// fmm_best_4Poly->SetParameter(18,def_mean_L);//Resp. func. peak 
 
 //	 fmm_best_4Poly=new TF1("fmm_best_4Poly",FMM_4Poly,min_mm,max_mm,11);
 //	 fmmbg_best_4Poly=new TF1("fmmbg_best_4Poly","pol4",min_mm,max_mm);
@@ -610,7 +719,6 @@ cout<<"BEST CUT START"<<endl;
 //	 fmm_best_4Poly->SetParLimits(4,def_mean_S-def_sig_S,def_mean_S+def_sig_S);
 //	 fmm_best_4Poly->SetParameter(5,sig_S_best);
 //	 fmm_best_4Poly->SetParLimits(5,0.,0.01);
-	 hmm_wo_bg_fom_best->Fit("fmm_best_4Poly","N","",fmin,fmax);//Total fitting w/ 4Poly BG
 	 constL=fmm_best_4Poly->GetParameter(0);
 	 meanL =fmm_best_4Poly->GetParameter(1);
 	 sigL  =fmm_best_4Poly->GetParameter(2);
@@ -1286,6 +1394,9 @@ cout<<"NO CUT START"<<endl;
 	fmm_best_4Poly->Draw("same");
 	fmm_best_Voigt->Draw("same");
 	fmm_best_2Gauss->Draw("same");
+		TCanvas* c11 = new TCanvas("c11","Lambda only");
+	fmm_Lambdaonly_4Poly->Draw();
+
 
 /*--- Print ---*/
 cout << "Print is starting" << endl;
