@@ -57,7 +57,7 @@ Efficiency Study
 -taken over from eff_z.cc
 This can create rootfile including "Cointime" and "Missing Mass" with each cut conditions (Z Cut).
 If you want to study in detail for each cut conditon, you can just use this rootfile.
-That means you don't have to re-analyze all runs (run111157~111220) anymore. (only if you didn't change other cut conditions)
+That means you don't have to re-analyze all runs (run111157~111220) anymore. (as long as you didn't change other cut conditions)
 
 %%% C macros (you can use these like "root kinemtacs.C")
 *kinematics.C
@@ -90,13 +90,25 @@ This information is stored in "gain_run111???.dat"
 *each_graph.cc
 This shows all AC segments' run dependences from "gain_run111???.dat"
 2 x 2 display
+
+
+%%%%%%%%%%%%%%%%
+%%Output files%%
+%%%%%%%%%%%%%%%%
+***h2all.root
+-updated version (Aug. 23, 2020)
+-consistency check with ana_Lambda.cc was performed.
+
+*h2all3.root
+-ct[][] (array mode)
+
+*h2all5.root
+-maybe old ver.
+
+***bgmea6.root
+-6 bunches x 100 mixtures = 600 effective bunches
+
+*bgmea7.root
+-including MM(Al)
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-%%%%%%%%%%
-%%Backup%%
-%%%%%%%%%%
---0531th1.copy 
-Backup of tuning_ac_oku.cc. When I make graphs of Survival Ratio vs th1
---0531th2u.copy 
-Backup of tuning_ac_oku.cc. When I make graphs of Survival Ratio vs th2u

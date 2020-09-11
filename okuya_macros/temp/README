@@ -1,0 +1,33 @@
+%%%%%%%%%%%%%%%%%%%%%%%
+%%Mixed Event Analyis%%
+%%%%%%%%%%%%%%%%%%%%%%%
+
+%Input files
+*h2all.root (H2 all run)
+
+%%% C macros (you can use these like "root kinemtacs.C")
+%CHOICE OF ACCIDENTAL BUNCHES
+*hcoin_40ns.C (Sep. 5. 2020)
+-Cointime display (window: 40ns, -20ns<-->20ns)
+
+*hcoin_wide.C (Sep. 5. 2020)
+-Cointime display (window: 120ns, -20ns<-->100ns)
+
+
+%MIXED EVENT ANALYSIS
+*mea_left.C (Sep. 5. 2020)
+[-17ns,-15ns] (1 bunch is used)
+
+*mea_right.C (Sep. 5. 2020)
+[15ns,17ns] (1 bunch is used)
+
+*mea_center.C (Sep. 5. 2020)
+[-5ns,-3ns] (1 bunch is used)
+
+*mea_pion.C (Sep. 5. 2020)
+[2ns,4ns] (1 bunch is used)
+
+*mea_compare.C (Sep. 5. 2020)
+-comparison of above four-type MEA results (mea_left.C, mea_right.C, mea_center.C, mea_pion)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

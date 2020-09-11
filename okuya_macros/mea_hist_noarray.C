@@ -17,7 +17,7 @@ void mea_hist_noarray(){
 cout << "Output pdf file name is " << pdfname << endl;
   
   TFile *file = new TFile("h2all5.root","read");//input file (default: h2all2.root)
-  TFile *file_new = new TFile("bgmea7.root","recreate");//new root
+  TFile *file_new = new TFile("bgmea_left.root","recreate");//new root
  // TTree *tree_old = (TTree*)file->Get("tree_out");
 //cout<<"Please wait a moment. CloneTree() is working..."<<endl;
   //TTree *tree = tree_old->CloneTree();
@@ -218,14 +218,15 @@ cout << "Output pdf file name is " << pdfname << endl;
 /***********************************/
 
   int ENum=0;
-  tree->Draw(">>elist", "abs(ct_orig+7*2.0)<1.0||abs(ct_orig+2*2.0)<1.0||abs(ct_orig+1.0*2.0)<1.0||abs(ct_orig-4.0*2.0)<1.0||abs(ct_orig-5.0*2.0)<1.0||abs(ct_orig-6.0*2.0)<1.0");
+ // tree->Draw(">>elist", "abs(ct_orig+7*2.0)<1.0||abs(ct_orig+2*2.0)<1.0||abs(ct_orig+1.0*2.0)<1.0||abs(ct_orig-4.0*2.0)<1.0||abs(ct_orig-5.0*2.0)<1.0||abs(ct_orig-6.0*2.0)<1.0");
+  tree->Draw(">>elist", "abs(ct_orig-11.*2.0)<1.0");
   TEventList *elist = (TEventList*)gROOT->FindObject("elist");
   ENum = elist->GetN(); 
   //ENum = tree->GetEntries();
 cout<<"Entries: "<<ENum<<endl;
   int time_div=ENum/25;
   if(ENum<100000)time_div=10000;
-  int nmix = 1;//Num of mix
+  int nmix = 20;//Num of mix
   double mass,mm;
   TLorentzVector L_4vec;
   TLorentzVector R_4vec;
@@ -284,7 +285,7 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
     	if(abs(ct-6.0*rf_bunch)<1.0) mix_region6 = true;
     	else mix_region6 = false;
 		//TEventList check
-		if(mix_region1==false&&mix_region2==false&&mix_region3==false&&mix_region4==false&&mix_region5==false&&mix_region6==false)cout<<"Weird!"<<endl;
+//		if(mix_region1==false&&mix_region2==false&&mix_region3==false&&mix_region4==false&&mix_region5==false&&mix_region6==false)cout<<"Weird!"<<endl;
 		//tree_out (in h2all.cc) check
 		if(L_Tr==false||R_Tr==false||L_FP==false||R_FP==false)cout<<"Weird! (Tr, FP)"<<endl;
 
@@ -532,10 +533,10 @@ cout<<"Entries(kaon): "<<ENum_kaon<<endl;
 		if(event_selection_Al)hmm_Al->Fill(mm_Al);
 		if(event_selection_Al)hmm_Al_2MeV->Fill(mm_Al);
 		if(event_selection_Al)hmm_Al_fake->Fill(mm_true);
-		if(event_selection_Al&&fabs(mm_true)<0.02)hmm_Al_fakeL->Fill(mm_Al);
-		if(event_selection_Al&&fabs(mm_true-MS0+ML)<0.02)hmm_Al_fakeS->Fill(mm_Al);
-		if(event_selection_Al&&fabs(mm_true)<0.02)hmm_Al_fakeL_2MeV->Fill(mm_Al);
-		if(event_selection_Al&&fabs(mm_true-MS0+ML)<0.02)hmm_Al_fakeS_2MeV->Fill(mm_Al);
+		if(event_selection_Al&&fabs(mm_true)<0.002)hmm_Al_fakeL->Fill(mm_Al);
+		if(event_selection_Al&&fabs(mm_true-MS0+ML)<0.002)hmm_Al_fakeS->Fill(mm_Al);
+		if(event_selection_Al&&fabs(mm_true)<0.002)hmm_Al_fakeL_2MeV->Fill(mm_Al);
+		if(event_selection_Al&&fabs(mm_true-MS0+ML)<0.002)hmm_Al_fakeS_2MeV->Fill(mm_Al);
 
   }//ENum_kaon
 

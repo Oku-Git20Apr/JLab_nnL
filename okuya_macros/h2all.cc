@@ -1290,7 +1290,7 @@ cout<<"bin coin"<<bin_coin_c<<endl;
 
 void tuning::MakeHist(){
   cout<<"Make Hist "<<endl;
-	file_out = new TFile("h2all.root","recreate");
+	file_out = new TFile("h2all_temp.root","recreate");
 	tree_out = new TTree("tree_out","tree_out");
 	//`tree_out ->Branch("branch name",variable ,"branch name/type");
 	

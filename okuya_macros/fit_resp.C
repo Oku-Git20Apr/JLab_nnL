@@ -121,7 +121,7 @@ double expgaus2(double *x, double *par, int num) {
      sum += fland * TMath::Exp(-xx/par[num+1]);
   }
   //val = par[2] * step * sum * invsq2pi / par[3];
-  val = par[num] * step * sum * invsq2pi / (par[num+2]*par[num+1]*exp(-par[num+3]/par[num+1]));
+  val = par[num] * step * sum * invsq2pi / (par[num+2]*par[num+1]*exp(par[num+3]/par[num+1]));
   return val;
 }
 
@@ -629,27 +629,30 @@ cout<<"BEST CUT START"<<endl;
 	 fmm_best_4Poly->SetParLimits(4,def_mean_S-def_sig_S,def_mean_S+def_sig_S);
 	 fmm_best_4Poly->SetParameter(5,sig_S_best);
 	 fmm_best_4Poly->SetParLimits(5,0.,0.003);
-	 fmm_best_4Poly->SetParameter(6,0.7);//scale
+//subL
+	 fmm_best_4Poly->SetParameter(6,0.1);//scale
 	 fmm_best_4Poly->SetParLimits(6,0.,2.);
 	 fmm_best_4Poly->SetParameter(7,0.04);//att.
 	 fmm_best_4Poly->SetParLimits(7,0.01,0.1);
 	 fmm_best_4Poly->SetParameter(8,0.01);//sigma
 	 fmm_best_4Poly->SetParLimits(8,0.,0.1);
-	 fmm_best_4Poly->SetParameter(9,-0.0001);//peak pos.
+	 fmm_best_4Poly->SetParameter(9,0.0001);//peak pos.
 	 fmm_best_4Poly->SetParLimits(9,-0.002,0.002);
-	 fmm_best_4Poly->SetParameter(10,10.);
-	 fmm_best_4Poly->SetParLimits(10,0.,20.);
+//Sigma0
+	 fmm_best_4Poly->SetParameter(10,0.25);
+	 fmm_best_4Poly->SetParLimits(10,0.,0.5);
 	 fmm_best_4Poly->SetParameter(11,0.04);
 	 fmm_best_4Poly->SetParLimits(11,0.01,0.1);
 	 fmm_best_4Poly->SetParameter(12,0.002);
 	 fmm_best_4Poly->SetParLimits(12,0.,0.01);
 	 fmm_best_4Poly->SetParameter(13,-0.077);
 	 fmm_best_4Poly->SetParLimits(13,-0.085,-0.065);
-	 fmm_best_4Poly->SetParameter(14,0.3);
-	 fmm_best_4Poly->SetParLimits(14,0.,1.0);
+//mainL
+	 fmm_best_4Poly->SetParameter(14,0.7);
+	 fmm_best_4Poly->SetParLimits(14,0.,1.5);
 	 fmm_best_4Poly->SetParameter(15,0.004);
 	 fmm_best_4Poly->SetParLimits(15,0.001,0.01);
-	 fmm_best_4Poly->SetParameter(16,0.002);
+	 fmm_best_4Poly->SetParameter(16,0.004);
 	 fmm_best_4Poly->SetParLimits(16,0.,0.01);
 	 fmm_best_4Poly->SetParameter(17,0.0);
 	 fmm_best_4Poly->SetParLimits(17,-0.002,0.002);

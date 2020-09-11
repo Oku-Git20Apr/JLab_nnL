@@ -121,7 +121,7 @@ double expgaus2(double *x, double *par, int num) {
      sum += fland * TMath::Exp(-xx/par[num+1]);
   }
   //val = par[2] * step * sum * invsq2pi / par[3];
-  val = par[num] * step * sum * invsq2pi / (par[num+2]*par[num+1]*exp(-par[num+3]/par[num+1]));
+  val = par[num] * step * sum * invsq2pi / (par[num+2]*par[num+1]*exp(par[num+3]/par[num+1]));
   return val;
 }
 
@@ -133,7 +133,7 @@ double FMM_Lambda_Sigma( double *x, double *par , int num)
 }
 double FMM_Res( double *x, double *par ){
 
-	return FMM_Lambda_Sigma(x,par,0)+expgaus2(x,par,6)+expgaus2(x,par,10)+expgaus2(x,par,14);
+	return FMM_Lambda_Sigma(x,par,0)+expgaus2(x,par,6)+expgaus2(x,par,10);//+expgaus2(x,par,14);
 
 }
 
@@ -608,9 +608,9 @@ cout<<"BEST CUT START"<<endl;
 /*%%%%%%%%%%%%%%%%%%%%%%%%*/
 	//--- w/ 4th Polynomial func.
 	 cout<<"4Poly MODE START"<<endl;
-	 fmm_best_4Poly=new TF1("fmm_best_4Poly",FMM_Res,min_mm,max_mm,18);
+	 fmm_best_4Poly=new TF1("fmm_best_4Poly",FMM_Res,min_mm,max_mm,14);
 	 fmmbg_best_4Poly=new TF1("fmmbg_best_4Poly","pol4",min_mm,max_mm);
-	 fmm_best_4Poly->SetNpx(2000);
+	 fmm_best_4Poly->SetNpx(20000);
 	 fmm_best_4Poly->SetTitle("Missing Mass (best)");
 	 fmm_best_4Poly->SetParLimits(0,0.,1000.);//positive
 	 fmm_best_4Poly->SetParLimits(3,0.,300.);//positive
@@ -624,31 +624,34 @@ cout<<"BEST CUT START"<<endl;
 	 fmm_best_4Poly->SetParLimits(4,def_mean_S-def_sig_S,def_mean_S+def_sig_S);
 	 fmm_best_4Poly->SetParameter(5,sig_S_best);
 	 fmm_best_4Poly->SetParLimits(5,0.,0.003);
+//subL
 	 fmm_best_4Poly->SetParameter(6,0.7);//scale
-	 fmm_best_4Poly->SetParLimits(6,0.,2.);
-	 fmm_best_4Poly->SetParameter(7,0.04);//att.
-	 fmm_best_4Poly->SetParLimits(7,0.01,0.1);
-	 fmm_best_4Poly->SetParameter(8,0.002);//sigma
-	 fmm_best_4Poly->SetParLimits(8,0.,0.01);
+	 fmm_best_4Poly->SetParLimits(6,0.,1.5);
+	 fmm_best_4Poly->SetParameter(7,0.02);//att.
+	 fmm_best_4Poly->SetParLimits(7,0.005,0.05);
+	 fmm_best_4Poly->SetParameter(8,0.02);//sigma
+	 fmm_best_4Poly->SetParLimits(8,0.001,0.1);
 	 fmm_best_4Poly->SetParameter(9,0.);//peak pos.
-	 fmm_best_4Poly->SetParLimits(9,-0.005,0.005);
-	 fmm_best_4Poly->SetParameter(10,10.);
-	 fmm_best_4Poly->SetParLimits(10,0.,20.);
-	 fmm_best_4Poly->SetParameter(11,0.04);
-	 fmm_best_4Poly->SetParLimits(11,0.01,0.1);
-	 fmm_best_4Poly->SetParameter(12,0.002);
-	 fmm_best_4Poly->SetParLimits(12,0.,0.01);
-	 fmm_best_4Poly->SetParameter(13,-0.077);
-	 fmm_best_4Poly->SetParLimits(13,-0.085,-0.065);
-	 fmm_best_4Poly->SetParameter(14,0.3);
-	 fmm_best_4Poly->SetParLimits(14,0.,1.0);
-	 fmm_best_4Poly->SetParameter(15,0.004);
-	 fmm_best_4Poly->SetParLimits(15,0.001,0.01);
-	 fmm_best_4Poly->SetParameter(16,0.002);
-	 fmm_best_4Poly->SetParLimits(16,0.,0.01);
-	 fmm_best_4Poly->SetParameter(17,0.0);
-	 fmm_best_4Poly->SetParLimits(17,-0.002,0.002);
-	 hmm_wo_bg_fom_best->Fit("fmm_best_4Poly","L","",-0.05,0.1);//Total fitting w/ 4Poly BG
+	 fmm_best_4Poly->SetParLimits(9,-0.05,0.05);
+//Sigma0
+	 fmm_best_4Poly->SetParameter(10,0.25);
+	 fmm_best_4Poly->SetParLimits(10,0.,1.5);
+	 fmm_best_4Poly->SetParameter(11,0.08);
+	 fmm_best_4Poly->SetParLimits(11,0.04,0.12);
+	 fmm_best_4Poly->SetParameter(12,0.01);
+	 fmm_best_4Poly->SetParLimits(12,0.001,0.01);
+	 fmm_best_4Poly->SetParameter(13,-0.067);
+	 fmm_best_4Poly->SetParLimits(13,-0.085,-0.055);
+//mainL
+//	 fmm_best_4Poly->SetParameter(14,0.7);
+//	 fmm_best_4Poly->SetParLimits(14,0.3,1.5);
+//	 fmm_best_4Poly->SetParameter(15,0.004);
+//	 fmm_best_4Poly->SetParLimits(15,0.001,0.01);
+//	 fmm_best_4Poly->SetParameter(16,0.002);
+//	 fmm_best_4Poly->SetParLimits(16,0.,0.01);
+//	 fmm_best_4Poly->SetParameter(17,0.0);
+//	 fmm_best_4Poly->SetParLimits(17,-0.002,0.002);
+	 hmm_wo_bg_fom_best->Fit("fmm_best_4Poly","","",-0.05,0.12);//Total fitting w/ 4Poly BG
 	 double chisq = fmm_best_4Poly->GetChisquare();
 	 double dof  = fmm_best_4Poly->GetNDF();
 	 cout<<"chisq="<<chisq<<endl;
