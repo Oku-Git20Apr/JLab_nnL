@@ -347,7 +347,7 @@ cout<<"Entries: "<<ENum<<endl;
 	 fcoin->SetParameter(10,-8.);
 	 fcoin->SetParLimits(10,-9.,-7.);
 	 fcoin->SetParameter(11,0.7);
-	 fcoin->FixParameter(12,2.0);
+	 fcoin->SetParameter(12,2.0);
 	 fcoin->SetLineColor(kAzure);
 	 hcoin->Fit("fcoin","","",12.,60.);
 	 double par0=fcoin->GetParameter(0);

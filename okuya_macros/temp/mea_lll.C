@@ -2,22 +2,19 @@
 //--  MIXED EVENT ANALYSIS        --//
 //----------------------------------//
 //
-//K. Okuyama (Aug. 11, 2020)
+//K. Okuyama (Sep. 13, 2020)
 //
-//add some necessary branch (Aug. 12, 2020)
-//complete MEA algorithm (Aug. 12, 2020)
-//delete matrix() and Calib() (Aug. 12, 2020)
-//
-//Converting to a PDF file becomes available. (Aug. 13, 2020)
-//
-//add MEA for Al (Aug. 19, 2020)
+//taken over from mea_lcr.C
+//using {left, left, left} bunch
 
-void mea_right(){
+void mea_lll(){
 	string pdfname = "temp.pdf";
+	string rootname= "bgmea_lll.root";
 cout << "Output pdf file name is " << pdfname << endl;
+cout << "Output root file name is " << rootname << endl;
   
   TFile *file = new TFile("../h2all5.root","read");//input file (default: h2all2.root)
-  TFile *file_new = new TFile("bgmea_right_temp.root","recreate");//new root
+  TFile *file_new = new TFile(rootname.c_str(),"recreate");//new root
  // TTree *tree_old = (TTree*)file->Get("tree_out");
 //cout<<"Please wait a moment. CloneTree() is working..."<<endl;
   //TTree *tree = tree_old->CloneTree();
@@ -156,19 +153,6 @@ cout << "Output pdf file name is " << pdfname << endl;
 /*-----------------*/
 /*--RESULT OUTPUT--*/
 /*-----------------*/
-  TH1F* hmm_Al  = new TH1F("hmm_Al","Al",400,-0.1,0.3);
-  hmm_Al->GetXaxis()->SetTitle("M_{x} - (M_{Mg}+M_{#Lambda}) (GeV/c^{2})");
-  hmm_Al->GetYaxis()->SetTitle("Counts / MeV");
-  TH1F* hmm_Al_fake  = new TH1F("hmm_Al_fake","Al (fake)",xbin,xmin,xmax);
-  hmm_Al_fake->GetXaxis()->SetTitle("M_{x} - M_{#Lambda} (GeV/c^{2})");
-  hmm_Al_fake->GetYaxis()->SetTitle("Counts / MeV");
-  TH1F* hmm_Al_fakeL  = new TH1F("hmm_Al_fakeL","Al (fake)",400,-0.1,0.3);
-  TH1F* hmm_Al_fakeS  = new TH1F("hmm_Al_fakeS","Al (fake)",400,-0.1,0.3);
-  TH1F* hmm_Al_2MeV  = new TH1F("hmm_Al_2MeV","Al",200,-0.1,0.3);
-  hmm_Al_2MeV->GetXaxis()->SetTitle("M_{x} - (M_{Mg}+M_{#Lambda}) (GeV/c^{2})");
-  hmm_Al_2MeV->GetYaxis()->SetTitle("Counts /2 MeV");
-  TH1F* hmm_Al_fakeL_2MeV  = new TH1F("hmm_Al_fakeL_2MeV","Al (fake)",200,-0.1,0.3);
-  TH1F* hmm_Al_fakeS_2MeV  = new TH1F("hmm_Al_fakeS_2MeV","Al (fake)",200,-0.1,0.3);
   TH1F* hmm_mixacc_result_best  = new TH1F("hmm_mixacc_result_best","ACC (30 bunch mixed)",xbin,xmin,xmax);
   TH1F* hmm_mixacc_result_nocut  = new TH1F("hmm_mixacc_result_nocut","ACC (30 bunch mixed)",xbin,xmin,xmax);
   TH1F* hmm_mixacc_result_nocut_forAl  = new TH1F("hmm_mixacc_result_nocut_forAl","ACC (30 bunch mixed)",xbin,xmin,xmax);
@@ -219,12 +203,12 @@ cout << "Output pdf file name is " << pdfname << endl;
 
   int ENum=0;
  // tree->Draw(">>elist", "abs(ct_orig+7*2.0)<1.0||abs(ct_orig+2*2.0)<1.0||abs(ct_orig+1.0*2.0)<1.0||abs(ct_orig-4.0*2.0)<1.0||abs(ct_orig-5.0*2.0)<1.0||abs(ct_orig-6.0*2.0)<1.0");
-  tree->Draw(">>elist", "abs(ct_orig-7.0*2.0)<1.0");
+  tree->Draw(">>elist", "abs(ct_orig+8.0*2.012)<1.006||abs(ct_orig+9.0*2.012)<1.006||abs(ct_orig+7.0*2.012)<1.006");
   TEventList *elist = (TEventList*)gROOT->FindObject("elist");
   ENum = elist->GetN(); 
   //ENum = tree->GetEntries();
 cout<<"Entries: "<<ENum<<endl;
-  int time_div=ENum/25;
+  int time_div=ENum/100;
   if(ENum<100000)time_div=10000;
   int nmix = 1000;//Num of mix
   double mass,mm;
@@ -449,7 +433,7 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
 /*************************************/
 //Following code is just for some checks using true-kaon event
 //e.g.) filling MM histogram, comparing MM & BG(MEA), etc.
-  tree->Draw(">>elist_kaon", "abs(ct_orig)<1.0");
+  tree->Draw(">>elist_kaon", "abs(ct_orig)<1.006");
   TEventList *elist_kaon = (TEventList*)gROOT->FindObject("elist_kaon");
   int ENum_kaon = elist_kaon->GetN(); 
 cout<<"Entries(kaon): "<<ENum_kaon<<endl;
@@ -508,13 +492,10 @@ cout<<"Entries(kaon): "<<ENum_kaon<<endl;
 		TLorentzVector R_4vec;
 		TLorentzVector B_4vec;
 		TLorentzVector T_4vec;
-		TLorentzVector Al_4vec;
 		L_4vec.SetPxPyPzE(L_px, L_py, L_pz, L_E);
         R_4vec.SetPxPyPzE(R_px, R_py, R_pz, R_E);
         B_4vec.SetPxPyPzE(0.0 ,  0.0,B_mom, B_E);
         T_4vec.SetPxPyPzE(0.0 ,  0.0,  0.0,  mt);
-		double mAl = (26.98154/1.00797)*Mp;
-        Al_4vec.SetPxPyPzE(0.0 ,  0.0,  0.0, mAl );
 
 	    R_4vec.RotateX(  13.2/180.*PI );
 	    L_4vec.RotateX( -13.2/180.*PI );
@@ -523,20 +504,9 @@ cout<<"Entries(kaon): "<<ENum_kaon<<endl;
 		double mass_true, mm_true;
 		mass_true = Missing.M();
 	    mm_true=mass_true - mh;//shift by ML
-		TLorentzVector Missing_Al = B_4vec + Al_4vec - L_4vec - R_4vec;
-		double mm_Al = Missing_Al.M() - ML - (25.98259/1.00797)*Mp; 
-	if(fabs(L_tr_vz-R_tr_vz)<0.025&&(fabs(fabs(R_tr_vz+L_tr_vz)/2.-0.12)<0.01||fabs(fabs(R_tr_vz+L_tr_vz)/2.+0.12)<0.01)&&ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection_Al=true;
-	else event_selection_Al=false;
 	
 		if(event_selection)hmm_best->Fill(mm_true);
 		if(event_selection_nocut)hmm_nocut->Fill(mm_true);
-		if(event_selection_Al)hmm_Al->Fill(mm_Al);
-		if(event_selection_Al)hmm_Al_2MeV->Fill(mm_Al);
-		if(event_selection_Al)hmm_Al_fake->Fill(mm_true);
-		if(event_selection_Al&&fabs(mm_true)<0.002)hmm_Al_fakeL->Fill(mm_Al);
-		if(event_selection_Al&&fabs(mm_true-MS0+ML)<0.002)hmm_Al_fakeS->Fill(mm_Al);
-		if(event_selection_Al&&fabs(mm_true)<0.002)hmm_Al_fakeL_2MeV->Fill(mm_Al);
-		if(event_selection_Al&&fabs(mm_true-MS0+ML)<0.002)hmm_Al_fakeS_2MeV->Fill(mm_Al);
 
   }//ENum_kaon
 
@@ -614,31 +584,6 @@ cout<<"6 bunches used "<<"( effective scale = "<<ntemp4/ntemp3<<" )"<<endl;
   hmm_mixacc3->SetLineColor(kRed);
   hmm_mixacc3->Draw("same");
 
-  TCanvas* c8 = new TCanvas("c8","Al");
-  hmm_Al->SetLineColor(kAzure);
-  hmm_Al->Draw("");
-
-  TCanvas* c9 = new TCanvas("c9","Al (fake)");
-  hmm_Al_fake->SetLineColor(kAzure);
-  hmm_Al_fake->Draw("");
-
-  TCanvas* c10 = new TCanvas("c10","Al (fake)");
-  hmm_Al->Draw("");
-  hmm_Al_fakeL->SetLineColor(kRed);
-  hmm_Al_fakeS->SetLineColor(kViolet);
-  hmm_Al_fakeL->Draw("same");
-  hmm_Al_fakeS->Draw("same");
-
-  TCanvas* c11 = new TCanvas("c11","Al 2MeV bin");
-  hmm_Al_2MeV->SetLineColor(kAzure);
-  hmm_Al_2MeV->Draw("");
-
-  TCanvas* c12 = new TCanvas("c12","Al 2MeV bin (fake)");
-  hmm_Al_2MeV->Draw("");
-  hmm_Al_fakeL_2MeV->SetLineColor(kRed);
-  hmm_Al_fakeS_2MeV->SetLineColor(kViolet);
-  hmm_Al_fakeL_2MeV->Draw("same");
-  hmm_Al_fakeS_2MeV->Draw("same");
 /*--- Print ---*/
 cout << "Print is starting" << endl;
 	c1->Print(Form("%s[",pdfname.c_str()));
@@ -649,12 +594,7 @@ cout << "Print is starting" << endl;
 	c5->Print(Form("%s",pdfname.c_str()));
 	c6->Print(Form("%s",pdfname.c_str()));
 	c7->Print(Form("%s",pdfname.c_str()));
-	c8->Print(Form("%s",pdfname.c_str()));
-	c9->Print(Form("%s",pdfname.c_str()));
-	c10->Print(Form("%s",pdfname.c_str()));
-	c11->Print(Form("%s",pdfname.c_str()));
-	c12->Print(Form("%s",pdfname.c_str()));
-	c12->Print(Form("%s]",pdfname.c_str()));
+	c7->Print(Form("%s]",pdfname.c_str()));
 
 
 cout << "creating new rootfile ... "<<endl;

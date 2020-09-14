@@ -15,19 +15,27 @@
 
 
 %MIXED EVENT ANALYSIS
-*mea_left.C (Sep. 5. 2020)
+*mea_left.C (Sep. 5, 2020)
 [-17ns,-15ns] (1 bunch is used)
 
-*mea_right.C (Sep. 5. 2020)
+*mea_right.C (Sep. 5, 2020)
 [15ns,17ns] (1 bunch is used)
 
-*mea_center.C (Sep. 5. 2020)
+*mea_center.C (Sep. 5, 2020)
 [-5ns,-3ns] (1 bunch is used)
 
-*mea_pion.C (Sep. 5. 2020)
+*mea_pion.C (Sep. 5, 2020)
 [2ns,4ns] (1 bunch is used)
 
-*mea_compare.C (Sep. 5. 2020)
+*mea_compare.C (Sep. 5, 2020)
 -comparison of above four-type MEA results (mea_left.C, mea_right.C, mea_center.C, mea_pion)
 
+*mea_lcr.C (Sep. 13, 2020)
+[-17ns,-15ns], [-5,-3], [13,15] (3 bunch is used, 2.012 ns width)
+
+*mea_lll.C (Sep. 13, 2020)
+[-19ns,-17ns], [-17,-15], [-15,-13] (3 bunch is used, 2.012 ns width)
+
+*mea_rrr.C (Sep. 13, 2020)
+[9ns,11ns], [13,15], [15,17] (3 bunch is used, 2.012 ns width)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

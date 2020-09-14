@@ -248,7 +248,7 @@ cout << "Output pdf file name is " << pdfname << endl;
 	TH1F* hmm_mea_comparison_lr=new TH1F("hmm_mea_comparison_lr","hmm_mea_comparison_lr",bin_mm,min_mm,max_mm);
 	TH1F* hmm_mea_comparison_cl=new TH1F("hmm_mea_comparison_cl","hmm_mea_comparison_cl",bin_mm,min_mm,max_mm);
 	TH1F* hmm_mea_comparison_cr=new TH1F("hmm_mea_comparison_cr","hmm_mea_comparison_cr",bin_mm,min_mm,max_mm);
-	hmm_mea_comparison->Add(hmm_mea_pion,hmm_mea_left,1.0,-1.0);
+	hmm_mea_comparison->Add(hmm_mea_pion,hmm_mea_left,-1.0,1.0);
 	hmm_mea_comparison_lr->Add(hmm_mea_left,hmm_mea_right,1.0,-1.0);
 	hmm_mea_comparison_cl->Add(hmm_mea_center,hmm_mea_left,1.0,-1.0);
 	hmm_mea_comparison_cr->Add(hmm_mea_center,hmm_mea_right,1.0,-1.0);
