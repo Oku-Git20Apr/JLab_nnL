@@ -2,100 +2,11 @@
 //--  Fitting w/ Response func. --//
 //--------------------------------//
 //
-//K. Okuyama (Sep. 11, 2020)
+//K. Okuyama (Sep. 14, 2020)
 //
 //This is taken over from fit_landau.C
 //No array branch mode 
 
-double F_Voigt( double *x, double *par )
-  {
-    // par[0] : area
-    // par[1] : location
-    // par[2] : gaussian sigma
-    // par[3] : lorentz fwhm
-    double val = par[0] * TMath::Voigt(x[0]-par[1],par[2],par[3],4);
-    return val;
-  }
-
-double F_2Gauss( double *x, double *par )
-  {
-	double val = par[0] * (TMath::Gaus(x[0],par[1],par[2]) + par[3] * TMath::Gaus(x[0],par[4],par[5]));
-    return val;
-  }
-
-double F_1Gauss( double *x, double *par )
-  {
-	double val = par[0] * TMath::Gaus(x[0],par[1],par[2]);
-    return val;
-  }
-
-double FMM_Voigt( double *x, double *par )
-  {
-    // par[6] : area
-    // par[7] : location
-    // par[8] : gaussian sigma
-    // par[9] : lorentz fwhm
-	double val = par[0] * TMath::Gaus(x[0],par[1],par[2]);
-	val += par[3] * TMath::Gaus(x[0],par[4],par[5]);
-    val += par[6] * TMath::Voigt(x[0]-par[7],par[8],par[9],4);
-    return val;
-  }
-
-double FMM_1Gauss( double *x, double *par )
-  {
-	double val = par[0] * TMath::Gaus(x[0],par[1],par[2]);
-	val += par[3] * TMath::Gaus(x[0],par[4],par[5]);
-	val += par[6] * TMath::Gaus(x[0],par[7],par[8]);
-    return val;
-  }
-
-double FMM_2Gauss( double *x, double *par )
-  {
-	double val = par[0] * TMath::Gaus(x[0],par[1],par[2]);
-	val += par[3] * TMath::Gaus(x[0],par[4],par[5]);
-	val += par[6] * (TMath::Gaus(x[0],par[7],par[8]) + par[9] * TMath::Gaus(x[0],par[10],par[11]));
-    return val;
-  }
-
-double FMM_2Poly( double *x, double *par )
-  {
-	double val = par[0] * TMath::Gaus(x[0],par[1],par[2]);
-	val += par[3] * TMath::Gaus(x[0],par[4],par[5]);
-    val += par[6] + par[7]*x[0] + par[8]*x[0]*x[0];
-    return val;
-  }
-
-double FMM_3Poly( double *x, double *par )
-  {
-	double val = par[0] * TMath::Gaus(x[0],par[1],par[2]);
-	val += par[3] * TMath::Gaus(x[0],par[4],par[5]);
-    val += par[6] + par[7]*x[0] + par[8]*x[0]*x[0] + par[9]*x[0]*x[0]*x[0];
-    return val;
-  }
-
-double FMM_4Poly( double *x, double *par )
-  {
-	double val = par[0] * TMath::Gaus(x[0],par[1],par[2]);
-	val += par[3] * TMath::Gaus(x[0],par[4],par[5]);
-    val += par[6] + par[7]*x[0] + par[8]*x[0]*x[0] + par[9]*x[0]*x[0]*x[0] + par[10]*TMath::Power(x[0],4.);
-    return val;
-  }
-
-double FMM_4Poly_wRes( double *x, double *par )
-  {
-	double Napier = 2.7182818;
-	double val = par[0] * TMath::Gaus(x[0],par[1],par[2]);//Lambda Gaussian
-	//double val = par[0] * TMath::Landau(x[0],par[1],par[2]);//Lambda Landau 
-	val += par[3] * TMath::Gaus(x[0],par[4],par[5]);//Sigma Gaussian
-    val += par[6] + par[7]*x[0] + par[8]*x[0]*x[0] + par[9]*x[0]*x[0]*x[0] + par[10]*TMath::Power(x[0],4.);//4Poly BG
-	if((x[0]-par[1])>0)val += (par[11]) * TMath::Power(Napier,-par[12]*(x[0]-par[13]))*TMath::Gaus(x[0],par[13],par[16]);//Lambda Radiative tail
-	//if((x[0]-par[1])>0)val += (par[11]/4.) * TMath::Power(Napier,-par[17]*(x[0]-par[18]))*TMath::Gaus(x[0],par[13],par[16]);//Lambda Radiative tail
-	//if((x[0]-par[4]-2*par[5])>0)val += par[14] * TMath::Power(Napier,-par[15]*(x[0]-par[16]));//Simga Radiative tail
-	if((x[0]-par[4]>0))val += par[14] * TMath::Power(Napier,-par[12]*(x[0]-par[15]))*TMath::Gaus(x[0],par[15],par[16]);//Simga Radiative tail//relevant to Lambda Radiative tail
-	//val += par[11] * TMath::Power(Napier,-par[12]*(x[0]-par[13]));//Lambda Radiative tail
-	//val += par[14] * TMath::Power(Napier,-par[15]*(x[0]-par[16]));//Simga Radiative tail
-    return val;
-  }
 
 double expgaus2(double *x, double *par, int num) {
   //par[0]=Total area
@@ -122,59 +33,6 @@ double expgaus2(double *x, double *par, int num) {
   }
   //val = par[2] * step * sum * invsq2pi / par[3];
   val = par[num] * step * sum * invsq2pi / (par[num+2]*par[num+1]*exp(par[num+3]/par[num+1]));
-  return val;
-}
-
-
-double landauexpgaus(double *x, double *par) {
-   //par[0]=Width (scale) parameter of Landau density
-   //par[1]=Most Probable (MP, location) parameter of Landau density
-   //par[2]=Total area (integral -inf to inf, normalization constant)
-   //par[3]=Width (sigma) of convoluted Gaussian function
-   //par[4]=tau of exp function
-   //par[5]=Shift of Function Peak
-   //par[6]=Relative strength
-
-//exp
-  //par[0]=Total area
-  //par[1]=tau of exp function
-  //par[2]=Width (sigma) of convoluted Gaussian function
-  //par[3]=Shift of Function Peak
-  double invsq2pi = 0.3989422804014;   // (2 pi)^(-1/2)
-  double mpshift  = -0.22278298;       // Landau maximum location
-  double np = 500.0;      // number of convolution steps
-  double sc =   5.0;      // convolution extends to +-sc Gaussian sigmas
-  double xx, mpc, fland, sum1 = 0.0, sum2 = 0.0, xlow,xupp, step, i;
-  double val;
-
-// MP shift correction
-  mpc = par[1] - mpshift * par[0];
-// Range of convolution integral
-  xlow = x[0] - sc * par[3];
-  xupp = x[0] + sc * par[3];
-  step = (xupp-xlow) / np;
-// Convolution integral of Landau and Gaussian by sum
-  for(i=1.0; i<=np/2; i++) {
-     xx = xlow + (i-0.5) * step;
-     fland = TMath::Landau(xx,mpc,par[0]) / par[0];
-     sum1 += fland * TMath::Gaus(x[0],xx,par[3]);
-
-     xx = xupp - (i-0.5) * step;
-     fland = TMath::Landau(xx,mpc,par[0]) / par[0];
-     sum1 += fland * TMath::Gaus(x[0],xx,par[3]);
-  }
-  for(i=1.0; i<=np/2; i++){
-     xx = xlow + (i-0.5) * step - par[5];
-     fland = TMath::Gaus(xx,x[0],par[3]);
-     sum2 += fland * TMath::Exp(-xx/par[4]);
-     xx = xupp - (i-0.5) * step - par[5];
-     fland = TMath::Gaus(xx,x[0],par[3]);
-     sum2 += fland * TMath::Exp(-xx/par[4]);
-  }
-  double val1 = par[0] * step * sum1 * invsq2pi / (par[2]*par[1]*exp(par[3]/par[1]));
-  double val2 = par[2] * step * sum2 * invsq2pi / par[3];
-  val = val1 + val2;
-
   return val;
 }
 
@@ -219,72 +77,72 @@ double FMM_Lambda_Sigma( double *x, double *par , int num)
   return val;
 }
 
-double triple_convolution(double *x, double *par) {//Landau x Exp x Gauss
-  //par[0]=Total area
-  //par[1]=tau of exp function
-  //par[2]=Width (sigma) of convoluted Gaussian function
-  //par[3]=Landau MPV
-  //par[4]=width of Landau
-  //par[5]=Shift of Function Peak
+double FMM_Response( double *x, double *par ){
 
+   //par[0]=Width (scale) parameter of Landau density
+   //par[1]=Most Probable (MP, location) parameter of Landau density
+   //par[2]=Total area (integral -inf to inf, normalization constant)
+   //par[3]=Width (sigma) of convoluted Gaussian function
+   //par[4]=tau of exp function
+   //par[5]=Shift of Function Peak
+   //par[6]=Relative Strength
   double invsq2pi = 0.3989422804014;   // (2 pi)^(-1/2)
   double mpshift  = -0.22278298;       // Landau maximum location
   double np = 500.0;      // number of convolution steps
-  double sc =   8.0;      // convolution extends to +-sc Gaussian sigmas
-  double yy, zz, fland, temp = 0.0, sum = 0.0, mpc, i, j;
-  double val;
-// Range of convolution integral
-  double ylow = 0.;
-  double yupp = x[0] + sc * par[2];
-  //double zlow = 0.;
-  double zlow = x[0] - sc * par[2]/2.;
-  double zupp = x[0] + sc * par[2]/2.;
-  double ystep = (yupp-ylow) / np;
-  double zstep = (zupp-zlow) / np;
-  mpc = par[3] - mpshift * par[4];
-// Convolution integral
-  for(i=1.0; i<=np; i++){
-     yy = ylow + (i-0.5) * ystep - par[5];
-	temp = 0.;
-     //yy = xupp - (i-0.5) * step - par[5];
-	for(j=1.0; j<=np/2; j++){
-     zz = zlow + (j-0.5) * zstep;
-     fland = TMath::Gaus(x[0],yy+zz,par[2]);
-     temp += fland * TMath::Landau(zz,mpc,par[4])/par[4];
+  double sc =   5.0;      // convolution extends to +-sc Gaussian sigmas
+  double xx, mpc, fland, sum = 0.0, xlow,xupp, step, i;
+  double val1, val2;
 
-     zz = zupp - (j-0.5) * zstep;
-     fland = TMath::Gaus(x[0],yy+zz,par[2]);
-     temp += fland * TMath::Landau(zz,mpc,par[4])/par[4];
-	}
-	//sum += temp ;
-	sum += temp * TMath::Exp(-yy/par[1])/par[1];
+// MP shift correction
+  mpc = par[1] - mpshift * par[0];
+// Range of convolution integral
+  xlow = x[0] - sc * par[3];
+  xupp = x[0] + sc * par[3];
+  step = (xupp-xlow) / np;
+// Convolution integral of Landau and Gaussian by sum
+  for(i=1.0; i<=np/2; i++) {
+     xx = xlow + (i-.5) * step;
+     fland = TMath::Landau(xx,mpc,par[0]) / par[0];
+     sum += fland * TMath::Gaus(x[0],xx,par[3]);
+
+     xx = xupp - (i-.5) * step;
+     fland = TMath::Landau(xx,mpc,par[0]) / par[0];
+     sum += fland * TMath::Gaus(x[0],xx,par[3]);
+  }
+  val1 = step * sum * invsq2pi / par[3];
+
+/*------Landau * Gauss convluted------*/
+
+// Range of convolution integral
+  sum  = 0.;
+  xlow = 0.;
+  xupp = x[0] + 1.6 * sc * par[3];
+  step = (xupp-xlow) / np;
+// Convolution integral
+  for(i=1.0; i<=np/2; i++){
+     xx = xlow + (i-0.5) * step - par[5];
+     fland = TMath::Gaus(xx,x[0],par[3]);
+     sum += fland * TMath::Exp(-xx/par[4]);
+     xx = xupp - (i-.5) * step - par[5];
+     fland = TMath::Gaus(xx,x[0],par[3]);
+     sum += fland * TMath::Exp(-xx/par[4]);
   }
   //val = par[2] * step * sum * invsq2pi / par[3];
-  //val = par[0] * zstep * ystep * sum * invsq2pi / (par[2]*exp(par[5]/par[1]));
-  val = par[0] * zstep * ystep * sum * invsq2pi / (par[2]);
-  return val;
+  val2 =  step * sum * invsq2pi / (par[3]*par[4]*exp(par[5]/par[4]));
+  //val2 =  step * sum * invsq2pi / (par[3]*par[4]);
+/*------Exp * Gauss convluted------*/
+
+  return par[2]*(val1+par[6]*val2);//N x (Landau*Gauss) + N' x (Exp*Gauss)
+
 }
 
 double FMM_Res( double *x, double *par ){
 
-	//return landaugaus2(x,par,0)+landaugaus2(x,par,4)+expgaus2(x,par,8)+expgaus2(x,par,12);//+expgaus2(x,par,14);
-	return triple_convolution(x,par)+triple_convolution(x,&par[6]);//+expgaus2(x,par,14);
+	return FMM_Response(x,par)+FMM_Response(x,&par[7]);
 
 }
 
-double FMM_Lambda_only( double *x, double *par ){
-
-	return landaugaus2(x,par,0)+expgaus2(x,par,4);
-
-}
-
-double FMM_Sigma_only( double *x, double *par ){
-
-	return landaugaus2(x,par,0)+expgaus2(x,par,4);
-
-}
-
-void fit_3conv(){
+void fit_Lexp(){
 	string pdfname = "fitting.pdf";
 cout << "Output pdf file name is " << pdfname << endl;
   
@@ -335,6 +193,7 @@ cout << "Output pdf file name is " << pdfname << endl;
  const double max_mm=0.2;//GeV/c^2
  int bin_mm=(max_mm-min_mm)/0.001; //Counts/2 MeV
  bin_mm=(int)bin_mm;
+ //const double fit_min_mm=-0.006;
  const double fit_min_mm=-0.02;
  const double fit_max_mm=0.12;
  const int fit_bin_mm = (fit_max_mm-fit_min_mm)/0.001;
@@ -757,73 +616,53 @@ cout<<"BEST CUT START"<<endl;
 /*%%%%%%%%%%%%%%%%%%%%%%%%*/
 	//--- w/ 4th Polynomial func.
 	 cout<<"4Poly MODE START"<<endl;
-	 fmm_best_4Poly=new TF1("fmm_best_4Poly",FMM_Res,fit_min_mm,fit_max_mm,12);
-     //par[0]=Total area
-     //par[1]=tau of exp function
-     //par[2]=Width (sigma) of convoluted Gaussian function
-     //par[3]=Landau MPV
-     //par[4]=width of Landau
-     //par[5]=Shift of Function Peak
+	 fmm_best_4Poly=new TF1("fmm_best_4Poly",FMM_Res,fit_min_mm,fit_max_mm,14);
+   //par[0]=Width (scale) parameter of Landau density
+   //par[1]=Most Probable (MP, location) parameter of Landau density
+   //par[2]=Total area (integral -inf to inf, normalization constant)
+   //par[3]=Width (sigma) of convoluted Gaussian function
+   //par[4]=tau of exp function
+   //par[5]=Shift of Function Peak
+   //par[6]=Relative Strength
+   //
+   //
+   //
+   //par[0]=Width (scale) parameter of Landau density
+   //par[1]=Most Probable (MP, location) parameter of Landau density
+   //par[2]=Total area (integral -inf to inf, normalization constant)
+   //par[3]=Width (sigma) of convoluted Gaussian function
 	 fmmbg_best_4Poly=new TF1("fmmbg_best_4Poly","pol4",fit_min_mm,fit_max_mm);
-	 fmm_best_4Poly->SetNpx(2000);
+	 fmm_best_4Poly->SetNpx(20000);
 	 fmm_best_4Poly->SetTitle("Missing Mass (best)");
-	 fmm_best_4Poly->SetParLimits(0,0.,500.);//positive
-	 fmm_best_4Poly->SetParLimits(6,0.,300.);//positive
-	 fmm_best_4Poly->SetParameter(0,35.);//L scale
-	 fmm_best_4Poly->SetParameter(1,0.055);//att.
-	 fmm_best_4Poly->SetParLimits(1,0.02,0.15);
-	 fmm_best_4Poly->SetParameter(2,0.0008);//Gauss sigma
-	 fmm_best_4Poly->SetParLimits(2,0.,0.03);
-	 fmm_best_4Poly->SetParameter(3,-0.001);//Landau MPV
-	 fmm_best_4Poly->SetParLimits(3,def_mean_L-def_sig_L,def_mean_L+def_sig_L);
-	 fmm_best_4Poly->SetParameter(4,0.00007);//Landau sigma
-	 fmm_best_4Poly->SetParLimits(4,0.,0.0015);//Landau sigma
-	 fmm_best_4Poly->SetParameter(5,0.);
-cout<<"meanL="<<mean_L_best<<endl;
-cout<<"sigL="<<sig_L_best<<endl;
+	 fmm_best_4Poly->SetParLimits(2,0.,1000.);//positive
+	 fmm_best_4Poly->SetParLimits(9,0.,300.);//positive
+	 fmm_best_4Poly->SetParameter(0,0.0007);//Landau width
+	 fmm_best_4Poly->SetParameter(1,mean_L_best);
+	 fmm_best_4Poly->SetParLimits(1,def_mean_L-def_sig_L,def_mean_L+def_sig_L);
+	 fmm_best_4Poly->SetParameter(2,1.5);//total scale
+	 fmm_best_4Poly->SetParameter(3,0.001);//sigma
+	 fmm_best_4Poly->SetParLimits(3,0.,0.01);
+	 fmm_best_4Poly->SetParameter(4,0.05);//att.
+	 fmm_best_4Poly->SetParLimits(4,0.005,0.08);
+	 fmm_best_4Poly->SetParameter(5,-0.004);//peak pos.
+	 fmm_best_4Poly->SetParLimits(5,-0.05,0.05);
+	 fmm_best_4Poly->SetParameter(6,0.6);//relative strength
+	 fmm_best_4Poly->SetParLimits(6,0.,1.5);//relative strength
 
-	 fmm_best_4Poly->SetParameter(6,5.);//S scale
-	 fmm_best_4Poly->SetParameter(7,0.055);//att.
-	 fmm_best_4Poly->SetParLimits(7,0.02,0.15);
-	 fmm_best_4Poly->SetParameter(8,0.0008);//Gauss sigma
-	 fmm_best_4Poly->SetParLimits(8,0.,0.03);
-	 fmm_best_4Poly->SetParameter(9,mean_S_best);//Landau MPV
-	 fmm_best_4Poly->SetParLimits(9,def_mean_S-def_sig_S,def_mean_S+def_sig_S);
-	 fmm_best_4Poly->SetParameter(10,0.00007);//Landau sigma
-	 fmm_best_4Poly->SetParLimits(10,0.,0.0015);//Landau sigma
-	 fmm_best_4Poly->SetParameter(11,-1.*mean_S_best);
+	 fmm_best_4Poly->SetParameter(7,0.0003);//Landau width
+	 fmm_best_4Poly->SetParameter(8,mean_S_best);//MPV
+	 fmm_best_4Poly->SetParLimits(8,def_mean_S-def_sig_S,def_mean_S+def_sig_S);
+	 fmm_best_4Poly->SetParameter(9,0.4);//total scale
+	 fmm_best_4Poly->SetParameter(10,0.0015);//sigma
+	 fmm_best_4Poly->SetParLimits(10,0.,0.01);
+	 fmm_best_4Poly->SetParameter(11,0.05);//att
+	 fmm_best_4Poly->SetParLimits(11,0.03,0.12);
+	 fmm_best_4Poly->SetParameter(12,0.080);//peak pos.
+	 //fmm_best_4Poly->SetParLimits(15,-0.085,-0.055);
+	 fmm_best_4Poly->SetParameter(13,0.6);
+	 fmm_best_4Poly->SetParLimits(13,0.,1.5);//relative strength
 
-
-
-//	 fmm_best_4Poly->SetParameter(2,1.5);
-//	 fmm_best_4Poly->SetParameter(4,0.001);
-//	 fmm_best_4Poly->SetParameter(5,mean_S_best);
-//	 fmm_best_4Poly->SetParLimits(5,def_mean_S-def_sig_S,def_mean_S+def_sig_S);
-//	 fmm_best_4Poly->SetParameter(6,0.4);
-////subL
-//	 fmm_best_4Poly->SetParameter(8,0.2);//scale
-//	 fmm_best_4Poly->SetParLimits(8,0.,1.5);
-//	 fmm_best_4Poly->SetParameter(10,0.02);//sigma
-//	 fmm_best_4Poly->SetParLimits(10,0.001,0.1);
-//	 fmm_best_4Poly->FixParameter(11,-0.005);//peak pos.
-//	 //fmm_best_4Poly->SetParLimits(11,-0.05,0.05);
-////Sigma0
-//	 fmm_best_4Poly->SetParameter(12,0.25);
-//	 fmm_best_4Poly->SetParLimits(12,0.,1.5);
-//	 fmm_best_4Poly->SetParameter(14,0.01);
-//	 fmm_best_4Poly->SetParLimits(14,0.001,0.01);
-//	 fmm_best_4Poly->FixParameter(15,-0.080);
-//	 //fmm_best_4Poly->SetParLimits(15,-0.085,-0.055);
-////mainL
-////	 fmm_best_4Poly->SetParameter(16,0.7);
-////	 fmm_best_4Poly->SetParLimits(16,0.3,1.5);
-////	 fmm_best_4Poly->SetParameter(17,0.004);
-////	 fmm_best_4Poly->SetParLimits(17,0.001,0.01);
-////	 fmm_best_4Poly->SetParameter(18,0.002);
-////	 fmm_best_4Poly->SetParLimits(18,0.,0.01);
-////	 fmm_best_4Poly->SetParameter(19,0.0);
-////	 fmm_best_4Poly->SetParLimits(19,-0.002,0.002);
-	 //hmm_wo_bg_fom_best->Fit("fmm_best_4Poly","","",fit_min_mm,fit_max_mm);//Total fitting w/ 4Poly BG
+	 hmm_wo_bg_fom_best->Fit("fmm_best_4Poly","","",fit_min_mm,fit_max_mm);//Total fitting w/ 4Poly BG
 	 double chisq = fmm_best_4Poly->GetChisquare();
 	 double dof  = fmm_best_4Poly->GetNDF();
 	 cout<<"chisq="<<chisq<<endl;
@@ -831,48 +670,46 @@ cout<<"sigL="<<sig_L_best<<endl;
 	 cout<<"Reduced chi-square = "<<chisq/dof<<endl;
 
 
-	 TF1* fmm_Lambda_only = new TF1("fmm_Lambda_only",FMM_Lambda_only,fit_min_mm,fit_max_mm,8);
-	 TF1* fmm_Sigma_only  = new TF1("fmm_Sigma_only" ,FMM_Sigma_only, fit_min_mm,fit_max_mm,8);
+	 TF1* fmm_Lambda_only = new TF1("fmm_Lambda_only",FMM_Response,fit_min_mm,fit_max_mm,7);
+	 TF1* fmm_Sigma_only  = new TF1("fmm_Sigma_only" ,FMM_Response, fit_min_mm,fit_max_mm,7);
 //Lambda_only
-	 fmm_Lambda_only->SetNpx(2000);
+	 fmm_Lambda_only->SetNpx(20000);
 	 fmm_Lambda_only->SetParameter(0,fmm_best_4Poly->GetParameter(0));
 	 fmm_Lambda_only->SetParameter(1,fmm_best_4Poly->GetParameter(1));
 	 fmm_Lambda_only->SetParameter(2,fmm_best_4Poly->GetParameter(2));
 	 fmm_Lambda_only->SetParameter(3,fmm_best_4Poly->GetParameter(3));
-	 fmm_Lambda_only->SetParameter(4,fmm_best_4Poly->GetParameter(8));
-	 fmm_Lambda_only->SetParameter(5,fmm_best_4Poly->GetParameter(9));
-	 fmm_Lambda_only->SetParameter(6,fmm_best_4Poly->GetParameter(10));
-	 fmm_Lambda_only->SetParameter(7,fmm_best_4Poly->GetParameter(11));
+	 fmm_Lambda_only->SetParameter(4,fmm_best_4Poly->GetParameter(4));
+	 fmm_Lambda_only->SetParameter(5,fmm_best_4Poly->GetParameter(5));
+	 fmm_Lambda_only->SetParameter(6,fmm_best_4Poly->GetParameter(6));
 //Sigma_only
-	 fmm_Sigma_only->SetNpx(2000);
-	 fmm_Sigma_only->SetParameter(0,fmm_best_4Poly->GetParameter(4));
-	 fmm_Sigma_only->SetParameter(1,fmm_best_4Poly->GetParameter(5));
-	 fmm_Sigma_only->SetParameter(2,fmm_best_4Poly->GetParameter(6));
-	 fmm_Sigma_only->SetParameter(3,fmm_best_4Poly->GetParameter(7));
-	 fmm_Sigma_only->SetParameter(4,fmm_best_4Poly->GetParameter(12));
-	 fmm_Sigma_only->SetParameter(5,fmm_best_4Poly->GetParameter(13));
-	 fmm_Sigma_only->SetParameter(6,fmm_best_4Poly->GetParameter(14));
-	 fmm_Sigma_only->SetParameter(7,fmm_best_4Poly->GetParameter(15));
+	 fmm_Sigma_only->SetNpx(20000);
+	 fmm_Sigma_only->SetParameter(0,fmm_best_4Poly->GetParameter(7));
+	 fmm_Sigma_only->SetParameter(1,fmm_best_4Poly->GetParameter(8));
+	 fmm_Sigma_only->SetParameter(2,fmm_best_4Poly->GetParameter(9));
+	 fmm_Sigma_only->SetParameter(3,fmm_best_4Poly->GetParameter(10));
+	 fmm_Sigma_only->SetParameter(4,fmm_best_4Poly->GetParameter(11));
+	 fmm_Sigma_only->SetParameter(5,fmm_best_4Poly->GetParameter(12));
+	 fmm_Sigma_only->SetParameter(6,fmm_best_4Poly->GetParameter(13));
 
-//	double nofL = fmm_Lambda_only->Integral(fit_min_mm,fit_max_mm);
-//	double nofL_old = fmm_Lambda_only->Integral(-0.006,0.006);
-//	nofL = nofL/fit_bin_width;
-//	nofL_old = nofL_old/fit_bin_width;
-//	cout<<"Number of Lambda (TF1 Integral) = "<<nofL<<endl;
-//	cout<<"Number of Lambda w/o radiative tail (TF1 Integral) = "<<nofL_old<<endl;
-//	cout<<"Number of Lambda w/o radiative tail (TH1F Integral) = "<<hmm_wo_bg_fom_best->Integral(hmm_wo_bg_fom_best->FindBin(-0.006),hmm_wo_bg_fom_best->FindBin(0.006))<<endl;
-//
-//	double nofS = fmm_Sigma_only->Integral(fit_min_mm,fit_max_mm);
-//	nofS = nofS/fit_bin_width;
-//	cout<<"Number of Sigma (TF1 Integral) = "<<nofS<<endl;
+	double nofL = fmm_Lambda_only->Integral(fit_min_mm,fit_max_mm);
+	double nofL_old = fmm_Lambda_only->Integral(-0.006,0.006);
+	nofL = nofL/fit_bin_width;
+	nofL_old = nofL_old/fit_bin_width;
+	cout<<"Number of Lambda (TF1 Integral) = "<<nofL<<endl;
+	cout<<"Number of Lambda w/o radiative tail (TF1 Integral) = "<<nofL_old<<endl;
+	cout<<"Number of Lambda w/o radiative tail (TH1F Integral) = "<<hmm_wo_bg_fom_best->Integral(hmm_wo_bg_fom_best->FindBin(-0.006),hmm_wo_bg_fom_best->FindBin(0.006))<<endl;
+
+	double nofS = fmm_Sigma_only->Integral(fit_min_mm,fit_max_mm);
+	nofS = nofS/fit_bin_width;
+	cout<<"Number of Sigma (TF1 Integral) = "<<nofS<<endl;
 
 	 hmm_wo_bg_fom_best->Draw();
 	 fmm_best_4Poly->SetLineColor(kRed);
 	 fmm_best_4Poly->Draw("same");
 	 fmm_Lambda_only->SetLineColor(kAzure);
 	 fmm_Sigma_only->SetLineColor(kCyan);
-	// fmm_Lambda_only->Draw("same");
-	// fmm_Sigma_only->Draw("same");
+	 fmm_Lambda_only->Draw("same");
+	 fmm_Sigma_only->Draw("same");
 	 //fL_best->SetLineColor(kGreen);
 	 //fS_best->SetLineColor(kGreen);
 	 //fL_best->Draw("same");

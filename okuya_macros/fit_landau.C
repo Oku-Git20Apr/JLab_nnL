@@ -685,7 +685,7 @@ cout<<"BEST CUT START"<<endl;
 	 fmm_best_4Poly->SetParLimits(9,0.005,0.08);
 	 fmm_best_4Poly->SetParameter(10,0.02);//sigma
 	 fmm_best_4Poly->SetParLimits(10,0.001,0.1);
-	 fmm_best_4Poly->FixParameter(11,-0.005);//peak pos.
+	 fmm_best_4Poly->FixParameter(11,0.005);//peak pos.
 	 //fmm_best_4Poly->SetParLimits(11,-0.05,0.05);
 //Sigma0
 	 fmm_best_4Poly->SetParameter(12,0.25);
@@ -694,7 +694,7 @@ cout<<"BEST CUT START"<<endl;
 	 fmm_best_4Poly->SetParLimits(13,0.04,0.12);
 	 fmm_best_4Poly->SetParameter(14,0.01);
 	 fmm_best_4Poly->SetParLimits(14,0.001,0.01);
-	 fmm_best_4Poly->FixParameter(15,-0.080);
+	 fmm_best_4Poly->FixParameter(15,0.080);
 	 //fmm_best_4Poly->SetParLimits(15,-0.085,-0.055);
 //mainL
 //	 fmm_best_4Poly->SetParameter(16,0.7);
