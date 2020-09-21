@@ -231,37 +231,41 @@ double triple_convolution(double *x, double *par) {//Landau x Exp x Gauss
   double mpshift  = -0.22278298;       // Landau maximum location
   double np = 500.0;      // number of convolution steps
   double sc =   8.0;      // convolution extends to +-sc Gaussian sigmas
-  double yy, zz, fland, temp = 0.0, sum = 0.0, mpc, i, j;
+  double yy, zz, fland, temp = 0.0, sum = 0.0, i, j;
   double val;
 // Range of convolution integral
-  double ylow = 0.;
-  double yupp = x[0] + sc * par[2];
-  //double zlow = 0.;
-  double zlow = x[0] - sc * par[2]/2.;
-  double zupp = x[0] + sc * par[2]/2.;
+  double ylow = x[0] - sc * par[2]/2.;
+  //double ylow = 0.;
+  double yupp = x[0] + sc * par[2]/2.;
+  double zlow = 0.;
+  double zupp = x[0] + sc * par[2];
   double ystep = (yupp-ylow) / np;
   double zstep = (zupp-zlow) / np;
-  mpc = par[3] - mpshift * par[4];
+if(zstep<0.)zstep=0.;
+  double mpc = par[3] - mpshift * par[4];
+
+
+
 // Convolution integral
   for(i=1.0; i<=np; i++){
-     yy = ylow + (i-0.5) * ystep - par[5];
+     yy = ylow + (i-0.5) * ystep;
 	temp = 0.;
      //yy = xupp - (i-0.5) * step - par[5];
 	for(j=1.0; j<=np/2; j++){
-     zz = zlow + (j-0.5) * zstep;
+     zz = zlow + (j-0.5) * zstep - par[5];
      fland = TMath::Gaus(x[0],yy+zz,par[2]);
-     temp += fland * TMath::Landau(zz,mpc,par[4])/par[4];
+	 temp += fland * TMath::Exp(-zz/par[1]);
 
-     zz = zupp - (j-0.5) * zstep;
+     zz = zupp - (j-0.5) * zstep - par[5];
      fland = TMath::Gaus(x[0],yy+zz,par[2]);
-     temp += fland * TMath::Landau(zz,mpc,par[4])/par[4];
+	 temp += fland * TMath::Exp(-zz/par[1]);
 	}
 	//sum += temp ;
-	sum += temp * TMath::Exp(-yy/par[1])/par[1];
+     sum += temp * TMath::Landau(yy,mpc,par[4]);
   }
   //val = par[2] * step * sum * invsq2pi / par[3];
   //val = par[0] * zstep * ystep * sum * invsq2pi / (par[2]*exp(par[5]/par[1]));
-  val = par[0] * zstep * ystep * sum * invsq2pi / (par[2]);
+  val = par[0] * zstep * ystep * sum * invsq2pi / (par[2]*par[1]*par[4]*exp(par[5]/par[1]));
   return val;
 }
 
@@ -769,27 +773,28 @@ cout<<"BEST CUT START"<<endl;
 	 fmm_best_4Poly->SetTitle("Missing Mass (best)");
 	 fmm_best_4Poly->SetParLimits(0,0.,500.);//positive
 	 fmm_best_4Poly->SetParLimits(6,0.,300.);//positive
-	 fmm_best_4Poly->SetParameter(0,35.);//L scale
+	 fmm_best_4Poly->SetParameter(0,30.0);//L scale
 	 fmm_best_4Poly->SetParameter(1,0.055);//att.
 	 fmm_best_4Poly->SetParLimits(1,0.02,0.15);
 	 fmm_best_4Poly->SetParameter(2,0.0008);//Gauss sigma
 	 fmm_best_4Poly->SetParLimits(2,0.,0.03);
-	 fmm_best_4Poly->SetParameter(3,-0.001);//Landau MPV
+	 fmm_best_4Poly->SetParameter(3,0.001);//Landau MPV
 	 fmm_best_4Poly->SetParLimits(3,def_mean_L-def_sig_L,def_mean_L+def_sig_L);
-	 fmm_best_4Poly->SetParameter(4,0.00007);//Landau sigma
+	 fmm_best_4Poly->SetParameter(4,0.0008);//Landau sigma
 	 fmm_best_4Poly->SetParLimits(4,0.,0.0015);//Landau sigma
 	 fmm_best_4Poly->SetParameter(5,0.);
 cout<<"meanL="<<mean_L_best<<endl;
 cout<<"sigL="<<sig_L_best<<endl;
 
-	 fmm_best_4Poly->SetParameter(6,5.);//S scale
+	 fmm_best_4Poly->SetParameter(6,13.8);//S scale
 	 fmm_best_4Poly->SetParameter(7,0.055);//att.
 	 fmm_best_4Poly->SetParLimits(7,0.02,0.15);
 	 fmm_best_4Poly->SetParameter(8,0.0008);//Gauss sigma
 	 fmm_best_4Poly->SetParLimits(8,0.,0.03);
-	 fmm_best_4Poly->SetParameter(9,mean_S_best);//Landau MPV
+	 //fmm_best_4Poly->SetParameter(9,mean_S_best);//Landau MPV
+	 fmm_best_4Poly->SetParameter(9,0.001);//Landau MPV
 	 fmm_best_4Poly->SetParLimits(9,def_mean_S-def_sig_S,def_mean_S+def_sig_S);
-	 fmm_best_4Poly->SetParameter(10,0.00007);//Landau sigma
+	 fmm_best_4Poly->SetParameter(10,0.0008);//Landau sigma
 	 fmm_best_4Poly->SetParLimits(10,0.,0.0015);//Landau sigma
 	 fmm_best_4Poly->SetParameter(11,-1.*mean_S_best);
 
