@@ -258,7 +258,7 @@ int main(int argc, char** argv){
 		//cout<<"nbin_mom:"<<i<<endl;
 		//cout<<"n1="<<n1<<endl;
 		//cout<<"n2="<<n2<<endl;
-		if(n1!=0 && n2!=0)val = volume*(1.0*n2/n1);
+		if(n1!=0 && n2!=0)val = volume*(1.0*n2/n1)*1000.;//MeV->GeV
 		h_vp_mom_result->SetBinContent(i+1, val);
 		if(n1!=0 && n2!=0)err = val * sqrt(1./n2 + 1./n1 - 2./sqrt(1.*n1*n2));
 		h_vp_mom_result->SetBinError(i+1, err);
@@ -271,12 +271,12 @@ int main(int argc, char** argv){
 		//cout<<"nbin_mom:"<<i<<endl;
 		//cout<<"n1="<<n1<<endl;
 		//cout<<"n2="<<n2<<endl;
-		if(n1!=0 && n2!=0)val = volume*(1.0*n2/n1);
+		if(n1!=0 && n2!=0)val = volume*(1.0*n2/n1)*1000;//MeV->GeV
 		h_vp_mom_result2->SetBinContent(i+1, val);
 		if(n1!=0 && n2!=0)err = val * sqrt(1./n2 + 1./n1 - 2./sqrt(1.*n1*n2));
 		h_vp_mom_result2->SetBinError(i+1, err);
 
-		double bin_width=(max_mom-min_mom)/bin_mom;//GeV/c
+		double bin_width=(max_mom-min_mom)/bin_mom/1000.;//GeV/c
 		vpflux_tot_mom+=val*bin_width;
 		vpflux_tot_mom_err+=sqrt(err*bin_width*err*bin_width);
 	}
@@ -329,8 +329,10 @@ int main(int argc, char** argv){
 	c7->Divide(2,2);
 	c7->cd(1);
 	//SetTitle(h_vp_mom_result, "Integrated VP Flux vs. Momentum (w/ all Cuts)", "Momentum [GeV/c]", "Integrated VP Flux [/GeV]");
+		h_vp_mom_result->Scale(bin_mom);
 	h_vp_mom_result->GetXaxis()->SetNdivisions(505, kFALSE);
 	h_vp_mom_result->Draw();
+	//	h_vp_mom_result2->Scale(bin_mom);
 	h_vp_mom_result2->GetXaxis()->SetNdivisions(505, kFALSE);
 	h_vp_mom_result2->SetLineColor(kAzure);
 	h_vp_mom_result2->Draw("same");
@@ -367,6 +369,20 @@ c4->Close();
 c5->Close();
 c6->Close();
 c7->Close();
+	
+	ofstream fout("vpflux_SIMC.dat");
+		fout<<"#VP Flux Calculation with SIMC Acceptance"<<endl;
+		fout<<"#1.8<pe[GeV/c]<2.4, 150 partition --> 1bin=4MeV/c"<<endl;
+		double vpflux_temp;
+		double vpflux_total=0.;
+	for(int i=0; i<bin_mom; i++){
+		vpflux_temp = h_vp_mom_result2->GetBinContent(i+1);
+		vpflux_temp = vpflux_temp * 0.004;
+		fout<<i+1<<" "<<vpflux_temp<<endl;
+		vpflux_total+=vpflux_temp;
+	}
+	
+	cout<<"vpflux_total="<<vpflux_total<<endl;
 
 	cout<< "Finish!" << endl;
 	return 0;

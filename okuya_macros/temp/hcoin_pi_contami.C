@@ -278,7 +278,8 @@ cout<<"Entries: "<<ENum<<endl;
 	
 
 		bool ac_cut=false;
-		if(ac1sum<3.75&&ac2sum>3.&&ac2sum<20.)ac_cut=true;
+		//if(ac1sum<3.75&&ac2sum>3.&&ac2sum<20.)ac_cut=true;
+		if(ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2)ac_cut=true;
 
 		if(fabs(ct)<1)ct_cut=true;
 		else ct_cut=false;
@@ -461,7 +462,7 @@ cout<<"Entries: "<<ENum<<endl;
 //	 fcoin->FixParameter(8,karea);//k
 //	 fcoin->FixParameter(9,klocation);
 //	 fcoin->FixParameter(10,gsigma);
-//	 fcoin->FixParameter(11,lwidth);
+	 fcoin->FixParameter(11,lwidth);
 	 fcoin->SetParameter(12,1000.);//p
 	 fcoin->SetParLimits(12,0.,100000.);
 	 fcoin->SetParameter(13,-8.);
@@ -501,11 +502,11 @@ cout<<"Entries: "<<ENum<<endl;
 		frame->Draw("");
 		hcoin->Draw("same");
 		fcoin->Draw("same");
-		double ktegrated = fcoin_k->Integral(-0.7,0.7);
+		double ktegrated = fcoin_k->Integral(-1.0,1.0);
 		cout<<"Kaon (-1ns<ct<1ns): "<<ktegrated/0.056<<endl;
-		double pitegrated = fcoin_pi->Integral(-0.7,0.7);
+		double pitegrated = fcoin_pi->Integral(-1.0,1.0);
 		cout<<"Pion (-1ns<ct<1ns): "<<pitegrated/0.056<<endl;
-		cout<<"Pion Contamination (-1ns<ct<1ns): "<<pitegrated*100./ktegrated<<endl;
+		cout<<"Pion Contamination (-1ns<ct<1ns): "<<pitegrated*100./(ktegrated+pitegrated)<<endl;
 		fcoin_pi->SetLineColor(kOrange);
 		fcoin_k->SetLineColor(kGreen);
 		fcoin_p->SetLineColor(kRed);

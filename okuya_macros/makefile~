@@ -66,12 +66,11 @@ OBJS21=   h2all.o Setting.o Tree.o ParamMan.o
 #OBJS14=   okuyana.o Setting.o Tree.o ParamMan.o
 
 .PHONY: all
-all:$(TARGET14)\
-     $(TARGET15)\
-     $(TARGET16)\
-     $(TARGET17)\
-     $(TARGET18)\
-     $(TARGET19)
+all:$(TARGET13)\
+     $(TARGET14)\
+     $(TARGET20)\
+     $(TARGET21)
+#     $(TARGET11)
 #$(TARGET1)\
 #     $(TARGET2)\
 #     $(TARGET3)\

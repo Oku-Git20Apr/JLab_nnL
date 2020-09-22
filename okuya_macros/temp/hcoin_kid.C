@@ -38,7 +38,7 @@ double fcoin_total( double *x, double *par ){
 }
 
 void hcoin_kid(){
-	string pdfname = "temp.pdf";
+	string pdfname = "kid_coin.pdf";
 cout << "Output pdf file name is " << pdfname << endl;
 
   
@@ -203,9 +203,11 @@ cout << "Output pdf file name is " << pdfname << endl;
   TH1F* hcoin_wobg[20][20][20];
 //		hcoin[10][10][10]       = new TH1F("hcoin[10][10][10]","",120000/56,-20.,100.);
 
-  for(int l=0;l<20;l++){
-	for(int m=0;m<20;m++){
-	  for(int n=0;n<20;n++){
+  int step = 20;//Maximum 20
+
+  for(int l=0;l<step;l++){
+	for(int m=0;m<step;m++){
+	  for(int n=0;n<step;n++){
 		hcoin[l][m][n]       = new TH1F(Form("hcoin[%d][%d][%d]"     ,l,m,n),"",120000/56,-20.,100.);
 		hcoin_bg[l][m][n]    = new TH1F(Form("hcoin_bg[%d][%d][%d]"  ,l,m,n),"",120000/56,-20.,100.);
 		hcoin_wobg[l][m][n]  = new TH1F(Form("hcoin_wobg[%d][%d][%d]",l,m,n),"",120000/56,-20.,100.);
@@ -247,18 +249,17 @@ cout << "Output pdf file name is " << pdfname << endl;
   double acc1[100];
   double acc2l[100];
   double acc2u[100];
-  int step = 20.;
-	acc1[0] =1.; acc1[step] =5.;
-	acc2l[0]=1.; acc2l[step]=3.;
-	acc2u[0]=5.; acc2u[step]=20.;
+	acc1[0] =1.; acc1[step] =6.5;
+	acc2l[0]=0.; acc2l[step]=4.;
+	acc2u[0]=4.; acc2u[step]=24.;
 
   double interval1 = (acc1[step]-acc1[0])/(double)step;
   double interval2l= (acc2l[step]-acc2l[0])/(double)step;
   double interval2u= (acc2u[step]-acc2u[0])/(double)step;
   for(int l=1;l<step;l++){
-	acc1[l] =acc1[0] +interval1;
-	acc2l[l]=acc2l[0]+interval2l;
-	acc2u[l]=acc2u[0]+interval2u;
+	acc1[l] =acc1[0] +interval1*l;
+	acc2l[l]=acc2l[0]+interval2l*l;
+	acc2u[l]=acc2u[0]+interval2u*l;
   }
 
 
@@ -333,11 +334,11 @@ cout<<"Entries: "<<ENum<<endl;
 
 		bool ac_cut=false;
 		//if(ac1sum<3.75&&ac2sum>3.&&ac2sum<20.)ac_cut=true;
-		if(ac_cut)hcoin[10][10][10]->Fill(ct);
+		//if(ac_cut)hcoin[10][10][10]->Fill(ct);
 
-  for(int l=0;l<20;l++){
-	for(int m=0;m<20;m++){
-	  for(int n=0;n<20;n++){
+  for(int l=0;l<step;l++){
+	for(int m=0;m<step;m++){
+	  for(int n=0;n<step;n++){
 
 		if(ac1sum<acc1[l]&&ac2sum>acc2l[m]&&ac2sum<acc2u[n])ac_cut=true;
 		else ac_cut=false;
@@ -399,31 +400,31 @@ cout<<"Entries: "<<ENum<<endl;
 }//ENum
 
 		TCanvas *c1 = new TCanvas("c1", "c1", 800, 800);
-		hcoin[10][10][10]->Draw("");
+		hcoin[step/2][step/2][step/2]->Draw("");
 
 	TF1* fcoin_first[20][20][20];
 	TF1* fcoin[20][20][20];
 	TF1* fcoin_pi[20][20][20];
 	TF1* fcoin_k[20][20][20];
 	TF1* fcoin_p[20][20][20];
-	TH1F* h_pi1[20];
-	TH1F* h_pi2l[20];
-	TH1F* h_pi2u[20];
-	TH1F* h_k1[20];
-	TH1F* h_k2l[20];
-	TH1F* h_k2u[20];
-	TEfficiency *pEff1[20];
-	TEfficiency *pEff2[20];
-	TEfficiency *pEff3[20];
+	TH1F* h_pi1 = new TH1F("h_pi1","",step,0,step);
+	TH1F* h_k1 = new TH1F("h_k1","",step,0,step);
+	TH1F* h_pi2l = new TH1F("h_pi2l","",step,0,step);
+	TH1F* h_k2l = new TH1F("h_k2l","",step,0,step);
+	TH1F* h_pi2u = new TH1F("h_pi2u","",step,0,step);
+	TH1F* h_k2u = new TH1F("h_k2u","",step,0,step);
+	TEfficiency *pEff1;
+	TEfficiency *pEff2;
+	TEfficiency *pEff3;
 	 double chisq, chisq2, dof, dof2;
 	 double area, location, gsigma, lwidth, bwidth;
 	 double numPI[20][20][20];
 	 double numK[20][20][20];
 
 //BG subtraction
-  for(int l=0;l<20;l++){
-	for(int m=0;m<20;m++){
-	  for(int n=0;n<20;n++){
+  for(int l=0;l<step;l++){
+	for(int m=0;m<step;m++){
+	  for(int n=0;n<step;n++){
 		hcoin_bg[l][m][n]->Scale(40./80.);
      	//hcoin_wobg[l][m][n]->Add(Form("hcoin[%d][%d][%d]",l,m,n),Form("hcoin_bg[%d][%d][%d]",l,m,n),1.0,-1.0);
      	hcoin_wobg[l][m][n]->Add(hcoin[l][m][n],hcoin_bg[l][m][n],1.0,-1.0);
@@ -557,38 +558,25 @@ cout<<"Entries: "<<ENum<<endl;
 	 fcoin_p[l][m][n]->SetParameter(2,fcoin[l][m][n]->GetParameter(14));
 	 fcoin_p[l][m][n]->SetParameter(3,fcoin[l][m][n]->GetParameter(15));
 	 numK[l][m][n] = fcoin_k[l][m][n]->Integral(-1.0,1.0)/0.056;
+	 //numK[l][m][n] = fcoin[l][m][n]->Integral(-1.0,1.0)/0.056;
 	 numPI[l][m][n] = fcoin_pi[l][m][n]->Integral(-1.0,1.0)/0.056;
+	 numK[l][m][n] += numPI[l][m][n];
 		//cout<<"Kaon (-1ns<ct<1ns): "<<ktegrated/0.056<<endl;
 		//double pitegrated = fcoin_pi->Integral(-0.7,0.7);
 		//cout<<"Pion (-1ns<ct<1ns): "<<pitegrated/0.056<<endl;
 		//cout<<"Pion Contamination (-1ns<ct<1ns): "<<pitegrated*100./ktegrated<<endl;
 
-	if(m==10&&n==10){
-	h_pi1[l] = new TH1F(Form("h_pi1[%d]",l),"",120000/56,-20.,100.);
-	h_k1[l] = new TH1F(Form("h_k1[%d]",l),"",120000/56,-20.,100.);
-	h_pi1[l]->SetBinContent(l+1,numPI[l][m][n]);
-	h_k1[l]->SetBinContent(l+1,numK[l][m][n]);
-		if(TEfficiency::CheckConsistency(*h_pi1[l],*h_k1[l],"w")){
-		pEff1[l] = new TEfficiency(*h_pi1[l],*h_k1[l]);
-		}
+	if(m==step/2&&n==step/2){
+	h_pi1->SetBinContent(l+1,numPI[l][m][n]);
+	h_k1->SetBinContent(l+1,numK[l][m][n]);
 	}
-	if(l==10&&n==10){
-	h_pi2l[m] = new TH1F(Form("h_pi2l[%d]",m),"",120000/56,-20.,100.);
-	h_k2l[m] = new TH1F(Form("h_k2l[%d]",m),"",120000/56,-20.,100.);
-	h_pi2l[m]->SetBinContent(m+1,numPI[l][m][n]);
-	h_k2l[m]->SetBinContent(m+1,numK[l][m][n]);
-		if(TEfficiency::CheckConsistency(*h_pi2l[m],*h_k2l[m],"w")){
-		pEff2[m] = new TEfficiency(*h_pi2l[m],*h_k2l[m]);
-		}
+	if(l==step/2&&n==step/2){
+	h_pi2l->SetBinContent(m+1,numPI[l][m][n]);
+	h_k2l->SetBinContent(m+1,numK[l][m][n]);
 	}
-	if(l==10&&m==10){
-	h_pi2u[n] = new TH1F(Form("h_pi2u[%d]",n),"",120000/56,-20.,100.);
-	h_k2u[n] = new TH1F(Form("h_k2u[%d]",n),"",120000/56,-20.,100.);
-	h_pi2u[n]->SetBinContent(n+1,numPI[l][m][n]);
-	h_k2u[n]->SetBinContent(n+1,numK[l][m][n]);
-		if(TEfficiency::CheckConsistency(*h_pi2u[n],*h_k2u[n],"w")){
-		pEff3[n] = new TEfficiency(*h_pi2u[n],*h_k2u[n]);
-		}
+	if(l==step/2&&m==step/2){
+	h_pi2u->SetBinContent(n+1,numPI[l][m][n]);
+	h_k2u->SetBinContent(n+1,numK[l][m][n]);
 	}
 
 
@@ -597,21 +585,56 @@ cout<<"Entries: "<<ENum<<endl;
   }//l loop
 //
 //cout<<"fcoin(4)="<<fcoin->GetParameter(4)<<endl;
+		if(TEfficiency::CheckConsistency(*h_pi1,*h_k1,"w")){
+		pEff1 = new TEfficiency(*h_pi1,*h_k1);
+		}
+		if(TEfficiency::CheckConsistency(*h_pi2l,*h_k2l,"w")){
+		pEff2 = new TEfficiency(*h_pi2l,*h_k2l);
+		}
+		if(TEfficiency::CheckConsistency(*h_pi2u,*h_k2u,"w")){
+		pEff3 = new TEfficiency(*h_pi2u,*h_k2u);
+		}
+	  TH2F* h2_ac1 = new TH2F("h2_ac1","",step,acc2l[0],acc2l[step],step,acc2u[0],acc2u[step]);
+	  TH2F* h2_ac2l = new TH2F("h2_ac2l","",step,acc1[0],acc1[step],step,acc2u[0],acc2u[step]);
+	  TH2F* h2_ac2u = new TH2F("h2_ac2u","",step,acc1[0],acc1[step],step,acc2l[0],acc2l[step]);
+
+	double conta1, conta2, conta3;
+	for(int j=0;j<step;j++){
+		for(int k=0;k<step;k++){
+			if(isfinite(numPI[step/2][j][k]/numK[step/2][j][k]))conta1=numPI[step/2][j][k]/numK[step/2][j][k];else conta1=0.;
+			if(isfinite(numPI[j][step/2][k]/numK[j][step/2][k]))conta2=numPI[j][step/2][k]/numK[j][step/2][k];else conta2=0.;
+			if(isfinite(numPI[j][k][step/2]/numK[j][k][step/2]))conta3=numPI[j][k][step/2]/numK[j][k][step/2];else conta3=0.;
+			h2_ac1->SetBinContent( j+1,k+1,conta1);
+		  	h2_ac2l->SetBinContent(j+1,k+1,conta2);
+		  	h2_ac2u->SetBinContent(j+1,k+1,conta3);
+		}
+	}
+	TCanvas *c2 = new TCanvas("c2", "c2", 800, 800);
+	//hcoin_wobg[step/2][step/2][step/2]->Draw("");
+	h2_ac1->Draw("colz");
+	TCanvas *c3 = new TCanvas("c3", "c3", 800, 800);
+	h2_ac2l->Draw("colz");
+	TCanvas *c4 = new TCanvas("c4", "c4", 800, 800);
+	h2_ac2u->Draw("colz");
+	TCanvas *c5 = new TCanvas("c5", "c5", 800, 800);
+	pEff1->Draw("");
+	TCanvas *c6 = new TCanvas("c6", "c6", 800, 800);
+	pEff2->Draw("");
+	TCanvas *c7 = new TCanvas("c7", "c7", 800, 800);
+	pEff3->Draw("");
 
 
 	ofstream fout("kid_coin.dat");
 		fout<<"#numPI[l][m][n]/numK[l][m][n] is filled"<<endl;
-  for(int l=0;l<20;l++){
-	for(int m=0;m<20;m++){
-	  for(int n=0;n<20;n++){
+  for(int l=0;l<step;l++){
+	for(int m=0;m<step;m++){
+	  for(int n=0;n<step;n++){
 		fout<<l<<" "<<m<<" "<<n<<" "<<numPI[l][m][n]/numK[l][m][n]<<" ="<<numPI[l][m][n]<<"/"<<numK[l][m][n]<<"    "<<"AC1<"<<acc1[l]<<", "<<acc2l[m]<<"<AC2<"<<acc2u[n]<<endl;
 	  }
 	}
   }
 
 
-		TCanvas *c2 = new TCanvas("c2", "c2", 800, 800);
-		hcoin_wobg[10][10][10]->Draw("");
 	//	fcoin_first->Draw("same");
 	//	TCanvas *c3 = new TCanvas("c3", "c3", 800, 800);
 	//	c3->SetLogy(1);
@@ -807,4 +830,16 @@ cout<<"Entries: "<<ENum<<endl;
 //
 //cout << "Well done!" << endl;
 file_new->Write();
+/*--- Print ---*/
+cout << "Print is starting" << endl;
+	c1->Print(Form("%s[",pdfname.c_str()));
+	c1->Print(Form("%s",pdfname.c_str()));
+	c2->Print(Form("%s",pdfname.c_str()));
+	c3->Print(Form("%s",pdfname.c_str()));
+	c4->Print(Form("%s",pdfname.c_str()));
+	c5->Print(Form("%s",pdfname.c_str()));
+	c6->Print(Form("%s",pdfname.c_str()));
+	c7->Print(Form("%s",pdfname.c_str()));
+	c7->Print(Form("%s]",pdfname.c_str()));
+
 }//fit
