@@ -166,6 +166,12 @@ cout << "Output pdf file name is " << pdfname << endl;
 	//ACCBGの引き算はmea_hist.ccから
   TFile *file_mea = new TFile("bgmea6.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
   double nbunch = 600.;//effetive bunches (6 bunches x 5 mixtures)
+  
+//Systematic study
+//TFile *file_mea = new TFile("./temp/bgmea_lcr.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
+//double nbunch = 3000.;//effetive bunches (3 bunches x 1000 mixtures)
+
+
  // TTree *tree_old = (TTree*)file->Get("tree_out");
 //cout<<"Please wait a moment. CloneTree() is working..."<<endl;
   //TTree *tree = tree_old->CloneTree();
@@ -760,14 +766,14 @@ cout<<"BEST CUT START"<<endl;
 	 fmm_nocut_Lexp->SetTitle("Missing Mass (nocut)");
 	 fmm_nocut_Lexp->FixParameter(0,fmm_best_Lexp->GetParameter(0));
 	 fmm_nocut_Lexp->FixParameter(1,fmm_best_Lexp->GetParameter(1));
-	 fmm_nocut_Lexp->SetParameter(2,fmm_best_Lexp->GetParameter(2));//scale
+	 fmm_nocut_Lexp->SetParameter(2,fmm_best_Lexp->GetParameter(2));//L scale
 	 fmm_nocut_Lexp->FixParameter(3,fmm_best_Lexp->GetParameter(3));
 	 fmm_nocut_Lexp->FixParameter(4,fmm_best_Lexp->GetParameter(4));
 	 fmm_nocut_Lexp->FixParameter(5,fmm_best_Lexp->GetParameter(5));
 	 fmm_nocut_Lexp->FixParameter(6,fmm_best_Lexp->GetParameter(6));
 	 fmm_nocut_Lexp->FixParameter(7,fmm_best_Lexp->GetParameter(7));
 	 fmm_nocut_Lexp->FixParameter(8,fmm_best_Lexp->GetParameter(8));
-	 fmm_nocut_Lexp->FixParameter(9,fmm_best_Lexp->GetParameter(9));
+	 fmm_nocut_Lexp->SetParameter(9,fmm_best_Lexp->GetParameter(9));//S scale
 	 fmm_nocut_Lexp->FixParameter(10,fmm_best_Lexp->GetParameter(10));
 	 fmm_nocut_Lexp->FixParameter(11,fmm_best_Lexp->GetParameter(11));
 	 fmm_nocut_Lexp->FixParameter(12,fmm_best_Lexp->GetParameter(12));

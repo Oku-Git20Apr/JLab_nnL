@@ -2839,9 +2839,10 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 for(int i=0;i<nth;i++){
 	cut_ac1=false;
 	cut_ac2=false;
-	zcut=true;
+	zcut=false;
 	if(tr.AC1_npe_sum<3.75)cut_ac1=true;
    	if(3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20.)cut_ac2=true;
+	if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<zver_diff[i])zcut=true;
 	if(zcut && cut_ac1 && cut_ac2){//no AC cut
 	//if(cut_ac1 && cut_ac2 && fabs(theta_ee-0.225)<0.0125&&fabs(phi_ee-1.6)<0.125&&fabs(pL-2.1)<0.05){//no AC cut
 	hcoin_k_fom_noZ[i]->Fill(ct);
@@ -4385,21 +4386,21 @@ pEff10 = new TEfficiency(*h_Ssr2l,*h_Stot2l);
 //pEff10->Write();
 }
 
-cout<<"pEff11:"<<endl;
-if(TEfficiency::CheckConsistency(*h_ksr11,*h_ktot11,"w")){
-pEff11 = new TEfficiency(*h_ksr11,*h_ktot11);
-//pEff11->Write();
-}
-cout<<"pEff111:"<<endl;
-if(TEfficiency::CheckConsistency(*h_ksr111,*h_ktot111,"w")){
-pEff111 = new TEfficiency(*h_ksr111,*h_ktot111);
-//pEff111->Write();
-}
-cout<<"pEff1111:"<<endl;
-if(TEfficiency::CheckConsistency(*h_ksr1111,*h_ktot1111,"w")){
-pEff1111 = new TEfficiency(*h_ksr1111,*h_ktot1111);
-//pEff1111->Write();
-}
+//cout<<"pEff11:"<<endl;
+//if(TEfficiency::CheckConsistency(*h_ksr11,*h_ktot11,"w")){
+//pEff11 = new TEfficiency(*h_ksr11,*h_ktot11);
+////pEff11->Write();
+//}
+//cout<<"pEff111:"<<endl;
+//if(TEfficiency::CheckConsistency(*h_ksr111,*h_ktot111,"w")){
+//pEff111 = new TEfficiency(*h_ksr111,*h_ktot111);
+////pEff111->Write();
+//}
+//cout<<"pEff1111:"<<endl;
+//if(TEfficiency::CheckConsistency(*h_ksr1111,*h_ktot1111,"w")){
+//pEff1111 = new TEfficiency(*h_ksr1111,*h_ktot1111);
+////pEff1111->Write();
+//}
 
 cout << "TGraphErrors!" << endl;
 //gcoin_pi_sr[0] = new TGraphErrors(99, ac1_adc, fom_pi1, 0, err_fom_pi1);
@@ -4586,9 +4587,9 @@ pEff9->SetLineColor(kAzure);pEff9->Draw("same");
 pEff10->SetLineColor(kCyan);pEff10->Draw("same");
 c9->cd()->DrawFrame(0.,0.,0.1,1.2);
 pEff2->SetLineColor(kGreen);pEff2->Draw("same");
-pEff11->SetLineColor(kGreen+1);pEff11->Draw("same");
-pEff111->SetLineColor(kGreen+2);pEff111->Draw("same");
-pEff1111->SetLineColor(kGreen+3);pEff1111->Draw("same");
+//pEff11->SetLineColor(kGreen+1);pEff11->Draw("same");
+//pEff111->SetLineColor(kGreen+2);pEff111->Draw("same");
+//pEff1111->SetLineColor(kGreen+3);pEff1111->Draw("same");
 c10->Divide(2,2);
 c10->cd(1);
 hmm_wo_bg_fom_noZ[25]->Draw("");

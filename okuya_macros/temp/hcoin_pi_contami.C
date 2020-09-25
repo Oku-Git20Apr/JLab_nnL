@@ -388,9 +388,9 @@ cout<<"Entries: "<<ENum<<endl;
 	 fcoin->SetParameter(0,600.);//acc
 	 fcoin->SetParameter(1,0.);//
 	 fcoin->SetParLimits(1,-1.,1.);//
-	 fcoin->SetParameter(2,fcoin_first->GetParameter(2));
+	 fcoin->FixParameter(2,fcoin_first->GetParameter(2));//G Fix
 	 //fcoin->SetParLimits(2,0.,0.6);//
-	 fcoin->FixParameter(3,fcoin_first->GetParameter(3));
+	 fcoin->SetParameter(3,fcoin_first->GetParameter(3));//L fix
 	 //fcoin->SetParLimits(3,0.,0.8);//
 	 fcoin->FixParameter(4,0.);//pi
 	 fcoin->SetParameter(5,fcoin_first->GetParameter(1));
@@ -434,9 +434,9 @@ cout<<"Entries: "<<ENum<<endl;
 	 fcoin->SetParLimits(8,0.,100000.);
 	 fcoin->SetParameter(9,0.);//k
 	 fcoin->SetParLimits(9,-0.5,0.5);
-	 fcoin->SetParameter(10,0.4);//k
+	 fcoin->FixParameter(10,fcoin_first->GetParameter(2));//k G Fix
 	 fcoin->SetParLimits(10,0.,0.6);
-	 fcoin->SetParameter(11,0.4);//k
+	 fcoin->SetParameter(11,fcoin_first->GetParameter(3));//k L Fix
 	 fcoin->SetParLimits(11,0.,1.0);
 //	 hcoin->Fit("fcoin","","",-0.7,0.7);
 
@@ -453,9 +453,9 @@ cout<<"Entries: "<<ENum<<endl;
 	 fcoin->SetParLimits(4.,0.,100000.);
 	 fcoin->SetParameter(5,fcoin_first->GetParameter(1));//pi
 	 fcoin->SetParLimits(5,2.5,3.5);
-	 fcoin->SetParameter(6,fcoin_first->GetParameter(2));
+	 fcoin->FixParameter(6,fcoin_first->GetParameter(2));//pi G Fix
 	 fcoin->SetParLimits(6,0.,0.5);
-	 fcoin->FixParameter(7,fcoin_first->GetParameter(3));
+	 fcoin->SetParameter(7,fcoin_first->GetParameter(3));//pi L Fix
 //L	 fcoin->SetParLimits(7,0.,1.0);
 	 //fcoin->FixParameter(6,gsigma);
 	 //fcoin->FixParameter(7,lwidth);
@@ -467,9 +467,9 @@ cout<<"Entries: "<<ENum<<endl;
 	 fcoin->SetParLimits(12,0.,100000.);
 	 fcoin->SetParameter(13,-8.);
 	 fcoin->SetParLimits(13,-9.,-7.);
-	 fcoin->SetParameter(14,gsigma);
+	 fcoin->FixParameter(14,gsigma);//p G Fix
 	 fcoin->SetParLimits(14,0.,2.);
-	 fcoin->FixParameter(15,lwidth);
+	 fcoin->SetParameter(15,lwidth);//p L Fix
 //L	 fcoin->SetParLimits(15,0.,2.);
 	 hcoin->Fit("fcoin","","",-20.,20.);
 	 TF1 *fcoin_pi=new TF1("fcoin_pi",F_Voigt,-20.,20.,4);
