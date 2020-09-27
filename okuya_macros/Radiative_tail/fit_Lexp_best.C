@@ -158,17 +158,17 @@ double FMM_Res_nocut( double *x, double *par ){
 
 }
 
-void fit_Lexp(){
+void fit_Lexp_best(){
 	string pdfname = "fitting.pdf";
 cout << "Output pdf file name is " << pdfname << endl;
   
   TFile *file = new TFile("h2all.root","read");//input file of all H2 run(default: h2all4.root)
 	//ACCBGの引き算はmea_hist.ccから
-  TFile *file_mea = new TFile("bgmea6.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
-  double nbunch = 600.;//effetive bunches (6 bunches x 5 mixtures)
+  TFile *file_mea = new TFile("./temp/bgmea_llccrr_new.root","read");//input file of BG(MEA) histo.(default: bgmea6.root)
+  double nbunch = 6000.;//effetive bunches (6 bunches x 1000 mixtures)
   
 //Systematic study
-//TFile *file_mea = new TFile("./temp/bgmea_lcr.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
+//TFile *file_mea = new TFile("./temp/bgmea_rrr.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
 //double nbunch = 3000.;//effetive bunches (3 bunches x 1000 mixtures)
 
 
@@ -420,7 +420,7 @@ cout << "Output pdf file name is " << pdfname << endl;
 
 
   //tree->Draw(">>elist" , "fabs(ct_orig[0][0])<1.0");
-  tree->Draw(">>elist" , "fabs(ct_orig)<1.0");//ctsum (does NOT dintinguish #track)
+  tree->Draw(">>elist" , "fabs(ct_orig)<1.006");//ctsum (does NOT dintinguish #track)
   TEventList *elist = (TEventList*)gROOT->FindObject("elist");
   int ENum = elist->GetN(); 
 cout<<"Entries: "<<ENum<<endl;
@@ -461,7 +461,7 @@ cout<<"Entries: "<<ENum<<endl;
 	
 
 
-		if(fabs(ct)<1)ct_cut=true;
+		if(fabs(ct)<1.006)ct_cut=true;
 		else ct_cut=false;
 		//if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
 		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
@@ -615,6 +615,17 @@ cout<<"BEST CUT START"<<endl;
 	 mean_S_best=fS_best->GetParameter(1);
 	 sig_S_best=fS_best->GetParameter(2);
 
+	 TF1 *fAl=new TF1("fAl",F_Voigt,fit_min_mm,fit_max_mm,4);
+	 fAl->SetNpx(2000);
+	 fAl->SetTitle("Al selected");
+	 fAl->SetParameters(3.,0.05,0.04,0.001);
+	 fAl->SetParLimits(0,0.,10000.);
+	 fAl->SetLineColor(kRed);
+	 hmm_pi_wobg_fom_nocut->Fit("fAl","N","",0.,0.1);
+	 double pion_par0 = fAl->GetParameter(0);
+	 double pion_par1 = fAl->GetParameter(1);
+	 double pion_par2 = fAl->GetParameter(2);
+	 double pion_par3 = fAl->GetParameter(3);
 
 	 constL=0.;
 	 meanL=0.;
@@ -778,11 +789,16 @@ cout<<"BEST CUT START"<<endl;
 	 fmm_nocut_Lexp->FixParameter(11,fmm_best_Lexp->GetParameter(11));
 	 fmm_nocut_Lexp->FixParameter(12,fmm_best_Lexp->GetParameter(12));
 	 fmm_nocut_Lexp->FixParameter(13,fmm_best_Lexp->GetParameter(13));
-	 fmm_nocut_Lexp->SetParameter(14,500.);//scale
+	 //fmm_nocut_Lexp->SetParameter(14,500.);//scale
+	 //fmm_nocut_Lexp->SetParLimits(14,0.,1000000.);//scale
+	 //fmm_nocut_Lexp->SetParameter(15,0.05);//mean
+	 //fmm_nocut_Lexp->SetParameter(16,0.04);//Gsigma
+	 //fmm_nocut_Lexp->SetParameter(17,0.01);//Lfwhm
+	 fmm_nocut_Lexp->SetParameter(14,6.);//scale
 	 fmm_nocut_Lexp->SetParLimits(14,0.,1000000.);//scale
-	 fmm_nocut_Lexp->SetParameter(15,0.05);//mean
-	 fmm_nocut_Lexp->SetParameter(16,0.04);//Gsigma
-	 fmm_nocut_Lexp->SetParameter(17,0.01);//Lfwhm
+	 fmm_nocut_Lexp->FixParameter(15,pion_par1);//mean
+	 fmm_nocut_Lexp->FixParameter(16,pion_par2);//Gsigma
+	 fmm_nocut_Lexp->FixParameter(17,pion_par3);//Lfwhm
 	 //fmm_nocut_Lexp->SetParLimits(2,0.,1000.);//positive
 	 //fmm_nocut_Lexp->SetParLimits(9,0.,300.);//positive
 	 //fmm_nocut_Lexp->SetParameter(0,0.0007);//Landau width
@@ -876,5 +892,8 @@ cout<<"BEST CUT START"<<endl;
 	 //fS_nocut->SetLineColor(kGreen);
 	 //fL_nocut->Draw("same");
 	 //fS_nocut->Draw("same");
+	TCanvas* c4 = new TCanvas("c4","c4");
+	hmm_pi_wobg_fom_nocut->Draw("");
+	fAl->Draw("same");
 cout << "Well done!" << endl;
 }//fit

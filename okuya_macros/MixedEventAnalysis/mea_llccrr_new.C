@@ -9,7 +9,7 @@
 
 void mea_llccrr_new(){
 	string pdfname = "temp.pdf";
-	string rootname= "bgmea_llccrr_new.root";
+	string rootname= "bgmea_llccrr_new_new.root";
 cout << "Output pdf file name is " << pdfname << endl;
 cout << "Output root file name is " << rootname << endl;
   
@@ -155,10 +155,12 @@ cout << "Output root file name is " << rootname << endl;
 /*-----------------*/
   TH1F* hmm_mixacc_result_best  = new TH1F("hmm_mixacc_result_best","MEA result (best)",xbin,xmin,xmax);
   TH1F* hmm_mixacc_result_nocut  = new TH1F("hmm_mixacc_result_nocut","MEA result (no Z cut)",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_nocut_new  = new TH1F("hmm_mixacc_result_nocut_new","MEA result (no Z, new AC cut)",xbin,xmin,xmax);
   TH1F* hmm_mixacc_result_new  = new TH1F("hmm_mixacc_result_new","MEA result (new AC best)",xbin,xmin,xmax);
   TH1F* hmm_mixacc_result_woac  = new TH1F("hmm_mixacc_result_woac","MEA result (no AC cut)",xbin,xmin,xmax);
   TH1F* hmm_mixacc_result_zdiff  = new TH1F("hmm_mixacc_result_zdiff","MEA result (Z diff cut)",xbin,xmin,xmax);
-  TH1F* hmm_mixacc_result_nocut_forAl  = new TH1F("hmm_mixacc_result_nocut_forAl","ACC (30 bunch mixed)",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_nocut_forAl  = new TH1F("hmm_mixacc_result_nocut_forAl","ACC (Al (best))",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_nocut_new_forAl  = new TH1F("hmm_mixacc_result_nocut_new_forAl","ACC (Al (strict))",xbin,xmin,xmax);
 /*-----------------*/
 /*--RESULT OUTPUT--*/
 /*-----------------*/
@@ -180,8 +182,8 @@ cout << "Output root file name is " << rootname << endl;
   bool event_selection_new = false;
   bool event_selection_woac = false;
   bool event_selection_zdiff = false;
-  bool event_selection_Al = false;
   bool event_selection_nocut = false;
+  bool event_selection_nocut_new = false;
   double z_par[100], ac_par[100], ct_par[100];
   double z2_par[100][100], ac2_par[100][100];
   bool mix_region1 = false;
@@ -280,6 +282,8 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
 		else event_selection=false;
 		if(ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection_nocut=true;
 		else event_selection_nocut=false;
+		if(ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection_nocut_new=true;
+		else event_selection_nocut_new=false;
 		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection_new=true;
 		else event_selection_new=false;
 		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection_woac=true;
@@ -387,10 +391,12 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
 			if(event_selection)hmm_mixacc3->Fill(mm_mixed);
 			if(event_selection)hmm_mixacc_result_best->Fill(mm_mixed);
 			if(event_selection_nocut)hmm_mixacc_result_nocut->Fill(mm_mixed);
+			if(event_selection_nocut_new)hmm_mixacc_result_nocut_new->Fill(mm_mixed);
 			if(event_selection_new)hmm_mixacc_result_new->Fill(mm);
 			if(event_selection_woac)hmm_mixacc_result_woac->Fill(mm);
 			if(event_selection_zdiff)hmm_mixacc_result_zdiff->Fill(mm);
 			if(ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP&&(fabs(R_tr_vz-L_tr_vz)<0.025)&&(fabs(fabs(R_tr_vz+L_tr_vz)/2.-0.12)<0.01||fabs(fabs(R_tr_vz+L_tr_vz)/2.+0.12)<0.01))hmm_mixacc_result_nocut_forAl->Fill(mm);//Al selection
+			if(ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&(fabs(R_tr_vz-L_tr_vz)<0.025)&&(fabs(fabs(R_tr_vz+L_tr_vz)/2.-0.12)<0.01||fabs(fabs(R_tr_vz+L_tr_vz)/2.+0.12)<0.01))hmm_mixacc_result_nocut_new_forAl->Fill(mm);//Al selection
 	}//Mix (j loop)
 	if(event_selection)best++;
 	if(event_selection_new)ac_new++;

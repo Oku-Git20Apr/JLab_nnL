@@ -2842,6 +2842,7 @@ for(int i=0;i<nth;i++){
 	zcut=true;
 	if(tr.AC1_npe_sum<3.75)cut_ac1=true;
    	if(3.<tr.AC2_npe_sum && tr.AC2_npe_sum < 20.)cut_ac2=true;
+//	if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<zver_diff[i])zcut=true;
 	if(zcut && cut_ac1 && cut_ac2){//no AC cut
 	//if(cut_ac1 && cut_ac2 && fabs(theta_ee-0.225)<0.0125&&fabs(phi_ee-1.6)<0.125&&fabs(pL-2.1)<0.05){//no AC cut
 	hcoin_k_fom_noZ[i]->Fill(ct);
@@ -2880,7 +2881,7 @@ for(int i=0;i<nth;i++){
 //				ac1_adc[i]=3.75;//to be consistent with No AC2 cut
 //				ac2l_adc[j]=0.;//to be consistent with No AC1 cut
 //Slice
-				ac2u_adc[l]=20.;//to be consistent with No AC1 cut
+				ac2u_adc[l]=10.;//to be consistent with No AC1 cut
 
 
 				cut_ac1=false;
@@ -2890,7 +2891,7 @@ for(int i=0;i<nth;i++){
 				if(tr.AC1_npe_sum<3.75)cut_ac1=true;
 				//if(ac2l_adc[j]<R_a2_asum_p && R_a2_asum_p < 4000)cut_ac2=true;
 //Okuyama		    	//if(ac2l_adc[j]<R_a2_asum_p && R_a2_asum_p < ac2u_adc[l])cut_ac2=true;
-		    	if(tr.AC2_npe_sum > 3. && tr.AC2_npe_sum < 20.)cut_ac2=true;
+		    	if(tr.AC2_npe_sum > 3. && tr.AC2_npe_sum < 10.)cut_ac2=true;
 				if(fabs(R_tr_vz[rt]-L_tr_vz[lt])<zver_diff[i] && fabs(R_tr_vz[rt] + L_tr_vz[lt])/2.0<zver[j])zcut=true;
 //Changed			
 //				if(ac2l_adc[j]<tr.AC2_npe_sum && tr.AC2_npe_sum < ac2l_adc[j]+10.)cut_ac2=true;
@@ -4190,35 +4191,35 @@ cout<<"sig_S"<<sig_S[i][j][l]<<endl;
 
 		if(j==20 && l==0){h_pisr1->SetBinContent(i+1,n_pi[i][j][l]);}
 		if(i==25 && l==0){h_pisr2l->SetBinContent(j+1,n_pi[i][j][l]);}
-		if(i==25 && j==20){h_pisr2u->SetBinContent(l+1,n_pi[i][j][l]);}
+	//	if(i==25 && j==20){h_pisr2u->SetBinContent(l+1,n_pi[i][j][l]);}
 		if(j==20 && l==0){h_ksr1->SetBinContent(i+1,n_k[i][j][l]);}
 		if(i==25 && l==0){h_ksr2l->SetBinContent(j+1,n_k[i][j][l]);}
-		if(i==25 && j==20){h_ksr2u->SetBinContent(l+1,n_k[i][j][l]);}
+	//	if(i==25 && j==20){h_ksr2u->SetBinContent(l+1,n_k[i][j][l]);}
 		if(j==20 && l==0){h_psr1->SetBinContent(i+1,n_p[i][j][l]);}
 		if(i==25 && l==0){h_psr2l->SetBinContent(j+1,n_p[i][j][l]);}
-		if(i==25 && j==20){h_psr2u->SetBinContent(l+1,n_p[i][j][l]);}
+	//	if(i==25 && j==20){h_psr2u->SetBinContent(l+1,n_p[i][j][l]);}
 		if(j==20 && l==0){h_Lsr1->SetBinContent(i+1,n_L[i][j][l]);}
 		if(i==25 && l==0){h_Lsr2l->SetBinContent(j+1,n_L[i][j][l]);}
-		if(i==25 && j==20){h_Lsr2u->SetBinContent(l+1,n_L[i][j][l]);}
+	//	if(i==25 && j==20){h_Lsr2u->SetBinContent(l+1,n_L[i][j][l]);}
 		if(j==20 && l==0){h_Ssr1->SetBinContent(i+1,n_S[i][j][l]);}
 		if(i==25 && l==0){h_Ssr2l->SetBinContent(j+1,n_S[i][j][l]);}
-		if(i==25 && j==20){h_Ssr2u->SetBinContent(l+1,n_S[i][j][l]);}
+	//	if(i==25 && j==20){h_Ssr2u->SetBinContent(l+1,n_S[i][j][l]);}
 
-		if(j==20 && l==0){h_pitot1->SetBinContent(i+1,n_pi_noZ);}
-		if(i==25 && l==0){h_pitot2l->SetBinContent(j+1,n_pi_noZ);}
-		if(i==25 && j==20){h_pitot2u->SetBinContent(l+1,n_pi_noZ);}
-		if(j==20 && l==0){h_ktot1->SetBinContent(i+1,n_k_noZ);}
-		if(i==25 && l==0){h_ktot2l->SetBinContent(j+1,n_k_noZ);}
-		if(i==25 && j==20){h_ktot2u->SetBinContent(l+1,n_k_noZ);}
-		if(j==20 && l==0){h_ptot1->SetBinContent(i+1,n_p_noZ);}
-		if(i==25 && l==0){h_ptot2l->SetBinContent(j+1,n_p_noZ);}
-		if(i==25 && j==20){h_ptot2u->SetBinContent(l+1,n_p_noZ);}
-		if(j==20 && l==0){h_Ltot1->SetBinContent(i+1,n_L_noZ);}
-		if(i==25 && l==0){h_Ltot2l->SetBinContent(j+1,n_L_noZ);}
-		if(i==25 && j==20){h_Ltot2u->SetBinContent(l+1,n_L_noZ);}
-		if(j==20 && l==0){h_Stot1->SetBinContent(i+1,n_S_noZ);}
-		if(i==25 && l==0){h_Stot2l->SetBinContent(j+1,n_S_noZ);}
-		if(i==25 && j==20){h_Stot2u->SetBinContent(l+1,n_S_noZ);}
+		if(j==20 && l==0){h_pitot1->SetBinContent(i+1,n_pi_noZ[i]);}
+		if(i==25 && l==0){h_pitot2l->SetBinContent(j+1,n_pi_noZ[i]);}
+	//	if(i==25 && j==20){h_pitot2u->SetBinContent(l+1,n_pi_noZ[i]);}
+		if(j==20 && l==0){h_ktot1->SetBinContent(i+1,n_k_noZ[i]);}
+		if(i==25 && l==0){h_ktot2l->SetBinContent(j+1,n_k_noZ[i]);}
+	//	if(i==25 && j==20){h_ktot2u->SetBinContent(l+1,n_k_noZ[i]);}
+		if(j==20 && l==0){h_ptot1->SetBinContent(i+1,n_p_noZ[i]);}
+		if(i==25 && l==0){h_ptot2l->SetBinContent(j+1,n_p_noZ[i]);}
+	//	if(i==25 && j==20){h_ptot2u->SetBinContent(l+1,n_p_noZ[i]);}
+		if(j==20 && l==0){h_Ltot1->SetBinContent(i+1,n_L_noZ[i]);}
+		if(i==25 && l==0){h_Ltot2l->SetBinContent(j+1,n_L_noZ[i]);}
+	//	if(i==25 && j==20){h_Ltot2u->SetBinContent(l+1,n_L_noZ[i]);}
+		if(j==20 && l==0){h_Stot1->SetBinContent(i+1,n_S_noZ[i]);}
+		if(i==25 && l==0){h_Stot2l->SetBinContent(j+1,n_S_noZ[i]);}
+	//	if(i==25 && j==20){h_Stot2u->SetBinContent(l+1,n_S_noZ[i]);}
 
 ////------------06.06, 1D Effciency---------------//
 ////	j==20 (zver=0.1), i==25 (zver_diff=0.025) 
@@ -4367,7 +4368,7 @@ pEff6 = new TEfficiency(*h_pisr2l,*h_pitot2l);
 cout<<"pEff7:"<<endl;
 if(TEfficiency::CheckConsistency(*h_ksr2l,*h_ktot2l,"w")){
 pEff7 = new TEfficiency(*h_ksr2l,*h_ktot2l);
-//pEff7->Write();
+pEff7->Write();
 }
 cout<<"pEff8:"<<endl;
 if(TEfficiency::CheckConsistency(*h_psr2l,*h_ptot2l,"w")){
@@ -4385,21 +4386,21 @@ pEff10 = new TEfficiency(*h_Ssr2l,*h_Stot2l);
 //pEff10->Write();
 }
 
-cout<<"pEff11:"<<endl;
-if(TEfficiency::CheckConsistency(*h_ksr11,*h_ktot11,"w")){
-pEff11 = new TEfficiency(*h_ksr11,*h_ktot11);
-//pEff11->Write();
-}
-cout<<"pEff111:"<<endl;
-if(TEfficiency::CheckConsistency(*h_ksr111,*h_ktot111,"w")){
-pEff111 = new TEfficiency(*h_ksr111,*h_ktot111);
-//pEff111->Write();
-}
-cout<<"pEff1111:"<<endl;
-if(TEfficiency::CheckConsistency(*h_ksr1111,*h_ktot1111,"w")){
-pEff1111 = new TEfficiency(*h_ksr1111,*h_ktot1111);
-//pEff1111->Write();
-}
+//cout<<"pEff11:"<<endl;
+//if(TEfficiency::CheckConsistency(*h_ksr11,*h_ktot11,"w")){
+//pEff11 = new TEfficiency(*h_ksr11,*h_ktot11);
+////pEff11->Write();
+//}
+//cout<<"pEff111:"<<endl;
+//if(TEfficiency::CheckConsistency(*h_ksr111,*h_ktot111,"w")){
+//pEff111 = new TEfficiency(*h_ksr111,*h_ktot111);
+////pEff111->Write();
+//}
+//cout<<"pEff1111:"<<endl;
+//if(TEfficiency::CheckConsistency(*h_ksr1111,*h_ktot1111,"w")){
+//pEff1111 = new TEfficiency(*h_ksr1111,*h_ktot1111);
+////pEff1111->Write();
+//}
 
 cout << "TGraphErrors!" << endl;
 //gcoin_pi_sr[0] = new TGraphErrors(99, ac1_adc, fom_pi1, 0, err_fom_pi1);
@@ -4544,84 +4545,155 @@ TLine *tl7, *tl8, *tl9, *tl10;
 
 c2->Divide(3,2);
 cout<<"c2 start"<<endl;
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 c2->cd(1);
 hmm_wo_bg_fom_noAC1->Draw("");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 c2->cd(2);
 hmm_wo_bg_fom_noZ[25]->Draw("");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 c2->cd(3);
 hmm_wo_bg_fom_noAC->Draw("");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 fmm_noAC->SetLineColor(kRed);
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 fmmbg_noAC->SetLineColor(kGreen);
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 fmm_noAC->Draw("same");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 fmmbg_noAC->Draw("same");
 //hmm_L_fom_noAC->Draw("");
 //hmm_pi_wobg_fom_noAC->SetLineColor(kRed);hmm_pi_wobg_fom_noAC->Draw("same");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 c2->cd(4);
 hmm_L_fom_noAC1->Draw("");hmm_bg_fom_noAC1->SetLineColor(kRed);hmm_bg_fom_noAC1->Draw("same");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 c2->cd(5);
 hmm_L_fom_noZ[25]->Draw("");hmm_bg_fom_noZ[25]->SetLineColor(kRed);hmm_bg_fom_noZ[25]->Draw("same");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 c2->cd(6);
 hmm_L_fom_noAC->Draw("");hmm_bg_fom_noAC->SetLineColor(kRed);hmm_bg_fom_noAC->Draw("same");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 c3->cd()->DrawFrame(0.,0.,0.5,1.2);//K,pi,p vs SUM 
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 pEff1->SetLineColor(kOrange);pEff1->Draw("same");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 pEff2->SetLineColor(kGreen);pEff2->Draw("same");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 pEff3->SetLineColor(kRed);pEff3->Draw("same");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 c4->cd()->DrawFrame(0.,0.,0.5,1.2);
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 pEff4->SetLineColor(kAzure);pEff4->Draw("same");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 pEff5->SetLineColor(kCyan);pEff5->Draw("same");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 c5->cd()->DrawFrame(0.,0.,0.5,1.2);
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 pEff2->SetLineColor(kGreen);pEff2->Draw("same");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 pEff4->SetLineColor(kAzure);pEff4->Draw("same");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 pEff5->SetLineColor(kCyan);pEff5->Draw("same");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 c6->cd()->DrawFrame(0.,0.,0.1,1.2);//K,pi,p vs DIFF 
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 pEff6->SetLineColor(kOrange);pEff6->Draw("same");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 pEff7->SetLineColor(kGreen);pEff7->Draw("same");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 pEff8->SetLineColor(kRed);pEff8->Draw("same");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 c7->cd()->DrawFrame(0.,0.,0.1,1.2);
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 pEff9->SetLineColor(kAzure);pEff9->Draw("same");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 pEff10->SetLineColor(kCyan);pEff10->Draw("same");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 c8->cd()->DrawFrame(0.,0.,0.1,1.2);
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 pEff7->SetLineColor(kGreen);pEff7->Draw("same");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 pEff9->SetLineColor(kAzure);pEff9->Draw("same");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 pEff10->SetLineColor(kCyan);pEff10->Draw("same");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 c9->cd()->DrawFrame(0.,0.,0.1,1.2);
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 pEff2->SetLineColor(kGreen);pEff2->Draw("same");
-pEff11->SetLineColor(kGreen+1);pEff11->Draw("same");
-pEff111->SetLineColor(kGreen+2);pEff111->Draw("same");
-pEff1111->SetLineColor(kGreen+3);pEff1111->Draw("same");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
+//pEff11->SetLineColor(kGreen+1);pEff11->Draw("same");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
+//pEff111->SetLineColor(kGreen+2);pEff111->Draw("same");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
+//pEff1111->SetLineColor(kGreen+3);pEff1111->Draw("same");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 c10->Divide(2,2);
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 c10->cd(1);
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 hmm_wo_bg_fom_noZ[25]->Draw("");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 fmm_noZ[25]->SetLineColor(kRed);
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 fmmbg_noZ[25]->SetLineColor(kGreen);
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 fmm_noZ[25]->Draw("same");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 fmmbg_noZ[25]->Draw("same");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 c10->cd(2);
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 hmm_wo_bg_fom_noZ[99]->Draw("");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 fmm_noZ[99]->SetLineColor(kRed);
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 fmmbg_noZ[99]->SetLineColor(kGreen);
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 fmm_noZ[99]->Draw("same");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 fmmbg_noZ[99]->Draw("same");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 c10->cd(3);
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 hcoin_wo_bg_fom_noZ[25]->Draw("");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 fcoin_noZ[25]->SetLineColor(kRed);
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 fcoin_noZ[25]->Draw("same");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 c10->cd(4);
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 hcoin_wo_bg_fom_noZ[99]->Draw("");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 fcoin_noZ[99]->SetLineColor(kRed);
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 fcoin_noZ[99]->Draw("same");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 c16->Divide(2,2);
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 c16->cd(1);h_pisr2d->Draw("colz");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 c16->cd(2);h_ksr2d->Draw("colz");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 c16->cd(3);h_Lsr2d->Draw("colz");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 c16->cd(4);h_Ssr2d->Draw("colz");
+cout<<"eeeeeeeeeeeeeeeeeeeeeeee"<<endl;
 c17->Divide(2,2);
+cout<<"ffffffffffffffffffffffffffffff"<<endl;
 c17->cd(1);h_pisr2d->Draw("surf3z");
+cout<<"ffffffffffffffffffffffffffffff"<<endl;
 c17->cd(2);h_ksr2d->Draw("surf3z");
+cout<<"ffffffffffffffffffffffffffffff"<<endl;
 c17->cd(3);h_Lsr2d->Draw("surf3z");
+cout<<"ffffffffffffffffffffffffffffff"<<endl;
 c17->cd(4);h_Ssr2d->Draw("surf3z");
+cout<<"ffffffffffffffffffffffffffffff"<<endl;
 c18->cd();
+cout<<"ffffffffffffffffffffffffffffff"<<endl;
 h_Lsr2d->Draw("colz");
 cout<<"n_pi_noZ[25]="<<n_pi_noZ[25]<<endl;
 cout<<"n_pi[25][20][0]="<<n_pi[25][20][0]<<endl;

@@ -1390,7 +1390,7 @@ cout << "mt = " << mt << endl;
      th2_max=20.0;
      th2_min=0.0;
      ac2l_adc[0]=0.0;//best = 3.0? ac2l[30]
-	 for(int i=1; i<nth; i++) ac2l_adc[i]=ac2l_adc[i-1]+0.2;
+	 for(int i=1; i<nth; i++) ac2l_adc[i]=ac2l_adc[i-1]+0.1;//0.2 (for best)
 	 //for(int i=1; i<nth; i++) ac2l_adc[i]=ac2l_adc[i-1]+1;
 //     ac2l_adc[0]=0.4;
      //ac2l_adc[1]=0.8;
@@ -1616,11 +1616,11 @@ void tuning::MakeHist(){
 	  h_psr1 = new TH1F("h_psr","Proton Survival Ratio",nth-1,ac1_adc[0],ac1_adc[nth-1]);
 	  h_Lsr1 = new TH1F("h_Lsr","Lambda Survival Ratio",nth-1,ac1_adc[0],ac1_adc[nth-1]);
 	  h_Ssr1 = new TH1F("h_Ssr","Signa Survival Ratio",nth-1,ac1_adc[0],ac1_adc[nth-1]);
-	  h_pitot1 = new TH1F("h_pitot","Pion Survival Ratio",nth-1,ac1_adc[0],ac1_adc[nth-1]);
-	  h_ktot1 = new TH1F("h_ktot","Kaon Survival Ratio",nth-1,ac1_adc[0],ac1_adc[nth-1]);
-	  h_ptot1 = new TH1F("h_ptot","Proton Survival Ratio",nth-1,ac1_adc[0],ac1_adc[nth-1]);
-	  h_Ltot1 = new TH1F("h_Ltot","Lambda Survival Ratio",nth-1,ac1_adc[0],ac1_adc[nth-1]);
-	  h_Stot1 = new TH1F("h_Stot","Sigma Survival Ratio",nth-1,ac1_adc[0],ac1_adc[nth-1]);
+	  h_pitot1 = new TH1F("h_pitot1","Pion Survival Ratio",nth-1,ac1_adc[0],ac1_adc[nth-1]);
+	  h_ktot1 = new TH1F("h_ktot1","Kaon Survival Ratio",nth-1,ac1_adc[0],ac1_adc[nth-1]);
+	  h_ptot1 = new TH1F("h_ptot1","Proton Survival Ratio",nth-1,ac1_adc[0],ac1_adc[nth-1]);
+	  h_Ltot1 = new TH1F("h_Ltot1","Lambda Survival Ratio",nth-1,ac1_adc[0],ac1_adc[nth-1]);
+	  h_Stot1 = new TH1F("h_Stot1","Sigma Survival Ratio",nth-1,ac1_adc[0],ac1_adc[nth-1]);
 //--------------------------------------------//
 	  h_pisr2l = new TH1F("h_pisr2l","Pion Survival Ratio",nth-1,ac2l_adc[0],ac2l_adc[nth-1]);
 	  h_ksr2l = new TH1F("h_ksr2l","Kaon Survival Ratio",nth-1,ac2l_adc[0],ac2l_adc[nth-1]);
@@ -2949,7 +2949,7 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 //				ac1_adc[i]=3.75;//to be consistent with No AC2 cut
 //				ac2l_adc[j]=0.;//to be consistent with No AC1 cut
 //Slice
-				ac2u_adc[l]=20.;//to be consistent with No AC1 cut
+				ac2u_adc[l]=10.;//to be consistent with No AC1 cut
 
 
 				cut_ac1=false;
@@ -4537,24 +4537,24 @@ fmm[0][10][0]->SetLineColor(kRed);
 fmmbg[0][10][0]->SetLineColor(kGreen);
 fmm[0][10][0]->Draw("same");
 fmmbg[0][10][0]->Draw("same");
-c3->cd(2);
-hmm_wo_bg_fom[0][30][0]->Draw("");
-fmm[0][30][0]->SetLineColor(kRed);
-fmmbg[0][30][0]->SetLineColor(kGreen);
-fmm[0][30][0]->Draw("same");
-fmmbg[0][30][0]->Draw("same");
-c3->cd(3);
-hmm_wo_bg_fom[0][99][0]->Draw("");
-fmm[0][99][0]->SetLineColor(kRed);
-fmmbg[0][99][0]->SetLineColor(kGreen);
-fmm[0][99][0]->Draw("same");
-fmmbg[0][99][0]->Draw("same");
-c3->cd(4);
-hmm_L_fom[0][10][0]->Draw("");hmm_bg_fom[0][10][0]->SetLineColor(kRed);hmm_bg_fom[0][10][0]->Draw("same");
-c3->cd(5);
-hmm_L_fom[0][30][0]->Draw("");hmm_bg_fom[0][30][0]->SetLineColor(kRed);hmm_bg_fom[0][30][0]->Draw("same");
-c3->cd(6);
-hmm_L_fom[0][99][0]->Draw("");hmm_bg_fom[0][99][0]->SetLineColor(kRed);hmm_bg_fom[0][99][0]->Draw("same");
+//c3->cd(2);
+//hmm_wo_bg_fom[0][30][0]->Draw("");
+//fmm[0][30][0]->SetLineColor(kRed);
+//fmmbg[0][30][0]->SetLineColor(kGreen);
+//fmm[0][30][0]->Draw("same");
+//fmmbg[0][30][0]->Draw("same");
+//c3->cd(3);
+//hmm_wo_bg_fom[0][99][0]->Draw("");
+//fmm[0][99][0]->SetLineColor(kRed);
+//fmmbg[0][99][0]->SetLineColor(kGreen);
+//fmm[0][99][0]->Draw("same");
+//fmmbg[0][99][0]->Draw("same");
+//c3->cd(4);
+//hmm_L_fom[0][10][0]->Draw("");hmm_bg_fom[0][10][0]->SetLineColor(kRed);hmm_bg_fom[0][10][0]->Draw("same");
+//c3->cd(5);
+//hmm_L_fom[0][30][0]->Draw("");hmm_bg_fom[0][30][0]->SetLineColor(kRed);hmm_bg_fom[0][30][0]->Draw("same");
+//c3->cd(6);
+//hmm_L_fom[0][99][0]->Draw("");hmm_bg_fom[0][99][0]->SetLineColor(kRed);hmm_bg_fom[0][99][0]->Draw("same");
 //c3->Divide(2,2);
 //cout<<"c3 start"<<endl;
 //c3->cd(1);
@@ -4711,23 +4711,23 @@ fmmbg[15][15][0]->SetLineColor(kGreen);
 fmm[15][15][0]->Draw("same");
 fmmbg[15][15][0]->Draw("same");
 c19->cd(2);
-hmm_wo_bg_fom[30][30][0]->Draw("");
-fmm[30][30][0]->SetLineColor(kRed);
-fmmbg[30][30][0]->SetLineColor(kGreen);
-fmm[30][30][0]->Draw("same");
-fmmbg[30][30][0]->Draw("same");
+//hmm_wo_bg_fom[30][30][0]->Draw("");
+//fmm[30][30][0]->SetLineColor(kRed);
+//fmmbg[30][30][0]->SetLineColor(kGreen);
+//fmm[30][30][0]->Draw("same");
+//fmmbg[30][30][0]->Draw("same");
 c19->cd(3);
-hmm_wo_bg_fom[1][99][0]->Draw("");
-fmm[1][99][0]->SetLineColor(kRed);
-fmmbg[1][99][0]->SetLineColor(kGreen);
-fmm[1][99][0]->Draw("same");
-fmmbg[1][99][0]->Draw("same");
+//hmm_wo_bg_fom[1][99][0]->Draw("");
+//fmm[1][99][0]->SetLineColor(kRed);
+//fmmbg[1][99][0]->SetLineColor(kGreen);
+//fmm[1][99][0]->Draw("same");
+//fmmbg[1][99][0]->Draw("same");
 c19->cd(4);
 hmm_L_fom[10][10][0]->Draw("");hmm_bg_fom[10][10][0]->SetLineColor(kRed);hmm_bg_fom[10][10][0]->Draw("same");
 c19->cd(5);
-hmm_L_fom[30][30][0]->Draw("");hmm_bg_fom[30][30][0]->SetLineColor(kRed);hmm_bg_fom[30][30][0]->Draw("same");
+//hmm_L_fom[30][30][0]->Draw("");hmm_bg_fom[30][30][0]->SetLineColor(kRed);hmm_bg_fom[30][30][0]->Draw("same");
 c19->cd(6);
-hmm_L_fom[99][99][0]->Draw("");hmm_bg_fom[99][99][0]->SetLineColor(kRed);hmm_bg_fom[99][99][0]->Draw("same");
+//hmm_L_fom[99][99][0]->Draw("");hmm_bg_fom[99][99][0]->SetLineColor(kRed);hmm_bg_fom[99][99][0]->Draw("same");
 //h_ptot1->Draw("sh");h_psr1->Draw("samesh");
 //npe_sum_a1->Draw("");
 //hcoin_wo_bg_fom[80][0][0]->Draw("");fcoin[80][0][0]->SetLineColor(kRed);fcoin[80][0][0]->Draw("same");
@@ -5032,6 +5032,7 @@ for(int i=0;i<nth;i++){
 
 
 int main(int argc, char** argv){
+cout<<"nth="<<nth<<endl;
 
 //  gStyle->SetOptFit(111111111);
 //  int ch;
