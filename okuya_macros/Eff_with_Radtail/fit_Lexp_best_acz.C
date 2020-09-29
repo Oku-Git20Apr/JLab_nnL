@@ -1,8 +1,13 @@
-//--------------------------------//
-//--  Fitting w/ Response func. --//
-//--------------------------------//
+//----------------------------------//
+//--  Fitting w/ Response func.   --//
+//--	Efficiency Re-evaluation  --//
+//--	(AC, Z, CT)
+//----------------------------------//
 //
-//K. Okuyama (Sep. 14, 2020)
+//K. Okuyama (Sep. 27, 2020)
+//
+//Add CT_best, CT_strict (Sep. 29, 2020)
+//
 //
 //This is taken over from fit_landau.C
 //No array branch mode 
@@ -222,7 +227,7 @@ cout << "Output pdf file name is " << pdfname << endl;
  int bin_mm=(max_mm-min_mm)/0.001; //Counts/2 MeV
  bin_mm=(int)bin_mm;
  //const double fit_min_mm=-0.006;
- const double fit_min_mm=-0.02;
+ const double fit_min_mm=-0.01;
  const double fit_max_mm=0.12;
  const int fit_bin_mm = (fit_max_mm-fit_min_mm)/0.001;
  const double fit_bin_width = (fit_max_mm-fit_min_mm)/fit_bin_mm;
@@ -256,6 +261,8 @@ cout << "Output pdf file name is " << pdfname << endl;
  TF1* fS_noZ;
  TF1* fmm_noZ_Lexp;
  TF1* fmm_noAC_Lexp;
+ TF1* fmm_noCT_best_Lexp;
+ TF1* fmm_noCT_strict_Lexp;
  TF1* fmm_strict_Lexp;
  TF1* fmmbg_nocut_Voigt;
  TF1* fmmbg_nocut_4Poly;
@@ -367,6 +374,8 @@ cout << "Output pdf file name is " << pdfname << endl;
   TH1F* hmm_L_fom_noZ_new  = new TH1F("hmm_L_fom_noZ_new","hmm_L_fom_noZ_new",xbin,xmin,xmax);
   TH1F* hmm_L_fom_noAC  = new TH1F("hmm_L_fom_noAC","hmm_L_fom_noAC",xbin,xmin,xmax);
   TH1F* hmm_L_fom_zdiff  = new TH1F("hmm_L_fom_zdiff","hmm_L_fom_zdiff",xbin,xmin,xmax);
+  TH1F* hmm_L_fom_noCT_best  = new TH1F("hmm_L_fom_noCT_best","hmm_L_fom_noCT_best",xbin,xmin,xmax);
+  TH1F* hmm_L_fom_noCT_strict  = new TH1F("hmm_L_fom_noCT_strict","hmm_L_fom_noCT_strict",xbin,xmin,xmax);
   TH1F* hmm_Al_fom_noZ  = new TH1F("hmm_Al_fom_noZ","hmm_Al_fom_noZ",xbin,xmin,xmax);
   TH1F* hmm_Al_fom_noZ_new  = new TH1F("hmm_Al_fom_noZ_new","hmm_Al_fom_noZ_new",xbin,xmin,xmax);
 //  TH1F* hmm_bg_fom_best  = new TH1F("hmm_bg_fom_best","hmm_bg_fom_best",xbin,xmin,xmax);
@@ -375,6 +384,8 @@ cout << "Output pdf file name is " << pdfname << endl;
   TH1F* hmm_wo_bg_fom_noZ  = new TH1F("hmm_wo_bg_fom_noZ","hmm_wo_bg_fom_noZ",xbin,xmin,xmax);
   TH1F* hmm_wo_bg_fom_noZ_new  = new TH1F("hmm_wo_bg_fom_noZ_new","hmm_wo_bg_fom_noZ_new",xbin,xmin,xmax);
   TH1F* hmm_wo_bg_fom_noAC  = new TH1F("hmm_wo_bg_fom_noAC","hmm_wo_bg_fom_noAC",xbin,xmin,xmax);
+  TH1F* hmm_wo_bg_fom_noCT_best  = new TH1F("hmm_wo_bg_fom_noCT_best","hmm_wo_bg_fom_noCT_best",xbin,xmin,xmax);
+  TH1F* hmm_wo_bg_fom_noCT_strict  = new TH1F("hmm_wo_bg_fom_noCT_strict","hmm_wo_bg_fom_noCT_strict",xbin,xmin,xmax);
   TH1F* hmm_Al_wobg_fom_noZ  = new TH1F("hmm_Al_wobg_fom_noZ","hmm_Al_wobg_fom",xbin,xmin,xmax);
   TH1F* hmm_Al_wobg_fom_noZ_new  = new TH1F("hmm_Al_wobg_fom_noZ_new","hmm_Al_wobg_fom_new",xbin,xmin,xmax);
   TH1F* hmm_pi_wobg_fom_best  = new TH1F("hmm_pi_wobg_fom_best","hmm_pi_wobg_fom_best",xbin,xmin,xmax);
@@ -409,6 +420,7 @@ cout << "Output pdf file name is " << pdfname << endl;
   bool R_Tr = false;
   bool R_FP = false;
   bool ct_cut = false;
+  bool noct_cut = false;
   bool event_selection = false;
   bool event_selection_noZ = false;
   bool event_selection_noZ_new=false;
@@ -437,7 +449,7 @@ cout << "Output pdf file name is " << pdfname << endl;
 
 
   //tree->Draw(">>elist" , "fabs(ct_orig[0][0])<1.0");
-  tree->Draw(">>elist" , "fabs(ct_orig)<1.006");//ctsum (does NOT dintinguish #track)
+  tree->Draw(">>elist" , "fabs(ct_orig)<2.012");//ctsum (does NOT dintinguish #track)
   TEventList *elist = (TEventList*)gROOT->FindObject("elist");
   int ENum = elist->GetN(); 
 cout<<"Entries: "<<ENum<<endl;
@@ -480,6 +492,8 @@ cout<<"Entries: "<<ENum<<endl;
 
 		if(fabs(ct)<1.006)ct_cut=true;
 		else ct_cut=false;
+		if(fabs(ct)<2.012)noct_cut=true;
+		else noct_cut=false;
 		//if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
 		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
 		else event_selection=false;
@@ -532,11 +546,13 @@ cout<<"Entries: "<<ENum<<endl;
 		if(event_selection&&ct_cut)hmm_L_fom_best->Fill(mm);
 		if(event_selection_noZ&&ct_cut)hmm_L_fom_noZ->Fill(mm);
 		if(event_selection_noZ_new&&ct_cut)hmm_L_fom_noZ_new->Fill(mm);
-		if(event_selection_strict)hmm_L_fom_strict->Fill(mm);
-		if(event_selection_noAC)hmm_L_fom_noAC->Fill(mm);
-		if(event_selection_zdiff)hmm_L_fom_zdiff->Fill(mm);
-		if(ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP&&(fabs(R_tr_vz-L_tr_vz)<0.025)&&(fabs(fabs(R_tr_vz+L_tr_vz)/2.-0.12)<0.01||fabs(fabs(R_tr_vz+L_tr_vz)/2.+0.12)<0.01))hmm_Al_fom_noZ->Fill(mm);//Al selection
-		if(ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&(fabs(R_tr_vz-L_tr_vz)<0.025)&&(fabs(fabs(R_tr_vz+L_tr_vz)/2.-0.12)<0.01||fabs(fabs(R_tr_vz+L_tr_vz)/2.+0.12)<0.01))hmm_Al_fom_noZ_new->Fill(mm);//Al selection
+		if(event_selection_strict&&ct_cut)hmm_L_fom_strict->Fill(mm);
+		if(event_selection_noAC&&ct_cut)hmm_L_fom_noAC->Fill(mm);
+		if(event_selection_zdiff&&ct_cut)hmm_L_fom_zdiff->Fill(mm);
+		if(event_selection&&noct_cut)hmm_L_fom_noCT_best->Fill(mm);
+		if(event_selection_strict&&noct_cut)hmm_L_fom_noCT_strict->Fill(mm);
+		if(ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP&&(fabs(R_tr_vz-L_tr_vz)<0.025)&&(fabs(fabs(R_tr_vz+L_tr_vz)/2.-0.12)<0.01||fabs(fabs(R_tr_vz+L_tr_vz)/2.+0.12)<0.01)&&ct_cut)hmm_Al_fom_noZ->Fill(mm);//Al selection
+		if(ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&(fabs(R_tr_vz-L_tr_vz)<0.025)&&(fabs(fabs(R_tr_vz+L_tr_vz)/2.-0.12)<0.01||fabs(fabs(R_tr_vz+L_tr_vz)/2.+0.12)<0.01)&&ct_cut)hmm_Al_fom_noZ_new->Fill(mm);//Al selection
 
 
 
@@ -552,9 +568,11 @@ cout<<"Entries: "<<ENum<<endl;
 	//TH1F* hmm_pi_fom_nocut=(TH1F*)file->Get("hmm_pi_fom_noZ");
 	//TH1F* hmm_pi_fom_best=(TH1F*)file->Get("hmm_pi_fom_best");
 	TH1F* hmm_bg_fom_best=(TH1F*)file_mea->Get("hmm_mixacc_result_best");//best cut
+	TH1F* hmm_bg_fom_noCT_best=(TH1F*)file_mea->Get("hmm_mixacc_result_best");//best cut
 	TH1F* hmm_bg_fom_noZ=(TH1F*)file_mea->Get("hmm_mixacc_result_nocut");//noZ
 	TH1F* hmm_bg_fom_noZ_new=(TH1F*)file_mea->Get("hmm_mixacc_result_nocut_new");//strict AC, w/o Z
 	TH1F* hmm_bg_fom_strict=(TH1F*)file_mea->Get("hmm_mixacc_result_new");//strict cut 
+	TH1F* hmm_bg_fom_noCT_strict=(TH1F*)file_mea->Get("hmm_mixacc_result_new");//best cut
 	TH1F* hmm_bg_fom_noAC=(TH1F*)file_mea->Get("hmm_mixacc_result_woac");// w/o AC, w/Z
 	TH1F* hmm_bg_fom_zdiff=(TH1F*)file_mea->Get("hmm_mixacc_result_zdiff");// w/Zdiff
 	TH1F* hmm_Albg_fom_noZ=(TH1F*)file_mea->Get("hmm_mixacc_result_nocut_forAl");
@@ -576,7 +594,9 @@ cout<<"Entries: "<<ENum<<endl;
 	hmm_Albg_fom_noZ->Sumw2();
 	hmm_Albg_fom_noZ_new->Sumw2();
 	hmm_bg_fom_best->Scale(1./nbunch);
+	hmm_bg_fom_noCT_best->Scale(2./nbunch);
 	hmm_bg_fom_strict->Scale(1./nbunch);
+	hmm_bg_fom_noCT_strict->Scale(2./nbunch);
 	hmm_bg_fom_noZ->Scale(1./nbunch);
 	hmm_bg_fom_noZ_new->Scale(1./nbunch);
 	hmm_bg_fom_noAC->Scale(1./nbunch);
@@ -588,6 +608,8 @@ cout<<"Entries: "<<ENum<<endl;
 	hmm_wo_bg_fom_noZ->Add(hmm_L_fom_noZ,hmm_bg_fom_noZ,1.0,-1.0);
 	hmm_wo_bg_fom_noZ_new->Add(hmm_L_fom_noZ_new,hmm_bg_fom_noZ_new,1.0,-1.0);
 	hmm_wo_bg_fom_noAC->Add(hmm_L_fom_noAC,hmm_bg_fom_noAC,1.0,-1.0);
+	hmm_wo_bg_fom_noCT_best->Add(hmm_L_fom_noCT_best,hmm_bg_fom_noCT_best,1.0,-1.0);
+	hmm_wo_bg_fom_noCT_strict->Add(hmm_L_fom_noCT_strict,hmm_bg_fom_noCT_strict,1.0,-1.0);
 	hmm_pi_wobg_fom_best->Add(hmm_pi_fom_best,hmm_bg_fom_best,1.0,-1.0);
 	//hmm_pi_wobg_fom_nocut->Add(hmm_pi_fom_nocut,hmm_bg_fom_nocut,1.0,-1.0);
 	hmm_Al_wobg_fom_noZ->Add(hmm_Al_fom_noZ,hmm_Albg_fom_noZ,1.0,-1.0);
@@ -784,17 +806,19 @@ cout<<"BEST CUT START"<<endl;
 	double nofL_old_best = fmm_Lambda_only_best->Integral(-0.006,0.006);
 	nofL_best = nofL_best/fit_bin_width;
 	nofL_old_best = nofL_old_best/fit_bin_width;
+	double nofL_old_hist_best=hmm_wo_bg_fom_best->Integral(hmm_wo_bg_fom_best->FindBin(-0.006),hmm_wo_bg_fom_best->FindBin(0.006));
 	cout<<"Number of Lambda (TF1 Integral) = "<<nofL_best<<endl;
 	cout<<"Number of Lambda w/o radiative tail (TF1 Integral) = "<<nofL_old_best<<endl;
-	cout<<"Number of Lambda w/o radiative tail (TH1F Integral) = "<<hmm_wo_bg_fom_best->Integral(hmm_wo_bg_fom_best->FindBin(-0.006),hmm_wo_bg_fom_best->FindBin(0.006))<<endl;
+	cout<<"Number of Lambda w/o radiative tail (TH1F Integral) = "<<nofL_old_hist_best<<endl;
 
 	double nofS_best = fmm_Sigma_only_best->Integral(fit_min_mm,fit_max_mm);
 	double nofS_old_best = fmm_Sigma_only_best->Integral(def_mean_S-0.008,def_mean_S+0.008);
 	nofS_best = nofS_best/fit_bin_width;
 	nofS_old_best = nofS_old_best/fit_bin_width;
+	double nofS_old_hist_best=hmm_wo_bg_fom_best->Integral(hmm_wo_bg_fom_best->FindBin(def_mean_S-0.008),hmm_wo_bg_fom_best->FindBin(def_mean_S+0.008));
 	cout<<"Number of Sigma (TF1 Integral) = "<<nofS_best<<endl;
 	cout<<"Number of Sigma w/o radiative tail (TF1 Integral) = "<<nofS_old_best<<endl;
-	cout<<"Number of Sigma w/o radiative tail (TH1F Integral) = "<<hmm_wo_bg_fom_best->Integral(hmm_wo_bg_fom_best->FindBin(def_mean_S-0.008),hmm_wo_bg_fom_best->FindBin(def_mean_S+0.008))<<endl;
+	cout<<"Number of Sigma w/o radiative tail (TH1F Integral) = "<<nofS_old_hist_best<<endl;
 
 	 hmm_wo_bg_fom_best->Draw();
 	 fmm_best_Lexp->SetLineColor(kRed);
@@ -931,19 +955,25 @@ cout<<"BEST CUT START"<<endl;
 
 	double nofL_noZ = fmm_Lambda_only_noZ->Integral(fit_min_mm,fit_max_mm);
 	double nofL_old_noZ = fmm_Lambda_only_noZ->Integral(-0.006,0.006);
+	double nofL_bg_noZ = fmm_bg_only_noZ->Integral(-0.006,0.006);
 	nofL_noZ = nofL_noZ/fit_bin_width;
 	nofL_old_noZ = nofL_old_noZ/fit_bin_width;
+	nofL_bg_noZ = nofL_bg_noZ/fit_bin_width;
+	double nofL_old_hist_noZ=hmm_wo_bg_fom_noZ->Integral(hmm_wo_bg_fom_noZ->FindBin(-0.006),hmm_wo_bg_fom_noZ->FindBin(0.006))-nofL_bg_noZ;
 	cout<<"Number of Lambda (TF1 Integral) = "<<nofL_noZ<<endl;
 	cout<<"Number of Lambda w/o radiative tail (TF1 Integral) = "<<nofL_old_noZ<<endl;
-	cout<<"Number of Lambda w/o radiative tail (TH1F Integral) = "<<hmm_wo_bg_fom_noZ->Integral(hmm_wo_bg_fom_noZ->FindBin(-0.006),hmm_wo_bg_fom_noZ->FindBin(0.006))<<endl;
+	cout<<"Number of Lambda w/o radiative tail (TH1F Integral) = "<<nofL_old_hist_noZ<<endl;
 
 	double nofS_noZ = fmm_Sigma_only_noZ->Integral(fit_min_mm,fit_max_mm);
 	double nofS_old_noZ = fmm_Sigma_only_noZ->Integral(def_mean_S-0.008,def_mean_S+0.008);
+	double nofS_bg_noZ = fmm_bg_only_noZ->Integral(def_mean_S-0.008,def_mean_S+0.008);
 	nofS_noZ = nofS_noZ/fit_bin_width;
 	nofS_old_noZ = nofS_old_noZ/fit_bin_width;
+	nofS_bg_noZ = nofS_bg_noZ/fit_bin_width;
+	double nofS_old_hist_noZ=hmm_wo_bg_fom_noZ->Integral(hmm_wo_bg_fom_noZ->FindBin(def_mean_S-0.008),hmm_wo_bg_fom_noZ->FindBin(def_mean_S+0.008))-nofS_bg_noZ;
 	cout<<"Number of Sigma (TF1 Integral) = "<<nofS_noZ<<endl;
 	cout<<"Number of Sigma w/o radiative tail (TF1 Integral) = "<<nofS_old_noZ<<endl;
-	cout<<"Number of Sigma w/o radiative tail (TH1F Integral) = "<<hmm_wo_bg_fom_noZ->Integral(hmm_wo_bg_fom_noZ->FindBin(def_mean_S-0.008),hmm_wo_bg_fom_noZ->FindBin(def_mean_S+0.008))<<endl;
+	cout<<"Number of Sigma w/o radiative tail (TH1F Integral) = "<<nofS_old_hist_noZ<<endl;
 
 	 hmm_wo_bg_fom_noZ->Draw();
 	 fmm_noZ_Lexp->SetLineColor(kRed);
@@ -1086,19 +1116,25 @@ cout<<"BEST CUT START"<<endl;
 
 	double nofL_strict = fmm_Lambda_only_strict->Integral(fit_min_mm,fit_max_mm);
 	double nofL_old_strict = fmm_Lambda_only_strict->Integral(-0.006,0.006);
+	double nofL_bg_strict = fmm_bg_only_strict->Integral(-0.006,0.006);
 	nofL_strict = nofL_strict/fit_bin_width;
 	nofL_old_strict = nofL_old_strict/fit_bin_width;
+	nofL_bg_strict = nofL_bg_strict/fit_bin_width;
+	double nofL_old_hist_strict=hmm_wo_bg_fom_strict->Integral(hmm_wo_bg_fom_strict->FindBin(-0.006),hmm_wo_bg_fom_strict->FindBin(0.006)-nofL_bg_strict);
 	cout<<"Number of Lambda (TF1 Integral) = "<<nofL_strict<<endl;
 	cout<<"Number of Lambda w/o radiative tail (TF1 Integral) = "<<nofL_old_strict<<endl;
-	cout<<"Number of Lambda w/o radiative tail (TH1F Integral) = "<<hmm_wo_bg_fom_strict->Integral(hmm_wo_bg_fom_strict->FindBin(-0.006),hmm_wo_bg_fom_strict->FindBin(0.006))<<endl;
+	cout<<"Number of Lambda w/o radiative tail (TH1F Integral) = "<<nofL_old_hist_strict<<endl;
 
 	double nofS_strict = fmm_Sigma_only_strict->Integral(fit_min_mm,fit_max_mm);
 	double nofS_old_strict = fmm_Sigma_only_strict->Integral(def_mean_S-0.008,def_mean_S+0.008);
+	double nofS_bg_strict = fmm_bg_only_strict->Integral(def_mean_S-0.008,def_mean_S+0.008);
 	nofS_strict = nofS_strict/fit_bin_width;
 	nofS_old_strict = nofS_old_strict/fit_bin_width;
+	nofS_bg_strict = nofS_bg_strict/fit_bin_width;
+	double nofS_old_hist_strict=hmm_wo_bg_fom_strict->Integral(hmm_wo_bg_fom_strict->FindBin(def_mean_S-0.008),hmm_wo_bg_fom_strict->FindBin(def_mean_S+0.008))-nofS_bg_strict;
 	cout<<"Number of Sigma (TF1 Integral) = "<<nofS_strict<<endl;
 	cout<<"Number of Sigma w/o radiative tail (TF1 Integral) = "<<nofS_old_strict<<endl;
-	cout<<"Number of Sigma w/o radiative tail (TH1F Integral) = "<<hmm_wo_bg_fom_strict->Integral(hmm_wo_bg_fom_strict->FindBin(def_mean_S-0.008),hmm_wo_bg_fom_strict->FindBin(def_mean_S+0.008))<<endl;
+	cout<<"Number of Sigma w/o radiative tail (TH1F Integral) = "<<nofS_old_hist_strict<<endl;
 
 	 hmm_wo_bg_fom_strict->Draw();
 	 fmm_strict_Lexp->SetLineColor(kRed);
@@ -1236,19 +1272,25 @@ cout<<"BEST CUT START"<<endl;
 
 	double nofL_noAC = fmm_Lambda_only_noAC->Integral(fit_min_mm,fit_max_mm);
 	double nofL_old_noAC = fmm_Lambda_only_noAC->Integral(-0.006,0.006);
+	double nofL_bg_noAC = fmm_bg_only_noAC->Integral(-0.006,0.006);
 	nofL_noAC = nofL_noAC/fit_bin_width;
 	nofL_old_noAC = nofL_old_noAC/fit_bin_width;
+	nofL_bg_noAC = nofL_bg_noAC/fit_bin_width;
+	double nofL_old_hist_noAC=hmm_wo_bg_fom_noAC->Integral(hmm_wo_bg_fom_noAC->FindBin(-0.006),hmm_wo_bg_fom_noAC->FindBin(0.006))-nofL_bg_noAC;
 	cout<<"Number of Lambda (TF1 Integral) = "<<nofL_noAC<<endl;
 	cout<<"Number of Lambda w/o radiative tail (TF1 Integral) = "<<nofL_old_noAC<<endl;
-	cout<<"Number of Lambda w/o radiative tail (TH1F Integral) = "<<hmm_wo_bg_fom_noAC->Integral(hmm_wo_bg_fom_noAC->FindBin(-0.006),hmm_wo_bg_fom_noAC->FindBin(0.006))<<endl;
+	cout<<"Number of Lambda w/o radiative tail (TH1F Integral) = "<<nofL_old_hist_noAC<<endl;
 
 	double nofS_noAC = fmm_Sigma_only_noAC->Integral(fit_min_mm,fit_max_mm);
 	double nofS_old_noAC = fmm_Sigma_only_noAC->Integral(def_mean_S-0.008,def_mean_S+0.008);
+	double nofS_bg_noAC = fmm_bg_only_noAC->Integral(def_mean_S-0.008,def_mean_S+0.008);
 	nofS_noAC = nofS_noAC/fit_bin_width;
 	nofS_old_noAC = nofS_old_noAC/fit_bin_width;
+	nofS_bg_noAC = nofS_bg_noAC/fit_bin_width;
+	double nofS_old_hist_noAC=hmm_wo_bg_fom_noAC->Integral(hmm_wo_bg_fom_noAC->FindBin(def_mean_S-0.008),hmm_wo_bg_fom_noAC->FindBin(def_mean_S+0.008))-nofS_bg_noAC;
 	cout<<"Number of Sigma (TF1 Integral) = "<<nofS_noAC<<endl;
 	cout<<"Number of Sigma w/o radiative tail (TF1 Integral) = "<<nofS_old_noAC<<endl;
-	cout<<"Number of Sigma w/o radiative tail (TH1F Integral) = "<<hmm_wo_bg_fom_noAC->Integral(hmm_wo_bg_fom_noAC->FindBin(def_mean_S-0.008),hmm_wo_bg_fom_noAC->FindBin(def_mean_S+0.008))<<endl;
+	cout<<"Number of Sigma w/o radiative tail (TH1F Integral) = "<<nofS_old_hist_noAC<<endl;
 
 	 hmm_wo_bg_fom_noAC->Draw();
 	 fmm_noAC_Lexp->SetLineColor(kRed);
@@ -1264,21 +1306,446 @@ cout<<"BEST CUT START"<<endl;
 	 //fL_noAC->Draw("same");
 	 //fS_noAC->Draw("same");
 	 
+	 
+/*%%%%%%%%%%%%%%%%%%%%*/
+/*%%    No CT cut	%%*/
+/*%%%%%%%%%%%%%%%%%%%%*/
+//best
 	TCanvas* c7 = new TCanvas("c7","c7");
+	 cout<<"noCT_best START"<<endl;
+	 cout<<"(Landau+Exp)*(Gauss) MODE START"<<endl;
+	 fmm_noCT_best_Lexp=new TF1("fmm_noCT_best_Lexp",FMM_Res_nocut,fit_min_mm,fit_max_mm,22);
+   //par[0]=Width (scale) parameter of Landau density
+   //par[1]=Most Probable (MP, location) parameter of Landau density
+   //par[2]=Total area (integral -inf to inf, normalization constant)
+   //par[3]=Width (sigma) of convoluted Gaussian function
+   //par[4]=tau of exp function
+   //par[5]=Shift of Function Peak
+   //par[6]=Relative Strength
+   //
+   //
+   //
+   //par[0]=Width (scale) parameter of Landau density
+   //par[1]=Most Probable (MP, location) parameter of Landau density
+   //par[2]=Total area (integral -inf to inf, normalization constant)
+   //par[3]=Width (sigma) of convoluted Gaussian function
+	 fmm_noCT_best_Lexp->SetNpx(20000);
+	 fmm_noCT_best_Lexp->SetTitle("Missing Mass (noCT_best)");
+	 fmm_noCT_best_Lexp->FixParameter(0,fmm_best_Lexp->GetParameter(0));
+	 fmm_noCT_best_Lexp->FixParameter(1,fmm_best_Lexp->GetParameter(1));
+	 fmm_noCT_best_Lexp->SetParameter(2,fmm_best_Lexp->GetParameter(2));//L scale
+	 fmm_noCT_best_Lexp->FixParameter(3,fmm_best_Lexp->GetParameter(3));
+	 fmm_noCT_best_Lexp->FixParameter(4,fmm_best_Lexp->GetParameter(4));
+	 fmm_noCT_best_Lexp->FixParameter(5,fmm_best_Lexp->GetParameter(5));
+	 fmm_noCT_best_Lexp->FixParameter(6,fmm_best_Lexp->GetParameter(6));
+	 fmm_noCT_best_Lexp->FixParameter(7,fmm_best_Lexp->GetParameter(7));
+	 fmm_noCT_best_Lexp->FixParameter(8,fmm_best_Lexp->GetParameter(8));
+	 fmm_noCT_best_Lexp->SetParameter(9,fmm_best_Lexp->GetParameter(9));//S scale
+	 fmm_noCT_best_Lexp->FixParameter(10,fmm_best_Lexp->GetParameter(10));
+	 fmm_noCT_best_Lexp->FixParameter(11,fmm_best_Lexp->GetParameter(11));
+	 fmm_noCT_best_Lexp->FixParameter(12,fmm_best_Lexp->GetParameter(12));
+	 fmm_noCT_best_Lexp->FixParameter(13,fmm_best_Lexp->GetParameter(13));
+	 //fmm_noCT_best_Lexp->SetParameter(14,500.);//scale
+	 //fmm_noCT_best_Lexp->SetParLimits(14,0.,1000000.);//scale
+	 //fmm_noCT_best_Lexp->SetParameter(15,0.05);//mean
+	 //fmm_noCT_best_Lexp->SetParameter(16,0.04);//Gsigma
+	 //fmm_noCT_best_Lexp->SetParameter(17,0.01);//Lfwhm
+	 fmm_noCT_best_Lexp->SetParameter(14,6.);//scale
+	 fmm_noCT_best_Lexp->SetParLimits(14,0.,1000000.);//scale
+	 fmm_noCT_best_Lexp->FixParameter(15,Al_par1);//mean
+	 fmm_noCT_best_Lexp->FixParameter(16,Al_par2);//Gsigma
+	 fmm_noCT_best_Lexp->FixParameter(17,Al_par3);//Lfwhm
+	 fmm_noCT_best_Lexp->FixParameter(18,pion_par1);//mean
+	 fmm_noCT_best_Lexp->FixParameter(19,pion_par2);//Gsigma
+	 fmm_noCT_best_Lexp->FixParameter(20,pion_par3);//Lfwhm
+	 fmm_noCT_best_Lexp->FixParameter(21,0.1);//Al vs Pi
+	 fmm_noCT_best_Lexp->SetParLimits(21,0.,0.2);
+	 //fmm_noCT_best_Lexp->SetParLimits(2,0.,1000.);//positive
+	 //fmm_noCT_best_Lexp->SetParLimits(9,0.,300.);//positive
+	 //fmm_noCT_best_Lexp->SetParameter(0,0.0007);//Landau width
+	 //fmm_noCT_best_Lexp->SetParameter(1,mean_L_noCT_best);
+	 //fmm_noCT_best_Lexp->SetParLimits(1,def_mean_L-def_sig_L,def_mean_L+def_sig_L);
+	 //fmm_noCT_best_Lexp->SetParameter(2,1.5);//total scale
+	 //fmm_noCT_best_Lexp->SetParameter(3,0.001);//sigma
+	 //fmm_noCT_best_Lexp->SetParLimits(3,0.,0.01);
+	 //fmm_noCT_best_Lexp->SetParameter(4,0.05);//att.
+	 //fmm_noCT_best_Lexp->SetParLimits(4,0.005,0.08);
+	 //fmm_noCT_best_Lexp->SetParameter(5,-0.004);//peak pos.
+	 //fmm_noCT_best_Lexp->SetParLimits(5,-0.05,0.05);
+	 //fmm_noCT_best_Lexp->SetParameter(6,0.6);//relative strength
+	 //fmm_noCT_best_Lexp->SetParLimits(6,0.,1.5);//relative strength
+
+	 //fmm_noCT_best_Lexp->SetParameter(7,0.0003);//Landau width
+	 //fmm_noCT_best_Lexp->SetParameter(8,mean_S_noCT_best);//MPV
+	 //fmm_noCT_best_Lexp->SetParLimits(8,def_mean_S-def_sig_S,def_mean_S+def_sig_S);
+	 //fmm_noCT_best_Lexp->SetParameter(9,0.4);//total scale
+	 //fmm_noCT_best_Lexp->SetParameter(10,0.0015);//sigma
+	 //fmm_noCT_best_Lexp->SetParLimits(10,0.,0.01);
+	 //fmm_noCT_best_Lexp->SetParameter(11,0.05);//att
+	 //fmm_noCT_best_Lexp->SetParLimits(11,0.03,0.12);
+	 //fmm_noCT_best_Lexp->SetParameter(12,0.080);//peak pos.
+	 ////fmm_noCT_best_Lexp->SetParLimits(15,-0.085,-0.055);
+	 //fmm_noCT_best_Lexp->SetParameter(13,0.6);
+	 //fmm_noCT_best_Lexp->SetParLimits(13,0.,1.5);//relative strength
+
+	 hmm_wo_bg_fom_noCT_best->Fit("fmm_noCT_best_Lexp","","",fit_min_mm,fit_max_mm);//Total fitting w/ 4Poly BG
+	 double chisq_noCT_best = fmm_noCT_best_Lexp->GetChisquare();
+	 double dof_noCT_best  = fmm_noCT_best_Lexp->GetNDF();
+	 cout<<"chisq_noCT_best="<<chisq_noCT_best<<endl;
+	 cout<<"dof="<<dof_noCT_best<<endl;
+	 cout<<"Reduced chi-square = "<<chisq_noCT_best/dof_noCT_best<<endl;
+
+
+	 TF1* fmm_Lambda_only_noCT_best = new TF1("fmm_Lambda_only_noCT_best",FMM_Response,fit_min_mm,fit_max_mm,7);
+	 TF1* fmm_Sigma_only_noCT_best  = new TF1("fmm_Sigma_only_noCT_best" ,FMM_Response, fit_min_mm,fit_max_mm,7);
+	 TF1* fmm_bg_only_noCT_best  = new TF1("fmm_bg_only_noCT_best" ,FMM_2BG, fit_min_mm,fit_max_mm,8);
+//Lambda_only_noCT_best
+	 fmm_Lambda_only_noCT_best->SetNpx(20000);
+	 fmm_Lambda_only_noCT_best->SetParameter(0,fmm_noCT_best_Lexp->GetParameter(0));
+	 fmm_Lambda_only_noCT_best->SetParameter(1,fmm_noCT_best_Lexp->GetParameter(1));
+	 fmm_Lambda_only_noCT_best->SetParameter(2,fmm_noCT_best_Lexp->GetParameter(2));
+	 fmm_Lambda_only_noCT_best->SetParameter(3,fmm_noCT_best_Lexp->GetParameter(3));
+	 fmm_Lambda_only_noCT_best->SetParameter(4,fmm_noCT_best_Lexp->GetParameter(4));
+	 fmm_Lambda_only_noCT_best->SetParameter(5,fmm_noCT_best_Lexp->GetParameter(5));
+	 fmm_Lambda_only_noCT_best->SetParameter(6,fmm_noCT_best_Lexp->GetParameter(6));
+//Sigma_only_noCT_best
+	 fmm_Sigma_only_noCT_best->SetNpx(20000);
+	 fmm_Sigma_only_noCT_best->SetParameter(0,fmm_noCT_best_Lexp->GetParameter(7));
+	 fmm_Sigma_only_noCT_best->SetParameter(1,fmm_noCT_best_Lexp->GetParameter(8));
+	 fmm_Sigma_only_noCT_best->SetParameter(2,fmm_noCT_best_Lexp->GetParameter(9));
+	 fmm_Sigma_only_noCT_best->SetParameter(3,fmm_noCT_best_Lexp->GetParameter(10));
+	 fmm_Sigma_only_noCT_best->SetParameter(4,fmm_noCT_best_Lexp->GetParameter(11));
+	 fmm_Sigma_only_noCT_best->SetParameter(5,fmm_noCT_best_Lexp->GetParameter(12));
+	 fmm_Sigma_only_noCT_best->SetParameter(6,fmm_noCT_best_Lexp->GetParameter(13));
+//bg_only_noCT_best
+	 fmm_bg_only_noCT_best->SetNpx(20000);
+	 fmm_bg_only_noCT_best->SetParameter(0,fmm_noCT_best_Lexp->GetParameter(14));
+	 fmm_bg_only_noCT_best->SetParameter(1,fmm_noCT_best_Lexp->GetParameter(15));
+	 fmm_bg_only_noCT_best->SetParameter(2,fmm_noCT_best_Lexp->GetParameter(16));
+	 fmm_bg_only_noCT_best->SetParameter(3,fmm_noCT_best_Lexp->GetParameter(17));
+	 fmm_bg_only_noCT_best->SetParameter(4,fmm_noCT_best_Lexp->GetParameter(18));
+	 fmm_bg_only_noCT_best->SetParameter(5,fmm_noCT_best_Lexp->GetParameter(19));
+	 fmm_bg_only_noCT_best->SetParameter(6,fmm_noCT_best_Lexp->GetParameter(20));
+	 fmm_bg_only_noCT_best->SetParameter(7,fmm_noCT_best_Lexp->GetParameter(21));
+
+	double nofL_noCT_best = fmm_Lambda_only_noCT_best->Integral(fit_min_mm,fit_max_mm);
+	double nofL_old_noCT_best = fmm_Lambda_only_noCT_best->Integral(-0.006,0.006);
+	double nofL_bg_noCT_best = fmm_bg_only_noCT_best->Integral(-0.006,0.006);
+	nofL_noCT_best = nofL_noCT_best/fit_bin_width;
+	nofL_old_noCT_best = nofL_old_noCT_best/fit_bin_width;
+	nofL_bg_noCT_best = nofL_bg_noCT_best/fit_bin_width;
+	double nofL_old_hist_noCT_best=hmm_wo_bg_fom_noCT_best->Integral(hmm_wo_bg_fom_noCT_best->FindBin(-0.006),hmm_wo_bg_fom_noCT_best->FindBin(0.006))-nofL_bg_noCT_best;
+	cout<<"Number of Lambda (TF1 Integral) = "<<nofL_noCT_best<<endl;
+	cout<<"Number of Lambda w/o radiative tail (TF1 Integral) = "<<nofL_old_noCT_best<<endl;
+	cout<<"Number of Lambda w/o radiative tail (TH1F Integral) = "<<nofL_old_hist_noCT_best<<endl;
+
+	double nofS_noCT_best = fmm_Sigma_only_noCT_best->Integral(fit_min_mm,fit_max_mm);
+	double nofS_old_noCT_best = fmm_Sigma_only_noCT_best->Integral(def_mean_S-0.008,def_mean_S+0.008);
+	double nofS_bg_noCT_best = fmm_bg_only_noCT_best->Integral(def_mean_S-0.008,def_mean_S+0.008);
+	nofS_noCT_best = nofS_noCT_best/fit_bin_width;
+	nofS_old_noCT_best = nofS_old_noCT_best/fit_bin_width;
+	nofS_bg_noCT_best = nofS_bg_noCT_best/fit_bin_width;
+	double nofS_old_hist_noCT_best=hmm_wo_bg_fom_noCT_best->Integral(hmm_wo_bg_fom_noCT_best->FindBin(def_mean_S-0.008),hmm_wo_bg_fom_noCT_best->FindBin(def_mean_S+0.008))-nofS_bg_noCT_best;
+	cout<<"Number of Sigma (TF1 Integral) = "<<nofS_noCT_best<<endl;
+	cout<<"Number of Sigma w/o radiative tail (TF1 Integral) = "<<nofS_old_noCT_best<<endl;
+	cout<<"Number of Sigma w/o radiative tail (TH1F Integral) = "<<nofS_old_hist_noCT_best<<endl;
+
+	 hmm_wo_bg_fom_noCT_best->Draw();
+	 fmm_noCT_best_Lexp->SetLineColor(kRed);
+	 fmm_noCT_best_Lexp->Draw("same");
+	 fmm_Lambda_only_noCT_best->SetLineColor(kAzure);
+	 fmm_Sigma_only_noCT_best->SetLineColor(kCyan);
+	 fmm_bg_only_noCT_best->SetLineColor(kOrange);
+	 fmm_Lambda_only_noCT_best->Draw("same");
+	 fmm_Sigma_only_noCT_best->Draw("same");
+	 fmm_bg_only_noCT_best->Draw("same");
+	 //fL_noCT_best->SetLineColor(kGreen);
+	 //fS_noCT_best->SetLineColor(kGreen);
+	 //fL_noCT_best->Draw("same");
+	 //fS_noCT_best->Draw("same");
+
+
+/*%%%%%%%%%%%%%%%%%%%%*/
+/*%%    No CT cut	%%*/
+/*%%%%%%%%%%%%%%%%%%%%*/
+//strict
+	TCanvas* c8 = new TCanvas("c8","c8");
+	 cout<<"noCT_strict START"<<endl;
+	 cout<<"(Landau+Exp)*(Gauss) MODE START"<<endl;
+	 fmm_noCT_strict_Lexp=new TF1("fmm_noCT_strict_Lexp",FMM_Res_nocut,fit_min_mm,fit_max_mm,22);
+   //par[0]=Width (scale) parameter of Landau density
+   //par[1]=Most Probable (MP, location) parameter of Landau density
+   //par[2]=Total area (integral -inf to inf, normalization constant)
+   //par[3]=Width (sigma) of convoluted Gaussian function
+   //par[4]=tau of exp function
+   //par[5]=Shift of Function Peak
+   //par[6]=Relative Strength
+   //
+   //
+   //
+   //par[0]=Width (scale) parameter of Landau density
+   //par[1]=Most Probable (MP, location) parameter of Landau density
+   //par[2]=Total area (integral -inf to inf, normalization constant)
+   //par[3]=Width (sigma) of convoluted Gaussian function
+	 fmm_noCT_strict_Lexp->SetNpx(20000);
+	 fmm_noCT_strict_Lexp->SetTitle("Missing Mass (noCT_strict)");
+	 fmm_noCT_strict_Lexp->FixParameter(0,fmm_best_Lexp->GetParameter(0));
+	 fmm_noCT_strict_Lexp->FixParameter(1,fmm_best_Lexp->GetParameter(1));
+	 fmm_noCT_strict_Lexp->SetParameter(2,fmm_best_Lexp->GetParameter(2));//L scale
+	 fmm_noCT_strict_Lexp->FixParameter(3,fmm_best_Lexp->GetParameter(3));
+	 fmm_noCT_strict_Lexp->FixParameter(4,fmm_best_Lexp->GetParameter(4));
+	 fmm_noCT_strict_Lexp->FixParameter(5,fmm_best_Lexp->GetParameter(5));
+	 fmm_noCT_strict_Lexp->FixParameter(6,fmm_best_Lexp->GetParameter(6));
+	 fmm_noCT_strict_Lexp->FixParameter(7,fmm_best_Lexp->GetParameter(7));
+	 fmm_noCT_strict_Lexp->FixParameter(8,fmm_best_Lexp->GetParameter(8));
+	 fmm_noCT_strict_Lexp->SetParameter(9,fmm_best_Lexp->GetParameter(9));//S scale
+	 fmm_noCT_strict_Lexp->FixParameter(10,fmm_best_Lexp->GetParameter(10));
+	 fmm_noCT_strict_Lexp->FixParameter(11,fmm_best_Lexp->GetParameter(11));
+	 fmm_noCT_strict_Lexp->FixParameter(12,fmm_best_Lexp->GetParameter(12));
+	 fmm_noCT_strict_Lexp->FixParameter(13,fmm_best_Lexp->GetParameter(13));
+	 //fmm_noCT_strict_Lexp->SetParameter(14,500.);//scale
+	 //fmm_noCT_strict_Lexp->SetParLimits(14,0.,1000000.);//scale
+	 //fmm_noCT_strict_Lexp->SetParameter(15,0.05);//mean
+	 //fmm_noCT_strict_Lexp->SetParameter(16,0.04);//Gsigma
+	 //fmm_noCT_strict_Lexp->SetParameter(17,0.01);//Lfwhm
+	 fmm_noCT_strict_Lexp->SetParameter(14,6.);//scale
+	 fmm_noCT_strict_Lexp->SetParLimits(14,0.,1000000.);//scale
+	 fmm_noCT_strict_Lexp->FixParameter(15,Al_par1);//mean
+	 fmm_noCT_strict_Lexp->FixParameter(16,Al_par2);//Gsigma
+	 fmm_noCT_strict_Lexp->FixParameter(17,Al_par3);//Lfwhm
+	 fmm_noCT_strict_Lexp->FixParameter(18,pion_par1);//mean
+	 fmm_noCT_strict_Lexp->FixParameter(19,pion_par2);//Gsigma
+	 fmm_noCT_strict_Lexp->FixParameter(20,pion_par3);//Lfwhm
+	 fmm_noCT_strict_Lexp->FixParameter(21,0.1);//Al vs Pi
+	 fmm_noCT_strict_Lexp->SetParLimits(21,0.,0.2);
+	 //fmm_noCT_strict_Lexp->SetParLimits(2,0.,1000.);//positive
+	 //fmm_noCT_strict_Lexp->SetParLimits(9,0.,300.);//positive
+	 //fmm_noCT_strict_Lexp->SetParameter(0,0.0007);//Landau width
+	 //fmm_noCT_strict_Lexp->SetParameter(1,mean_L_noCT_strict);
+	 //fmm_noCT_strict_Lexp->SetParLimits(1,def_mean_L-def_sig_L,def_mean_L+def_sig_L);
+	 //fmm_noCT_strict_Lexp->SetParameter(2,1.5);//total scale
+	 //fmm_noCT_strict_Lexp->SetParameter(3,0.001);//sigma
+	 //fmm_noCT_strict_Lexp->SetParLimits(3,0.,0.01);
+	 //fmm_noCT_strict_Lexp->SetParameter(4,0.05);//att.
+	 //fmm_noCT_strict_Lexp->SetParLimits(4,0.005,0.08);
+	 //fmm_noCT_strict_Lexp->SetParameter(5,-0.004);//peak pos.
+	 //fmm_noCT_strict_Lexp->SetParLimits(5,-0.05,0.05);
+	 //fmm_noCT_strict_Lexp->SetParameter(6,0.6);//relative strength
+	 //fmm_noCT_strict_Lexp->SetParLimits(6,0.,1.5);//relative strength
+
+	 //fmm_noCT_strict_Lexp->SetParameter(7,0.0003);//Landau width
+	 //fmm_noCT_strict_Lexp->SetParameter(8,mean_S_noCT_strict);//MPV
+	 //fmm_noCT_strict_Lexp->SetParLimits(8,def_mean_S-def_sig_S,def_mean_S+def_sig_S);
+	 //fmm_noCT_strict_Lexp->SetParameter(9,0.4);//total scale
+	 //fmm_noCT_strict_Lexp->SetParameter(10,0.0015);//sigma
+	 //fmm_noCT_strict_Lexp->SetParLimits(10,0.,0.01);
+	 //fmm_noCT_strict_Lexp->SetParameter(11,0.05);//att
+	 //fmm_noCT_strict_Lexp->SetParLimits(11,0.03,0.12);
+	 //fmm_noCT_strict_Lexp->SetParameter(12,0.080);//peak pos.
+	 ////fmm_noCT_strict_Lexp->SetParLimits(15,-0.085,-0.055);
+	 //fmm_noCT_strict_Lexp->SetParameter(13,0.6);
+	 //fmm_noCT_strict_Lexp->SetParLimits(13,0.,1.5);//relative strength
+
+	 hmm_wo_bg_fom_noCT_strict->Fit("fmm_noCT_strict_Lexp","","",fit_min_mm,fit_max_mm);//Total fitting w/ 4Poly BG
+	 double chisq_noCT_strict = fmm_noCT_strict_Lexp->GetChisquare();
+	 double dof_noCT_strict  = fmm_noCT_strict_Lexp->GetNDF();
+	 cout<<"chisq_noCT_strict="<<chisq_noCT_strict<<endl;
+	 cout<<"dof="<<dof_noCT_strict<<endl;
+	 cout<<"Reduced chi-square = "<<chisq_noCT_strict/dof_noCT_strict<<endl;
+
+
+	 TF1* fmm_Lambda_only_noCT_strict = new TF1("fmm_Lambda_only_noCT_strict",FMM_Response,fit_min_mm,fit_max_mm,7);
+	 TF1* fmm_Sigma_only_noCT_strict  = new TF1("fmm_Sigma_only_noCT_strict" ,FMM_Response, fit_min_mm,fit_max_mm,7);
+	 TF1* fmm_bg_only_noCT_strict  = new TF1("fmm_bg_only_noCT_strict" ,FMM_2BG, fit_min_mm,fit_max_mm,8);
+//Lambda_only_noCT_strict
+	 fmm_Lambda_only_noCT_strict->SetNpx(20000);
+	 fmm_Lambda_only_noCT_strict->SetParameter(0,fmm_noCT_strict_Lexp->GetParameter(0));
+	 fmm_Lambda_only_noCT_strict->SetParameter(1,fmm_noCT_strict_Lexp->GetParameter(1));
+	 fmm_Lambda_only_noCT_strict->SetParameter(2,fmm_noCT_strict_Lexp->GetParameter(2));
+	 fmm_Lambda_only_noCT_strict->SetParameter(3,fmm_noCT_strict_Lexp->GetParameter(3));
+	 fmm_Lambda_only_noCT_strict->SetParameter(4,fmm_noCT_strict_Lexp->GetParameter(4));
+	 fmm_Lambda_only_noCT_strict->SetParameter(5,fmm_noCT_strict_Lexp->GetParameter(5));
+	 fmm_Lambda_only_noCT_strict->SetParameter(6,fmm_noCT_strict_Lexp->GetParameter(6));
+//Sigma_only_noCT_strict
+	 fmm_Sigma_only_noCT_strict->SetNpx(20000);
+	 fmm_Sigma_only_noCT_strict->SetParameter(0,fmm_noCT_strict_Lexp->GetParameter(7));
+	 fmm_Sigma_only_noCT_strict->SetParameter(1,fmm_noCT_strict_Lexp->GetParameter(8));
+	 fmm_Sigma_only_noCT_strict->SetParameter(2,fmm_noCT_strict_Lexp->GetParameter(9));
+	 fmm_Sigma_only_noCT_strict->SetParameter(3,fmm_noCT_strict_Lexp->GetParameter(10));
+	 fmm_Sigma_only_noCT_strict->SetParameter(4,fmm_noCT_strict_Lexp->GetParameter(11));
+	 fmm_Sigma_only_noCT_strict->SetParameter(5,fmm_noCT_strict_Lexp->GetParameter(12));
+	 fmm_Sigma_only_noCT_strict->SetParameter(6,fmm_noCT_strict_Lexp->GetParameter(13));
+//bg_only_noCT_strict
+	 fmm_bg_only_noCT_strict->SetNpx(20000);
+	 fmm_bg_only_noCT_strict->SetParameter(0,fmm_noCT_strict_Lexp->GetParameter(14));
+	 fmm_bg_only_noCT_strict->SetParameter(1,fmm_noCT_strict_Lexp->GetParameter(15));
+	 fmm_bg_only_noCT_strict->SetParameter(2,fmm_noCT_strict_Lexp->GetParameter(16));
+	 fmm_bg_only_noCT_strict->SetParameter(3,fmm_noCT_strict_Lexp->GetParameter(17));
+	 fmm_bg_only_noCT_strict->SetParameter(4,fmm_noCT_strict_Lexp->GetParameter(18));
+	 fmm_bg_only_noCT_strict->SetParameter(5,fmm_noCT_strict_Lexp->GetParameter(19));
+	 fmm_bg_only_noCT_strict->SetParameter(6,fmm_noCT_strict_Lexp->GetParameter(20));
+	 fmm_bg_only_noCT_strict->SetParameter(7,fmm_noCT_strict_Lexp->GetParameter(21));
+
+	double nofL_noCT_strict = fmm_Lambda_only_noCT_strict->Integral(fit_min_mm,fit_max_mm);
+	double nofL_old_noCT_strict = fmm_Lambda_only_noCT_strict->Integral(-0.006,0.006);
+	double nofL_bg_noCT_strict = fmm_bg_only_noCT_strict->Integral(-0.006,0.006);
+	nofL_noCT_strict = nofL_noCT_strict/fit_bin_width;
+	nofL_old_noCT_strict = nofL_old_noCT_strict/fit_bin_width;
+	nofL_bg_noCT_strict = nofL_bg_noCT_strict/fit_bin_width;
+	double nofL_old_hist_noCT_strict=hmm_wo_bg_fom_noCT_strict->Integral(hmm_wo_bg_fom_noCT_strict->FindBin(-0.006),hmm_wo_bg_fom_noCT_strict->FindBin(0.006))-nofL_bg_noCT_strict;
+	cout<<"Number of Lambda (TF1 Integral) = "<<nofL_noCT_strict<<endl;
+	cout<<"Number of Lambda w/o radiative tail (TF1 Integral) = "<<nofL_old_noCT_strict<<endl;
+	cout<<"Number of Lambda w/o radiative tail (TH1F Integral) = "<<nofL_old_hist_noCT_strict<<endl;
+
+	double nofS_noCT_strict = fmm_Sigma_only_noCT_strict->Integral(fit_min_mm,fit_max_mm);
+	double nofS_old_noCT_strict = fmm_Sigma_only_noCT_strict->Integral(def_mean_S-0.008,def_mean_S+0.008);
+	double nofS_bg_noCT_strict = fmm_bg_only_noCT_strict->Integral(def_mean_S-0.008,def_mean_S+0.008);
+	nofS_noCT_strict = nofS_noCT_strict/fit_bin_width;
+	nofS_old_noCT_strict = nofS_old_noCT_strict/fit_bin_width;
+	nofS_bg_noCT_strict = nofS_bg_noCT_strict/fit_bin_width;
+	double nofS_old_hist_noCT_strict=hmm_wo_bg_fom_noCT_strict->Integral(hmm_wo_bg_fom_noCT_strict->FindBin(def_mean_S-0.008),hmm_wo_bg_fom_noCT_strict->FindBin(def_mean_S+0.008))-nofS_bg_noCT_strict;
+	cout<<"Number of Sigma (TF1 Integral) = "<<nofS_noCT_strict<<endl;
+	cout<<"Number of Sigma w/o radiative tail (TF1 Integral) = "<<nofS_old_noCT_strict<<endl;
+	cout<<"Number of Sigma w/o radiative tail (TH1F Integral) = "<<nofS_old_hist_noCT_strict<<endl;
+
+	 hmm_wo_bg_fom_noCT_strict->Draw();
+	 fmm_noCT_strict_Lexp->SetLineColor(kRed);
+	 fmm_noCT_strict_Lexp->Draw("same");
+	 fmm_Lambda_only_noCT_strict->SetLineColor(kAzure);
+	 fmm_Sigma_only_noCT_strict->SetLineColor(kCyan);
+	 fmm_bg_only_noCT_strict->SetLineColor(kOrange);
+	 fmm_Lambda_only_noCT_strict->Draw("same");
+	 fmm_Sigma_only_noCT_strict->Draw("same");
+	 fmm_bg_only_noCT_strict->Draw("same");
+	 //fL_noCT_strict->SetLineColor(kGreen);
+	 //fS_noCT_strict->SetLineColor(kGreen);
+	 //fL_noCT_strict->Draw("same");
+	 //fS_noCT_strict->Draw("same");
+
+	TCanvas* c9 = new TCanvas("c9","c9");
 	 fAl->SetLineColor(kRed);
 	 hmm_Al_wobg_fom_noZ->Draw("");
 	 fAl->Draw("same");
 
-	TCanvas* c8 = new TCanvas("c8","c8");
+	TCanvas* c10 = new TCanvas("c10","c10");
 	 fAl_new->SetLineColor(kRed);
 	 hmm_Al_wobg_fom_noZ_new->Draw("");
 	 fAl_new->Draw("same");
 
 
-	TCanvas* c9 = new TCanvas("c9","c9");
+	TCanvas* c11 = new TCanvas("c11","c11");
 	 fpion->SetLineColor(kRed);
 	 hmm_pi_wobg_fom_best->Draw("");
 	 fpion->Draw("same");
+
+//TF1 w/ radiative tail
+	cout<<"Number of Lambda w/ radiative tail (TF1 Integral)"<<endl;
+	cout<<"best   = "<<nofL_best<<endl;
+	cout<<"strict = "<<nofL_strict<<endl;
+	cout<<"No Z   = "<<nofL_noZ<<endl;
+	cout<<"No AC  = "<<nofL_noAC<<endl;
+	cout<<"No CT_b= "<<nofL_noCT_best<<endl;
+	cout<<"No CT_s= "<<nofL_noCT_strict<<endl;
+	cout<<"Efficiencies:"<<endl;
+	cout<<"(Bestcut)"<<endl;
+	cout<<"Z : "<<nofL_best/nofL_noZ<<endl;
+	cout<<"AC: "<<nofL_best/nofL_noAC<<endl;
+	cout<<"CT: "<<nofL_best/nofL_noCT_best<<endl;
+	cout<<"(Strictcut)"<<endl;
+	//cout<<"Z : "<<nofL_strict/nofL_noZ<<endl;
+	cout<<"AC: "<<nofL_strict/nofL_noAC<<endl;
+	cout<<"CT: "<<nofL_strict/nofL_noCT_strict<<endl;
+
+	cout<<"Number of Sigma w/ radiative tail (TF1 Integral)"<<endl;
+	cout<<"best   = "<<nofS_best<<endl;
+	cout<<"strict = "<<nofS_strict<<endl;
+	cout<<"No Z   = "<<nofS_noZ<<endl;
+	cout<<"No AC  = "<<nofS_noAC<<endl;
+	cout<<"No CT_b= "<<nofS_noCT_best<<endl;
+	cout<<"No CT_s= "<<nofS_noCT_strict<<endl;
+	cout<<"Efficiencies:"<<endl;
+	cout<<"(Bestcut)"<<endl;
+	cout<<"Z : "<<nofS_best/nofS_noZ<<endl;
+	cout<<"AC: "<<nofS_best/nofS_noAC<<endl;
+	cout<<"CT: "<<nofS_best/nofS_noCT_best<<endl;
+	cout<<"(Strictcut)"<<endl;
+	//cout<<"Z : "<<nofS_strict/nofS_noZ<<endl;
+	cout<<"AC: "<<nofS_strict/nofS_noAC<<endl;
+	cout<<"CT: "<<nofS_strict/nofS_noCT_strict<<endl;
+
+
+//TF1 w/o radiative tail
+	cout<<"Number of Lambda w/o radiative tail (TF1 Integral)"<<endl;
+	cout<<"best   = "<<nofL_old_best<<endl;
+	cout<<"strict = "<<nofL_old_strict<<endl;
+	cout<<"No Z   = "<<nofL_old_noZ<<endl;
+	cout<<"No AC  = "<<nofL_old_noAC<<endl;
+	cout<<"No CT_b= "<<nofL_old_noCT_best<<endl;
+	cout<<"No CT_s= "<<nofL_old_noCT_strict<<endl;
+	cout<<"Efficiencies:"<<endl;
+	cout<<"(Bestcut)"<<endl;
+	cout<<"Z : "<<nofL_old_best/nofL_old_noZ<<endl;
+	cout<<"AC: "<<nofL_old_best/nofL_old_noAC<<endl;
+	cout<<"CT: "<<nofL_old_best/nofL_old_noCT_best<<endl;
+	cout<<"(Strictcut)"<<endl;
+	//cout<<"Z : "<<nofL_old_strict/nofL_old_noZ<<endl;
+	cout<<"AC: "<<nofL_old_strict/nofL_old_noAC<<endl;
+	cout<<"CT: "<<nofL_old_strict/nofL_old_noCT_strict<<endl;
+
+	cout<<"Number of Sigma w/o radiative tail (TF1 Integral)"<<endl;
+	cout<<"best   = "<<nofS_old_best<<endl;
+	cout<<"strict = "<<nofS_old_strict<<endl;
+	cout<<"No Z   = "<<nofS_old_noZ<<endl;
+	cout<<"No AC  = "<<nofS_old_noAC<<endl;
+	cout<<"No CT_b= "<<nofS_old_noCT_best<<endl;
+	cout<<"No CT_s= "<<nofS_old_noCT_strict<<endl;
+	cout<<"Efficiencies:"<<endl;
+	cout<<"(Bestcut)"<<endl;
+	cout<<"Z : "<<nofS_old_best/nofS_old_noZ<<endl;
+	cout<<"AC: "<<nofS_old_best/nofS_old_noAC<<endl;
+	cout<<"CT: "<<nofS_old_best/nofS_old_noCT_best<<endl;
+	cout<<"(Strictcut)"<<endl;
+	//cout<<"Z : "<<nofS_old_strict/nofS_old_noZ<<endl;
+	cout<<"AC: "<<nofS_old_strict/nofS_old_noAC<<endl;
+	cout<<"CT: "<<nofS_old_strict/nofS_old_noCT_strict<<endl;
+
+
+//TF1 w/o radiative tail
+	cout<<"Number of Lambda w/o radiative tail (TH1F Integral)"<<endl;
+	cout<<"best   = "<<nofL_old_hist_best<<endl;
+	cout<<"strict = "<<nofL_old_hist_strict<<endl;
+	cout<<"No Z   = "<<nofL_old_hist_noZ<<endl;
+	cout<<"No AC  = "<<nofL_old_hist_noAC<<endl;
+	cout<<"No CT_b= "<<nofL_old_hist_noCT_best<<endl;
+	cout<<"No CT_s= "<<nofL_old_hist_noCT_strict<<endl;
+	cout<<"Efficiencies:"<<endl;
+	cout<<"(Bestcut)"<<endl;
+	cout<<"Z : "<<nofL_old_hist_best/nofL_old_hist_noZ<<endl;
+	cout<<"AC: "<<nofL_old_hist_best/nofL_old_hist_noAC<<endl;
+	cout<<"CT: "<<nofL_old_hist_best/nofL_old_hist_noCT_best<<endl;
+	cout<<"(Strictcut)"<<endl;
+	//cout<<"Z : "<<nofL_old_hist_strict/nofL_old_hist_noZ<<endl;
+	cout<<"AC: "<<nofL_old_hist_strict/nofL_old_hist_noAC<<endl;
+	cout<<"CT: "<<nofL_old_hist_strict/nofL_old_hist_noCT_strict<<endl;
+
+	cout<<"Number of Sigma w/o radiative tail (TH1F Integral)"<<endl;
+	cout<<"best   = "<<nofS_old_hist_best<<endl;
+	cout<<"strict = "<<nofS_old_hist_strict<<endl;
+	cout<<"No Z   = "<<nofS_old_hist_noZ<<endl;
+	cout<<"No AC  = "<<nofS_old_hist_noAC<<endl;
+	cout<<"No CT_b= "<<nofS_old_hist_noCT_best<<endl;
+	cout<<"No CT_s= "<<nofS_old_hist_noCT_strict<<endl;
+	cout<<"Efficiencies:"<<endl;
+	cout<<"(Bestcut)"<<endl;
+	cout<<"Z : "<<nofS_old_hist_best/nofS_old_hist_noZ<<endl;
+	cout<<"AC: "<<nofS_old_hist_best/nofS_old_hist_noAC<<endl;
+	cout<<"CT: "<<nofS_old_hist_best/nofS_old_hist_noCT_best<<endl;
+	cout<<"(Strictcut)"<<endl;
+	//cout<<"Z : "<<nofS_old_hist_strict/nofS_old_hist_noZ<<endl;
+	cout<<"AC: "<<nofS_old_hist_strict/nofS_old_hist_noAC<<endl;
+	cout<<"CT: "<<nofS_old_hist_strict/nofS_old_hist_noCT_strict<<endl;
+
+
 	
 /*--- Print ---*/
 cout << "Print is starting" << endl;
@@ -1292,8 +1759,8 @@ cout << "Print is starting" << endl;
 	c7->Print(Form("%s",pdfname.c_str()));
 	c8->Print(Form("%s",pdfname.c_str()));
 	c9->Print(Form("%s",pdfname.c_str()));
-	c9->Print(Form("%s]",pdfname.c_str()));
-	 
-
+	c10->Print(Form("%s",pdfname.c_str()));
+	c11->Print(Form("%s",pdfname.c_str()));
+	c11->Print(Form("%s]",pdfname.c_str()));
 cout << "Well done!" << endl;
 }//fit

@@ -164,11 +164,12 @@ cout << "Output pdf file name is " << pdfname << endl;
   
   TFile *file = new TFile("../h2all.root","read");//input file of all H2 run(default: h2all4.root)
 	//ACCBGの引き算はmea_hist.ccから
-  TFile *file_mea = new TFile("../MixedEventAnalysis/bgmea_llccrr_new.root","read");//input file of BG(MEA) histo.(default: bgmea6.root)
-  double nbunch = 6000.;//effetive bunches (6 bunches x 1000 mixtures)
+  //TFile *file_mea = new TFile("./bgmea_llccrr_new.root","read");//input file of BG(MEA) histo.(default: bgmea6.root)
+  TFile *file_mea = new TFile("./bgmea6.root","read");//input file of BG(MEA) histo.(default: bgmea6.root)
+  double nbunch = 600.;//effetive bunches (6 bunches x 1000 mixtures)
   
 //Systematic study
-//TFile *file_mea = new TFile("./temp/bgmea_rrr.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
+//TFile *file_mea = new TFile("./bgmea_lcr.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
 //double nbunch = 3000.;//effetive bunches (3 bunches x 1000 mixtures)
 
 
@@ -216,7 +217,7 @@ cout << "Output pdf file name is " << pdfname << endl;
  int bin_mm=(max_mm-min_mm)/0.001; //Counts/2 MeV
  bin_mm=(int)bin_mm;
  //const double fit_min_mm=-0.006;
- const double fit_min_mm=-0.01;
+ const double fit_min_mm=-0.012;
  const double fit_max_mm=0.12;
  const int fit_bin_mm = (fit_max_mm-fit_min_mm)/0.001;
  const double fit_bin_width = (fit_max_mm-fit_min_mm)/fit_bin_mm;
@@ -866,19 +867,23 @@ cout<<"BEST CUT START"<<endl;
 
 	double nofL_nocut = fmm_Lambda_only_nocut->Integral(fit_min_mm,fit_max_mm);
 	double nofL_old_nocut = fmm_Lambda_only_nocut->Integral(-0.006,0.006);
+	double nofL_bg_nocut = fmm_bg_only_nocut->Integral(-0.006,0.006);
 	nofL_nocut = nofL_nocut/fit_bin_width;
 	nofL_old_nocut = nofL_old_nocut/fit_bin_width;
+	nofL_bg_nocut = nofL_bg_nocut/fit_bin_width;
 	cout<<"Number of Lambda (TF1 Integral) = "<<nofL_nocut<<endl;
 	cout<<"Number of Lambda w/o radiative tail (TF1 Integral) = "<<nofL_old_nocut<<endl;
-	cout<<"Number of Lambda w/o radiative tail (TH1F Integral) = "<<hmm_wo_bg_fom_nocut->Integral(hmm_wo_bg_fom_nocut->FindBin(-0.006),hmm_wo_bg_fom_nocut->FindBin(0.006))<<endl;
+	cout<<"Number of Lambda w/o radiative tail (TH1F Integral) = "<<hmm_wo_bg_fom_nocut->Integral(hmm_wo_bg_fom_nocut->FindBin(-0.006),hmm_wo_bg_fom_nocut->FindBin(0.006))-nofL_bg_nocut<<endl;
 
 	double nofS_nocut = fmm_Sigma_only_nocut->Integral(fit_min_mm,fit_max_mm);
 	double nofS_old_nocut = fmm_Sigma_only_nocut->Integral(def_mean_S-0.008,def_mean_S+0.008);
+	double nofS_bg_nocut = fmm_bg_only_nocut->Integral(def_mean_S-0.008,def_mean_S+0.008);
 	nofS_nocut = nofS_nocut/fit_bin_width;
 	nofS_old_nocut = nofS_old_nocut/fit_bin_width;
+	nofS_bg_nocut = nofS_bg_nocut/fit_bin_width;
 	cout<<"Number of Sigma (TF1 Integral) = "<<nofS_nocut<<endl;
 	cout<<"Number of Sigma w/o radiative tail (TF1 Integral) = "<<nofS_old_nocut<<endl;
-	cout<<"Number of Sigma w/o radiative tail (TH1F Integral) = "<<hmm_wo_bg_fom_nocut->Integral(hmm_wo_bg_fom_nocut->FindBin(def_mean_S-0.008),hmm_wo_bg_fom_nocut->FindBin(def_mean_S+0.008))<<endl;
+	cout<<"Number of Sigma w/o radiative tail (TH1F Integral) = "<<hmm_wo_bg_fom_nocut->Integral(hmm_wo_bg_fom_nocut->FindBin(def_mean_S-0.008),hmm_wo_bg_fom_nocut->FindBin(def_mean_S+0.008))-nofS_bg_nocut<<endl;
 
 	 hmm_wo_bg_fom_nocut->Draw();
 	 fmm_nocut_Lexp->SetLineColor(kRed);
