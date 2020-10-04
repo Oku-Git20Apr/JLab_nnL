@@ -2,7 +2,7 @@
 //--  Cointime Histo.        --//
 //-----------------------------//
 //
-//K. Okuyama (Sep. 27, 2020)
+//K. Okuyama (Oct. 10, 2020)
 
 double F_Voigt( double *x, double *par )
   {
@@ -23,10 +23,10 @@ double fcoin_template( double *x, double *par , int shift, int num)
 double fcoin_acc( double *x, double *par)
 {
 	double val=0.;
-	for(int i=0;i<=60;i++){
+	for(int i=0;i<=80;i++){
 	//val += par[num]*TMath::Gaus(x[0],par[num+1]+par[num+12]*i-20,par[num+2]);
-    val += par[0] * (1.-par[5]) * TMath::Voigt(x[0]-par[1]-par[4]*i+20.,par[2],par[3],4);
-    val += par[0] * par[5] * TMath::Voigt(x[0]-par[1]-par[4]*i+20.,par[6],par[7],4);
+    val += par[0] * (1.-par[5]) * TMath::Voigt(x[0]-3.18-par[1]-par[4]*i+30.,par[2],par[3],4);
+    val += par[0] * par[5] * TMath::Voigt(x[0]+7.92-par[1]-par[4]*i+30.,par[6],par[7],4);
 	}
 	return val;
 }
@@ -38,7 +38,7 @@ double fcoin_total( double *x, double *par ){
 
 }
 
-void hcoin_pi_contami_V(){
+void hcoin_pi_contami_ultraimproved_V(){
 //ROOT::Math::IntegratorOneDimOptions::SetDefaultRelTolerance(1.E-6);
 	string pdfname = "temp.pdf";
 cout << "Output pdf file name is " << pdfname << endl;
@@ -337,7 +337,7 @@ cout<<"Entries: "<<ENum<<endl;
 		if(ac_cut_p)hcoin_p->Fill(ct);
 		if(best_cut)hcoin_best->Fill(ct);
 		if(strict_cut)hcoin_strict->Fill(ct);
-		if(ac_cut&&20.<ct && ct<100.){
+		if(ac_cut&&20.<ct && ct<60.){
 		   double ct_ = ct;
 		       while(1){
 		     if(-20.<ct && ct<20.){
@@ -348,7 +348,7 @@ cout<<"Entries: "<<ENum<<endl;
 		    }
 		   ct = ct_;
 		   }//cointime
-		if(ac_cut_new&&20.<ct && ct<100.){
+		if(ac_cut_new&&20.<ct && ct<60.){
 		   double ct_ = ct;
 		       while(1){
 		     if(-20.<ct && ct<20.){
@@ -359,7 +359,7 @@ cout<<"Entries: "<<ENum<<endl;
 		    }
 		   ct = ct_;
 		   }//cointime
-		if(ac_cut_pi&&20.<ct && ct<100.){
+		if(ac_cut_pi&&20.<ct && ct<60.){
 		   double ct_ = ct;
 		       while(1){
 		     if(-20.<ct && ct<20.){
@@ -370,7 +370,7 @@ cout<<"Entries: "<<ENum<<endl;
 		    }
 		   ct = ct_;
 		   }//cointime
-		if(ac_cut_p&&20.<ct && ct<100.){
+		if(ac_cut_p&&20.<ct && ct<60.){
 		   double ct_ = ct;
 		       while(1){
 		     if(-20.<ct && ct<20.){
@@ -381,7 +381,7 @@ cout<<"Entries: "<<ENum<<endl;
 		    }
 		   ct = ct_;
 		   }//cointime
-		if(best_cut&&20.<ct && ct<100.){
+		if(best_cut&&20.<ct && ct<60.){
 		   double ct_ = ct;
 		       while(1){
 		     if(-20.<ct && ct<20.){
@@ -392,7 +392,7 @@ cout<<"Entries: "<<ENum<<endl;
 		    }
 		   ct = ct_;
 		   }//cointime
-		if(strict_cut&&20.<ct && ct<100.){
+		if(strict_cut&&20.<ct && ct<60.){
 		   double ct_ = ct;
 		       while(1){
 		     if(-20.<ct && ct<20.){
@@ -445,12 +445,18 @@ cout<<"Entries: "<<ENum<<endl;
 }//ENum
 
 //BG subtraction
-     hcoin_bg->Scale(40./80.);
-     hcoin_new_bg->Scale(40./80.);
-     hcoin_pi_bg->Scale(40./80.);
-     hcoin_p_bg->Scale(40./80.);
-     hcoin_best_bg->Scale(40./80.);
-     hcoin_strict_bg->Scale(40./80.);
+     //hcoin_bg->Scale(40./80.);
+     //hcoin_new_bg->Scale(40./80.);
+     //hcoin_pi_bg->Scale(40./80.);
+     //hcoin_p_bg->Scale(40./80.);
+     //hcoin_best_bg->Scale(40./80.);
+     //hcoin_strict_bg->Scale(40./80.);
+     hcoin_bg->Sumw2();
+     hcoin_new_bg->Sumw2();
+     hcoin_pi_bg->Sumw2();
+     hcoin_p_bg->Sumw2();
+     hcoin_best_bg->Sumw2();
+     hcoin_strict_bg->Sumw2();
      hcoin_wobg->Add(hcoin,hcoin_bg,1.0,-1.0);
      hcoin_newwobg->Add(hcoin_new,hcoin_new_bg,1.0,-1.0);
      hcoin_piwobg->Add(hcoin_pi,hcoin_pi_bg,1.0,-1.0);
@@ -510,7 +516,7 @@ cout<<"Entries: "<<ENum<<endl;
 	 TF1 *fcoin=new TF1("fcoin",fcoin_total,-20.,100.,20);
 	 fcoin->SetNpx(20000);
 	 fcoin->SetParameter(0,200.);//acc
-	 fcoin->SetParameter(1,1.);//
+	 fcoin->FixParameter(1,0.);//
 	 fcoin->FixParameter(2,pion_par2);//
 	 fcoin->FixParameter(3,pion_par3);//
 	 fcoin->SetParameter(4,2.012);//shift
@@ -583,14 +589,14 @@ cout<<"Entries: "<<ENum<<endl;
 	 fcoin->ReleaseParameter(17);
 	 fcoin->ReleaseParameter(18);
 	 fcoin->ReleaseParameter(19);
-	 fcoin->FixParameter(0,fcoin->GetParameter(0));
-	 fcoin->FixParameter(1,fcoin->GetParameter(1));
-	 fcoin->FixParameter(2,fcoin->GetParameter(2));
-	 fcoin->FixParameter(3,fcoin->GetParameter(3));
-	 fcoin->FixParameter(4,fcoin->GetParameter(4));
-	 fcoin->FixParameter(5,fcoin->GetParameter(5));
-	 fcoin->FixParameter(6,fcoin->GetParameter(6));
-	 fcoin->FixParameter(7,fcoin->GetParameter(7));
+	 fcoin->SetParameter(0,fcoin->GetParameter(0));
+	 fcoin->SetParameter(1,fcoin->GetParameter(1));
+	 fcoin->SetParameter(2,fcoin->GetParameter(2));
+	 fcoin->SetParameter(3,fcoin->GetParameter(3));
+	 fcoin->SetParameter(4,fcoin->GetParameter(4));
+	 fcoin->SetParameter(5,fcoin->GetParameter(5));
+	 fcoin->SetParameter(6,fcoin->GetParameter(6));
+	 fcoin->SetParameter(7,fcoin->GetParameter(7));
 	 fcoin->SetParameter(8,16000.);//pi scale
 	 fcoin->SetParLimits(8,0.,100000.);//pi scale
 	 fcoin->SetParameter(9,3.18);
@@ -607,8 +613,8 @@ cout<<"Entries: "<<ENum<<endl;
 	 fcoin->SetParameter(16,2000.);//p scale
 	 fcoin->SetParLimits(16,0.,100000.);//p scale
 	 fcoin->SetParameter(17,-7.9);
-	 fcoin->FixParameter(18,proton_par2);
-	 fcoin->FixParameter(19,proton_par3);
+	 fcoin->SetParameter(18,proton_par2);
+	 fcoin->SetParameter(19,proton_par3);
 
 	 hcoin->Fit("fcoin","","",-20.,20.);
 	 cout<<"%%%%%Information%%%%%"<<endl;
@@ -641,7 +647,8 @@ cout<<"Entries: "<<ENum<<endl;
 //
 		TCanvas *c2 = new TCanvas("c2", "c2", 800, 800);
 		hcoin_piwobg->Draw("");
-		fcoin_firstp->Draw("same");
+		fcoin_first->SetLineColor(kPink);
+		fcoin_first->Draw("same");
 		TCanvas *c3 = new TCanvas("c3", "c3", 800, 800);
 		c3->SetLogy(0);
 		TH1 *frame = c3->DrawFrame(-20.,1.,20.,2000.);
@@ -726,7 +733,7 @@ cout<<"%%%%%%%%%%%%%%%%%%%%"<<endl;
 	 TF1 *fcoin_best= new TF1("fcoin_best",fcoin_total,-20.,100.,20);
 	 fcoin_best->SetNpx(20000);
 	 fcoin_best->SetParameter(0,200.);//acc
-	 fcoin_best->SetParameter(1,1.);//
+	 fcoin_best->FixParameter(1,0.);//
 	 fcoin_best->FixParameter(2,pion_best_par2);//
 	 fcoin_best->FixParameter(3,pion_best_par3);//
 	 fcoin_best->SetParameter(4,2.012);//shift
@@ -770,14 +777,14 @@ cout<<"%%%%%%%%%%%%%%%%%%%%"<<endl;
 	 fcoin_best->ReleaseParameter(17);
 	 fcoin_best->ReleaseParameter(18);
 	 fcoin_best->ReleaseParameter(19);
-	 fcoin_best->FixParameter(0,fcoin_best->GetParameter(0));
-	 fcoin_best->FixParameter(1,fcoin_best->GetParameter(1));
-	 fcoin_best->FixParameter(2,fcoin_best->GetParameter(2));
-	 fcoin_best->FixParameter(3,fcoin_best->GetParameter(3));
-	 fcoin_best->FixParameter(4,fcoin_best->GetParameter(4));
-	 fcoin_best->FixParameter(5,fcoin_best->GetParameter(5));
-	 fcoin_best->FixParameter(6,fcoin_best->GetParameter(6));
-	 fcoin_best->FixParameter(7,fcoin_best->GetParameter(7));
+	 fcoin_best->SetParameter(0,fcoin_best->GetParameter(0));
+	 fcoin_best->SetParameter(1,fcoin_best->GetParameter(1));
+	 fcoin_best->SetParameter(2,fcoin_best->GetParameter(2));
+	 fcoin_best->SetParameter(3,fcoin_best->GetParameter(3));
+	 fcoin_best->SetParameter(4,fcoin_best->GetParameter(4));
+	 fcoin_best->SetParameter(5,fcoin_best->GetParameter(5));
+	 fcoin_best->SetParameter(6,fcoin_best->GetParameter(6));
+	 fcoin_best->SetParameter(7,fcoin_best->GetParameter(7));
 	 fcoin_best->SetParameter(8,16000.);//pi scale
 	 fcoin_best->SetParLimits(8,0.,100000.);//pi scale
 	 fcoin_best->SetParameter(9,3.18);
@@ -794,8 +801,8 @@ cout<<"%%%%%%%%%%%%%%%%%%%%"<<endl;
 	 fcoin_best->SetParameter(16,2000.);//p scale
 	 fcoin_best->SetParLimits(16,0.,100000.);//p scale
 	 fcoin_best->SetParameter(17,-7.9);
-	 fcoin_best->FixParameter(18,proton_best_par2);
-	 fcoin_best->FixParameter(19,proton_best_par3);
+	 fcoin_best->SetParameter(18,proton_best_par2);
+	 fcoin_best->SetParameter(19,proton_best_par3);
 
 	 hcoin_best->Fit("fcoin_best","","",-20.,20.);
 	 cout<<"%%%%%Information%%%%%"<<endl;
@@ -907,7 +914,7 @@ cout<<"%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 	 TF1 *fcoin_new= new TF1("fcoin_new",fcoin_total,-20.,100.,20);
 	 fcoin_new->SetNpx(20000);
 	 fcoin_new->SetParameter(0,400.);//acc
-	 fcoin_new->SetParameter(1,1.);//
+	 fcoin_new->FixParameter(1,0.);//
 	 fcoin_new->FixParameter(2,pion_new_par2);//
 	 fcoin_new->FixParameter(3,pion_new_par3);//
 	 fcoin_new->SetParameter(4,2.012);//shift
@@ -951,14 +958,14 @@ cout<<"%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 	 fcoin_new->ReleaseParameter(17);
 	 fcoin_new->ReleaseParameter(18);
 	 fcoin_new->ReleaseParameter(19);
-	 fcoin_new->FixParameter(0,fcoin_new->GetParameter(0));
-	 fcoin_new->FixParameter(1,fcoin_new->GetParameter(1));
-	 fcoin_new->FixParameter(2,fcoin_new->GetParameter(2));
-	 fcoin_new->FixParameter(3,fcoin_new->GetParameter(3));
-	 fcoin_new->FixParameter(4,fcoin_new->GetParameter(4));
-	 fcoin_new->FixParameter(5,fcoin_new->GetParameter(5));
-	 fcoin_new->FixParameter(6,fcoin_new->GetParameter(6));
-	 fcoin_new->FixParameter(7,fcoin_new->GetParameter(7));
+	 fcoin_new->SetParameter(0,fcoin_new->GetParameter(0));
+	 fcoin_new->SetParameter(1,fcoin_new->GetParameter(1));
+	 fcoin_new->SetParameter(2,fcoin_new->GetParameter(2));
+	 fcoin_new->SetParameter(3,fcoin_new->GetParameter(3));
+	 fcoin_new->SetParameter(4,fcoin_new->GetParameter(4));
+	 fcoin_new->SetParameter(5,fcoin_new->GetParameter(5));
+	 fcoin_new->SetParameter(6,fcoin_new->GetParameter(6));
+	 fcoin_new->SetParameter(7,fcoin_new->GetParameter(7));
 	 fcoin_new->SetParameter(8,16000.);//pi scale
 	 fcoin_new->SetParLimits(8,0.,100000.);//pi scale
 	 fcoin_new->SetParameter(9,3.18);
@@ -975,8 +982,8 @@ cout<<"%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 	 fcoin_new->SetParameter(16,2000.);//p scale
 	 fcoin_new->SetParLimits(16,0.,100000.);//p scale
 	 fcoin_new->SetParameter(17,-7.9);
-	 fcoin_new->FixParameter(18,proton_new_par2);
-	 fcoin_new->FixParameter(19,proton_new_par3);
+	 fcoin_new->SetParameter(18,proton_new_par2);
+	 fcoin_new->SetParameter(19,proton_new_par3);
 
 	 hcoin_new->Fit("fcoin_new","","",-20.,20.);
 	 cout<<"%%%%%Information%%%%%"<<endl;
@@ -1085,7 +1092,7 @@ cout<<"%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 	 TF1 *fcoin_strict= new TF1("fcoin_strict",fcoin_total,-20.,100.,20);
 	 fcoin_strict->SetNpx(20000);
 	 fcoin_strict->SetParameter(0,200.);//acc
-	 fcoin_strict->SetParameter(1,1.);//
+	 fcoin_strict->FixParameter(1,0.);//
 	 fcoin_strict->FixParameter(2,pion_strict_par2);//
 	 fcoin_strict->FixParameter(3,pion_strict_par3);//
 	 fcoin_strict->SetParameter(4,2.012);//shift
@@ -1129,14 +1136,14 @@ cout<<"%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 	 fcoin_strict->ReleaseParameter(17);
 	 fcoin_strict->ReleaseParameter(18);
 	 fcoin_strict->ReleaseParameter(19);
-	 fcoin_strict->FixParameter(0,fcoin_strict->GetParameter(0));
-	 fcoin_strict->FixParameter(1,fcoin_strict->GetParameter(1));
-	 fcoin_strict->FixParameter(2,fcoin_strict->GetParameter(2));
-	 fcoin_strict->FixParameter(3,fcoin_strict->GetParameter(3));
-	 fcoin_strict->FixParameter(4,fcoin_strict->GetParameter(4));
-	 fcoin_strict->FixParameter(5,fcoin_strict->GetParameter(5));
-	 fcoin_strict->FixParameter(6,fcoin_strict->GetParameter(6));
-	 fcoin_strict->FixParameter(7,fcoin_strict->GetParameter(7));
+	 fcoin_strict->SetParameter(0,fcoin_strict->GetParameter(0));
+	 fcoin_strict->SetParameter(1,fcoin_strict->GetParameter(1));
+	 fcoin_strict->SetParameter(2,fcoin_strict->GetParameter(2));
+	 fcoin_strict->SetParameter(3,fcoin_strict->GetParameter(3));
+	 fcoin_strict->SetParameter(4,fcoin_strict->GetParameter(4));
+	 fcoin_strict->SetParameter(5,fcoin_strict->GetParameter(5));
+	 fcoin_strict->SetParameter(6,fcoin_strict->GetParameter(6));
+	 fcoin_strict->SetParameter(7,fcoin_strict->GetParameter(7));
 	 fcoin_strict->SetParameter(8,16000.);//pi scale
 	 fcoin_strict->SetParLimits(8,0.,100000.);//pi scale
 	 fcoin_strict->SetParameter(9,3.18);
@@ -1153,8 +1160,8 @@ cout<<"%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 	 fcoin_strict->SetParameter(16,2000.);//p scale
 	 fcoin_strict->SetParLimits(16,0.,100000.);//p scale
 	 fcoin_strict->SetParameter(17,-7.9);
-	 fcoin_strict->FixParameter(18,proton_strict_par2);
-	 fcoin_strict->FixParameter(19,proton_strict_par3);
+	 fcoin_strict->SetParameter(18,proton_strict_par2);
+	 fcoin_strict->SetParameter(19,proton_strict_par3);
 
 	 hcoin_strict->Fit("fcoin_strict","","",-20.,20.);
 	 cout<<"%%%%%Information%%%%%"<<endl;
@@ -1202,5 +1209,13 @@ cout<<"%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 		fcoin_pi_strict->Draw("same");
 		fcoin_k_strict->Draw("same");
 		fcoin_p_strict->Draw("same");
+		TCanvas *c7 = new TCanvas("c7", "c7", 800, 800);
+		hcoin_piwobg->Draw("");
+		fcoin_first->SetLineColor(kPink);
+		fcoin_first->Draw("same");
+		TCanvas *c8 = new TCanvas("c8", "c8", 800, 800);
+		hcoin_pwobg->Draw("");
+		fcoin_firstp->SetLineColor(kPink);
+		fcoin_firstp->Draw("same");
 
 }//fit

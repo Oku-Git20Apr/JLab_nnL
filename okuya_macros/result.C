@@ -150,7 +150,7 @@ cout << "Output pdf file name is " << pdfname << endl;
   
   TFile *file = new TFile("h2all.root","read");//input file of all H2 run(default: h2all4.root)
 	//ACCBGの引き算はmea_hist.ccから
-  TFile *file_mea = new TFile("bgmea6.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
+  TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea6.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
   double nbunch = 600.;//effetive bunches (6 bunches x 5 mixtures)
  // TTree *tree_old = (TTree*)file->Get("tree_out");
 //cout<<"Please wait a moment. CloneTree() is working..."<<endl;
@@ -259,7 +259,7 @@ cout << "Param file : " << daq_file.c_str() << endl;
  int bin_mm=(max_mm-min_mm)/0.001; //Counts/2 MeV
  bin_mm=(int)bin_mm;
  //const double fit_min_mm=-0.006;
- const double fit_min_mm=-0.02;
+ const double fit_min_mm=-0.01;
  const double fit_max_mm=0.12;
  const int fit_bin_mm = (fit_max_mm-fit_min_mm)/0.001;
  const double fit_bin_width = (fit_max_mm-fit_min_mm)/fit_bin_mm;

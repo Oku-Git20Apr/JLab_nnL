@@ -23,7 +23,7 @@ void kinematics(){
 	string pdfname = "kinematics.pdf";
 cout << "Output pdf file name is " << pdfname << endl;
   
-  TFile *file = new TFile("h2all_test.root","read");//input file (default: h2all1.root)
+  TFile *file = new TFile("h2all.root","read");//input file (default: h2all1.root)
   TFile *file_new = new TFile("kinematics.root","recreate");//new root
  // TTree *tree_old = (TTree*)file->Get("tree_out");
 //cout<<"Please wait a moment. CloneTree() is working..."<<endl;
@@ -156,25 +156,58 @@ const double PI=3.14159265359;
   TH1F* hm4   = (TH1F*)hm1->Clone("hm4");
 
   TH1D* h_theta_ee = new TH1D("h_theta_ee", "theta_ee",1000,0.1,0.35);
+  h_theta_ee->SetLineColor(kAzure);
   TH1D* h_phi_ee = new TH1D("h_phi_ee", "phi_ee",1000,0.,PI);
   TH1D* h_theta_ek = new TH1D("h_theta_ek", "theta_ek",1000,0.1,0.35);
   TH1D* h_phi_ek = new TH1D("h_phi_ek", "phi_ek",1000,3*PI/2-1.,3*PI/2+1.);
   TH1D* h_theta_g = new TH1D("h_theta_g", "theta_g",1000,0.1,0.35);
   TH1D* h_phi_g = new TH1D("h_phi_g", "phi_g",1000,3*PI/2-1.,3*PI/2+1.);
-  TH1D* h_theta_gk_lab = new TH1D("h_theta_gk_lab", "theta_gk_lab",1000,0.,0.2);
-  TH1D* h_theta_gk_cm = new TH1D("h_theta_gk_cm", "theta_gk_cm",1000,0.,0.3);
-  TH1D* h_cos_gk_lab = new TH1D("h_cos_gk_lab", "cos_gk_lab",1000,0.97,1.0);
-  TH1D* h_cos_gk_cm = new TH1D("h_cos_gk_cm", "cos_gk_cm",1000,0.8,1.0);
-  TH1D* h_mom_g = new TH1D("h_mom_g", "mom_g",1000,1.8,2.5);
-  TH1D* h_qsq = new TH1D("h_qsq", "Q^2",1000,0.,0.8);
-  TH1D* h_w = new TH1D("h_w", "W",1000,0.,0.8);
+  TH1D* h_theta_gk_lab = new TH1D("h_theta_gk_lab", "#theta_{#gamma K}^{lab}",70,0.,7.);
+  h_theta_gk_lab->GetXaxis()->SetTitle("#theta_{#gamma K}^{lab} [deg]");
+  h_theta_gk_lab->GetYaxis()->SetTitle("Counts");
+  h_theta_gk_lab->SetLineColor(kAzure);
+  TH1D* h_theta_gk_cm = new TH1D("h_theta_gk_cm", "#theta_{#gamma K}^{CM}",180,0.,18.);
+  h_theta_gk_cm->GetXaxis()->SetTitle("#theta_{#gamma K}^{CM} [deg]");
+  h_theta_gk_cm->GetYaxis()->SetTitle("Counts");
+  h_theta_gk_cm->SetLineColor(kAzure);
+  TH1D* h_cos_gk_lab = new TH1D("h_cos_gk_lab", "cos(#theta_{#gamma K}^{lab})",100,0.97,1.0);
+  h_cos_gk_lab->GetXaxis()->SetTitle("cos(#theta_{#gamma K}^{lab})");
+  h_cos_gk_lab->GetYaxis()->SetTitle("Counts");
+  h_cos_gk_lab->SetLineColor(kAzure);
+  TH1D* h_cos_gk_cm = new TH1D("h_cos_gk_cm", "cos(#theta_{#gamma K}^{CM})",100,0.8,1.0);
+  h_cos_gk_cm->GetXaxis()->SetTitle("cos(#theta_{#gamma K}^{CM})");
+  h_cos_gk_cm->GetYaxis()->SetTitle("Counts");
+  h_cos_gk_cm->SetLineColor(kAzure);
+  TH1D* h_mom_g = new TH1D("h_mom_g", "mom_g",1000,2.1,2.5);
+  h_mom_g->SetLineColor(kAzure);
+  TH1D* h_qsq = new TH1D("h_qsq", "Q^{2}",150,0.2,0.8);
+  h_qsq->GetXaxis()->SetTitle("Q^{2} [(GeV/c)^{2}]");
+  h_qsq->GetYaxis()->SetTitle("Counts");
+  h_qsq->SetLineColor(kAzure);
+  TH1D* h_w = new TH1D("h_w", "W",100,2.05,2.25);
+  h_w->GetXaxis()->SetTitle("W [GeV]");
+  h_w->GetYaxis()->SetTitle("Counts");
+  h_w->SetLineColor(kAzure);
+  TH1D* h_labtocm = new TH1D("h_labtocm", "labtocm",100,0.0,0.25);
+  h_labtocm->GetXaxis()->SetTitle("(d#sigma/d#Omega)_{CM}/(d#sigma/d#Omega)_{lab}");
+  h_labtocm->GetYaxis()->SetTitle("Counts");
+  h_labtocm->SetLineColor(kAzure);
+  TH2D* h_qw = new TH2D("h_qw", "Q^{2}:W" ,20,2.05,2.25,60,0.2,0.8);
+  h_qw->GetXaxis()->SetTitle("W [GeV]");
+  h_qw->GetYaxis()->SetTitle("Q^{2} [(GeV/c)^{2}]");
   TH2D* h_thph_ee = new TH2D("h_thph_ee", "theta_ee:phi_ee" ,1000,0.1,0.35,1000,PI/2-1.,PI/2+1.);
   TH2D* h_thph_ek = new TH2D("h_thph_ek", "theta_ek:phi_ek" ,1000,0.1,0.35,1000,3*PI/2-1.,3*PI/2+1.);
   TH2D* h_thph_g = new TH2D("h_thph_g", "theta_g:phi_g" ,1000,0.1,0.35,1000,3*PI/2-1.,3*PI/2+1.);
-  TH1D* h_pR_lab = new TH1D("h_pR_lab", "h_pR_lab" ,1000,1.7,1.95);
-  TH1D* h_pR_cm = new TH1D("h_pR_cm", "h_pR_cm" ,1000,0.0,1.0);
-  TH1D* h_pL_cm = new TH1D("h_pL_cm", "h_pL_cm" ,1000,0.0,1.5);
-  TH1D* h_pB_cm = new TH1D("h_pB_cm", "h_pB_cm" ,1000,1.0,2.5);
+  TH1D* h_pR_lab = new TH1D("h_pR_lab", "p_{K}^{lab}" ,100,1.7,1.95);
+  h_pR_lab->GetXaxis()->SetTitle("p_{K}^{lab} [GeV/c]");
+  h_pR_lab->GetYaxis()->SetTitle("Counts");
+  h_pR_lab->SetLineColor(kAzure);
+  TH1D* h_pR_cm = new TH1D("h_pR_cm", "p_{K}^{CM}" ,50,0.5,0.75);
+  h_pR_cm->GetXaxis()->SetTitle("p_{K}^{CM} [GeV/c]");
+  h_pR_cm->GetYaxis()->SetTitle("Counts");
+  h_pR_cm->SetLineColor(kAzure);
+  TH1D* h_pL_cm = new TH1D("h_pL_cm", "h_pL_cm" ,1000,0.8,1.2);
+  TH1D* h_pB_cm = new TH1D("h_pB_cm", "h_pB_cm" ,1000,1.6,2.0);
   TH2D* h2_pR_lab_cm = new TH2D("h_pR_lab_cm", "h_pR_lab_cm" ,1000,1.7,1.95,1000,0.0,1.0);
   
   h1 ->SetLineColor(2);
@@ -204,8 +237,11 @@ const double PI=3.14159265359;
   double mt = Mp;//target mass
   double B_p, L_p, R_p;//Momentum
 
-  int ENum=0;
-  ENum = tree->GetEntries();
+  //int ENum=0;
+  //ENum = tree->GetEntries();
+  tree->Draw(">>elist" , "fabs(ct_orig)<1.006");//ctsum (does NOT dintinguish #track)
+  TEventList *elist = (TEventList*)gROOT->FindObject("elist");
+  int ENum = elist->GetN(); 
 cout<<"Entries: "<<ENum<<endl;
   int time_div=ENum/25;
   if(ENum<100000)time_div=10000;
@@ -221,7 +257,8 @@ cout<<"Entries: "<<ENum<<endl;
 	time(&start);
 
   for(int i=0;i<ENum;i++){
-	    tree->GetEntry(i);
+	    //tree->GetEntry(i);
+	    tree->GetEntry(elist->GetEntry(i));
 
     if(i%time_div==0){
       end = time(NULL);
@@ -234,6 +271,8 @@ cout<<"Entries: "<<ENum<<endl;
       //int NLtr = (int)L_tr_n;  if(NLtr>MAX) NLtr = MAX;
       //int NRtr = (int)R_tr_n;  if(NRtr>MAX) NRtr = MAX;
       
+	  NLtr = 1;
+	  NRtr = 1;
       for(int lt=0;lt<NLtr;lt++){
         L_Tr = L_FP = false;
         if( L_tr_chi2[lt]<0.01 ) L_Tr = true;
@@ -253,7 +292,7 @@ cout<<"Entries: "<<ENum<<endl;
 	
 
 
-	if(fabs(ct)<1)ct_cut=true;
+	if(fabs(ct)<1.006)ct_cut=true;
 	else ct_cut=false;
     if(abs(ct+5.0*rf_bunch)<1.0) mix_region1 = true;
     else mix_region1 = false;
@@ -265,8 +304,8 @@ cout<<"Entries: "<<ENum<<endl;
     else mix_region4 = false;
     if(abs(ct+4.0*rf_bunch)<1.0) mix_region5 = true;
     else mix_region5 = false;
-	//if(fabs(L_tr_vz[lt]-R_tr_vz[rt])<0.025&&fabs(R_tr_vz[rt]+L_tr_vz[lt])<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
-	if(fabs(L_tr_vz[lt]-R_tr_vz[rt])<0.025&&fabs(R_tr_vz[rt]+L_tr_vz[lt])<0.2&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
+	if(fabs(L_tr_vz[lt]-R_tr_vz[rt])<0.025&&fabs(R_tr_vz[rt]+L_tr_vz[lt])<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
+	//if(fabs(L_tr_vz[lt]-R_tr_vz[rt])<0.025&&fabs(R_tr_vz[rt]+L_tr_vz[lt])<0.2&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
 	else event_selection=false;
 
 	    //===== Right Hand Coordinate ====//
@@ -328,7 +367,9 @@ cout<<"Entries: "<<ENum<<endl;
 		double theta_ek = R_4vec.Theta();
 		//double phi_L = atan((phi*cos(phi0)+sin(phi0))/theta);//LHRS frame
 		double phi_ee = L_4vec.Phi();//original frame
+//cout<<"phi_ee="<<phi_ee<<endl;
 		double phi_ek = R_4vec.Phi()+2*PI;//original frame
+//cout<<"phi_ek="<<phi_ek<<endl;
 
 		G_4vec = B_4vec - L_4vec;
 		//double mom_g = G_4vec.Rho();
@@ -336,9 +377,22 @@ cout<<"Entries: "<<ENum<<endl;
 		double Qsq = G_4vec.M()*G_4vec.M();
 		double phi_g = G_4vec.Phi()+2*PI;
 		double theta_g = G_4vec.Theta();
+//cout<<"theta_gk="<<(theta_ek-theta_g)*180./PI<<endl;
 		double theta_gk_lab = G_4vec.Angle(R_4vec.Vect());
+//cout<<"theta_gk_lab(TLorentz)="<<theta_gk_lab*180./PI<<endl;
 		double omega=G_4vec.E();
+		double pY = sqrt((omega+Mp-sqrt(pR*pR+MK*MK))*(omega+Mp-sqrt(pR*pR+MK*MK))-ML*ML);
+		double W = sqrt((omega+Mp)*(omega+Mp)-mom_g*mom_g);
+		//double theta_gk_lab_test = acos((mom_g*mom_g+pR*pR-pY*pY)/(2.*pR*mom_g));
+		double theta_eg_lab = acos((B_E-L_E*(1.-Qsq/2./B_E/L_E))/mom_g);
+//cout<<"theta_eg_lab="<<theta_eg_lab*180./PI<<endl;
+		double theta_gk_lab_test = 13.2*PI/180.-theta_eg_lab;
+//cout<<"theta_gk_lab="<<theta_gk_lab_test*180./PI<<endl;
 		double beta=mom_g/(omega+Mp);
+		double ER=sqrt(pR*pR+MK*MK);
+		double gamma=1./sqrt(1-beta*beta);
+		double theta_gk_cm_test = atan((pR*sin(theta_gk_lab_test))/(-1.*gamma*beta*ER+gamma*pR*cos(theta_gk_lab_test)));
+//cout<<"theta_gk_cm="<<theta_gk_cm_test*180./PI<<endl;
 	
 		TVector3 boost;
 		TLorentzVector GT_4vec;
@@ -352,19 +406,20 @@ cout<<"Entries: "<<ENum<<endl;
 		double pL_cm=sqrt(L_4vec.Px()*L_4vec.Px()+L_4vec.Py()*L_4vec.Py()+L_4vec.Pz()*L_4vec.Pz());
 		double pB_cm=sqrt(B_4vec.Px()*B_4vec.Px()+B_4vec.Py()*B_4vec.Py()+B_4vec.Pz()*B_4vec.Pz());
 
+//cout<<"theta_gk_cm(TLorentz)="<<theta_gk_cm*180./PI<<endl;
 		double n = MK/ML;
 		double p_cm=sqrt(GT_4vec.Px()*GT_4vec.Px()+GT_4vec.Py()*GT_4vec.Py()+GT_4vec.Pz()*GT_4vec.Pz());
 		double E_cm = GT_4vec.E();
-beta=2.3/(2.2+Mp);
-pR_cm=0.65;
-theta_gk_cm=0.12;
-		double gamma=1./sqrt(1-beta*beta);
+//beta=2.3/(2.2+Mp);
+//pR_cm=0.65;
+//theta_gk_cm=0.12;
+		//double gamma=1./sqrt(1-beta*beta);
 		double ER_cm=sqrt(pR_cm*pR_cm+MK*MK);
 //cout<<"beta="<<beta<<endl;
 //cout<<"gamma="<<gamma<<endl;
 
 		double labtocm = (gamma*pR_cm*pR_cm*(pR_cm*cos(theta_gk_cm)+beta*ER_cm))/(pow(sqrt(pR_cm*pR_cm*sin(theta_gk_cm)*sin(theta_gk_cm)+gamma*gamma*(pR_cm*cos(theta_gk_cm)+beta*ER_cm)*(pR_cm*cos(theta_gk_cm)+beta*ER_cm)),3.));
-cout<<"labtocm="<<labtocm<<endl;
+//cout<<"labtocm="<<labtocm<<endl;
 		double tan_lab1 = sin(theta_gk_cm)/(gamma*(cos(theta_gk_cm)+beta*sqrt(MK*MK+pR_cm*pR_cm)/pR_cm));
 		double tan_lab2 = sin(theta_gk_cm)/(gamma*(cos(theta_gk_cm)+(omega*Mp-Qsq*Qsq)/(omega*Mp+Mp*Mp)));
 		//if(tan_lab1!=tan_lab2)cout<<"tan1="<<atan(tan_lab1)<<", tan2="<<atan(tan_lab2)<<"theta_gk_lab="<<theta_gk_lab<<endl;
@@ -383,8 +438,11 @@ cout<<"labtocm="<<labtocm<<endl;
 		h_thph_g->Fill(theta_g,phi_g);
 		h_mom_g->Fill(mom_g);
 		h_qsq->Fill(Qsq);
-		h_theta_gk_lab->Fill(theta_gk_lab);
-		h_theta_gk_cm->Fill(theta_gk_cm);
+		h_w->Fill(W);
+		h_labtocm->Fill(labtocm);
+		h_qw->Fill(W,Qsq);
+		h_theta_gk_lab->Fill(theta_gk_lab*180./PI);
+		h_theta_gk_cm->Fill(theta_gk_cm*180./PI);
 		h_cos_gk_lab->Fill(cos(theta_gk_lab));
 		h_cos_gk_cm->Fill(cos(theta_gk_cm));
 		h_pR_lab->Fill(pR);
@@ -444,9 +502,15 @@ cout<<"labtocm="<<labtocm<<endl;
 	h_pR_cm->Draw("");
 	c7->cd(3);
 	//h2_pR_lab_cm->Draw("colz");
-	h_pL_cm->Draw("");
+	//h_pL_cm->Draw("");
 	c7->cd(4);
-	h_pB_cm->Draw("");
+	//h_pB_cm->Draw("");
+	TCanvas* c8 = new TCanvas("c8","c8");
+	h_w->Draw("");
+	TCanvas* c9 = new TCanvas("c9","c9");
+	h_qw->Draw("colz");
+	TCanvas* c10 = new TCanvas("c10","c10");
+	h_labtocm->Draw("");
 
 /*--- Print ---*/
 cout << "Print is starting" << endl;
@@ -460,6 +524,11 @@ cout << "Print is starting" << endl;
 	c7->Print(Form("%s",pdfname.c_str()));
 	c7->Print(Form("%s]",pdfname.c_str()));
 
+	c5->Print("Qsq.pdf");
+	c6->Print("theta_gk.pdf");
+	c7->Print("CM.pdf");
+	c8->Print("W.pdf");
+	c9->Print("QsqW.pdf");
 
 cout << "Well done!" << endl;
 }//kinematics
