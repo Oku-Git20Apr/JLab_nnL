@@ -161,7 +161,7 @@ cout << "Output pdf file name is " << pdfname << endl;
 
 //---  DAQ Efficiency ---//
 //H2 run (run111157~111222 & run111480~542)
-	string daq_file = "./daq.dat";//DAQ Efficiency from ELOG
+	string daq_file = "./information/daq.dat";//DAQ Efficiency from ELOG
 	int runnum;
 	double daq_eff;
 	double daq_table[600];
@@ -190,6 +190,31 @@ cout << "Param file : " << daq_file.c_str() << endl;
 		daq_table[runnum] = daq_eff;
 	}
 
+//----------------HRS-R Acceptance-----------------//
+
+	string AcceptanceR_table = "./information/RHRS_SIMC.dat";//Acceptance Table (SIMC)
+	int RHRS_bin;
+	double RHRS_SIMC;
+	double RHRS_table[150];//1.8<pe[GeV/c]<2.4, 150 partition --> 1bin=4MeV/c
+	double RHRS_total=0.;
+	string buf2;
+
+/*----- HRS-R Acceptance Table -----*/
+	ifstream ifp2(AcceptanceR_table.c_str(),ios::in);
+	if (ifp2.fail()){ cout << "Failed" << endl; exit(1);}
+cout << "Param file : " << AcceptanceR_table.c_str() << endl;
+	while(1){
+		getline(ifp2,buf2);
+		if(buf2[0]=='#'){continue;}
+		if(ifp2.eof())break;
+		stringstream sbuf2(buf2);
+		sbuf2 >> RHRS_bin >> RHRS_SIMC;
+		cout << RHRS_bin << ", " << RHRS_SIMC <<endl;
+
+		RHRS_table[RHRS_bin-1] = RHRS_SIMC*0.001;//sr
+		RHRS_total+=RHRS_SIMC;
+	}
+	cout<<"HRS-R Acceptance (average)="<<RHRS_total/(double)RHRS_bin<<endl;
 
 
 //----------------Mistake-----------------//
@@ -649,10 +674,14 @@ cout<<"Entries: "<<ENum<<endl;
 		//if(Ng!=0.)cs = pow(10.,33.)/(ntar_h2*efficiency*RHRS*Ng);//[nb/sr]
 		//else cs=0.;
 		//}else{cs=0.;} 
+		int kbin = (int)((L_mom-1.8)/0.004);
+		if(kbin>=0 &&kbin<150){
+		RHRS = RHRS_table[kbin];//
 		effDAQ = daq_table[nrun-111000];
 		if(effDAQ==0.2)cout<<"Starange!!! DAQ Eff. of run"<<nrun<<" does not exist."<<endl;
 		efficiency = effAC*effZ*effFP*effch2*effct*effDAQ*efftr*effK;
-		cs = pow(10.,33.)/(ntar_h2*efficiency*RHRS*Ng);//[nb/sr]
+		if(RHRS!=0.)cs = pow(10.,33.)/(ntar_h2*efficiency*RHRS*Ng);//[nb/sr]
+		}else{cs=0.;}
 		double cs_temp = cs*labtocm;
 		//cout<<"Ng="<<Ng<<endl;
 		//cout<<"cs="<<cs<<endl;
