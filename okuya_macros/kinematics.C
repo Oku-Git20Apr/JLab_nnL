@@ -192,6 +192,9 @@ const double PI=3.14159265359;
   h_labtocm->GetXaxis()->SetTitle("(d#sigma/d#Omega)_{CM}/(d#sigma/d#Omega)_{lab}");
   h_labtocm->GetYaxis()->SetTitle("Counts");
   h_labtocm->SetLineColor(kAzure);
+  TH2D* h_z_yfp = new TH2D("h_z_yfp", "z vs y(FP)" ,60,-0.06,0.06,60,-0.15,0.15);
+  TH2D* h_z_phi = new TH2D("h_z_phi", "z vs phi" ,60,-0.06,0.06,60,-0.15,0.15);
+  TH2D* h_yfp_phi = new TH2D("h_yfp_phi", "y(FP) vs phi" ,60,-0.06,0.06,60,-0.06,0.06);
   TH2D* h_qw = new TH2D("h_qw", "Q^{2}:W" ,20,2.05,2.25,60,0.2,0.8);
   h_qw->GetXaxis()->SetTitle("W [GeV]");
   h_qw->GetYaxis()->SetTitle("Q^{2} [(GeV/c)^{2}]");
@@ -451,6 +454,11 @@ cout<<"Entries: "<<ENum<<endl;
 		h_pL_cm->Fill(pL_cm);
 		h_pB_cm->Fill(pB_cm);
 		}
+		if(fabs(L_tr_vz[lt]-R_tr_vz[rt])<0.025&&fabs(L_tr_vz[lt]+R_tr_vz[rt])<0.2){
+		h_z_yfp->Fill(R_tr_y[rt],R_tr_vz[rt]); 
+  		h_z_phi->Fill(R_tr_ph[rt],R_tr_vz[rt]); 
+		h_yfp_phi->Fill(R_tr_y[rt],R_tr_ph[rt]); 
+		}
 
 		}//NRtr
 	}//NLtr
@@ -511,6 +519,14 @@ cout<<"Entries: "<<ENum<<endl;
 	h_qw->Draw("colz");
 	TCanvas* c10 = new TCanvas("c10","c10");
 	h_labtocm->Draw("");
+	TCanvas* c11 = new TCanvas("c11","c11");
+	c11->Divide(1,2);
+	c11->cd(1);
+	h_z_yfp->Draw("colz");
+	c11->cd(2);
+	h_z_phi->Draw("colz");
+	TCanvas* c12 = new TCanvas("c12","c12");
+	h_yfp_phi->Draw("colz");
 
 /*--- Print ---*/
 cout << "Print is starting" << endl;

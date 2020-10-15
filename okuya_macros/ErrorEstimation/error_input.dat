@@ -1,0 +1,30 @@
+#error estimation
+#1 --> nominator
+#2 --> denominator
+#
+# by Clopper-Pearson
+#
+#flag | Eff_label | value
+1 1 2406.46 #best 
+2 1 2948.41 #noZ
+1 2 2406.46 #best 
+2 2 2979.11 #noAC
+1 3 2406.46 #best 
+2 3 2440.02 #noCT
+1 5 1722.54 #strict 
+2 5 2979.11 #noAC
+1 6 1722.54 #strict 
+2 6 1793.05 #noCT
+#
+#
+##Sigma0
+1 7 366.092 #best 
+2 7 412.345 #noZ
+1 8 366.092 #best 
+2 8 430.077 #noAC
+1 9 366.092 #best 
+2 9 367.529 #noCT
+1 10 259.79 #strict 
+2 10 430.077 #noAC
+1 11 259.79 #strict 
+2 11 268.212 #noCT

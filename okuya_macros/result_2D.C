@@ -3,9 +3,10 @@
 //--  Differential Cross Section  --//
 //----------------------------------//
 //
-//K. Okuyama (Sep. 22, 2020)
+//K. Okuyama (Oct. 13, 2020)
 //
-//This is taken over from fit_Lexp.C
+//This is taken over from result.C
+//Use 2D Acceptance Map (Z, pK)
 //No array branch mode 
 
 
@@ -144,7 +145,7 @@ double FMM_Res( double *x, double *par ){
 
 }
 
-void result(){
+void result_2D(){
 	string pdfname = "fitting.pdf";
 cout << "Output pdf file name is " << pdfname << endl;
   
@@ -193,31 +194,119 @@ cout << "Param file : " << daq_file.c_str() << endl;
 
 //----------------HRS-R Acceptance-----------------//
 
-	string AcceptanceR_table = "./information/RHRS_SIMC.dat";//Acceptance Table (SIMC)
 	int RHRS_bin;
 	double RHRS_SIMC;
-	double RHRS_table[150];//1.5<pk[GeV/c]<2.1, 150 partition --> 1bin=4MeV/c
+	double RHRS_table[150][5];//1.5<pk[GeV/c]<2.1, 150 partition --> 1bin=4MeV/c
 	double RHRS_total=0.;
 	int RHRS_total_bin=0;
-	string buf2;
+/*----- -10 < z < -6 -----*/
+	string AcceptanceR_table_z1 = "./information/RHRS_SIMC_z1.dat";//Acceptance Table (SIMC)
+	string buf_z1;
 
-/*----- HRS-R Acceptance Table -----*/
-	ifstream ifp2(AcceptanceR_table.c_str(),ios::in);
-	if (ifp2.fail()){ cout << "Failed" << endl; exit(1);}
-cout << "Param file : " << AcceptanceR_table.c_str() << endl;
+	ifstream ifp_z1(AcceptanceR_table_z1.c_str(),ios::in);
+	if (ifp_z1.fail()){ cout << "Failed" << endl; exit(1);}
+cout << "Param file : " << AcceptanceR_table_z1.c_str() << endl;
 	while(1){
-		getline(ifp2,buf2);
-		if(buf2[0]=='#'){continue;}
-		if(ifp2.eof())break;
-		stringstream sbuf2(buf2);
-		sbuf2 >> RHRS_bin >> RHRS_SIMC;
-		cout << RHRS_bin << ", " << RHRS_SIMC <<endl;
+		getline(ifp_z1,buf_z1);
+		if(buf_z1[0]=='#'){continue;}
+		if(ifp_z1.eof())break;
+		stringstream sbuf_z1(buf_z1);
+		sbuf_z1 >> RHRS_bin >> RHRS_SIMC;
+		//cout << RHRS_bin << ", " << RHRS_SIMC <<endl;
 
-		RHRS_table[RHRS_bin-1] = RHRS_SIMC*0.001;//sr
+		RHRS_table[RHRS_bin-1][0] = RHRS_SIMC*0.001;//sr
 		RHRS_total+=RHRS_SIMC;
 		if(RHRS_SIMC!=0)RHRS_total_bin++;
 	}
-	cout<<"HRS-R Acceptance (average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
+	cout<<"HRS-R Acceptance (z1 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
+/*----- -6 < z < -2 -----*/
+	string AcceptanceR_table_z2 = "./information/RHRS_SIMC_z2.dat";//Acceptance Table (SIMC)
+	string buf_z2;
+	RHRS_total=0.;
+	RHRS_total_bin=0;
+
+	ifstream ifp_z2(AcceptanceR_table_z2.c_str(),ios::in);
+	if (ifp_z2.fail()){ cout << "Failed" << endl; exit(1);}
+cout << "Param file : " << AcceptanceR_table_z2.c_str() << endl;
+	while(1){
+		getline(ifp_z2,buf_z2);
+		if(buf_z2[0]=='#'){continue;}
+		if(ifp_z2.eof())break;
+		stringstream sbuf_z2(buf_z2);
+		sbuf_z2 >> RHRS_bin >> RHRS_SIMC;
+		//cout << RHRS_bin << ", " << RHRS_SIMC <<endl;
+
+		RHRS_table[RHRS_bin-1][1] = RHRS_SIMC*0.001;//sr
+		RHRS_total+=RHRS_SIMC;
+		if(RHRS_SIMC!=0)RHRS_total_bin++;
+	}
+	cout<<"HRS-R Acceptance (z2 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
+/*----- -2 < z < 2 -----*/
+	string AcceptanceR_table_z3 = "./information/RHRS_SIMC_z3.dat";//Acceptance Table (SIMC)
+	string buf_z3;
+	RHRS_total=0.;
+	RHRS_total_bin=0;
+
+	ifstream ifp_z3(AcceptanceR_table_z3.c_str(),ios::in);
+	if (ifp_z3.fail()){ cout << "Failed" << endl; exit(1);}
+cout << "Param file : " << AcceptanceR_table_z3.c_str() << endl;
+	while(1){
+		getline(ifp_z3,buf_z3);
+		if(buf_z3[0]=='#'){continue;}
+		if(ifp_z3.eof())break;
+		stringstream sbuf_z3(buf_z3);
+		sbuf_z3 >> RHRS_bin >> RHRS_SIMC;
+		//cout << RHRS_bin << ", " << RHRS_SIMC <<endl;
+
+		RHRS_table[RHRS_bin-1][2] = RHRS_SIMC*0.001;//sr
+		RHRS_total+=RHRS_SIMC;
+		if(RHRS_SIMC!=0)RHRS_total_bin++;
+	}
+	cout<<"HRS-R Acceptance (z3 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
+/*----- 2 < z < 6 -----*/
+	string AcceptanceR_table_z4 = "./information/RHRS_SIMC_z4.dat";//Acceptance Table (SIMC)
+	string buf_z4;
+	RHRS_total=0.;
+	RHRS_total_bin=0;
+
+	ifstream ifp_z4(AcceptanceR_table_z4.c_str(),ios::in);
+	if (ifp_z4.fail()){ cout << "Failed" << endl; exit(1);}
+cout << "Param file : " << AcceptanceR_table_z4.c_str() << endl;
+	while(1){
+		getline(ifp_z4,buf_z4);
+		if(buf_z4[0]=='#'){continue;}
+		if(ifp_z4.eof())break;
+		stringstream sbuf_z4(buf_z4);
+		sbuf_z4 >> RHRS_bin >> RHRS_SIMC;
+		//cout << RHRS_bin << ", " << RHRS_SIMC <<endl;
+
+		RHRS_table[RHRS_bin-1][3] = RHRS_SIMC*0.001;//sr
+		RHRS_total+=RHRS_SIMC;
+		if(RHRS_SIMC!=0)RHRS_total_bin++;
+	}
+	cout<<"HRS-R Acceptance (z4 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
+/*----- 6 < z < 10 -----*/
+	string AcceptanceR_table_z5 = "./information/RHRS_SIMC_z5.dat";//Acceptance Table (SIMC)
+	string buf_z5;
+	RHRS_total=0.;
+	RHRS_total_bin=0;
+
+	ifstream ifp_z5(AcceptanceR_table_z5.c_str(),ios::in);
+	if (ifp_z5.fail()){ cout << "Failed" << endl; exit(1);}
+cout << "Param file : " << AcceptanceR_table_z5.c_str() << endl;
+	while(1){
+		getline(ifp_z5,buf_z5);
+		if(buf_z5[0]=='#'){continue;}
+		if(ifp_z5.eof())break;
+		stringstream sbuf_z5(buf_z5);
+		sbuf_z5 >> RHRS_bin >> RHRS_SIMC;
+		//cout << RHRS_bin << ", " << RHRS_SIMC <<endl;
+
+		RHRS_table[RHRS_bin-1][4] = RHRS_SIMC*0.001;//sr
+		RHRS_total+=RHRS_SIMC;
+		if(RHRS_SIMC!=0)RHRS_total_bin++;
+	}
+	cout<<"HRS-R Acceptance (z5 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
 
 
 //----------------Mistake-----------------//
@@ -682,8 +771,15 @@ cout<<"Entries: "<<ENum<<endl;
 		//else cs=0.;
 		//}else{cs=0.;} 
 		int kbin = (int)((R_mom-1.5)/0.004);
-		if(kbin>=0 &&kbin<150){
-		RHRS = RHRS_table[kbin];//
+		int zbin = (int)((((L_tr_vz+R_tr_vz)/2.)-0.1)/0.04);
+		if(event_selection&&ct_cut&&kbin>=0 &&kbin<150){
+		if((L_tr_vz+R_tr_vz)/2.>-0.1&&(L_tr_vz+R_tr_vz)/2.<-0.06)RHRS = RHRS_table[kbin][0];
+		else if((L_tr_vz+R_tr_vz)/2.>-0.06&&(L_tr_vz+R_tr_vz)/2.<-0.02)RHRS = RHRS_table[kbin][1];
+		else if((L_tr_vz+R_tr_vz)/2.>-0.02&&(L_tr_vz+R_tr_vz)/2.<0.02)RHRS = RHRS_table[kbin][2];
+		else if((L_tr_vz+R_tr_vz)/2.>0.02&&(L_tr_vz+R_tr_vz)/2.<0.06)RHRS = RHRS_table[kbin][3];
+		else if((L_tr_vz+R_tr_vz)/2.>0.06&&(L_tr_vz+R_tr_vz)/2.<0.1)RHRS = RHRS_table[kbin][4];
+		else cout<<"Z Error"<<(L_tr_vz+R_tr_vz)/2.<<endl;
+
 		effDAQ = daq_table[nrun-111000];
 		if(effDAQ==0.2)cout<<"Starange!!! DAQ Eff. of run"<<nrun<<" does not exist."<<endl;
 		efficiency = effAC*effZ*effFP*effch2*effct*effDAQ*efftr*effK;
