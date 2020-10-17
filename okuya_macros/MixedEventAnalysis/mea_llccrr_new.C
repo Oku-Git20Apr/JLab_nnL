@@ -9,11 +9,12 @@
 
 void mea_llccrr_new(){
 	string pdfname = "temp.pdf";
-	string rootname= "bgmea_llccrr_new_new.root";
+	string rootname= "bgmea_llccrr_Lsingle.root";
 cout << "Output pdf file name is " << pdfname << endl;
 cout << "Output root file name is " << rootname << endl;
   
-  TFile *file = new TFile("../h2all5.root","read");//input file (default: h2all2.root)
+  TFile *file = new TFile("../h2all_Lsingle.root","read");//input file (default: h2all2.root)
+ // TFile *file = new TFile("../h2all5.root","read");//input file (default: h2all2.root)
   TFile *file_new = new TFile(rootname.c_str(),"recreate");//new root
  // TTree *tree_old = (TTree*)file->Get("tree_out");
 //cout<<"Please wait a moment. CloneTree() is working..."<<endl;
@@ -161,6 +162,19 @@ cout << "Output root file name is " << rootname << endl;
   TH1F* hmm_mixacc_result_zdiff  = new TH1F("hmm_mixacc_result_zdiff","MEA result (Z diff cut)",xbin,xmin,xmax);
   TH1F* hmm_mixacc_result_nocut_forAl  = new TH1F("hmm_mixacc_result_nocut_forAl","ACC (Al (best))",xbin,xmin,xmax);
   TH1F* hmm_mixacc_result_nocut_new_forAl  = new TH1F("hmm_mixacc_result_nocut_new_forAl","ACC (Al (strict))",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_momcut  = new TH1F("hmm_mixacc_result_momcut","MEA result (Mom. cut)",xbin,xmin,xmax);
+/*-------------------*/
+/*--Angle partition--*/
+/*-------------------*/
+  TH1F* hmm_mixacc_result_cm2_1  = new TH1F("hmm_mixacc_result_cm2_1","#theta_{#gamma K}^{CM}<8 deg",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_cm2_2  = new TH1F("hmm_mixacc_result_cm2_2","#theta_{#gamma K}^{CM}>8 deg",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_cm3_1  = new TH1F("hmm_mixacc_result_cm3_1","#theta_{#gamma K}^{CM}<6 deg",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_cm3_2  = new TH1F("hmm_mixacc_result_cm3_2","6<#theta_{#gamma K}^{CM}<10 deg",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_cm3_3  = new TH1F("hmm_mixacc_result_cm3_3","#theta_{#gamma K}^{CM}>10 deg",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_cm4_1  = new TH1F("hmm_mixacc_result_cm4_1","#theta_{#gamma K}^{CM}<5 deg",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_cm4_2  = new TH1F("hmm_mixacc_result_cm4_2","5<#theta_{#gamma K}^{CM}<8 deg",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_cm4_3  = new TH1F("hmm_mixacc_result_cm4_3","8<#theta_{#gamma K}^{CM}<11 deg",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_cm4_4  = new TH1F("hmm_mixacc_result_cm4_4","#theta_{#gamma K}^{CM}>11 deg",xbin,xmin,xmax);
 /*-----------------*/
 /*--RESULT OUTPUT--*/
 /*-----------------*/
@@ -184,6 +198,16 @@ cout << "Output root file name is " << rootname << endl;
   bool event_selection_zdiff = false;
   bool event_selection_nocut = false;
   bool event_selection_nocut_new = false;
+  bool event_selection_momcut = false;
+  bool cm2_angle1_cut=false;
+  bool cm2_angle2_cut=false;
+  bool cm3_angle1_cut=false;
+  bool cm3_angle2_cut=false;
+  bool cm3_angle3_cut=false;
+  bool cm4_angle1_cut=false;
+  bool cm4_angle2_cut=false;
+  bool cm4_angle3_cut=false;
+  bool cm4_angle4_cut=false;
   double z_par[100], ac_par[100], ct_par[100];
   double z2_par[100][100], ac2_par[100][100];
   bool mix_region1 = false;
@@ -214,6 +238,9 @@ cout<<"Entries: "<<ENum<<endl;
   TLorentzVector R_4vec;
   TLorentzVector B_4vec;
   TLorentzVector T_4vec;
+  TLorentzVector G_4vec;
+  TVector3 boost;
+  TLorentzVector GT_4vec;
   TLorentzVector Missing;
   TLorentzVector L_4vec_saved, B_4vec_saved, T_4vec_saved;
 
@@ -286,6 +313,8 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
 		else event_selection_nocut_new=false;
 		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection_new=true;
 		else event_selection_new=false;
+		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&L_tr_p>2.12&&L_tr_p<2.18&&R_tr_p>1.81&&R_tr_p<1.88)event_selection_momcut=true;
+		else event_selection_momcut=false;
 		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection_woac=true;
 		else event_selection_woac=false;
 		if(fabs(L_tr_vz-R_tr_vz)<0.025&&ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection_zdiff=true;
@@ -337,6 +366,59 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
 		L_tr_vz_saved  = L_tr_vz;
 		/*--Electron information is saved.--*/
 	
+		double theta_ee = L_4vec.Theta();
+		//test double theta_ek = acos((phi_R*sin(phi0)+cos(phi0))/(sqrt(1+theta*theta+phi*phi)));//original frame
+		double theta_ek = R_4vec.Theta();
+		//double phi_L = atan((phi*cos(phi0)+sin(phi0))/theta);//LHRS frame
+		double phi_ee = L_4vec.Phi();//original frame
+		double phi_ek = R_4vec.Phi()+2*PI;//original frame
+
+		G_4vec = B_4vec - L_4vec;
+		//double mom_g = G_4vec.Rho();
+		double mom_g=sqrt(G_4vec.Px()*G_4vec.Px()+G_4vec.Py()*G_4vec.Py()+G_4vec.Pz()*G_4vec.Pz());
+		double Qsq = G_4vec.M()*G_4vec.M();
+		double phi_g = G_4vec.Phi()+2*PI;
+		double theta_g = G_4vec.Theta();
+		double theta_gk_lab = G_4vec.Angle(R_4vec.Vect());
+		double omega=G_4vec.E();
+		double beta=mom_g/(omega+Mp);
+	
+		GT_4vec=G_4vec+T_4vec;
+		boost=GT_4vec.BoostVector();
+		R_4vec.Boost(-boost);
+		L_4vec.Boost(-boost);
+		B_4vec.Boost(-boost);
+		double theta_gk_cm = G_4vec.Angle(R_4vec.Vect());
+		double pR_cm=sqrt(R_4vec.Px()*R_4vec.Px()+R_4vec.Py()*R_4vec.Py()+R_4vec.Pz()*R_4vec.Pz());
+		double pL_cm=sqrt(L_4vec.Px()*L_4vec.Px()+L_4vec.Py()*L_4vec.Py()+L_4vec.Pz()*L_4vec.Pz());
+		double pB_cm=sqrt(B_4vec.Px()*B_4vec.Px()+B_4vec.Py()*B_4vec.Py()+B_4vec.Pz()*B_4vec.Pz());
+
+		double n = MK/ML;
+		double p_cm=sqrt(GT_4vec.Px()*GT_4vec.Px()+GT_4vec.Py()*GT_4vec.Py()+GT_4vec.Pz()*GT_4vec.Pz());
+		double E_cm = GT_4vec.E();
+//beta=2.3/(2.2+Mp);
+//pR_cm=0.65;
+//theta_gk_cm=0.12;
+		double gamma=1./sqrt(1-beta*beta);
+		double ER_cm=sqrt(pR_cm*pR_cm+MK*MK);
+//cout<<"beta="<<beta<<endl;
+//cout<<"gamma="<<gamma<<endl;
+
+		double labtocm = (gamma*pR_cm*pR_cm*(pR_cm*cos(theta_gk_cm)+beta*ER_cm))/(pow(sqrt(pR_cm*pR_cm*sin(theta_gk_cm)*sin(theta_gk_cm)+gamma*gamma*(pR_cm*cos(theta_gk_cm)+beta*ER_cm)*(pR_cm*cos(theta_gk_cm)+beta*ER_cm)),3.));
+//cout<<"labtocm="<<labtocm<<endl;
+		double tan_lab1 = sin(theta_gk_cm)/(gamma*(cos(theta_gk_cm)+beta*sqrt(MK*MK+pR_cm*pR_cm)/pR_cm));
+		double tan_lab2 = sin(theta_gk_cm)/(gamma*(cos(theta_gk_cm)+(omega*Mp-Qsq*Qsq)/(omega*Mp+Mp*Mp)));
+
+	if(theta_gk_cm*180./PI<8.)cm2_angle1_cut=true;
+	if(theta_gk_cm*180./PI>8.)cm2_angle2_cut=true;
+	if(theta_gk_cm*180./PI<6.)cm3_angle1_cut=true;
+	if(theta_gk_cm*180./PI>6. && theta_gk_cm*180./PI<10.)cm3_angle2_cut=true;
+	if(theta_gk_cm*180./PI>10.)cm3_angle3_cut=true;
+	if(theta_gk_cm*180./PI<5.)cm4_angle1_cut=true;
+	if(theta_gk_cm*180./PI>5. && theta_gk_cm*180./PI<8.)cm4_angle2_cut=true;
+	if(theta_gk_cm*180./PI>8. && theta_gk_cm*180./PI<11.)cm4_angle3_cut=true;
+	if(theta_gk_cm*180./PI>11.)cm4_angle4_cut=true;
+
 		
 	for(int j=0 ; j<(int)nmix ; j++){
 	  
@@ -392,11 +474,23 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
 			if(event_selection)hmm_mixacc_result_best->Fill(mm_mixed);
 			if(event_selection_nocut)hmm_mixacc_result_nocut->Fill(mm_mixed);
 			if(event_selection_nocut_new)hmm_mixacc_result_nocut_new->Fill(mm_mixed);
-			if(event_selection_new)hmm_mixacc_result_new->Fill(mm);
-			if(event_selection_woac)hmm_mixacc_result_woac->Fill(mm);
-			if(event_selection_zdiff)hmm_mixacc_result_zdiff->Fill(mm);
-			if(ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP&&(fabs(R_tr_vz-L_tr_vz)<0.025)&&(fabs(fabs(R_tr_vz+L_tr_vz)/2.-0.12)<0.01||fabs(fabs(R_tr_vz+L_tr_vz)/2.+0.12)<0.01))hmm_mixacc_result_nocut_forAl->Fill(mm);//Al selection
-			if(ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&(fabs(R_tr_vz-L_tr_vz)<0.025)&&(fabs(fabs(R_tr_vz+L_tr_vz)/2.-0.12)<0.01||fabs(fabs(R_tr_vz+L_tr_vz)/2.+0.12)<0.01))hmm_mixacc_result_nocut_new_forAl->Fill(mm);//Al selection
+			if(event_selection_new)hmm_mixacc_result_new->Fill(mm_mixed);
+			if(event_selection_momcut)hmm_mixacc_result_new->Fill(mm_mixed);
+			if(event_selection_woac)hmm_mixacc_result_woac->Fill(mm_mixed);
+			if(event_selection_zdiff)hmm_mixacc_result_zdiff->Fill(mm_mixed);
+			if(ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP&&(fabs(R_tr_vz-L_tr_vz)<0.025)&&(fabs(fabs(R_tr_vz+L_tr_vz)/2.-0.12)<0.01||fabs(fabs(R_tr_vz+L_tr_vz)/2.+0.12)<0.01))hmm_mixacc_result_nocut_forAl->Fill(mm_mixed);//Al selection
+			if(ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&(fabs(R_tr_vz-L_tr_vz)<0.025)&&(fabs(fabs(R_tr_vz+L_tr_vz)/2.-0.12)<0.01||fabs(fabs(R_tr_vz+L_tr_vz)/2.+0.12)<0.01))hmm_mixacc_result_nocut_new_forAl->Fill(mm_mixed);//Al selection
+			if(cm2_angle1_cut)hmm_mixacc_result_cm2_1->Fill(mm_mixed);
+			if(cm2_angle2_cut)hmm_mixacc_result_cm2_2->Fill(mm_mixed);
+			if(cm3_angle1_cut)hmm_mixacc_result_cm3_1->Fill(mm_mixed);
+			if(cm3_angle2_cut)hmm_mixacc_result_cm3_2->Fill(mm_mixed);
+			if(cm3_angle3_cut)hmm_mixacc_result_cm3_3->Fill(mm_mixed);
+			if(cm4_angle1_cut)hmm_mixacc_result_cm4_1->Fill(mm_mixed);
+			if(cm4_angle2_cut)hmm_mixacc_result_cm4_2->Fill(mm_mixed);
+			if(cm4_angle3_cut)hmm_mixacc_result_cm4_3->Fill(mm_mixed);
+			if(cm4_angle4_cut)hmm_mixacc_result_cm4_4->Fill(mm_mixed);
+//cout<<"mm="<<mm<<endl;
+//cout<<"mm_mixed="<<mm_mixed<<endl;
 	}//Mix (j loop)
 	if(event_selection)best++;
 	if(event_selection_new)ac_new++;

@@ -1,7 +1,8 @@
-//------------------//
-// VP Flux Integral //
-//------------------//
-
+//------------------------------------//
+//------------------------------------//
+//---   HRS-R Acceptance           ---//
+//------------------------------------//
+//K. Okuyama (Oct. 13, 2020)
 
 
 #include <iostream>
@@ -9,8 +10,7 @@
 #include <sstream>
 #include <math.h>
 #include <time.h>
-#include <string>
-
+#include <string> 
 #include "TStyle.h"
 #include "TROOT.h"
 #include "TApplication.h"
@@ -29,75 +29,16 @@ void SetTitle( TH1D*, const char*, const char*, const char*);
 
 static const double PI = 4.*atan(1.0);
 
-double vpflux_lab(double *par){
-	double Einc  = 4.3;//[GeV]
-	//double Escat = 2.1;//[GeV]
-	double Escat = par[0];//[GeV]
-	double theta = par[1];	
-
-	double Me=pow(511,-6.);//[GeV/c^2]
-	double Mp=0.9382720;//[GeV/c^2]
-	double Qsq=2*Einc*Escat*(1-cos(theta));
-	double omega = Einc - Escat;
-	double q2=Qsq+omega*omega;
-	double kg=omega-Qsq/(2*Mp);
-	double eps=1/(1+2*(q2/Qsq)*tan(theta/2)*tan(theta/2));
-//if(theta>0.230&&theta<0.231){
-//cout<<"Qsq="<<Qsq<<endl;
-//cout<<"q2="<<q2<<endl;
-//cout<<"kg="<<kg<<endl;
-//cout<<"eps="<<eps<<endl;
-//}
-
-	double vpflux=Escat*kg/(137*2*PI*PI*Einc*Qsq*(1-eps));
-	return vpflux;
-}
-//TF1* func3 = new TF1("func3",vpflux_lab, 0.001, 0.3,1);
-//func3->SetNpx(600);
-//func3->SetParameter(0,2.1);
-//func3->SetLineColor(kGreen);
-//func3->SetLineWidth(4);
-//func3->Draw("same");
-
 int main(int argc, char** argv){
 	//////////////////////
 	// command argument //
 	//////////////////////
 	int option;
 	//string filename = "1H_kaon";
-	//label
-	string filename = "LHRS_new";
-	//string filename = "RHRS";
+	string filename = "RHRS";
 	bool BatchFlag = true;
 	bool PDFFlag = true;
-	while((option=getopt(argc, argv, "f:bp"))!=-1){
-		switch(option){
-			case 'f':
-				filename = optarg;
-				break;
-			case 'b':
-				cout << "batch mode" << endl;
-				BatchFlag = true;
-				break;
-			case 'p':
-				PDFFlag = true;
-				break;
-			case 'h':
-				cout<<"-f : input root filename"<<endl;
-				cout<<"-b : execute in batch mode"<<endl;
-				cout<<"-p : print pdf file"<<endl;
-				return 0;
-				break;
-			case '?':
-				cout << "unknown option: " << option << endl;
-				return 0;
-				break;
-			default:
-				cout<<"type -h to see help!!"<<endl;
-				return 0;
-				break;
-		}
-	}
+
   TApplication theApp("App", &argc, argv);
 	ostringstream RootFile;
 	ostringstream PDFFile;
@@ -154,8 +95,10 @@ int main(int argc, char** argv){
 
 
 	int bin_mom = 150;
-	double min_mom = 1900;//nnL
-	double max_mom = 2300;//nnL
+	double min_mom = 1600;//nnL
+	double max_mom = 2000;//nnL
+	double min_mom_cm = 450;//nnL
+	double max_mom_cm = 850;//nnL
 	int bin_th = 150;
 	//double min_th = 0.10;
 	//double max_th = 0.35;
@@ -170,16 +113,11 @@ int main(int argc, char** argv){
 	TH1D *h_mom_gen = new TH1D( "h_mom_gen", "", bin_mom, min_mom, max_mom);
 	TH1D *h_mom_result = new TH1D( "h_mom_result", "", bin_mom, min_mom, max_mom);
 	TH1D *h_sa_mom_result = new TH1D("h_sa_mom_result", "", bin_mom, min_mom, max_mom);
-	//t->Project("h_mom_result","Lp_orig");
-	
-	//TH1D *h_mom_gen_cm = new TH1D( "h_mom_gen_cm", "", bin_mom, min_mom_cm, max_mom_cm);
-	//TH1D *h_mom_result_cm = new TH1D( "h_mom_result_cm", "", bin_mom, min_mom_cm, max_mom_cm);
-	//TH1D *h_sa_mom_result_cm = new TH1D("h_sa_mom_result_cm", "", bin_mom, min_mom_cm, max_mom_cm);
+	//t->Project("h_mom_result","Rp_orig");
 
-	TH1D *h_vp_mom = new TH1D( "h_vp_mom", "", bin_mom, min_mom, max_mom);
-	TH1D *h_vp_mom2 = new TH1D( "h_vp_mom2", "w/ HRS-R Acceptance", bin_mom, min_mom, max_mom);
-	TH1D *h_vp_mom_result = new TH1D("h_vp_mom_result", "", bin_mom, min_mom, max_mom);
-	TH1D *h_vp_mom_result2 = new TH1D("h_vp_mom_result2", "", bin_mom, min_mom, max_mom);//w/ RHRS Acceptance
+	TH1D *h_mom_gen_cm = new TH1D( "h_mom_gen_cm", "", bin_mom, min_mom_cm, max_mom_cm);
+	TH1D *h_mom_result_cm = new TH1D( "h_mom_result_cm", "", bin_mom, min_mom_cm, max_mom_cm);
+	TH1D *h_sa_mom_result_cm = new TH1D("h_sa_mom_result_cm", "", bin_mom, min_mom_cm, max_mom_cm);
 
 	int n1, n2;
 	double val;
@@ -200,6 +138,7 @@ int main(int argc, char** argv){
 	float L_mom=0.;
 	float L_th=0.;
 	float L_ph=0.;
+	float vertex=0.;
 	tree->SetBranchStatus("*",0);
 	tree->SetBranchStatus("Rp_gen",1);tree->SetBranchAddress("Rp_gen",&R_mom);
 	tree->SetBranchStatus("Rth_gen",1);tree->SetBranchAddress("Rth_gen",&R_th);
@@ -207,6 +146,7 @@ int main(int argc, char** argv){
 	tree->SetBranchStatus("Lp_gen",1);tree->SetBranchAddress("Lp_gen",&L_mom);
 	tree->SetBranchStatus("Lth_gen",1);tree->SetBranchAddress("Lth_gen",&L_th);
     tree->SetBranchStatus("Lph_gen"    ,1);tree->SetBranchAddress("Lph_gen"    ,&L_ph     );
+    tree->SetBranchStatus("zposi"    ,1);tree->SetBranchAddress("zposi"    ,&vertex     );
     ENum = tree->GetEntries();
   for(int i=0;i<ENum;i++){
     tree->GetEntry(i);
@@ -232,9 +172,12 @@ int main(int argc, char** argv){
 		//h_mom_result->SetBinContent(h_mom_gen->FindBin(mom),mom);
 		for(int i=0;i<bin_mom;i++){
 		//h_mom_gen->SetBinContent(i,26147*(1./189.)*(max_mom-min_mom)/bin_mom);//first try
-		//h_mom_gen->SetBinContent(i,2583235*(1./189.)*(max_mom-min_mom)/bin_mom);//LHRS 1,000,000 (2020/10/4)
-		h_mom_gen->SetBinContent(i,2582007*(1./189.)*(max_mom-min_mom)/bin_mom);//LHRS 1,000,000 (2020/10/13)// true density
-		//h_mom_gen->SetBinContent(i,2549979*(1./189.)*(max_mom-min_mom)/bin_mom);//RHRS 1,000,000 (2020/10/4)
+		h_mom_gen->SetBinContent(i,2549979*(1./163.8)*(max_mom-min_mom)/bin_mom);//RHRS 1,000,000 (2020/10/4), w/ z dep.
+		h_mom_gen_cm->SetBinContent(i,2549979*(4./25.)*(1./163.8)*(max_mom_cm-min_mom_cm)/bin_mom);//RHRS 1,000,000 (2020/10/4), w/ z dep.
+		//h_mom_gen->SetBinContent(i,2549979*(1./163.8)*(max_mom-min_mom)/bin_mom);//RHRS 1,000,000 (2020/10/4)
+		//h_mom_gen_cm->SetBinContent(i,2549979*(1./163.8)*(max_mom_cm-min_mom_cm)/bin_mom);//RHRS 1,000,000 (2020/10/4)
+		//h_mom_gen->SetBinContent(i,5248172*(1./163.8)*(max_mom-min_mom)/bin_mom);//BOTH 1,000,000 (2020/10/4)
+		//h_mom_gen_cm->SetBinContent(i,5248172*(1./163.8)*(max_mom_cm-min_mom_cm)/bin_mom);//BOTH 1,000,000 (2020/10/4)
 		}
 	double vpflux=Escat*kg/(137*2*PI*PI*Einc*Qsq*(1-eps));
 	double k = MAX*gRandom->Uniform();
@@ -244,7 +187,6 @@ int main(int argc, char** argv){
 //cout<<"kg="<<kg<<endl;
 //cout<<"eps="<<eps<<endl;
 
-	//cout<<"vpflux vs k = "<<vpflux<<" : "<<k<<endl;
 	
 	    //===== Right Hand Coordinate ====//
 	    //th and phi are originally meant tan(theta) and tan(phi),
@@ -352,17 +294,12 @@ int main(int argc, char** argv){
 		double tan_lab1 = sin(theta_gk_cm)/(gamma*(cos(theta_gk_cm)+beta*sqrt(MK*MK+pR_cm*pR_cm)/pR_cm));
 		double tan_lab2 = sin(theta_gk_cm)/(gamma*(cos(theta_gk_cm)+(omega*Mp-Qsq*Qsq)/(omega*Mp+Mp*Mp)));
 
-		//if(theta_gk_cm*180./PI<8.)h_mom_result->Fill(L_mom);
-		h_mom_result->Fill(L_mom);
-	 if(vpflux>k){//Full
-		h_vp_mom->Fill(L_mom);
-		//if(L_mom>2100.&&theta_gk_cm*180./PI>10.)h_vp_mom2->Fill(L_mom);
-		if(L_mom>2100.)h_vp_mom2->Fill(L_mom);
-	}
+		h_mom_result_cm->Fill(pR_cm);
+		//if(6.<vertex&&vertex<10.)h_mom_result->Fill(R_mom);
+		h_mom_result->Fill(R_mom);
+
 	}
 
-	double vpflux_tot_mom=0.;
-	double vpflux_tot_mom_err=0.;
 	for(int i=0; i<bin_mom; i++){
 		n1 = 0;
 		n1 = (int)h_mom_gen->GetBinContent(i+1);
@@ -380,38 +317,18 @@ int main(int argc, char** argv){
 		if(n1!=0 && n2!=0)err = val * sqrt(1./n2 + 1./n1 - 2./sqrt(1.*n1*n2));
 		h_sa_mom_result->SetBinError(i+1, err);
 
-		// === VP Flux ===
+		// === all cuts in CM frame ===
+		n1 = 0;
+		n1 = (int)h_mom_gen_cm->GetBinContent(i+1);
 		n2 = 0;
 		val = 0.;
 		err = 0.;
-		n2 = (int)h_vp_mom->GetBinContent(i+1);
-		//cout<<"nbin_mom:"<<i<<endl;
-		//cout<<"n1="<<n1<<endl;
-		//cout<<"n2="<<n2<<endl;
-		if(n1!=0 && n2!=0)val = volume*(1.0*n2/n1);//*1000.;//MeV->GeV
-		h_vp_mom_result->SetBinContent(i+1, val);
+		n2 = (int)h_mom_result_cm->GetBinContent(i+1);
+		if(n1!=0 && n2!=0)val = omega*(1.0*n2/n1);
+		h_sa_mom_result_cm->SetBinContent(i+1, val);
 		if(n1!=0 && n2!=0)err = val * sqrt(1./n2 + 1./n1 - 2./sqrt(1.*n1*n2));
-		h_vp_mom_result->SetBinError(i+1, err);
-
-		// === VP Flux (w/ RHRS Acceptance)===
-		n2 = 0;
-		val = 0.;
-		err = 0.;
-		n2 = (int)h_vp_mom2->GetBinContent(i+1);
-		//cout<<"nbin_mom:"<<i<<endl;
-		//cout<<"n1="<<n1<<endl;
-		//cout<<"n2="<<n2<<endl;
-		if(n1!=0 && n2!=0)val = volume*(1.0*n2/n1);//*1000;//MeV->GeV
-		h_vp_mom_result2->SetBinContent(i+1, val);
-		if(n1!=0 && n2!=0)err = val * sqrt(1./n2 + 1./n1 - 2./sqrt(1.*n1*n2));
-		h_vp_mom_result2->SetBinError(i+1, err);
-
-		double bin_width=(max_mom-min_mom)/bin_mom;//GeV/c
-		vpflux_tot_mom+=val*bin_width;
-		vpflux_tot_mom_err+=sqrt(err*bin_width*err*bin_width);
+		h_sa_mom_result_cm->SetBinError(i+1, err);
 	}
-	cout<<"vpflux_tot_mom="<<vpflux_tot_mom<<endl;
-	cout<<"vpflux_tot_mom_err="<<vpflux_tot_mom_err<<endl;
 
 ////////////////////
 // Draw histgrams //
@@ -423,7 +340,7 @@ int main(int argc, char** argv){
 	lth->SetLineColor(4);
 
 	TCanvas *c1 = new TCanvas("c1", "Momentum Acceptance (Lab)");
-	TCanvas *c2 = new TCanvas("c2", "Virtual Photon Flux");
+	TCanvas *c2 = new TCanvas("c2", "Angular Acceptance (CM)");
 
 
 	//======= Momentum Acceptance (Lab) ======
@@ -434,8 +351,9 @@ int main(int argc, char** argv){
 	SetTitle(h_sa_mom_result, "Solid Angle vs. Momentum (w/ all Cuts)", "Momentum [MeV/c]", "Solid Angle [msr]");
 //	h_sa_mom_result->GetXaxis()->SetNdivisions(506, kFALSE);
 	h_sa_mom_result->GetXaxis()->SetNdivisions(505, kFALSE);
-	h_sa_mom_result->SetMarkerColor(kRed);
-	h_sa_mom_result->SetLineColor(kRed);
+	h_sa_mom_result->SetMarkerColor(kSpring-1);
+	h_sa_mom_result->SetLineColor(kSpring-1);
+	h_sa_mom_result->SetLineWidth(2);
 //	h_sa_mom_result->Draw("same");
 	h_sa_mom_result->Draw("e2");
 	h_sa_mom_result->Draw("p same");
@@ -453,26 +371,30 @@ int main(int argc, char** argv){
 	h_mom_result->SetLineColor(kAzure);
 	h_mom_result->Draw("same");
 
-	//======= VP Flux  ======
+	//======= Momentum Acceptance (CM) ======
 	c2->Divide(2,2);
 	c2->cd(1);
-	//SetTitle(h_vp_mom_result, "Integrated VP Flux vs. Momentum (w/ all Cuts)", "Momentum [GeV/c]", "Integrated VP Flux [/GeV]");
-		//h_vp_mom_result->Scale(bin_mom);
-	h_vp_mom_result->GetXaxis()->SetNdivisions(505, kFALSE);
-	h_vp_mom_result->Draw();
-		//h_vp_mom_result2->Scale(bin_mom);
-	h_vp_mom_result2->GetXaxis()->SetNdivisions(505, kFALSE);
-	h_vp_mom_result2->SetLineColor(kAzure);
-	h_vp_mom_result2->Draw("same");
-	double ymax = (h_vp_mom_result->GetBinContent(h_vp_mom_result->GetMaximumBin()));
-	TLine *RHRS_min = new TLine( 2100., 0., 2100, 1.1*ymax);
-	TLine *RHRS_max = new TLine( 2220, 0., 2220, 1.1*ymax);
-	RHRS_min->SetLineColor(kRed);
-	RHRS_max->SetLineColor(kRed);
-	RHRS_min->Draw("same");
-	RHRS_max->Draw("same");
+//	hframe = (TH1D*)gPad->DrawFrame( min_mom_gen_cm, 0., max_mom_gen_cm, omega + 0.5);
+	//SetTitle(h_sa_mom_result_cm, "Solid Angle vs. Momentum at Reference Plane (CM)", "Momentum [MeV/c]", "Solid Angle [msr]");
+	SetTitle(h_sa_mom_result_cm, "Solid Angle vs. Momentum in CM (w/ all Cuts)", "Momentum [MeV/c]", "Solid Angle [msr]");
+//	h_sa_mom_result_cm->GetXaxis()->SetNdivisions(506, kFALSE);
+	h_sa_mom_result_cm->GetXaxis()->SetNdivisions(505, kFALSE);
+//	h_sa_mom_result_cm->Draw("same");
+	h_sa_mom_result_cm->Draw();
+//	lmom->Draw("same");
+	c2->cd(2);
+	SetTitle(h_mom_gen_cm, "Solid Angle vs. Momentum in CM (generated)", "Momentum [MeV/c]", "Solid Angle [msr]");
+	h_mom_gen_cm->GetXaxis()->SetNdivisions(505, kFALSE);
+	h_mom_gen_cm->Draw();
 	c2->cd(3);
-	h_vp_mom->Draw();
+	SetTitle(h_mom_result_cm, "Solid Angle vs. Momentum in CM (cut)", "Momentum [MeV/c]", "Solid Angle [msr]");
+	h_mom_result_cm->GetXaxis()->SetNdivisions(505, kFALSE);
+	h_mom_result_cm->Draw();
+	c2->cd(4);
+	h_mom_gen_cm->Draw();
+	h_mom_result_cm->SetLineColor(kAzure);
+	h_mom_result_cm->Draw("same");
+
 
 	if(!BatchFlag){
 		theApp.Run();
@@ -488,25 +410,9 @@ int main(int argc, char** argv){
 c1->Close();
 c2->Close();
 	
-	//label
-	ofstream fout("vpflux_SIMC.dat");//LHRS
-	//ofstream fout("vpflux_dummy.dat");//RHRS
-		fout<<"#VP Flux Calculation with SIMC Acceptance"<<endl;
-		fout<<"#1.8<pe[GeV/c]<2.4, 150 partition --> 1bin=4MeV/c"<<endl;
-		double vpflux_temp;
-		double vpflux_total=0.;
-	for(int i=0; i<bin_mom; i++){
-		vpflux_temp = h_vp_mom_result2->GetBinContent(i+1);
-		vpflux_temp = vpflux_temp;// * 0.004/bin_mom;
-		fout<<i+1<<" "<<vpflux_temp<<endl;
-		vpflux_total+=vpflux_temp;
-	}
 	
-	cout<<"vpflux_total="<<vpflux_total<<endl;
 
-	//label
-	ofstream fout2("LHRS_SIMC.dat");//LHRS
-	//ofstream fout2("RHRS_SIMC.dat");//RHRS
+	ofstream fout2("RHRS_SIMC_z5.dat");//RHRS
 		fout2<<"#Acceptance by SIMC"<<endl;
 		fout2<<"#1.8<pe[GeV/c]<2.4, 150 partition --> 1bin=4MeV/c"<<endl;
 		double Acceptance_temp;

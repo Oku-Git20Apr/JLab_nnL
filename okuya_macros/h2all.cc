@@ -1290,7 +1290,8 @@ cout<<"bin coin"<<bin_coin_c<<endl;
 
 void tuning::MakeHist(){
   cout<<"Make Hist "<<endl;
-	file_out = new TFile("h2all_temp.root","recreate");
+	//file_out = new TFile("h2all_temp.root","recreate");
+	file_out = new TFile("h2all_Lsingle.root","recreate");
 	tree_out = new TTree("tree_out","tree_out");
 	//`tree_out ->Branch("branch name",variable ,"branch name/type");
 	
@@ -2070,6 +2071,12 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
       int NRtr = (int)R_tr_n;  if(NRtr>MAX) NRtr = MAX;
       tr.ntrack_l=NLtr;
       tr.ntrack_r=NRtr;
+	  h_L_tr_n->Fill(NLtr);
+	  h_R_tr_n->Fill(NRtr);
+	if(NLtr>1){//Multi-track
+		NLtr = 0;
+		NRtr = 0;
+	}
       
       for(int lt=0;lt<NLtr;lt++){
         L_Tr = L_FP = false;

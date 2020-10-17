@@ -71,7 +71,8 @@ all:$(TARGET14)\
      $(TARGET16)\
      $(TARGET17)\
      $(TARGET18)\
-     $(TARGET19)
+     $(TARGET19)\
+     $(TARGET21)
 #$(TARGET1)\
 #     $(TARGET2)\
 #     $(TARGET3)\

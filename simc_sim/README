@@ -1,0 +1,20 @@
+2020.10.4  LHRS.root (2583235)
+- SpectMode: e
+- 1,000,000 events
+
+2020.10.4  RHRS.root (2549979)
+- SpectMode: p
+- 1,000,000 events
+
+2020.10.11 RHRS+10.root (???)
+- SpectMode: p
+- 1,000,000 events
+
+2020.10.11 BOTH.root (5248172)
+- SpectMode: e+p
+- 1,000,000 events
+
+2020.10.17 BOTH.root (2582007)
+- thick: 70.8 [mg/cm^2], rho=0.002832 [g/cm^3]
+- SpectMode: e
+- 1,000,000 events

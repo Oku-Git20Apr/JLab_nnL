@@ -31,8 +31,11 @@ TARGET1=    Acceptance
 OBJS1  =    Acceptance.o
 TARGET2=    vpflux 
 OBJS2  =    vpflux.o
+TARGET3=    acceptanceR 
+OBJS3  =    acceptanceR.o
 
-all: $(TARGET2)
+all: $(TARGET2)\
+		$(TARGET3)
 
 $(LIBDIR)/%.o : %.cc
 	$(CXX) $(CFLAGS) -c -o $@ $< $(CXXFLAGS)
@@ -47,6 +50,9 @@ $(TARGET1): $(patsubst %,$(LIBDIR)/%,$(OBJS1))
 	$(CXX) $(CFLAGS) -o $(BINDIR)/$@ $< $(CXXLIBS) $(CXXFLAGS)
 
 $(TARGET2): $(patsubst %,$(LIBDIR)/%,$(OBJS2))
+	$(CXX) $(CFLAGS) -o $(BINDIR)/$@ $< $(CXXLIBS) $(CXXFLAGS)
+
+$(TARGET3): $(patsubst %,$(LIBDIR)/%,$(OBJS3))
 	$(CXX) $(CFLAGS) -o $(BINDIR)/$@ $< $(CXXLIBS) $(CXXFLAGS)
 
 .PHONY: clean
