@@ -48,7 +48,8 @@ void hcoin_pi_contami_improved_V(){
 	string pdfname = "temp.pdf";
 cout << "Output pdf file name is " << pdfname << endl;
   
-  TFile *file = new TFile("../h2all5.root","read");//input file of all H2 run(default: h2all4.root)
+  //TFile *file = new TFile("../h2all5.root","read");//input file of all H2 run(default: h2all4.root)
+  TFile *file = new TFile("../h2all_Lsingle.root","read");//input file of all H2 run(default: h2all4.root)
 	//ACCBGの引き算はmea_hist.ccから
   TFile *file_mea = new TFile("../bgmea6.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
   double nbunch = 600.;//effetive bunches (6 bunches x 5 mixtures)
@@ -1294,5 +1295,10 @@ cout<<"%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 		hcoin_p->Draw("");
 		fcoin_firstp_best->SetLineColor(kPink);
 		fcoin_firstp_best->Draw("same");
+
+		TCanvas *c9 = new TCanvas("c9", "c9", 800, 800);
+		hcoin_strict->Fit("gausn","","",-10.,-6.);
+		hcoin_strict->Fit("gausn","","",-1.,1.);
+		hcoin_strict->Fit("gausn","","",2.,4.);
 
 }//fit

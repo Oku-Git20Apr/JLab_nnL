@@ -9,7 +9,7 @@
 
 void mea_llccrr_new(){
 	string pdfname = "temp.pdf";
-	string rootname= "bgmea_llccrr_Lsingle.root";
+	string rootname= "bgmea_llccrr_Lsingle_new.root";
 cout << "Output pdf file name is " << pdfname << endl;
 cout << "Output root file name is " << rootname << endl;
   
@@ -418,15 +418,24 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
 		double tan_lab1 = sin(theta_gk_cm)/(gamma*(cos(theta_gk_cm)+beta*sqrt(MK*MK+pR_cm*pR_cm)/pR_cm));
 		double tan_lab2 = sin(theta_gk_cm)/(gamma*(cos(theta_gk_cm)+(omega*Mp-Qsq*Qsq)/(omega*Mp+Mp*Mp)));
 
+    cm2_angle1_cut=false;
+    cm2_angle2_cut=false;
+    cm3_angle1_cut=false;
+    cm3_angle2_cut=false;
+    cm3_angle3_cut=false;
+    cm4_angle1_cut=false;
+    cm4_angle2_cut=false;
+    cm4_angle3_cut=false;
+    cm4_angle4_cut=false;
 	if(theta_gk_cm*180./PI<8.)cm2_angle1_cut=true;
-	if(theta_gk_cm*180./PI>8.)cm2_angle2_cut=true;
+	if(theta_gk_cm*180./PI>=8.)cm2_angle2_cut=true;
 	if(theta_gk_cm*180./PI<6.)cm3_angle1_cut=true;
-	if(theta_gk_cm*180./PI>6. && theta_gk_cm*180./PI<10.)cm3_angle2_cut=true;
-	if(theta_gk_cm*180./PI>10.)cm3_angle3_cut=true;
+	if(theta_gk_cm*180./PI>=6. && theta_gk_cm*180./PI<10.)cm3_angle2_cut=true;
+	if(theta_gk_cm*180./PI>=10.)cm3_angle3_cut=true;
 	if(theta_gk_cm*180./PI<5.)cm4_angle1_cut=true;
-	if(theta_gk_cm*180./PI>5. && theta_gk_cm*180./PI<8.)cm4_angle2_cut=true;
-	if(theta_gk_cm*180./PI>8. && theta_gk_cm*180./PI<11.)cm4_angle3_cut=true;
-	if(theta_gk_cm*180./PI>11.)cm4_angle4_cut=true;
+	if(theta_gk_cm*180./PI>=5. && theta_gk_cm*180./PI<8.)cm4_angle2_cut=true;
+	if(theta_gk_cm*180./PI>=8. && theta_gk_cm*180./PI<11.)cm4_angle3_cut=true;
+	if(theta_gk_cm*180./PI>=11.)cm4_angle4_cut=true;
 
 		
 	for(int j=0 ; j<(int)nmix ; j++){

@@ -153,7 +153,7 @@ cout << "Output pdf file name is " << pdfname << endl;
 	//ACCBGの引き算はmea_hist.ccから
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea6.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_llccrr_new_new.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
-  TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_llccrr_Lsingle.root","read");//from h2all_Lsingle.root, HRS-L: Single-tracking
+  TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_llccrr_Lsingle_new.root","read");//from h2all_Lsingle.root, HRS-L: Single-tracking
   double nbunch = 6000.;//effetive bunches (6 bunches x 5 mixtures)
  // TTree *tree_old = (TTree*)file->Get("tree_out");
 //cout<<"Please wait a moment. CloneTree() is working..."<<endl;
@@ -383,7 +383,7 @@ cout << "Param file : " << AcceptanceR_table_z5.c_str() << endl;
  bin_mm=(int)bin_mm;
  //const double fit_min_mm=-0.006;
  const double fit_min_mm=-0.01;
- const double fit_max_mm=0.095;
+ const double fit_max_mm=0.085;
  const double fmin_mm=-0.01;
  const double fmax_mm=0.12;
  const int fit_bin_mm = (fit_max_mm-fit_min_mm)/0.001;
@@ -529,6 +529,10 @@ cout << "Param file : " << AcceptanceR_table_z5.c_str() << endl;
   hmm_L_fom_best->GetXaxis()->SetTitle("M_{x} - M_{#Lambda} (GeV/c^{2})");
   hmm_L_fom_best->GetYaxis()->SetTitle("Counts / MeV");
   hmm_L_fom_best->SetLineColor(1);
+  TH1F* hmm_L_fom_strict  = new TH1F("hmm_L_fom_strict","hmm_L_fom_strict",xbin,xmin,xmax);
+  hmm_L_fom_strict->GetXaxis()->SetTitle("M_{x} - M_{#Lambda} (GeV/c^{2})");
+  hmm_L_fom_strict->GetYaxis()->SetTitle("Counts / MeV");
+  hmm_L_fom_strict->SetLineColor(1);
   TH1F* hcs_L_fom_best  = new TH1F("hcs_L_fom_best","hcs_L_fom_best",xbin,xmin,xmax);
   hcs_L_fom_best->GetXaxis()->SetTitle("M_{x} - M_{#Lambda} [GeV/c^{2}]");
   hcs_L_fom_best->GetYaxis()->SetTitle("d#sigma/d#Omega (C.M.F.) [nb/sr]");
@@ -557,7 +561,8 @@ cout << "Param file : " << AcceptanceR_table_z5.c_str() << endl;
   TH1D* h_theta_g = new TH1D("h_theta_g", "theta_g",1000,0.1,0.35);
   TH1D* h_phi_g = new TH1D("h_phi_g", "phi_g",1000,3*PI/2-1.,3*PI/2+1.);
   TH1D* h_theta_gk_lab = new TH1D("h_theta_gk_lab", "theta_gk_lab",1000,0.,0.2);
-  TH1D* h_theta_gk_cm = new TH1D("h_theta_gk_cm", "theta_gk_cm",1000,0.,0.3);
+  TH1D* h_theta_gk_cm = new TH1D("h_theta_gk_cm", "theta_gk_cm",100,0.,20.);
+  TH1D* h_theta_gk_cm2 = new TH1D("h_theta_gk_cm2", "theta_gk_cm2",100,0.,20.);
   TH1D* h_cos_gk_lab = new TH1D("h_cos_gk_lab", "cos_gk_lab",1000,0.97,1.0);
   TH1D* h_cos_gk_cm = new TH1D("h_cos_gk_cm", "cos_gk_cm",1000,0.8,1.0);
   TH1D* h_mom_g = new TH1D("h_mom_g", "mom_g",1000,1.8,2.5);
@@ -655,11 +660,11 @@ cout << "Param file : " << AcceptanceR_table_z5.c_str() << endl;
 		double effFP = 1.000;
 		double effch2= 0.999;
 		double effct = 0.966;
-		double effDAQ= 0.960;
+		double effDAQ= 0.950;
 		double efftr = 0.810;
 		double effK	 = 0.170;
 		double efficiency = effAC*effZ*effFP*effch2*effct*effDAQ*efftr*effK;
-		double RHRS  = 0.006;
+		double RHRS  = 0.0056;
 		//double LHRS  = 0.006;
 		double Charge= 4.6486;//[C]
 		double ee	 = 1.602*pow(10.,-19);
@@ -781,6 +786,7 @@ cout<<"Entries: "<<ENum<<endl;
 	    mm=mass - mh;//shift by ML
 		
 		if(event_selection&&ct_cut)hmm_L_fom_best->Fill(mm);
+		if(event_selection_new&&ct_cut)hmm_L_fom_strict->Fill(mm);
 		if(event_selection_nocut&&ct_cut)hmm_L_fom_nocut->Fill(mm);
 		double theta_ee = L_4vec.Theta();
 		//test double theta_ek = acos((phi_R*sin(phi0)+cos(phi0))/(sqrt(1+theta*theta+phi*phi)));//original frame
@@ -830,17 +836,28 @@ cout<<"Entries: "<<ENum<<endl;
 
 
 
+		h_theta_gk_cm->Fill(theta_gk_cm*180./PI);
+		if(L_mom>2.1)h_theta_gk_cm2->Fill(theta_gk_cm*180./PI);
 
+		cm2_angle1_cut=false;
+   		cm2_angle2_cut=false;
+   		cm3_angle1_cut=false;
+   		cm3_angle2_cut=false;
+   		cm3_angle3_cut=false;
+   		cm4_angle1_cut=false;
+   		cm4_angle2_cut=false;
+   		cm4_angle3_cut=false;
+   		cm4_angle4_cut=false;
 //======= CM Angle(gamma-K) ========//
 		if(theta_gk_cm*180./PI<8.)cm2_angle1_cut=true;
-		if(theta_gk_cm*180./PI>8.)cm2_angle2_cut=true;
+		if(theta_gk_cm*180./PI>=8.)cm2_angle2_cut=true;
 		if(theta_gk_cm*180./PI<6.)cm3_angle1_cut=true;
-		if(theta_gk_cm*180./PI>6. && theta_gk_cm*180./PI<10.)cm3_angle2_cut=true;
-		if(theta_gk_cm*180./PI>10.)cm3_angle3_cut=true;
+		if(theta_gk_cm*180./PI>=6. && theta_gk_cm*180./PI<10.)cm3_angle2_cut=true;
+		if(theta_gk_cm*180./PI>=10.)cm3_angle3_cut=true;
 		if(theta_gk_cm*180./PI<5.)cm4_angle1_cut=true;
-		if(theta_gk_cm*180./PI>5. && theta_gk_cm*180./PI<8.)cm4_angle2_cut=true;
-		if(theta_gk_cm*180./PI>8. && theta_gk_cm*180./PI<11.)cm4_angle3_cut=true;
-		if(theta_gk_cm*180./PI>11.)cm4_angle4_cut=true;
+		if(theta_gk_cm*180./PI>=5. && theta_gk_cm*180./PI<8.)cm4_angle2_cut=true;
+		if(theta_gk_cm*180./PI>=8. && theta_gk_cm*180./PI<11.)cm4_angle3_cut=true;
+		if(theta_gk_cm*180./PI>=11.)cm4_angle4_cut=true;
 //======= CM Angle(gamma-K) ========//
 
 		//int ebin = (int)((L_mom-1.8)/0.004);
@@ -906,8 +923,8 @@ cout<<"Entries: "<<ENum<<endl;
 }//ENum
 	cout<<"nbunch="<<nbunch<<endl;
 	TCanvas* c1 = new TCanvas("c1","c1");
-	//hmm_L_fom_best->Draw("");
-	hcs_L_fom_best->Draw("");
+	hmm_L_fom_best->Draw("");
+	//hcs_L_fom_best->Draw("");
 	TCanvas* c2 = new TCanvas("c2","c2");
 	TH1F* hmm_pi_fom_nocut=(TH1F*)file->Get("hmm_pi_fom_noZ");
 	TH1F* hmm_Al_fom_nocut=(TH1F*)file->Get("hmm_Al_fom_best");
@@ -954,7 +971,7 @@ cout<<"Entries: "<<ENum<<endl;
 	//cs	 = pow(10.,33.)/(ntar_h2*efficiency*RHRS*Ng);//[nb/sr]
 	cs	 = 1./(effDAQ*RHRS*100.);//[nb/sr]
 	hmm_bg_fom_best->Scale(cs);
-	hmm_bg_fom_strict->Scale(cs);
+	//hmm_bg_fom_strict->Scale(cs);
 	hmm_bg_cm2_1->Scale(1./nbunch/cs);
 	hmm_bg_cm2_2->Scale(1./nbunch/cs);
 	hmm_bg_cm3_1->Scale(1./nbunch/cs);
@@ -986,7 +1003,7 @@ cout<<"Entries: "<<ENum<<endl;
 //Loose Cut
 	//hmm_wo_bg_fom_best->Add(hcs_L_fom_best,hmm_bg_fom_best,1.0,-1.0);//All
 	//hmm_wo_bg_fom_best->Add(hcs_L_cm2_1,hmm_bg_cm2_1,1.0,-1.0);//2 div.
-	//hmm_wo_bg_fom_best->Add(hcs_L_cm2_2,hmm_bg_cm2_2,1.0,-1.0);//2 div.
+	hmm_wo_bg_fom_best->Add(hcs_L_cm2_2,hmm_bg_cm2_2,1.0,-1.0);//2 div.
 	//hmm_wo_bg_fom_best->Add(hcs_L_cm3_1,hmm_bg_cm3_1,1.0,-1.0);//3 div.
 	//hmm_wo_bg_fom_best->Add(hcs_L_cm3_2,hmm_bg_cm3_2,1.0,-1.0);//3 div.
 	//hmm_wo_bg_fom_best->Add(hcs_L_cm3_3,hmm_bg_cm3_3,1.0,-1.0);//3 div.
@@ -996,7 +1013,8 @@ cout<<"Entries: "<<ENum<<endl;
 	//hmm_wo_bg_fom_best->Add(hcs_L_cm4_4,hmm_bg_cm4_4,1.0,-1.0);//4 div.
 	
 //Tight Cut	
-	hmm_wo_bg_fom_best->Add(hcs_L_fom_strict,hmm_bg_fom_strict,1.0,-1.0);//All
+	//hmm_wo_bg_fom_best->Add(hcs_L_fom_strict,hmm_bg_fom_strict,1.0,-1.0);//All
+	//hmm_wo_bg_fom_best->Add(hmm_L_fom_strict,hmm_bg_fom_strict,1.0,-1.0);//All
 	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm2_1,hmm_bg_new_cm2_1,1.0,-1.0);//2 div.
 	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm2_2,hmm_bg_new_cm2_2,1.0,-1.0);//2 div.
 	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm3_1,hmm_bg_new_cm3_1,1.0,-1.0);//3 div.
@@ -1008,20 +1026,24 @@ cout<<"Entries: "<<ENum<<endl;
 	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm4_4,hmm_bg_new_cm4_4,1.0,-1.0);//4 div.
 //===CHANGE===//
 
+	
+	for(int i=90;i<200;i++){
+	if(hcs_L_new_cm2_1->GetBinContent(i)==0)cout<<"Empty bin at "<<((double)i*0.001-0.1)<<endl;
+	}
 
 	hmm_wo_bg_fom_nocut->Add(hmm_L_fom_nocut,hmm_bg_fom_nocut,1.0,-1.0);
 	//hmm_pi_wobg_fom_best->Add(hmm_pi_fom_best,hmm_bg_fom_best,1.0,-1.0);
 	//hmm_pi_wobg_fom_nocut->Add(hmm_pi_fom_nocut,hmm_bg_fom_nocut,1.0,-1.0);
 	hmm_pi_wobg_fom_nocut->Add(hmm_Al_fom_nocut,hmm_Albg_fom_nocut,1.0,-1.0);
-	hmm_wo_bg_cm2_1->Add(hcs_L_cm2_1,hmm_bg_cm2_1,1.0,-1.0);
-	hmm_wo_bg_cm2_2->Add(hcs_L_cm2_2,hmm_bg_cm2_2,1.0,-1.0);
-	hmm_wo_bg_cm3_1->Add(hcs_L_cm3_1,hmm_bg_cm3_1,1.0,-1.0);
-	hmm_wo_bg_cm3_2->Add(hcs_L_cm3_2,hmm_bg_cm3_2,1.0,-1.0);
-	hmm_wo_bg_cm3_3->Add(hcs_L_cm3_3,hmm_bg_cm3_3,1.0,-1.0);
-	hmm_wo_bg_cm4_1->Add(hcs_L_cm4_1,hmm_bg_cm4_1,1.0,-1.0);
-	hmm_wo_bg_cm4_2->Add(hcs_L_cm4_2,hmm_bg_cm4_2,1.0,-1.0);
-	hmm_wo_bg_cm4_3->Add(hcs_L_cm4_3,hmm_bg_cm4_3,1.0,-1.0);
-	hmm_wo_bg_cm4_4->Add(hcs_L_cm4_4,hmm_bg_cm4_4,1.0,-1.0);
+	//hmm_wo_bg_cm2_1->Add(hcs_L_cm2_1,hmm_bg_cm2_1,1.0,-1.0);
+	//hmm_wo_bg_cm2_2->Add(hcs_L_cm2_2,hmm_bg_cm2_2,1.0,-1.0);
+	//hmm_wo_bg_cm3_1->Add(hcs_L_cm3_1,hmm_bg_cm3_1,1.0,-1.0);
+	//hmm_wo_bg_cm3_2->Add(hcs_L_cm3_2,hmm_bg_cm3_2,1.0,-1.0);
+	//hmm_wo_bg_cm3_3->Add(hcs_L_cm3_3,hmm_bg_cm3_3,1.0,-1.0);
+	//hmm_wo_bg_cm4_1->Add(hcs_L_cm4_1,hmm_bg_cm4_1,1.0,-1.0);
+	//hmm_wo_bg_cm4_2->Add(hcs_L_cm4_2,hmm_bg_cm4_2,1.0,-1.0);
+	//hmm_wo_bg_cm4_3->Add(hcs_L_cm4_3,hmm_bg_cm4_3,1.0,-1.0);
+	//hmm_wo_bg_cm4_4->Add(hcs_L_cm4_4,hmm_bg_cm4_4,1.0,-1.0);
 
 
 	 double constL=0.;
@@ -1211,5 +1233,22 @@ cout<<"BEST CUT START"<<endl;
 	c3->cd(4);
 	eklab_gkcm->Draw("colz");
 
+	TCanvas* c4 = new TCanvas("c4","c4");
+	//c4->Divide(2,2);
+	//c4->cd(1);
+	h_theta_gk_cm->Draw("");
+	h_theta_gk_cm2->SetLineColor(kRed);
+	h_theta_gk_cm2->Draw("same");
+
+	TCanvas* c5 = new TCanvas("c5","c5");
+	hmm_L_fom_best->SetLineColor(kBlack);
+	hmm_L_fom_best->Draw("");
+	hmm_bg_fom_best->SetLineColor(kGreen);
+	hmm_bg_fom_best->Draw("same");
+	TCanvas* c6 = new TCanvas("c6","c6");
+	hmm_L_fom_strict->SetLineColor(kBlack);
+	hmm_L_fom_strict->Draw("");
+	hmm_bg_fom_strict->SetLineColor(kGreen);
+	hmm_bg_fom_strict->Draw("same");
 cout << "Well done!" << endl;
 }//fit

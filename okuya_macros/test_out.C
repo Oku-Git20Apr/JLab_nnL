@@ -4,7 +4,51 @@
 //
 //This is taken over from result.C
 //No array branch mode 
+//
+double F_Voigt( double *x, double *par )
+  {
+    // par[0] : area
+    // par[1] : location
+    // par[2] : gaussian sigma
+    // par[3] : lorentz fwhm
+    double val = par[0] * TMath::Voigt(x[0]-par[1],par[2],par[3],4);
+    return val;
+  }
 
+double pol2gaus(double *x, double *par) {
+   //par[0]=x^2
+   //par[1]=x^1
+   //par[2]=x^0
+   //par[3]=Norm
+   //par[4]=Width (sigma) of convoluted Gaussian function
+  double invsq2pi = 0.3989422804014;   // (2 pi)^(-1/2)
+  double mpshift  = -0.22278298;       // Landau maximum location
+  double np = 500.0;      // number of convolution steps
+  double sc =   5.0;      // convolution extends to +-sc Gaussian sigmas
+  double xx, mpc, fland, sum = 0.0, xlow,xupp, step, i;
+  double val;
+
+// Range of convolution integral
+  xlow = x[0] - sc * par[4];
+  xupp = x[0] + sc * par[4];
+  step = (xupp-xlow) / np;
+  for(i=1.0; i<=np/2; i++) {
+     xx = xlow + (i-.5) * step;
+     fland = TMath::Gaus(xx,x[0],par[4]);
+if(xlow>-0.125&&xupp<0.125){
+     sum += fland * (par[0]*x[0]*x[0]+par[1]*x[0]+par[2])*(1./(2.*par[0]*pow(0.125,3.)/3.+2.*par[2]*0.125));
+}else sum += fland;
+
+     xx = xupp - (i-.5) * step;
+     fland = TMath::Gaus(xx,x[0],par[4]);
+if(xlow>-0.125&&xupp<0.125){
+     sum += fland * (par[0]*x[0]*x[0]+par[1]*x[0]+par[2])*(1./(2.*par[0]*pow(0.125,3.)/3.+2.*par[2]*0.125));
+}else sum += fland;
+  }
+  val = par[3] * step * sum * invsq2pi / par[4];
+
+  return val;
+}
 
 double expgaus2(double *x, double *par, int num) {
   //par[0]=Total area
@@ -73,6 +117,11 @@ double FMM_Lambda_Sigma( double *x, double *par , int num)
   double val = par[num] * TMath::Gaus(x[0],par[num+1],par[num+2]);//Lambda Gaussian
   val += par[num+3] * TMath::Gaus(x[0],par[num+4],par[num+5]);//Sigma Gaussian
   return val;
+}
+
+double F_VZ( double *x, double *par )
+{
+  return pol2gaus(x,par)+par[5]*TMath::Gaus(x[0],par[6],par[7],1)+par[8]*TMath::Gaus(x[0],par[9],par[10],1)+par[11]*TMath::Gaus(x[0],par[12],par[13],1)+par[14]*TMath::Gaus(x[0],par[15],par[16],1);
 }
 
 double FMM_Response( double *x, double *par ){
@@ -146,14 +195,31 @@ void test_out(){
 cout << "Output pdf file name is " << pdfname << endl;
   
   TFile *file = new TFile("h2all_Lsingle.root","read");//input file of all H2 run(default: h2all4.root)
+  TFile *file_dummy = new TFile("dummy_Tkin/tritium_111325.root","read");//input file of all H2 run(default: h2all4.root)
+  TFile *file_true = new TFile("dummy_Tkin/tritium_111157.root","read");//input file of all H2 run(default: h2all4.root)
 	//ACCBGの引き算はmea_hist.ccから
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea6.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
-  TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_llccrr_new_new.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
+  TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_llccrr_Lsingle.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
   double nbunch = 6000.;//effetive bunches (6 bunches x 5 mixtures)
  // TTree *tree_old = (TTree*)file->Get("tree_out");
 //cout<<"Please wait a moment. CloneTree() is working..."<<endl;
   //TTree *tree = tree_old->CloneTree();
   TTree *tree = (TTree*)file->Get("tree_out");
+  TChain *chain_dummy = new TChain("T");
+	//chain_dummy = (TChain*)file_dummy->Get("T");
+  TChain *chain_true = new TChain("T");// = (TChain*)file_true->Get("T");
+  //TChain *chain_dummy = new TChain("tree_dummy","");
+  //TChain *chain_true = new TChain("tree_true","");
+	chain_dummy->Add("dummy_Tkin/tritium_111325.root");
+	chain_dummy->Add("dummy_Tkin/tritium_111325_1.root");
+	chain_dummy->Add("dummy_Tkin/tritium_111323.root");
+	chain_dummy->Add("dummy_Tkin/tritium_111324.root");
+	chain_dummy->Add("dummy_Tkin/tritium_111324_1.root");
+	chain_true->Add("~/data_okuyama/rootfiles/nnL_temp/tritium_111157_1.root");
+	chain_true->Add("~/data_okuyama/rootfiles/nnL_temp/tritium_111157_2.root");
+	chain_true->Add("~/data_okuyama/rootfiles/nnL_temp/tritium_111157_3.root");
+	chain_true->Add("~/data_okuyama/rootfiles/nnL_temp/tritium_111157_4.root");
+	chain_true->Add("~/data_okuyama/rootfiles/nnL_temp/tritium_111157_5.root");
 //	tree->Write();
 
 
@@ -183,7 +249,7 @@ cout << "Param file : " << daq_file.c_str() << endl;
 		if(ifp.eof())break;
 		stringstream sbuf(buf);
 		sbuf >> runnum >> daq_eff;
-		cout << runnum << ", " << daq_eff <<endl;
+		//cout << runnum << ", " << daq_eff <<endl;
 
 		daq_table[runnum] = daq_eff;
 	}
@@ -208,7 +274,7 @@ cout << "Param file : " << AcceptanceR_table.c_str() << endl;
 		if(ifp2.eof())break;
 		stringstream sbuf2(buf2);
 		sbuf2 >> RHRS_bin >> RHRS_SIMC;
-		cout << RHRS_bin << ", " << RHRS_SIMC <<endl;
+		//cout << RHRS_bin << ", " << RHRS_SIMC <<endl;
 
 		RHRS_table[RHRS_bin-1] = RHRS_SIMC*0.001;//sr
 		RHRS_total+=RHRS_SIMC;
@@ -374,16 +440,23 @@ cout << "Param file : " << AcceptanceR_table.c_str() << endl;
 	double L_tr_x, L_tr_y, L_tr_th, L_tr_ph;
 	double L_tr_p;
 	double L_tr_tg_th, L_tr_tg_ph;
-	double L_tr_vz;
+	double L_tr_vz, L_tr_vz2, L_tr_vz3;
 	double L_tr_vz_saved;
 	double R_tr_chi2;
 	double R_tr_x, R_tr_y, R_tr_th, R_tr_ph;
 	double R_tr_p;
 	double R_tr_tg_th, R_tr_tg_ph;
-	double R_tr_vz;
+	double R_tr_vz, R_tr_vz2, R_tr_vz3;
 	double L_mom, R_mom, B_mom; 
 	double L_ene, R_ene, B_ene; 
 	double ac1sum, ac2sum;//NPE SUM
+
+	//chain_dummy->SetBranchStatus("*",0);
+  	//chain_dummy->SetBranchStatus("L.tr.vz",1);  chain_dummy->SetBranchAddress("L.tr.vz", &L_tr_vz2);
+  	//chain_dummy->SetBranchStatus("R.tr.vz",1);  chain_dummy->SetBranchAddress("R.tr.vz", &R_tr_vz2);
+	//chain_true->SetBranchStatus("*",0);
+  	//chain_true->SetBranchStatus("L.tr.vz",1);  chain_true->SetBranchAddress("L.tr.vz", &L_tr_vz3);
+  	//chain_true->SetBranchStatus("R.tr.vz",1);  chain_true->SetBranchAddress("R.tr.vz", &R_tr_vz3);
 
 	tree->SetBranchStatus("*",0);
 	tree->SetBranchStatus("nrun",1);tree->SetBranchAddress("nrun",&nrun);
@@ -466,6 +539,11 @@ cout << "Param file : " << AcceptanceR_table.c_str() << endl;
   TH1F* h_nltrack  = new TH1F("h_nltrack","NLtr",10,-2,8);
   TH1F* h_nrtrack  = new TH1F("h_nrtrack","NRtr",10,-2,8);
   TH2F* h_pepk  = new TH2F("h_pepk","h_pepk (tight)",40,1.73,1.93,40,1.95,2.25);
+  TH2F* h_zz_dummy  = new TH2F("h_zz_dummy","h_zz_dummy",100,-0.15,0.15,100,-0.15,0.15);
+
+  TH1F* h_zave  = new TH1F("h_zave","Z-vertex (Ave.)",1000,-0.25,0.25);
+  TH1F* h_zave_dummy  = new TH1F("h_zave_dummy","Z-vertex (Ave.)",1000,-0.15,0.15);
+  TH1F* h_zave_true  = new TH1F("h_zave_true","Z-vertex (Ave.)",1000,-0.15,0.15);
   h1 ->SetLineColor(2);
   h1->SetLineWidth(2);
 
@@ -524,6 +602,22 @@ cout<<"cs="<<cs<<endl;
 	double csL[xbin];
 
 
+
+  int ENum_dummy = chain_dummy->GetEntries();
+cout<<"Entries(dummy): "<<ENum_dummy<<endl;
+ // for(int i=0;i<ENum_dummy;i++){
+//	chain_dummy->GetEntry(i);
+	//if(abs(R_tr_vz2-L_tr_vz2)<0.025)h_zave_dummy->Fill((R_tr_vz2+L_tr_vz2)/2.);
+	chain_dummy->Project("h_zave_dummy","(R.tr.vz+L.tr.vz)/2.","abs(R.tr.vz-L.tr.vz)<0.025","");
+	chain_dummy->Project("h_zz_dummy","R.tr.vz:L.tr.vz","","");
+//	}
+  int ENum_true = chain_true->GetEntries();
+cout<<"Entries(true): "<<ENum_true<<endl;
+ // for(int i=0;i<ENum_true;i++){
+//	chain_true->GetEntry(i);
+	//if(abs(R_tr_vz3-L_tr_vz3)<0.025)h_zave_true->Fill((R_tr_vz3+L_tr_vz3)/2.);
+	chain_true->Project("h_zave_true","(R.tr.vz+L.tr.vz)/2.","abs(R.tr.vz-L.tr.vz)<0.025","");
+//	}
 
   //tree->Draw(">>elist" , "fabs(ct_orig[0][0])<1.0");
   tree->Draw(">>elist" , "fabs(ct_orig)<1.006");//ctsum (does NOT dintinguish #track)
@@ -706,6 +800,8 @@ cout<<"Entries: "<<ENum<<endl;
 			h_pepk->Fill(R_mom,L_mom);
 		}
 
+		//if(abs(R_tr_vz-L_tr_vz)<0.025&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP)h_zave->Fill((R_tr_vz+L_tr_vz)/2.);
+		if(abs(R_tr_vz-L_tr_vz)<0.025)h_zave->Fill((R_tr_vz+L_tr_vz)/2.);
 		h_nltrack->Fill(NLtr);
 		h_nrtrack->Fill(NRtr);
 
@@ -945,6 +1041,125 @@ cout<<"Entries: "<<ENum<<endl;
 	h_nrtrack->Draw("");
 	TCanvas* c6 = new TCanvas("c6","c6");
 	h_pepk->Draw("colz");
+	TCanvas* c7 = new TCanvas("c7","c7");
+	c7->SetLogy(1);
+	 TF1* fz_true_front = new TF1("fz_true_front","F_VZ",-0.15,0.15,13);
+	 TF1* fz_true_back  = new TF1("fz_true_back ","F_VZ",-0.15,0.15,13);
+	 TF1* fz_dummy_front = new TF1("fz_dummy_front","F_VZ",-0.15,0.15,13);
+	 TF1* fz_dummy_back  = new TF1("fz_dummy_back ","F_VZ",-0.15,0.15,13);
+	 TF1* fz_corr_front = new TF1("fz_corr_front","F_VZ",-0.15,0.15,13);
+	 TF1* fz_corr_back  = new TF1("fz_corr_back ","F_VZ",-0.15,0.15,13);
+	 TF1* fz_corr  = new TF1("fz_corr","F_VZ",-0.15,0.15,17);
+	 TF1* fz_front  = new TF1("fz_front","gausn(0)+gausn(3)",-0.15,0.15);
+	 TF1* fz_back   = new TF1("fz_back ","gausn(0)+gausn(3)",-0.15,0.15);
+	fz_corr->SetNpx(20000);
+	fz_front->SetNpx(20000);
+	fz_back ->SetNpx(20000);
+   //==pol2gaus
+   //par[0]=x^2
+   //par[1]=x^1
+   //par[2]=x^0
+   //par[3]=Norm
+   //par[4]=Width (sigma) of convoluted Gaussian function
+   //==F_Voigt
+    // par[0] : area
+    // par[1] : location
+    // par[2] : gaussian sigma
+    // par[3] : lorentz fwhm
+	fz_corr->SetParameter(0,-200.);
+	//fz_corr->SetParLimits(0,-0.1,0.1);
+	fz_corr->SetParameter(1,-12.);
+	fz_corr->SetParameter(2,15.);
+	fz_corr->SetParameter(3,2.);
+	fz_corr->SetParameter(4,0.004);
+//front
+	fz_corr->SetParameter(5,2.2);
+	fz_corr->SetParLimits(5,0.,10000.);
+	fz_corr->SetParameter(6,-0.125);
+	fz_corr->SetParameter(7,0.004);//sigma
+	fz_corr->SetParLimits(7,0.,10000.);
+	fz_corr->SetParameter(8,1.35);
+	fz_corr->SetParLimits(8,0.,10000.);
+	fz_corr->SetParameter(9,-0.125);
+	fz_corr->SetParameter(10,0.008);//sigma
+	fz_corr->SetParLimits(10,0.,10000.);
+//back
+	fz_corr->SetParameter(11,1.);
+	fz_corr->SetParLimits(11,0.,10000.);
+	fz_corr->SetParameter(12,0.125);
+	fz_corr->SetParameter(13,0.004);//sigma
+	fz_corr->SetParLimits(13,0.,10000.);
+	fz_corr->SetParameter(14,2.);
+	fz_corr->SetParLimits(14,0.,10000.);
+	fz_corr->SetParameter(15,0.125);
+	fz_corr->SetParameter(16,0.008);//sigma
+	fz_corr->SetParLimits(16,0.,10000.);
+	//h_zave->Draw("");
+	h_zave_true->SetLineColor(kAzure);
+	h_zave_true->Sumw2();
+	//h_zave_dummy->Sumw2();
+	h_zave_true->Scale(0.28*0.997442/40.6/0.946037);
+	//h_zave_dummy->Scale(100./0.28/0.997442);
+	h_zave_dummy->SetLineColor(kRed);
+	h_zave_dummy->Draw("");
+	h_zave_true->Draw("same");
+	//h_zave_true->Fit("fz_true_front","","",-0.145,-0.105);
+	//h_zave_true->Fit("fz_true_back ","","",0.105,0.145);
+//	double Al_contami_true = fz_true_front->Integral(-0.1,0.1);
+//	Al_contami_true+=fz_true_back->Integral(-0.1,0.1);
+//	Al_contami_true/=0.0003;
+//	double Al_contami_dummy = fz_dummy_front->Integral(-0.1,0.1);
+//	Al_contami_dummy+=fz_dummy_back->Integral(-0.1,0.1);
+//	Al_contami_dummy/=0.0003;
+	//h_zave_dummy->Fit("fz_dummy_front","","",-0.145,-0.105);
+	//h_zave_dummy->Fit("fz_dummy_back ","","",0.105,0.145);
+	TCanvas* c8 = new TCanvas("c8","c8");
+	c8->SetLogy(1);
+	//h_zave->Fit("fz_corr_front","","",-0.145,-0.105);
+	//h_zave->Fit("fz_corr_back ","","",0.105,0.145);
+	TCanvas* c9 = new TCanvas("c9","c9");
+	//h_zave_dummy->Draw("");
+	h_zave->Fit("fz_corr","","",-0.15,0.15);
+	fz_front->SetParameter(0,fz_corr->GetParameter(5));
+	fz_front->SetParameter(1,fz_corr->GetParameter(6));
+	fz_front->SetParameter(2,fz_corr->GetParameter(7));
+	fz_front->SetParameter(3,fz_corr->GetParameter(8));
+	fz_front->SetParameter(4,fz_corr->GetParameter(9));
+	fz_front->SetParameter(5,fz_corr->GetParameter(10));
+	fz_back->SetParameter(0,fz_corr->GetParameter(11));
+	fz_back->SetParameter(1,fz_corr->GetParameter(12));
+	fz_back->SetParameter(2,fz_corr->GetParameter(13));
+	fz_back->SetParameter(3,fz_corr->GetParameter(14));
+	fz_back->SetParameter(4,fz_corr->GetParameter(15));
+	fz_back->SetParameter(5,fz_corr->GetParameter(16));
+	fz_front->SetLineColor(kViolet);
+	fz_back->SetLineColor(kViolet);
+	fz_front->SetLineStyle(2);
+	fz_back->SetLineStyle(2);
+	fz_front->Draw("same");
+	fz_back->Draw("same");
+	fz_corr->Draw("same");
+	//fz_corr->Draw("");
+	 double chisq = fz_corr->GetChisquare();
+	 double dof  = fz_corr->GetNDF();
+	 cout<<"chisq="<<chisq<<endl;
+	 cout<<"dof="<<dof<<endl;
+	 cout<<"Reduced chi-square = "<<chisq/dof<<endl;
+
+	double Al_contami_corr = fz_corr->Integral(-0.1,0.1);
+	Al_contami_corr+=fz_corr->Integral(-0.1,0.1);
+	Al_contami_corr/=0.0003;
+	cout<<"Al (corr) = "<<Al_contami_corr<<endl;
+	double Al_contami_front = fz_front->Integral(-0.1,0.1);
+	Al_contami_front+=fz_front->Integral(-0.1,0.1);
+	Al_contami_front/=0.0003;
+	cout<<"Al (front) = "<<Al_contami_front<<endl;
+	double Al_contami_back = fz_back->Integral(-0.1,0.1);
+	Al_contami_back+=fz_back->Integral(-0.1,0.1);
+	Al_contami_back/=0.0003;
+	cout<<"Al (back) = "<<Al_contami_back<<endl;
+	
+//	h_zz_dummy->Draw("colz");
 
 cout << "Well done!" << endl;
 }//fit
