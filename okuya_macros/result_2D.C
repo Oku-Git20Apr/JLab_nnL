@@ -149,10 +149,11 @@ void result_2D(){
 	string pdfname = "fitting.pdf";
 cout << "Output pdf file name is " << pdfname << endl;
   
-  TFile *file = new TFile("h2all.root","read");//input file of all H2 run(default: h2all4.root)
+  TFile *file = new TFile("h2all_Lsingle.root","read");//input file of all H2 run(default: h2all4.root)
 	//ACCBGの引き算はmea_hist.ccから
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea6.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
-  TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_llccrr_new_new.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
+  //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_llccrr_new_new.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
+  TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_llccrr_Lsingle.root","read");//from h2all_Lsingle.root, HRS-L: Single-tracking
   double nbunch = 6000.;//effetive bunches (6 bunches x 5 mixtures)
  // TTree *tree_old = (TTree*)file->Get("tree_out");
 //cout<<"Please wait a moment. CloneTree() is working..."<<endl;
@@ -166,6 +167,8 @@ cout << "Output pdf file name is " << pdfname << endl;
 	string daq_file = "./information/daq.dat";//DAQ Efficiency from ELOG
 	int runnum;
 	double daq_eff;
+	double daq_eff_total=0.;
+	int daq_eff_bin=0;
 	double daq_table[600];
 	for(int nnn=0;nnn<600;nnn++){
 		daq_table[nnn]=0.0;
@@ -187,10 +190,13 @@ cout << "Param file : " << daq_file.c_str() << endl;
 		if(ifp.eof())break;
 		stringstream sbuf(buf);
 		sbuf >> runnum >> daq_eff;
-		cout << runnum << ", " << daq_eff <<endl;
+		//cout << runnum << ", " << daq_eff <<endl;
 
 		daq_table[runnum] = daq_eff;
+		daq_eff_total+=daq_eff;
+		daq_eff_bin++;
 	}
+	cout<<"DAQ Efficiency (average)="<<daq_eff_total/(double)daq_eff_bin<<endl;
 
 //----------------HRS-R Acceptance-----------------//
 
@@ -378,6 +384,8 @@ cout << "Param file : " << AcceptanceR_table_z5.c_str() << endl;
  //const double fit_min_mm=-0.006;
  const double fit_min_mm=-0.01;
  const double fit_max_mm=0.095;
+ const double fmin_mm=-0.01;
+ const double fmax_mm=0.12;
  const int fit_bin_mm = (fit_max_mm-fit_min_mm)/0.001;
  const double fit_bin_width = (fit_max_mm-fit_min_mm)/fit_bin_mm;
 
@@ -525,9 +533,13 @@ cout << "Param file : " << AcceptanceR_table_z5.c_str() << endl;
   hcs_L_fom_best->GetXaxis()->SetTitle("M_{x} - M_{#Lambda} [GeV/c^{2}]");
   hcs_L_fom_best->GetYaxis()->SetTitle("d#sigma/d#Omega (C.M.F.) [nb/sr]");
   hcs_L_fom_best->SetLineColor(1);
+  TH1F* hcs_L_fom_strict  = new TH1F("hcs_L_fom_strict","hcs_L_fom_strict",xbin,xmin,xmax);
+  hcs_L_fom_strict->GetXaxis()->SetTitle("M_{x} - M_{#Lambda} [GeV/c^{2}]");
+  hcs_L_fom_strict->GetYaxis()->SetTitle("d#sigma/d#Omega (C.M.F.) [nb/sr]");
+  hcs_L_fom_strict->SetLineColor(1);
   TH1F* hmm_L_fom_nocut  = new TH1F("hmm_L_fom_nocut","hmm_L_fom_nocut",xbin,xmin,xmax);
 //  TH1F* hmm_bg_fom_best  = new TH1F("hmm_bg_fom_best","hmm_bg_fom_best",xbin,xmin,xmax);
-  TH1F* hmm_wo_bg_fom_best  = new TH1F("hmm_wo_bg_fom_best","hmm_wo_bg_fom_best",xbin/2,xmin,xmax);
+  TH1F* hmm_wo_bg_fom_best  = new TH1F("hmm_wo_bg_fom_best","RESULT (N_{#Lambda}/#Delta#Omega_{K}/#epsilon_{DAQ})",xbin,xmin,xmax);
   TH1F* hmm_wo_bg_fom_nocut  = new TH1F("hmm_wo_bg_fom_nocut","hmm_wo_bg_fom_nocut",xbin,xmin,xmax);
   TH1F* hmm_pi_wobg_fom_best  = new TH1F("hmm_pi_wobg_fom_best","hmm_pi_wobg_fom_best",xbin,xmin,xmax);
   TH1F* hmm_pi_wobg_fom_nocut  = new TH1F("hmm_pi_wobg_fom_nocut","hmm_pi_wobg_fom_nocut",xbin,xmin,xmax);
@@ -560,13 +572,63 @@ cout << "Param file : " << AcceptanceR_table_z5.c_str() << endl;
 
   TH1F* h_test  = new TH1F("h_test","",1000,1.8,2.4);
 
+/*-------------------*/
+/*--Angle partition--*/
+/*-------------------*/
+  TH1F* hcs_L_cm2_1  = new TH1F("hcs_L_cm2_1","#theta_{#gamma K}^{CM}<8 deg",xbin,xmin,xmax);
+  TH1F* hcs_L_cm2_2  = new TH1F("hcs_L_cm2_2","#theta_{#gamma K}^{CM}>8 deg",xbin,xmin,xmax);
+  TH1F* hcs_L_cm3_1  = new TH1F("hcs_L_cm3_1","#theta_{#gamma K}^{CM}<6 deg",xbin,xmin,xmax);
+  TH1F* hcs_L_cm3_2  = new TH1F("hcs_L_cm3_2","6<#theta_{#gamma K}^{CM}<10 deg",xbin,xmin,xmax);
+  TH1F* hcs_L_cm3_3  = new TH1F("hcs_L_cm3_3","#theta_{#gamma K}^{CM}>10 deg",xbin,xmin,xmax);
+  TH1F* hcs_L_cm4_1  = new TH1F("hcs_L_cm4_1","#theta_{#gamma K}^{CM}<5 deg",xbin,xmin,xmax);
+  TH1F* hcs_L_cm4_2  = new TH1F("hcs_L_cm4_2","5<#theta_{#gamma K}^{CM}<8 deg",xbin,xmin,xmax);
+  TH1F* hcs_L_cm4_3  = new TH1F("hcs_L_cm4_3","8<#theta_{#gamma K}^{CM}<11 deg",xbin,xmin,xmax);
+  TH1F* hcs_L_cm4_4  = new TH1F("hcs_L_cm4_4","#theta_{#gamma K}^{CM}>11 deg",xbin,xmin,xmax);
+  TH1F* hmm_wo_bg_cm2_1 = new TH1F("hmm_wo_bg_cm2_1","",xbin,xmin,xmax);
+  TH1F* hmm_wo_bg_cm2_2 = new TH1F("hmm_wo_bg_cm2_2","",xbin,xmin,xmax);
+  TH1F* hmm_wo_bg_cm3_1 = new TH1F("hmm_wo_bg_cm3_1","",xbin,xmin,xmax);
+  TH1F* hmm_wo_bg_cm3_2 = new TH1F("hmm_wo_bg_cm3_2","",xbin,xmin,xmax);
+  TH1F* hmm_wo_bg_cm3_3 = new TH1F("hmm_wo_bg_cm3_3","",xbin,xmin,xmax);
+  TH1F* hmm_wo_bg_cm4_1 = new TH1F("hmm_wo_bg_cm4_1","",xbin,xmin,xmax);
+  TH1F* hmm_wo_bg_cm4_2 = new TH1F("hmm_wo_bg_cm4_2","",xbin,xmin,xmax);
+  TH1F* hmm_wo_bg_cm4_3 = new TH1F("hmm_wo_bg_cm4_3","",xbin,xmin,xmax);
+  TH1F* hmm_wo_bg_cm4_4 = new TH1F("hmm_wo_bg_cm4_4","",xbin,xmin,xmax);
+
+  TH1F* hcs_L_new_cm2_1  = new TH1F("hcs_L_new_cm2_1","#theta_{#gamma K}^{CM}<8 deg",xbin,xmin,xmax);
+  TH1F* hcs_L_new_cm2_2  = new TH1F("hcs_L_new_cm2_2","#theta_{#gamma K}^{CM}>8 deg",xbin,xmin,xmax);
+  TH1F* hcs_L_new_cm3_1  = new TH1F("hcs_L_new_cm3_1","#theta_{#gamma K}^{CM}<6 deg",xbin,xmin,xmax);
+  TH1F* hcs_L_new_cm3_2  = new TH1F("hcs_L_new_cm3_2","6<#theta_{#gamma K}^{CM}<10 deg",xbin,xmin,xmax);
+  TH1F* hcs_L_new_cm3_3  = new TH1F("hcs_L_new_cm3_3","#theta_{#gamma K}^{CM}>10 deg",xbin,xmin,xmax);
+  TH1F* hcs_L_new_cm4_1  = new TH1F("hcs_L_new_cm4_1","#theta_{#gamma K}^{CM}<5 deg",xbin,xmin,xmax);
+  TH1F* hcs_L_new_cm4_2  = new TH1F("hcs_L_new_cm4_2","5<#theta_{#gamma K}^{CM}<8 deg",xbin,xmin,xmax);
+  TH1F* hcs_L_new_cm4_3  = new TH1F("hcs_L_new_cm4_3","8<#theta_{#gamma K}^{CM}<11 deg",xbin,xmin,xmax);
+  TH1F* hcs_L_new_cm4_4  = new TH1F("hcs_L_new_cm4_4","#theta_{#gamma K}^{CM}>11 deg",xbin,xmin,xmax);
+  TH1F* hmm_wo_bg_new_cm2_1 = new TH1F("hmm_wo_bg_new_cm2_1","",xbin,xmin,xmax);
+  TH1F* hmm_wo_bg_new_cm2_2 = new TH1F("hmm_wo_bg_new_cm2_2","",xbin,xmin,xmax);
+  TH1F* hmm_wo_bg_new_cm3_1 = new TH1F("hmm_wo_bg_new_cm3_1","",xbin,xmin,xmax);
+  TH1F* hmm_wo_bg_new_cm3_2 = new TH1F("hmm_wo_bg_new_cm3_2","",xbin,xmin,xmax);
+  TH1F* hmm_wo_bg_new_cm3_3 = new TH1F("hmm_wo_bg_new_cm3_3","",xbin,xmin,xmax);
+  TH1F* hmm_wo_bg_new_cm4_1 = new TH1F("hmm_wo_bg_new_cm4_1","",xbin,xmin,xmax);
+  TH1F* hmm_wo_bg_new_cm4_2 = new TH1F("hmm_wo_bg_new_cm4_2","",xbin,xmin,xmax);
+  TH1F* hmm_wo_bg_new_cm4_3 = new TH1F("hmm_wo_bg_new_cm4_3","",xbin,xmin,xmax);
+  TH1F* hmm_wo_bg_new_cm4_4 = new TH1F("hmm_wo_bg_new_cm4_4","",xbin,xmin,xmax);
   bool L_Tr = false;
   bool L_FP = false;
   bool R_Tr = false;
   bool R_FP = false;
   bool ct_cut = false;
-  bool event_selection = false;
+  bool event_selection = false;//best=loose
+  bool event_selection_new = false;//strict=tight
   bool event_selection_nocut = false;
+  bool cm2_angle1_cut=false;
+  bool cm2_angle2_cut=false;
+  bool cm3_angle1_cut=false;
+  bool cm3_angle2_cut=false;
+  bool cm3_angle3_cut=false;
+  bool cm4_angle1_cut=false;
+  bool cm4_angle2_cut=false;
+  bool cm4_angle3_cut=false;
+  bool cm4_angle4_cut=false;
   double z_par[100], ac_par[100], ct_par[100];
   double z2_par[100][100], ac2_par[100][100];
   double rf_bunch=2.0;//ns (RF bunch structure)
@@ -661,6 +723,9 @@ cout<<"Entries: "<<ENum<<endl;
 		//if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
 		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
 		else event_selection=false;
+
+		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection_new=true;
+		else event_selection_new=false;
 
 		event_selection_nocut=false;
 		if(zcut_flag){
@@ -764,6 +829,20 @@ cout<<"Entries: "<<ENum<<endl;
 		//if(tan_lab1!=tan_lab2)cout<<"tan1="<<atan(tan_lab1)<<", tan2="<<atan(tan_lab2)<<"theta_gk_lab="<<theta_gk_lab<<endl;
 
 
+
+
+//======= CM Angle(gamma-K) ========//
+		if(theta_gk_cm*180./PI<8.)cm2_angle1_cut=true;
+		if(theta_gk_cm*180./PI>8.)cm2_angle2_cut=true;
+		if(theta_gk_cm*180./PI<6.)cm3_angle1_cut=true;
+		if(theta_gk_cm*180./PI>6. && theta_gk_cm*180./PI<10.)cm3_angle2_cut=true;
+		if(theta_gk_cm*180./PI>10.)cm3_angle3_cut=true;
+		if(theta_gk_cm*180./PI<5.)cm4_angle1_cut=true;
+		if(theta_gk_cm*180./PI>5. && theta_gk_cm*180./PI<8.)cm4_angle2_cut=true;
+		if(theta_gk_cm*180./PI>8. && theta_gk_cm*180./PI<11.)cm4_angle3_cut=true;
+		if(theta_gk_cm*180./PI>11.)cm4_angle4_cut=true;
+//======= CM Angle(gamma-K) ========//
+
 		//int ebin = (int)((L_mom-1.8)/0.004);
 		//if(ebin>=0 &&ebin<150){
 		//Ng = Ng_table[ebin]*Ne;//
@@ -791,7 +870,9 @@ cout<<"Entries: "<<ENum<<endl;
 		//cs_ave += cs;
 		//cout<<"Ng="<<Ng<<endl;
 		//cout<<"cs="<<cs<<endl;
-		if(event_selection&&ct_cut&&theta_gk_cm*180./PI>8.)hcs_L_fom_best->Fill(mm,cs);
+		if(event_selection&&ct_cut)hcs_L_fom_best->Fill(mm,cs);
+		if(event_selection_new&&ct_cut)hcs_L_fom_strict->Fill(mm,cs);
+		//if(event_selection&&ct_cut)hcs_L_fom_best->Fill(mm,cs);
 //		//if(event_selection_nocut&&ct_cut)hcs_L_fom_nocut->SetBinContent(hmm_L_fom_best->FindBin(mm),cs);
 
 		if(event_selection&&ct_cut){
@@ -799,6 +880,26 @@ cout<<"Entries: "<<ENum<<endl;
 			gklab_eklab->Fill(theta_gk_lab,theta_ek);
 			eelab_eklab->Fill(theta_ee,theta_ek);
 			eklab_gkcm->Fill(theta_ek,theta_gk_cm);
+			if(cm2_angle1_cut)hcs_L_cm2_1->Fill(mm,cs);
+			if(cm2_angle2_cut)hcs_L_cm2_2->Fill(mm,cs);
+			if(cm3_angle1_cut)hcs_L_cm3_1->Fill(mm,cs);
+			if(cm3_angle2_cut)hcs_L_cm3_2->Fill(mm,cs);
+			if(cm3_angle3_cut)hcs_L_cm3_3->Fill(mm,cs);
+			if(cm4_angle1_cut)hcs_L_cm4_1->Fill(mm,cs);
+			if(cm4_angle2_cut)hcs_L_cm4_2->Fill(mm,cs);
+			if(cm4_angle3_cut)hcs_L_cm4_3->Fill(mm,cs);
+			if(cm4_angle4_cut)hcs_L_cm4_4->Fill(mm,cs);
+		}
+		if(event_selection_new&&ct_cut){
+			if(cm2_angle1_cut)hcs_L_new_cm2_1->Fill(mm,cs);
+			if(cm2_angle2_cut)hcs_L_new_cm2_2->Fill(mm,cs);
+			if(cm3_angle1_cut)hcs_L_new_cm3_1->Fill(mm,cs);
+			if(cm3_angle2_cut)hcs_L_new_cm3_2->Fill(mm,cs);
+			if(cm3_angle3_cut)hcs_L_new_cm3_3->Fill(mm,cs);
+			if(cm4_angle1_cut)hcs_L_new_cm4_1->Fill(mm,cs);
+			if(cm4_angle2_cut)hcs_L_new_cm4_2->Fill(mm,cs);
+			if(cm4_angle3_cut)hcs_L_new_cm4_3->Fill(mm,cs);
+			if(cm4_angle4_cut)hcs_L_new_cm4_4->Fill(mm,cs);
 		}
 
 
@@ -811,10 +912,28 @@ cout<<"Entries: "<<ENum<<endl;
 	TH1F* hmm_pi_fom_nocut=(TH1F*)file->Get("hmm_pi_fom_noZ");
 	TH1F* hmm_Al_fom_nocut=(TH1F*)file->Get("hmm_Al_fom_best");
 	TH1F* hmm_pi_fom_best=(TH1F*)file->Get("hmm_pi_fom_best");
+	TH1F* hmm_bg_cm2_1=(TH1F*)file_mea->Get("hmm_mixacc_result_cm2_1");
+	TH1F* hmm_bg_cm2_2=(TH1F*)file_mea->Get("hmm_mixacc_result_cm2_2");
+	TH1F* hmm_bg_cm3_1=(TH1F*)file_mea->Get("hmm_mixacc_result_cm3_1");
+	TH1F* hmm_bg_cm3_2=(TH1F*)file_mea->Get("hmm_mixacc_result_cm3_2");
+	TH1F* hmm_bg_cm3_3=(TH1F*)file_mea->Get("hmm_mixacc_result_cm3_3");
+	TH1F* hmm_bg_cm4_1=(TH1F*)file_mea->Get("hmm_mixacc_result_cm4_1");
+	TH1F* hmm_bg_cm4_2=(TH1F*)file_mea->Get("hmm_mixacc_result_cm4_2");
+	TH1F* hmm_bg_cm4_3=(TH1F*)file_mea->Get("hmm_mixacc_result_cm4_3");
+	TH1F* hmm_bg_cm4_4=(TH1F*)file_mea->Get("hmm_mixacc_result_cm4_4");
+	TH1F* hmm_bg_new_cm2_1=(TH1F*)file_mea->Get("hmm_mixacc_result_new_cm2_1");
+	TH1F* hmm_bg_new_cm2_2=(TH1F*)file_mea->Get("hmm_mixacc_result_new_cm2_2");
+	TH1F* hmm_bg_new_cm3_1=(TH1F*)file_mea->Get("hmm_mixacc_result_new_cm3_1");
+	TH1F* hmm_bg_new_cm3_2=(TH1F*)file_mea->Get("hmm_mixacc_result_new_cm3_2");
+	TH1F* hmm_bg_new_cm3_3=(TH1F*)file_mea->Get("hmm_mixacc_result_new_cm3_3");
+	TH1F* hmm_bg_new_cm4_1=(TH1F*)file_mea->Get("hmm_mixacc_result_new_cm4_1");
+	TH1F* hmm_bg_new_cm4_2=(TH1F*)file_mea->Get("hmm_mixacc_result_new_cm4_2");
+	TH1F* hmm_bg_new_cm4_3=(TH1F*)file_mea->Get("hmm_mixacc_result_new_cm4_3");
+	TH1F* hmm_bg_new_cm4_4=(TH1F*)file_mea->Get("hmm_mixacc_result_new_cm4_4");
 	//TH1F* hmm_pi_fom_nocut=(TH1F*)file->Get("hmm_pi_fom_noZ");
 	//TH1F* hmm_pi_fom_best=(TH1F*)file->Get("hmm_pi_fom_best");
 	TH1F* hmm_bg_fom_best=(TH1F*)file_mea->Get("hmm_mixacc_result_best");
-	hcs_L_fom_best->Rebin(2);
+	TH1F* hmm_bg_fom_strict=(TH1F*)file_mea->Get("hmm_mixacc_result_new");
 	TH1F* hmm_bg_fom_nocut=(TH1F*)file_mea->Get("hmm_mixacc_result_nocut");
 	TH1F* hmm_Albg_fom_nocut=(TH1F*)file_mea->Get("hmm_mixacc_result_nocut_forAl");
 	//TH1F* hmm_bg_fom_nocut=(TH1F*)file_mea->Get("hmm_mixacc_nocut_result");
@@ -827,21 +946,82 @@ cout<<"Entries: "<<ENum<<endl;
 	cout<<"hmm_bg integral ="<<num2<<endl;
 	cout<<"mixscale(mixed/original)="<<1/mixscale<<endl;
 	hmm_bg_fom_best->Sumw2();
+	hmm_bg_fom_strict->Sumw2();
 	hmm_bg_fom_nocut->Sumw2();
 	hmm_Albg_fom_nocut->Sumw2();
 	hmm_bg_fom_best->Scale(1./nbunch);
+	hmm_bg_fom_strict->Scale(1./nbunch);
 	//cs	 = pow(10.,33.)/(ntar_h2*efficiency*RHRS*Ng);//[nb/sr]
 	cs	 = 1./(effDAQ*RHRS*100.);//[nb/sr]
 	hmm_bg_fom_best->Scale(cs);
-	hmm_bg_fom_best->Rebin(2);
+	hmm_bg_fom_strict->Scale(cs);
+	hmm_bg_cm2_1->Scale(1./nbunch/cs);
+	hmm_bg_cm2_2->Scale(1./nbunch/cs);
+	hmm_bg_cm3_1->Scale(1./nbunch/cs);
+	hmm_bg_cm3_2->Scale(1./nbunch/cs);
+	hmm_bg_cm3_3->Scale(1./nbunch/cs);
+	hmm_bg_cm4_1->Scale(1./nbunch/cs);
+	hmm_bg_cm4_2->Scale(1./nbunch/cs);
+	hmm_bg_cm4_3->Scale(1./nbunch/cs);
+	hmm_bg_cm4_4->Scale(1./nbunch/cs);
+	hmm_bg_new_cm2_1->Scale(1./nbunch/cs);
+	hmm_bg_new_cm2_2->Scale(1./nbunch/cs);
+	hmm_bg_new_cm3_1->Scale(1./nbunch/cs);
+	hmm_bg_new_cm3_2->Scale(1./nbunch/cs);
+	hmm_bg_new_cm3_3->Scale(1./nbunch/cs);
+	hmm_bg_new_cm4_1->Scale(1./nbunch/cs);
+	hmm_bg_new_cm4_2->Scale(1./nbunch/cs);
+	hmm_bg_new_cm4_3->Scale(1./nbunch/cs);
+	hmm_bg_new_cm4_4->Scale(1./nbunch/cs);
 	hmm_bg_fom_nocut->Scale(1./nbunch);
 	hmm_Albg_fom_nocut->Scale(1./nbunch);
 	//TH1F* hmm_wo_bg_fom_best = (TH1F*)hmm_L_fom_best->Clone("hmm_wo_bg_fom_best");
-	hmm_wo_bg_fom_best->Add(hcs_L_fom_best,hmm_bg_fom_best,1.0,-1.0);
+	//hmm_wo_bg_fom_best->Add(hcs_L_fom_best,hmm_bg_fom_best,1.0,-1.0);
+	
+
+
+//MM spctrum to be fitted (2020/10/18)
+//Choose one from the list below
+//===CHANGE===//
+//Loose Cut
+	//hmm_wo_bg_fom_best->Add(hcs_L_fom_best,hmm_bg_fom_best,1.0,-1.0);//All
+	//hmm_wo_bg_fom_best->Add(hcs_L_cm2_1,hmm_bg_cm2_1,1.0,-1.0);//2 div.
+	//hmm_wo_bg_fom_best->Add(hcs_L_cm2_2,hmm_bg_cm2_2,1.0,-1.0);//2 div.
+	//hmm_wo_bg_fom_best->Add(hcs_L_cm3_1,hmm_bg_cm3_1,1.0,-1.0);//3 div.
+	//hmm_wo_bg_fom_best->Add(hcs_L_cm3_2,hmm_bg_cm3_2,1.0,-1.0);//3 div.
+	//hmm_wo_bg_fom_best->Add(hcs_L_cm3_3,hmm_bg_cm3_3,1.0,-1.0);//3 div.
+	//hmm_wo_bg_fom_best->Add(hcs_L_cm4_1,hmm_bg_cm4_1,1.0,-1.0);//4 div.
+	//hmm_wo_bg_fom_best->Add(hcs_L_cm4_2,hmm_bg_cm4_2,1.0,-1.0);//4 div.
+	//hmm_wo_bg_fom_best->Add(hcs_L_cm4_3,hmm_bg_cm4_3,1.0,-1.0);//4 div.
+	//hmm_wo_bg_fom_best->Add(hcs_L_cm4_4,hmm_bg_cm4_4,1.0,-1.0);//4 div.
+	
+//Tight Cut	
+	hmm_wo_bg_fom_best->Add(hcs_L_fom_strict,hmm_bg_fom_strict,1.0,-1.0);//All
+	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm2_1,hmm_bg_new_cm2_1,1.0,-1.0);//2 div.
+	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm2_2,hmm_bg_new_cm2_2,1.0,-1.0);//2 div.
+	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm3_1,hmm_bg_new_cm3_1,1.0,-1.0);//3 div.
+	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm3_2,hmm_bg_new_cm3_2,1.0,-1.0);//3 div.
+	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm3_3,hmm_bg_new_cm3_3,1.0,-1.0);//3 div.
+	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm4_1,hmm_bg_new_cm4_1,1.0,-1.0);//4 div.
+	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm4_2,hmm_bg_new_cm4_2,1.0,-1.0);//4 div.
+	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm4_3,hmm_bg_new_cm4_3,1.0,-1.0);//4 div.
+	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm4_4,hmm_bg_new_cm4_4,1.0,-1.0);//4 div.
+//===CHANGE===//
+
+
 	hmm_wo_bg_fom_nocut->Add(hmm_L_fom_nocut,hmm_bg_fom_nocut,1.0,-1.0);
 	//hmm_pi_wobg_fom_best->Add(hmm_pi_fom_best,hmm_bg_fom_best,1.0,-1.0);
 	//hmm_pi_wobg_fom_nocut->Add(hmm_pi_fom_nocut,hmm_bg_fom_nocut,1.0,-1.0);
 	hmm_pi_wobg_fom_nocut->Add(hmm_Al_fom_nocut,hmm_Albg_fom_nocut,1.0,-1.0);
+	hmm_wo_bg_cm2_1->Add(hcs_L_cm2_1,hmm_bg_cm2_1,1.0,-1.0);
+	hmm_wo_bg_cm2_2->Add(hcs_L_cm2_2,hmm_bg_cm2_2,1.0,-1.0);
+	hmm_wo_bg_cm3_1->Add(hcs_L_cm3_1,hmm_bg_cm3_1,1.0,-1.0);
+	hmm_wo_bg_cm3_2->Add(hcs_L_cm3_2,hmm_bg_cm3_2,1.0,-1.0);
+	hmm_wo_bg_cm3_3->Add(hcs_L_cm3_3,hmm_bg_cm3_3,1.0,-1.0);
+	hmm_wo_bg_cm4_1->Add(hcs_L_cm4_1,hmm_bg_cm4_1,1.0,-1.0);
+	hmm_wo_bg_cm4_2->Add(hcs_L_cm4_2,hmm_bg_cm4_2,1.0,-1.0);
+	hmm_wo_bg_cm4_3->Add(hcs_L_cm4_3,hmm_bg_cm4_3,1.0,-1.0);
+	hmm_wo_bg_cm4_4->Add(hcs_L_cm4_4,hmm_bg_cm4_4,1.0,-1.0);
 
 
 	 double constL=0.;
@@ -921,7 +1101,7 @@ cout<<"BEST CUT START"<<endl;
 /*%%%%%%%%%%%%%%%%%%%%%%%%*/
 	//--- w/ 4th Polynomial func.
 	 cout<<"4Poly MODE START"<<endl;
-	 fmm_best_4Poly=new TF1("fmm_best_4Poly",FMM_Res,fit_min_mm,fit_max_mm,14);
+	 fmm_best_4Poly=new TF1("fmm_best_4Poly",FMM_Res,fmin_mm,fmax_mm,14);
    //par[0]=Width (scale) parameter of Landau density
    //par[1]=Most Probable (MP, location) parameter of Landau density
    //par[2]=Total area (integral -inf to inf, normalization constant)
@@ -936,7 +1116,7 @@ cout<<"BEST CUT START"<<endl;
    //par[1]=Most Probable (MP, location) parameter of Landau density
    //par[2]=Total area (integral -inf to inf, normalization constant)
    //par[3]=Width (sigma) of convoluted Gaussian function
-	 fmmbg_best_4Poly=new TF1("fmmbg_best_4Poly","pol4",fit_min_mm,fit_max_mm);
+	 fmmbg_best_4Poly=new TF1("fmmbg_best_4Poly","pol4",fmin_mm,fmax_mm);
 	 fmm_best_4Poly->SetNpx(20000);
 	 fmm_best_4Poly->SetTitle("Missing Mass (best)");
 	 fmm_best_4Poly->SetParLimits(2,0.,1000.);//positive
@@ -975,8 +1155,8 @@ cout<<"BEST CUT START"<<endl;
 	 cout<<"Reduced chi-square = "<<chisq/dof<<endl;
 
 
-	 TF1* fmm_Lambda_only = new TF1("fmm_Lambda_only",FMM_Response,fit_min_mm,fit_max_mm,7);
-	 TF1* fmm_Sigma_only  = new TF1("fmm_Sigma_only" ,FMM_Response, fit_min_mm,fit_max_mm,7);
+	 TF1* fmm_Lambda_only = new TF1("fmm_Lambda_only",FMM_Response,fmin_mm,fmax_mm,7);
+	 TF1* fmm_Sigma_only  = new TF1("fmm_Sigma_only" ,FMM_Response, fmin_mm,fmax_mm,7);
 //Lambda_only
 	 fmm_Lambda_only->SetNpx(20000);
 	 fmm_Lambda_only->SetParameter(0,fmm_best_4Poly->GetParameter(0));
@@ -996,7 +1176,7 @@ cout<<"BEST CUT START"<<endl;
 	 fmm_Sigma_only->SetParameter(5,fmm_best_4Poly->GetParameter(12));
 	 fmm_Sigma_only->SetParameter(6,fmm_best_4Poly->GetParameter(13));
 
-	double nofL = fmm_Lambda_only->Integral(fit_min_mm,fit_max_mm);
+	double nofL = fmm_Lambda_only->Integral(fmin_mm,fmax_mm);
 	double nofL_old = fmm_Lambda_only->Integral(-0.006,0.006);
 	nofL = nofL/fit_bin_width;
 	nofL_old = nofL_old/fit_bin_width;
@@ -1004,7 +1184,7 @@ cout<<"BEST CUT START"<<endl;
 	cout<<"Number of Lambda w/o radiative tail (TF1 Integral) = "<<nofL_old<<endl;
 	cout<<"Number of Lambda w/o radiative tail (TH1F Integral) = "<<hmm_wo_bg_fom_best->Integral(hmm_wo_bg_fom_best->FindBin(-0.006),hmm_wo_bg_fom_best->FindBin(0.006))<<endl;
 
-	double nofS = fmm_Sigma_only->Integral(fit_min_mm,fit_max_mm);
+	double nofS = fmm_Sigma_only->Integral(fmin_mm,fmax_mm);
 	nofS = nofS/fit_bin_width;
 	cout<<"Number of Sigma (TF1 Integral) = "<<nofS<<endl;
 

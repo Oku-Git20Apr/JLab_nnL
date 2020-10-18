@@ -175,6 +175,15 @@ cout << "Output root file name is " << rootname << endl;
   TH1F* hmm_mixacc_result_cm4_2  = new TH1F("hmm_mixacc_result_cm4_2","5<#theta_{#gamma K}^{CM}<8 deg",xbin,xmin,xmax);
   TH1F* hmm_mixacc_result_cm4_3  = new TH1F("hmm_mixacc_result_cm4_3","8<#theta_{#gamma K}^{CM}<11 deg",xbin,xmin,xmax);
   TH1F* hmm_mixacc_result_cm4_4  = new TH1F("hmm_mixacc_result_cm4_4","#theta_{#gamma K}^{CM}>11 deg",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_new_cm2_1  = new TH1F("hmm_mixacc_result_new_cm2_1","(tight) #theta_{#gamma K}^{CM}<8 deg",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_new_cm2_2  = new TH1F("hmm_mixacc_result_new_cm2_2","(tight) #theta_{#gamma K}^{CM}>8 deg",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_new_cm3_1  = new TH1F("hmm_mixacc_result_new_cm3_1","(tight) #theta_{#gamma K}^{CM}<6 deg",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_new_cm3_2  = new TH1F("hmm_mixacc_result_new_cm3_2","(tight) 6<#theta_{#gamma K}^{CM}<10 deg",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_new_cm3_3  = new TH1F("hmm_mixacc_result_new_cm3_3","(tight) #theta_{#gamma K}^{CM}>10 deg",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_new_cm4_1  = new TH1F("hmm_mixacc_result_new_cm4_1","(tight) #theta_{#gamma K}^{CM}<5 deg",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_new_cm4_2  = new TH1F("hmm_mixacc_result_new_cm4_2","(tight) 5<#theta_{#gamma K}^{CM}<8 deg",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_new_cm4_3  = new TH1F("hmm_mixacc_result_new_cm4_3","(tight) 8<#theta_{#gamma K}^{CM}<11 deg",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_new_cm4_4  = new TH1F("hmm_mixacc_result_new_cm4_4","(tight) #theta_{#gamma K}^{CM}>11 deg",xbin,xmin,xmax);
 /*-----------------*/
 /*--RESULT OUTPUT--*/
 /*-----------------*/
@@ -480,15 +489,24 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
 			if(event_selection_zdiff)hmm_mixacc_result_zdiff->Fill(mm_mixed);
 			if(ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP&&(fabs(R_tr_vz-L_tr_vz)<0.025)&&(fabs(fabs(R_tr_vz+L_tr_vz)/2.-0.12)<0.01||fabs(fabs(R_tr_vz+L_tr_vz)/2.+0.12)<0.01))hmm_mixacc_result_nocut_forAl->Fill(mm_mixed);//Al selection
 			if(ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&(fabs(R_tr_vz-L_tr_vz)<0.025)&&(fabs(fabs(R_tr_vz+L_tr_vz)/2.-0.12)<0.01||fabs(fabs(R_tr_vz+L_tr_vz)/2.+0.12)<0.01))hmm_mixacc_result_nocut_new_forAl->Fill(mm_mixed);//Al selection
-			if(cm2_angle1_cut)hmm_mixacc_result_cm2_1->Fill(mm_mixed);
-			if(cm2_angle2_cut)hmm_mixacc_result_cm2_2->Fill(mm_mixed);
-			if(cm3_angle1_cut)hmm_mixacc_result_cm3_1->Fill(mm_mixed);
-			if(cm3_angle2_cut)hmm_mixacc_result_cm3_2->Fill(mm_mixed);
-			if(cm3_angle3_cut)hmm_mixacc_result_cm3_3->Fill(mm_mixed);
-			if(cm4_angle1_cut)hmm_mixacc_result_cm4_1->Fill(mm_mixed);
-			if(cm4_angle2_cut)hmm_mixacc_result_cm4_2->Fill(mm_mixed);
-			if(cm4_angle3_cut)hmm_mixacc_result_cm4_3->Fill(mm_mixed);
-			if(cm4_angle4_cut)hmm_mixacc_result_cm4_4->Fill(mm_mixed);
+			if(event_selection&&cm2_angle1_cut)hmm_mixacc_result_cm2_1->Fill(mm_mixed);
+			if(event_selection&&cm2_angle2_cut)hmm_mixacc_result_cm2_2->Fill(mm_mixed);
+			if(event_selection&&cm3_angle1_cut)hmm_mixacc_result_cm3_1->Fill(mm_mixed);
+			if(event_selection&&cm3_angle2_cut)hmm_mixacc_result_cm3_2->Fill(mm_mixed);
+			if(event_selection&&cm3_angle3_cut)hmm_mixacc_result_cm3_3->Fill(mm_mixed);
+			if(event_selection&&cm4_angle1_cut)hmm_mixacc_result_cm4_1->Fill(mm_mixed);
+			if(event_selection&&cm4_angle2_cut)hmm_mixacc_result_cm4_2->Fill(mm_mixed);
+			if(event_selection&&cm4_angle3_cut)hmm_mixacc_result_cm4_3->Fill(mm_mixed);
+			if(event_selection&&cm4_angle4_cut)hmm_mixacc_result_cm4_4->Fill(mm_mixed);
+			if(event_selection_new&&cm2_angle1_cut)hmm_mixacc_result_new_cm2_1->Fill(mm_mixed);
+			if(event_selection_new&&cm2_angle2_cut)hmm_mixacc_result_new_cm2_2->Fill(mm_mixed);
+			if(event_selection_new&&cm3_angle1_cut)hmm_mixacc_result_new_cm3_1->Fill(mm_mixed);
+			if(event_selection_new&&cm3_angle2_cut)hmm_mixacc_result_new_cm3_2->Fill(mm_mixed);
+			if(event_selection_new&&cm3_angle3_cut)hmm_mixacc_result_new_cm3_3->Fill(mm_mixed);
+			if(event_selection_new&&cm4_angle1_cut)hmm_mixacc_result_new_cm4_1->Fill(mm_mixed);
+			if(event_selection_new&&cm4_angle2_cut)hmm_mixacc_result_new_cm4_2->Fill(mm_mixed);
+			if(event_selection_new&&cm4_angle3_cut)hmm_mixacc_result_new_cm4_3->Fill(mm_mixed);
+			if(event_selection_new&&cm4_angle4_cut)hmm_mixacc_result_new_cm4_4->Fill(mm_mixed);
 //cout<<"mm="<<mm<<endl;
 //cout<<"mm_mixed="<<mm_mixed<<endl;
 	}//Mix (j loop)

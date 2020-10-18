@@ -143,7 +143,7 @@ int main(int argc, char** argv){
 	double phimax = 1.*(centralphi + phiwidth);
 	double omega = 2.*PI* (1-cos(thetawidth))*1000.; // [msr]
 	double momwidth = 0.5;
-	double MAX = 0.00001;
+	double MAX = 0.01;
 	double volume = omega*MAX/1000.; 
 	cout<< "thetamin = " << thetamin*180/PI << " [deg]" <<endl;
 	cout<< "thetamax = " << thetamax*180/PI << " [deg]" <<endl;
@@ -154,8 +154,8 @@ int main(int argc, char** argv){
 
 
 	int bin_mom = 150;
-	double min_mom = 1900;//nnL
-	double max_mom = 2300;//nnL
+	double min_mom = 1.9;//nnL
+	double max_mom = 2.3;//nnL
 	int bin_th = 150;
 	//double min_th = 0.10;
 	//double max_th = 0.35;
@@ -212,15 +212,17 @@ int main(int argc, char** argv){
     tree->GetEntry(i);
     if(i%100000==0)cout<<i<<" / "<<ENum<<endl;
 	
-	double Einc  = 4318.;//[MeV]
-	//double Escat = 2.1;//[MeV]
-	double Escat = L_mom;//[MeV]
+	L_mom /= 1000.;//MeV-->GeV
+	R_mom /= 1000.;//MeV-->GeV
+	double Einc  = 4.318;//[GeV]
+	//double Escat = 2.1;//[GeV]
+	double Escat = L_mom;//[GeV]
 	double theta = L_th+centraltheta;	
 
-	double Me=pow(511,-3.);//[MeV/c^2]
-	double Mp=938.2720;//[MeV/c^2]
-	double MK=494.677;//[MeV/c^2]
-    double ML = 1115.683;//[MeV/c2]
+	double Me=pow(511,-6.);//[GeV/c^2]
+	double Mp=0.9382720;//[GeV/c^2]
+	double MK=0.494677;//[GeV/c^2]
+    double ML = 1.115683;//[GeV/c2]
     double mh = ML;//hypernuclei
     double mt = Mp;//target mass
 	double Qsq=2*Einc*Escat*(1-cos(theta));
@@ -231,10 +233,10 @@ int main(int argc, char** argv){
 		//h_mom_gen->SetBinContent(h_mom_gen->FindBin(mom),deltaE);
 		//h_mom_result->SetBinContent(h_mom_gen->FindBin(mom),mom);
 		for(int i=0;i<bin_mom;i++){
-		//h_mom_gen->SetBinContent(i,26147*(1./189.)*(max_mom-min_mom)/bin_mom);//first try
-		//h_mom_gen->SetBinContent(i,2583235*(1./189.)*(max_mom-min_mom)/bin_mom);//LHRS 1,000,000 (2020/10/4)
-		h_mom_gen->SetBinContent(i,2582007*(1./189.)*(max_mom-min_mom)/bin_mom);//LHRS 1,000,000 (2020/10/13)// true density
-		//h_mom_gen->SetBinContent(i,2549979*(1./189.)*(max_mom-min_mom)/bin_mom);//RHRS 1,000,000 (2020/10/4)
+		//h_mom_gen->SetBinContent(i,26147*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//first try
+		//h_mom_gen->SetBinContent(i,2583235*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//LHRS 1,000,000 (2020/10/4)
+		h_mom_gen->SetBinContent(i,2582007*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//LHRS_new 1,000,000 (2020/10/17)// true density
+		//h_mom_gen->SetBinContent(i,2549979*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//RHRS 1,000,000 (2020/10/4)
 		}
 	double vpflux=Escat*kg/(137*2*PI*PI*Einc*Qsq*(1-eps));
 	double k = MAX*gRandom->Uniform();
@@ -279,8 +281,8 @@ int main(int argc, char** argv){
 
 
 
-	    double pL    = L_mom;//MeV
-	    double pR    = R_mom;//MeV
+	    double pL    = L_mom;//GeV
+	    double pR    = R_mom;//GeV
 		theta = L_th;
 		double theta_R = R_th;
 		double phi = L_ph;
@@ -357,7 +359,7 @@ int main(int argc, char** argv){
 	 if(vpflux>k){//Full
 		h_vp_mom->Fill(L_mom);
 		//if(L_mom>2100.&&theta_gk_cm*180./PI>10.)h_vp_mom2->Fill(L_mom);
-		if(L_mom>2100.)h_vp_mom2->Fill(L_mom);
+		if(L_mom>2.1)h_vp_mom2->Fill(L_mom);
 	}
 	}
 
@@ -431,7 +433,7 @@ int main(int argc, char** argv){
 	c1->cd(1);
 //	hframe = (TH1D*)gPad->DrawFrame( min_mom_gen, 0., max_mom_gen, omega + 0.5);
 	//SetTitle(h_sa_mom_result, "Solid Angle vs. Momentum at Reference Plane", "Momentum [GeV/c]", "Solid Angle [msr]");
-	SetTitle(h_sa_mom_result, "Solid Angle vs. Momentum (w/ all Cuts)", "Momentum [MeV/c]", "Solid Angle [msr]");
+	SetTitle(h_sa_mom_result, "Solid Angle vs. Momentum (w/ all Cuts)", "Momentum [GeV/c]", "Solid Angle [msr]");
 //	h_sa_mom_result->GetXaxis()->SetNdivisions(506, kFALSE);
 	h_sa_mom_result->GetXaxis()->SetNdivisions(505, kFALSE);
 	h_sa_mom_result->SetMarkerColor(kRed);
@@ -441,11 +443,11 @@ int main(int argc, char** argv){
 	h_sa_mom_result->Draw("p same");
 //	lmom->Draw("same");
 	c1->cd(2);
-	SetTitle(h_mom_gen, "Solid Angle vs. Momentum (generated)", "Momentum [MeV/c]", "Solid Angle [msr]");
+	SetTitle(h_mom_gen, "Solid Angle vs. Momentum (generated)", "Momentum [GeV/c]", "Solid Angle [msr]");
 	h_mom_gen->GetXaxis()->SetNdivisions(505, kFALSE);
 	h_mom_gen->Draw();
 	c1->cd(3);
-	SetTitle(h_mom_result, "Solid Angle vs. Momentum (cut)", "Momentum [MeV/c]", "Solid Angle [msr]");
+	SetTitle(h_mom_result, "Solid Angle vs. Momentum (cut)", "Momentum [GeV/c]", "Solid Angle [msr]");
 	h_mom_result->GetXaxis()->SetNdivisions(505, kFALSE);
 	h_mom_result->Draw();
 	c1->cd(4);
@@ -460,17 +462,20 @@ int main(int argc, char** argv){
 		//h_vp_mom_result->Scale(bin_mom);
 	h_vp_mom_result->GetXaxis()->SetNdivisions(505, kFALSE);
 	h_vp_mom_result->Draw();
+	c2->cd(2);
+	h_vp_mom_result->GetXaxis()->SetNdivisions(505, kFALSE);
+	h_vp_mom_result->Draw();
 		//h_vp_mom_result2->Scale(bin_mom);
 	h_vp_mom_result2->GetXaxis()->SetNdivisions(505, kFALSE);
 	h_vp_mom_result2->SetLineColor(kAzure);
 	h_vp_mom_result2->Draw("same");
 	double ymax = (h_vp_mom_result->GetBinContent(h_vp_mom_result->GetMaximumBin()));
-	TLine *RHRS_min = new TLine( 2100., 0., 2100, 1.1*ymax);
-	TLine *RHRS_max = new TLine( 2220, 0., 2220, 1.1*ymax);
+	TLine *RHRS_min = new TLine( 2.1, 0., 2.1, 1.1*ymax);
+	TLine *RHRS_max = new TLine( 2.2, 0., 2.2, 1.1*ymax);
 	RHRS_min->SetLineColor(kRed);
 	RHRS_max->SetLineColor(kRed);
 	RHRS_min->Draw("same");
-	RHRS_max->Draw("same");
+	//RHRS_max->Draw("same");
 	c2->cd(3);
 	h_vp_mom->Draw();
 

@@ -14,7 +14,12 @@
 - SpectMode: e+p
 - 1,000,000 events
 
-2020.10.17 BOTH.root (2582007)
+2020.10.17 LHRS_new.root (2582007)
 - thick: 70.8 [mg/cm^2], rho=0.002832 [g/cm^3]
 - SpectMode: e
+- 1,000,000 events
+
+2020.10.18 RHRS_new.root (2547932)
+- thick: 70.8 [mg/cm^2], rho=0.002832 [g/cm^3]
+- SpectMode: p
 - 1,000,000 events

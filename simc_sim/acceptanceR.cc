@@ -35,7 +35,7 @@ int main(int argc, char** argv){
 	//////////////////////
 	int option;
 	//string filename = "1H_kaon";
-	string filename = "RHRS";
+	string filename = "RHRS_new";
 	bool BatchFlag = true;
 	bool PDFFlag = true;
 
@@ -95,10 +95,10 @@ int main(int argc, char** argv){
 
 
 	int bin_mom = 150;
-	double min_mom = 1600;//nnL
-	double max_mom = 2000;//nnL
-	double min_mom_cm = 450;//nnL
-	double max_mom_cm = 850;//nnL
+	double min_mom = 1.6;//nnL
+	double max_mom = 2.0;//nnL
+	double min_mom_cm = 0.45;//nnL
+	double max_mom_cm = 0.85;//nnL
 	int bin_th = 150;
 	//double min_th = 0.10;
 	//double max_th = 0.35;
@@ -152,15 +152,17 @@ int main(int argc, char** argv){
     tree->GetEntry(i);
     if(i%100000==0)cout<<i<<" / "<<ENum<<endl;
 	
-	double Einc  = 4318.;//[MeV]
-	//double Escat = 2.1;//[MeV]
-	double Escat = L_mom;//[MeV]
+	L_mom /= 1000.;//MeV-->GeV
+	R_mom /= 1000.;//MeV-->GeV
+	double Einc  = 4.318;//[GeV]
+	//double Escat = 2.1;//[GeV]
+	double Escat = L_mom;//[GeV]
 	double theta = L_th+centraltheta;	
 
-	double Me=pow(511,-3.);//[MeV/c^2]
-	double Mp=938.2720;//[MeV/c^2]
-	double MK=494.677;//[MeV/c^2]
-    double ML = 1115.683;//[MeV/c2]
+	double Me=pow(511,-6.);//[GeV/c^2]
+	double Mp=0.9382720;//[GeV/c^2]
+	double MK=0.494677;//[GeV/c^2]
+    double ML = 1.115683;//[GeV/c2]
     double mh = ML;//hypernuclei
     double mt = Mp;//target mass
 	double Qsq=2*Einc*Escat*(1-cos(theta));
@@ -172,12 +174,14 @@ int main(int argc, char** argv){
 		//h_mom_result->SetBinContent(h_mom_gen->FindBin(mom),mom);
 		for(int i=0;i<bin_mom;i++){
 		//h_mom_gen->SetBinContent(i,26147*(1./189.)*(max_mom-min_mom)/bin_mom);//first try
-		h_mom_gen->SetBinContent(i,2549979*(1./163.8)*(max_mom-min_mom)/bin_mom);//RHRS 1,000,000 (2020/10/4), w/ z dep.
-		h_mom_gen_cm->SetBinContent(i,2549979*(4./25.)*(1./163.8)*(max_mom_cm-min_mom_cm)/bin_mom);//RHRS 1,000,000 (2020/10/4), w/ z dep.
-		//h_mom_gen->SetBinContent(i,2549979*(1./163.8)*(max_mom-min_mom)/bin_mom);//RHRS 1,000,000 (2020/10/4)
-		//h_mom_gen_cm->SetBinContent(i,2549979*(1./163.8)*(max_mom_cm-min_mom_cm)/bin_mom);//RHRS 1,000,000 (2020/10/4)
-		//h_mom_gen->SetBinContent(i,5248172*(1./163.8)*(max_mom-min_mom)/bin_mom);//BOTH 1,000,000 (2020/10/4)
-		//h_mom_gen_cm->SetBinContent(i,5248172*(1./163.8)*(max_mom_cm-min_mom_cm)/bin_mom);//BOTH 1,000,000 (2020/10/4)
+		h_mom_gen->SetBinContent(i,2547932*(1./163.8)*1000.*(max_mom-min_mom)/bin_mom);//RHRS_new 1,000,000 (2020/10/18)
+		h_mom_gen_cm->SetBinContent(i,2547932*(4./25.)*1000.*(1./163.8)*(max_mom_cm-min_mom_cm)/bin_mom);//RHRS_new 1,000,000 (2020/10/18)
+		//h_mom_gen->SetBinContent(i,2549979*(1./163.8)*1000.*(max_mom-min_mom)/bin_mom);//RHRS 1,000,000 (2020/10/4), w/ z dep.
+		//h_mom_gen_cm->SetBinContent(i,2549979*(4./25.)*1000.*(1./163.8)*(max_mom_cm-min_mom_cm)/bin_mom);//RHRS 1,000,000 (2020/10/4), w/ z dep.
+		//h_mom_gen->SetBinContent(i,2549979*(1./163.8)*1000.*(max_mom-min_mom)/bin_mom);//RHRS 1,000,000 (2020/10/4)
+		//h_mom_gen_cm->SetBinContent(i,2549979*(1./163.8)*1000.*(max_mom_cm-min_mom_cm)/bin_mom);//RHRS 1,000,000 (2020/10/4)
+		//h_mom_gen->SetBinContent(i,5248172*(1./163.8)*1000.*(max_mom-min_mom)/bin_mom);//BOTH 1,000,000 (2020/10/4)
+		//h_mom_gen_cm->SetBinContent(i,5248172*(1./163.8)*1000.*(max_mom_cm-min_mom_cm)/bin_mom);//BOTH 1,000,000 (2020/10/4)
 		}
 	double vpflux=Escat*kg/(137*2*PI*PI*Einc*Qsq*(1-eps));
 	double k = MAX*gRandom->Uniform();
@@ -221,8 +225,8 @@ int main(int argc, char** argv){
 
 
 
-	    double pL    = L_mom;//MeV
-	    double pR    = R_mom;//MeV
+	    double pL    = L_mom;//GeV
+	    double pR    = R_mom;//GeV
 		theta = L_th;
 		double theta_R = R_th;
 		double phi = L_ph;
@@ -348,7 +352,7 @@ int main(int argc, char** argv){
 	c1->cd(1);
 //	hframe = (TH1D*)gPad->DrawFrame( min_mom_gen, 0., max_mom_gen, omega + 0.5);
 	//SetTitle(h_sa_mom_result, "Solid Angle vs. Momentum at Reference Plane", "Momentum [GeV/c]", "Solid Angle [msr]");
-	SetTitle(h_sa_mom_result, "Solid Angle vs. Momentum (w/ all Cuts)", "Momentum [MeV/c]", "Solid Angle [msr]");
+	SetTitle(h_sa_mom_result, "Solid Angle vs. Momentum (w/ all Cuts)", "Momentum [GeV/c]", "Solid Angle [msr]");
 //	h_sa_mom_result->GetXaxis()->SetNdivisions(506, kFALSE);
 	h_sa_mom_result->GetXaxis()->SetNdivisions(505, kFALSE);
 	h_sa_mom_result->SetMarkerColor(kSpring-1);
@@ -359,11 +363,11 @@ int main(int argc, char** argv){
 	h_sa_mom_result->Draw("p same");
 //	lmom->Draw("same");
 	c1->cd(2);
-	SetTitle(h_mom_gen, "Solid Angle vs. Momentum (generated)", "Momentum [MeV/c]", "Solid Angle [msr]");
+	SetTitle(h_mom_gen, "Solid Angle vs. Momentum (generated)", "Momentum [GeV/c]", "Solid Angle [msr]");
 	h_mom_gen->GetXaxis()->SetNdivisions(505, kFALSE);
 	h_mom_gen->Draw();
 	c1->cd(3);
-	SetTitle(h_mom_result, "Solid Angle vs. Momentum (cut)", "Momentum [MeV/c]", "Solid Angle [msr]");
+	SetTitle(h_mom_result, "Solid Angle vs. Momentum (cut)", "Momentum [GeV/c]", "Solid Angle [msr]");
 	h_mom_result->GetXaxis()->SetNdivisions(505, kFALSE);
 	h_mom_result->Draw();
 	c1->cd(4);
@@ -375,19 +379,19 @@ int main(int argc, char** argv){
 	c2->Divide(2,2);
 	c2->cd(1);
 //	hframe = (TH1D*)gPad->DrawFrame( min_mom_gen_cm, 0., max_mom_gen_cm, omega + 0.5);
-	//SetTitle(h_sa_mom_result_cm, "Solid Angle vs. Momentum at Reference Plane (CM)", "Momentum [MeV/c]", "Solid Angle [msr]");
-	SetTitle(h_sa_mom_result_cm, "Solid Angle vs. Momentum in CM (w/ all Cuts)", "Momentum [MeV/c]", "Solid Angle [msr]");
+	//SetTitle(h_sa_mom_result_cm, "Solid Angle vs. Momentum at Reference Plane (CM)", "Momentum [GeV/c]", "Solid Angle [msr]");
+	SetTitle(h_sa_mom_result_cm, "Solid Angle vs. Momentum in CM (w/ all Cuts)", "Momentum [GeV/c]", "Solid Angle [msr]");
 //	h_sa_mom_result_cm->GetXaxis()->SetNdivisions(506, kFALSE);
 	h_sa_mom_result_cm->GetXaxis()->SetNdivisions(505, kFALSE);
 //	h_sa_mom_result_cm->Draw("same");
 	h_sa_mom_result_cm->Draw();
 //	lmom->Draw("same");
 	c2->cd(2);
-	SetTitle(h_mom_gen_cm, "Solid Angle vs. Momentum in CM (generated)", "Momentum [MeV/c]", "Solid Angle [msr]");
+	SetTitle(h_mom_gen_cm, "Solid Angle vs. Momentum in CM (generated)", "Momentum [GeV/c]", "Solid Angle [msr]");
 	h_mom_gen_cm->GetXaxis()->SetNdivisions(505, kFALSE);
 	h_mom_gen_cm->Draw();
 	c2->cd(3);
-	SetTitle(h_mom_result_cm, "Solid Angle vs. Momentum in CM (cut)", "Momentum [MeV/c]", "Solid Angle [msr]");
+	SetTitle(h_mom_result_cm, "Solid Angle vs. Momentum in CM (cut)", "Momentum [GeV/c]", "Solid Angle [msr]");
 	h_mom_result_cm->GetXaxis()->SetNdivisions(505, kFALSE);
 	h_mom_result_cm->Draw();
 	c2->cd(4);
