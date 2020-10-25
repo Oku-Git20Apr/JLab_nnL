@@ -386,6 +386,7 @@ cout << "Param file : " << AcceptanceR_table_z5.c_str() << endl;
  const double fit_max_mm=0.085;
  const double fmin_mm=-0.01;
  const double fmax_mm=0.12;
+ //const double fmax_mm=10.;
  const int fit_bin_mm = (fit_max_mm-fit_min_mm)/0.001;
  const double fit_bin_width = (fit_max_mm-fit_min_mm)/fit_bin_mm;
 
@@ -971,7 +972,7 @@ cout<<"Entries: "<<ENum<<endl;
 	//cs	 = pow(10.,33.)/(ntar_h2*efficiency*RHRS*Ng);//[nb/sr]
 	cs	 = 1./(effDAQ*RHRS*100.);//[nb/sr]
 	hmm_bg_fom_best->Scale(cs);
-	//hmm_bg_fom_strict->Scale(cs);
+	hmm_bg_fom_strict->Scale(cs);
 	hmm_bg_cm2_1->Scale(1./nbunch/cs);
 	hmm_bg_cm2_2->Scale(1./nbunch/cs);
 	hmm_bg_cm3_1->Scale(1./nbunch/cs);
@@ -1003,7 +1004,7 @@ cout<<"Entries: "<<ENum<<endl;
 //Loose Cut
 	//hmm_wo_bg_fom_best->Add(hcs_L_fom_best,hmm_bg_fom_best,1.0,-1.0);//All
 	//hmm_wo_bg_fom_best->Add(hcs_L_cm2_1,hmm_bg_cm2_1,1.0,-1.0);//2 div.
-	hmm_wo_bg_fom_best->Add(hcs_L_cm2_2,hmm_bg_cm2_2,1.0,-1.0);//2 div.
+	//hmm_wo_bg_fom_best->Add(hcs_L_cm2_2,hmm_bg_cm2_2,1.0,-1.0);//2 div.
 	//hmm_wo_bg_fom_best->Add(hcs_L_cm3_1,hmm_bg_cm3_1,1.0,-1.0);//3 div.
 	//hmm_wo_bg_fom_best->Add(hcs_L_cm3_2,hmm_bg_cm3_2,1.0,-1.0);//3 div.
 	//hmm_wo_bg_fom_best->Add(hcs_L_cm3_3,hmm_bg_cm3_3,1.0,-1.0);//3 div.
@@ -1013,8 +1014,8 @@ cout<<"Entries: "<<ENum<<endl;
 	//hmm_wo_bg_fom_best->Add(hcs_L_cm4_4,hmm_bg_cm4_4,1.0,-1.0);//4 div.
 	
 //Tight Cut	
+	hmm_wo_bg_fom_best->Add(hcs_L_fom_strict,hmm_bg_fom_strict,1.0,-1.0);//All
 	//hmm_wo_bg_fom_best->Add(hcs_L_fom_strict,hmm_bg_fom_strict,1.0,-1.0);//All
-	//hmm_wo_bg_fom_best->Add(hmm_L_fom_strict,hmm_bg_fom_strict,1.0,-1.0);//All
 	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm2_1,hmm_bg_new_cm2_1,1.0,-1.0);//2 div.
 	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm2_2,hmm_bg_new_cm2_2,1.0,-1.0);//2 div.
 	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm3_1,hmm_bg_new_cm3_1,1.0,-1.0);//3 div.
@@ -1028,7 +1029,7 @@ cout<<"Entries: "<<ENum<<endl;
 
 	
 	for(int i=90;i<200;i++){
-	if(hcs_L_new_cm2_1->GetBinContent(i)==0)cout<<"Empty bin at "<<((double)i*0.001-0.1)<<endl;
+	if(hcs_L_cm3_1->GetBinContent(i)==0)cout<<"Empty bin at "<<((double)i*0.001-0.1)<<endl;
 	}
 
 	hmm_wo_bg_fom_nocut->Add(hmm_L_fom_nocut,hmm_bg_fom_nocut,1.0,-1.0);
@@ -1062,8 +1063,8 @@ cout<<"Entries: "<<ENum<<endl;
 	 double integralS_nocut = 0.;
 	 n_L_nocut=0.;
 	 n_S_nocut=0.;
-	 double fmin = -0.05;
-	 double fmax =  0.15;
+	 double fmin = -0.01;
+	 double fmax =  0.12;
 /****************************************/
 /************BEST CUT********************/
 /****************************************/
