@@ -665,7 +665,7 @@ cout << "Param file : " << AcceptanceR_table_z5.c_str() << endl;
 		double efftr = 0.810;
 		double effK	 = 0.170;
 		double efficiency = effAC*effZ*effFP*effch2*effct*effDAQ*efftr*effK;
-		double RHRS  = 0.0056;
+		double RHRS  = 0.005;
 		//double LHRS  = 0.006;
 		double Charge= 4.6486;//[C]
 		double ee	 = 1.602*pow(10.,-19);

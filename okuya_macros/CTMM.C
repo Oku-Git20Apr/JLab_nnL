@@ -867,6 +867,7 @@ cout<<"Entries: "<<ENum<<endl;
 //
 //
 	TCanvas* c2 = new TCanvas("c2","c2");
+c2->SetLogz(1);
 h_ctmm->Draw("colz");
 	TCanvas* c3 = new TCanvas("c3","c3");
 h_ctmm2->Draw("colz");
