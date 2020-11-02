@@ -35,7 +35,7 @@ double vpflux_lab(double *par){
 	double Escat = par[0];//[GeV]
 	double theta = par[1];	
 
-	double Me=pow(511,-6.);//[GeV/c^2]
+	double Me=511.*pow(10.,-6.);//[GeV/c^2]
 	double Mp=0.9382720;//[GeV/c^2]
 	double Qsq=2*Einc*Escat*(1-cos(theta));
 	double omega = Einc - Escat;
@@ -66,7 +66,9 @@ int main(int argc, char** argv){
 	int option;
 	//string filename = "1H_kaon";
 	//label
-	string filename = "LHRS_new";
+	//string filename = "LHRS_new";//tehta_width=0.067 rad
+	string filename = "LHRS_big";//thetawidth=0.1 rad
+	//string filename = "BOTH";
 	//string filename = "RHRS";
 	bool BatchFlag = true;
 	bool PDFFlag = true;
@@ -126,7 +128,8 @@ int main(int argc, char** argv){
 
 	
 	centraltheta=13.2*PI/180.;
-	thetawidth=0.07;
+	//thetawidth=0.067;
+	thetawidth=0.1;
 	centralphi=0.;
 	phiwidth=2*PI;
 	cout<< "central theta = " << centraltheta*180/PI << " [deg]" << endl;
@@ -180,6 +183,10 @@ int main(int argc, char** argv){
 	TH1D *h_vp_mom2 = new TH1D( "h_vp_mom2", "w/ HRS-R Acceptance", bin_mom, min_mom, max_mom);
 	TH1D *h_vp_mom_result = new TH1D("h_vp_mom_result", "", bin_mom, min_mom, max_mom);
 	TH1D *h_vp_mom_result2 = new TH1D("h_vp_mom_result2", "", bin_mom, min_mom, max_mom);//w/ RHRS Acceptance
+	TH2D *h_th_mom = new TH2D( "h_th_mom", "", bin_2D_th, 0.,20.,bin_2D_mom, 1.95, 2.25);
+	TH2D *h_momL_momR = new TH2D( "h_momL_momR", "", 50, 1.73, 1.93 ,50., 1.95, 2.25);
+	TH1D *h_th_cm = new TH1D( "h_th_cm", "", 100.,0.,20.);
+	TH1D *h_th_cm2 = new TH1D( "h_th_cm2", "", 100.,0.,20.);
 
 	int n1, n2;
 	double val;
@@ -214,12 +221,15 @@ int main(int argc, char** argv){
 	
 	L_mom /= 1000.;//MeV-->GeV
 	R_mom /= 1000.;//MeV-->GeV
+	//R_mom = 1.85;//GeV/c
+	//R_th=0.;
+	//R_ph=0.;
 	double Einc  = 4.318;//[GeV]
 	//double Escat = 2.1;//[GeV]
 	double Escat = L_mom;//[GeV]
 	double theta = L_th+centraltheta;	
 
-	double Me=pow(511,-6.);//[GeV/c^2]
+	double Me=511.*pow(10.,-6.);//[GeV/c^2]
 	double Mp=0.9382720;//[GeV/c^2]
 	double MK=0.494677;//[GeV/c^2]
     double ML = 1.115683;//[GeV/c2]
@@ -235,7 +245,8 @@ int main(int argc, char** argv){
 		for(int i=0;i<bin_mom;i++){
 		//h_mom_gen->SetBinContent(i,26147*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//first try
 		//h_mom_gen->SetBinContent(i,2583235*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//LHRS 1,000,000 (2020/10/4)
-		h_mom_gen->SetBinContent(i,2582007*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//LHRS_new 1,000,000 (2020/10/17)// true density
+		//h_mom_gen->SetBinContent(i,2582007*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//LHRS_new 1,000,000 (2020/10/17)// true density
+		h_mom_gen->SetBinContent(i,5688035*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//LHRS_big 1,000,000 (2020/10/27)
 		//h_mom_gen->SetBinContent(i,2549979*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//RHRS 1,000,000 (2020/10/4)
 		}
 	double vpflux=Escat*kg/(137*2*PI*PI*Einc*Qsq*(1-eps));
@@ -354,12 +365,21 @@ int main(int argc, char** argv){
 		double tan_lab1 = sin(theta_gk_cm)/(gamma*(cos(theta_gk_cm)+beta*sqrt(MK*MK+pR_cm*pR_cm)/pR_cm));
 		double tan_lab2 = sin(theta_gk_cm)/(gamma*(cos(theta_gk_cm)+(omega*Mp-Qsq*Qsq)/(omega*Mp+Mp*Mp)));
 
-		//if(theta_gk_cm*180./PI<8.)h_mom_result->Fill(L_mom);
+//===Angle partition===//
 		h_mom_result->Fill(L_mom);
+		//if(theta_gk_cm*180./PI>=8.)h_mom_result->Fill(L_mom);
+		//h_mom_result->Fill(L_mom);
+		h_th_mom->Fill(theta_gk_cm*180./PI,L_mom);
+		h_momL_momR->Fill(R_mom,L_mom);
+		h_th_cm->Fill(theta_gk_cm*180./PI);
+		if(L_mom>2.08)h_th_cm2->Fill(theta_gk_cm*180./PI);
 	 if(vpflux>k){//Full
 		h_vp_mom->Fill(L_mom);
-		//if(L_mom>2100.&&theta_gk_cm*180./PI>10.)h_vp_mom2->Fill(L_mom);
-		if(L_mom>2.1)h_vp_mom2->Fill(L_mom);
+		//if(L_mom>2.08&&theta_gk_cm*180./PI>=8.){
+		if(L_mom>2.08){//L_mom>2.08(Lambda), L_mom<2.12(Simga0)
+		h_vp_mom2->Fill(L_mom);
+		//if(L_mom>2.1)h_vp_mom2->Fill(L_mom);
+		}
 	}
 	}
 
@@ -438,6 +458,7 @@ int main(int argc, char** argv){
 	h_sa_mom_result->GetXaxis()->SetNdivisions(505, kFALSE);
 	h_sa_mom_result->SetMarkerColor(kRed);
 	h_sa_mom_result->SetLineColor(kRed);
+	h_sa_mom_result->SetLineWidth(2);
 //	h_sa_mom_result->Draw("same");
 	h_sa_mom_result->Draw("e2");
 	h_sa_mom_result->Draw("p same");
@@ -470,14 +491,27 @@ int main(int argc, char** argv){
 	h_vp_mom_result2->SetLineColor(kAzure);
 	h_vp_mom_result2->Draw("same");
 	double ymax = (h_vp_mom_result->GetBinContent(h_vp_mom_result->GetMaximumBin()));
-	TLine *RHRS_min = new TLine( 2.1, 0., 2.1, 1.1*ymax);
-	TLine *RHRS_max = new TLine( 2.2, 0., 2.2, 1.1*ymax);
+	TLine *RHRS_min = new TLine( 2.08, 0., 2.08, 1.1*ymax);
+	TLine *RHRS_max = new TLine( 2.12, 0., 2.12, 1.1*ymax);
 	RHRS_min->SetLineColor(kRed);
 	RHRS_max->SetLineColor(kRed);
-	RHRS_min->Draw("same");
-	//RHRS_max->Draw("same");
+	RHRS_min->Draw("same");//Lambda
+	//RHRS_max->Draw("same");//Sigma0
 	c2->cd(3);
 	h_vp_mom->Draw();
+
+	TCanvas *c3 = new TCanvas("c3", "test");
+	gStyle->SetPadGridX(0);
+	gStyle->SetPadGridY(0);
+	c3->Divide(2,2);
+	c3->cd(1);
+	h_th_mom->Draw("colz");
+	c3->cd(2);
+	h_th_cm->Draw("");
+	h_th_cm2->SetLineColor(kRed);
+	h_th_cm2->Draw("same");
+	c3->cd(3);
+	h_momL_momR->Draw("colz");
 
 	if(!BatchFlag){
 		theApp.Run();
@@ -488,10 +522,12 @@ int main(int argc, char** argv){
 		c1 ->Print(Form("%s[",PDFFile.str().c_str()) );
 		c1 ->Print(Form("%s" ,PDFFile.str().c_str()) );
 		c2 ->Print(Form("%s" ,PDFFile.str().c_str()) );
-		c2 ->Print(Form("%s]" ,PDFFile.str().c_str()) );
+		c3 ->Print(Form("%s" ,PDFFile.str().c_str()) );
+		c3 ->Print(Form("%s]" ,PDFFile.str().c_str()) );
 	}
 c1->Close();
 c2->Close();
+c3->Close();
 	
 	//label
 	ofstream fout("vpflux_SIMC.dat");//LHRS

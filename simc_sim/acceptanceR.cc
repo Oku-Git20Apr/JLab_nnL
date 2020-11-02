@@ -35,7 +35,9 @@ int main(int argc, char** argv){
 	//////////////////////
 	int option;
 	//string filename = "1H_kaon";
-	string filename = "RHRS_new";
+	//string filename = "RHRS_new";//0<theta_max<0.067
+	string filename = "RHRS_big";//0<theta_max<0.01
+	//string filename = "RHRS2";//0<theta_max<0.01
 	bool BatchFlag = true;
 	bool PDFFlag = true;
 
@@ -67,7 +69,8 @@ int main(int argc, char** argv){
 
 	
 	centraltheta=13.2*PI/180.;
-	thetawidth=0.07;
+	//thetawidth=0.067;//new
+	thetawidth=0.1;//big
 	centralphi=0.;
 	phiwidth=2*PI;
 	cout<< "central theta = " << centraltheta*180/PI << " [deg]" << endl;
@@ -159,7 +162,7 @@ int main(int argc, char** argv){
 	double Escat = L_mom;//[GeV]
 	double theta = L_th+centraltheta;	
 
-	double Me=pow(511,-6.);//[GeV/c^2]
+	double Me=511.*pow(10.,-6.);//[GeV/c^2]
 	double Mp=0.9382720;//[GeV/c^2]
 	double MK=0.494677;//[GeV/c^2]
     double ML = 1.115683;//[GeV/c2]
@@ -174,7 +177,9 @@ int main(int argc, char** argv){
 		//h_mom_result->SetBinContent(h_mom_gen->FindBin(mom),mom);
 		for(int i=0;i<bin_mom;i++){
 		//h_mom_gen->SetBinContent(i,26147*(1./189.)*(max_mom-min_mom)/bin_mom);//first try
-		h_mom_gen->SetBinContent(i,2547932*(1./163.8)*1000.*(max_mom-min_mom)/bin_mom);//RHRS_new 1,000,000 (2020/10/18)
+		//h_mom_gen->SetBinContent(i,2547932*(1./163.8)*1000.*(max_mom-min_mom)/bin_mom);//RHRS_new 1,000,000 (2020/10/18)
+		h_mom_gen->SetBinContent(i,5682429*(1./163.8)*1000.*(max_mom-min_mom)/bin_mom);//RHRS2 1,000,000 (2020/11/2)// true density
+		//h_mom_gen->SetBinContent(i,5710184*(1./163.8)*1000.*(max_mom-min_mom)/bin_mom);//RHRS_big 1,000,000 (2020/10/27)// true density
 		h_mom_gen_cm->SetBinContent(i,2547932*(4./25.)*1000.*(1./163.8)*(max_mom_cm-min_mom_cm)/bin_mom);//RHRS_new 1,000,000 (2020/10/18)
 		//h_mom_gen->SetBinContent(i,2549979*(1./163.8)*1000.*(max_mom-min_mom)/bin_mom);//RHRS 1,000,000 (2020/10/4), w/ z dep.
 		//h_mom_gen_cm->SetBinContent(i,2549979*(4./25.)*1000.*(1./163.8)*(max_mom_cm-min_mom_cm)/bin_mom);//RHRS 1,000,000 (2020/10/4), w/ z dep.
@@ -299,7 +304,9 @@ int main(int argc, char** argv){
 		double tan_lab2 = sin(theta_gk_cm)/(gamma*(cos(theta_gk_cm)+(omega*Mp-Qsq*Qsq)/(omega*Mp+Mp*Mp)));
 
 		h_mom_result_cm->Fill(pR_cm);
-		//if(6.<vertex&&vertex<10.)h_mom_result->Fill(R_mom);
+		
+		//Z partition; SIMC_RHRS_z1(,z2,z3,z4,z5).dat
+		//if(6.<=vertex&&vertex<10.)h_mom_result->Fill(R_mom);
 		h_mom_result->Fill(R_mom);
 
 	}
@@ -416,7 +423,7 @@ c2->Close();
 	
 	
 
-	ofstream fout2("RHRS_SIMC_z5.dat");//RHRS
+	ofstream fout2("RHRS_SIMC.dat");//RHRS
 		fout2<<"#Acceptance by SIMC"<<endl;
 		fout2<<"#1.8<pe[GeV/c]<2.4, 150 partition --> 1bin=4MeV/c"<<endl;
 		double Acceptance_temp;

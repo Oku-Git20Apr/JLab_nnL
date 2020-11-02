@@ -23,3 +23,18 @@
 - thick: 70.8 [mg/cm^2], rho=0.002832 [g/cm^3]
 - SpectMode: p
 - 1,000,000 events
+
+2020.10.27 LHRS_big.root (5710184)
+- thick: 70.8 [mg/cm^2], rho=0.002832 [g/cm^3]
+- SpectMode: e
+- 1,000,000 events
+
+2020.10.27 RHRS_big.root (5688035)
+- thick: 70.8 [mg/cm^2], rho=0.002832 [g/cm^3]
+- SpectMode: p
+- 1,000,000 events
+
+2020.11.2 RHRS2.root (5682429)
+- thick: 70.8 [mg/cm^2], rho=0.002832 [g/cm^3]
+- SpectMode: p
+- 1,000,000 events
