@@ -230,9 +230,11 @@ cout << "Output pdf file name is " << pdfname << endl;
  bin_mm=(int)bin_mm;
  //const double fit_min_mm=-0.006;
  const double fmin_mm=-0.1;
- const double fmax_mm=0.12;
+ const double fmax_mm=0.2;
+ //const double fit_min_mm=-0.01;
+ //const double fit_max_mm=0.078;
  const double fit_min_mm=-0.01;
- const double fit_max_mm=0.078;
+ const double fit_max_mm=0.11;
  const int fit_bin_mm = (fit_max_mm-fit_min_mm)/0.001;
  const double fit_bin_width = (fit_max_mm-fit_min_mm)/fit_bin_mm;
 

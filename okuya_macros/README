@@ -49,6 +49,22 @@ Efficiency Study
 -coinsr*.pdf
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%Differential Cross Section%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+*result_2D.C
+-CS Calc.
+-(Number of hyperons)/(DAQ Eff. x Solid Angle)
+-Solid Angle --> DeltaOmega(P_K,Z);2D
+-Fitting with radiative tails
+-Event by Event (DAQ Eff. & Solid Angle (K+) only)
+-Other factors are calculated using google spreadsheet
+
+*Eff_with_Radtail/fit_Lexp_best_acz.C
+-Efficiency study (AC, Z, CT) with Radiative tail fitting
+-(Landau + Exp)*Gaus
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%Systematic Error Study%%
