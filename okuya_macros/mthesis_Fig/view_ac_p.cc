@@ -42,10 +42,14 @@ cout << " output file name is " << ofname << endl;
 
 	TH1D *h_a1[24], *h_a2[26];
 	for(int i=0;i<24;i++){
-	h_a1[i] = new TH1D(Form("h_a1[%d]",i),Form("h_a1[%d]",i),1000,-100.,2000.);
+	h_a1[i] = new TH1D(Form("h_a1[%d]",i),Form("AC1[%d]",i+1),2000,-100.,2000.);
+	h_a1[i]->GetXaxis()->SetTitle("ADC [ch]");
+	h_a1[i]->GetYaxis()->SetTitle("Counts");
 	}
 	for(int i=0;i<26;i++){
-	h_a2[i] = new TH1D(Form("h_a2[%d]",i),Form("h_a2[%d]",i),1100,-100.,1000.);
+	h_a2[i] = new TH1D(Form("h_a2[%d]",i),Form("AC2[%d]",i+1),2000,-100.,15000.);
+	h_a2[i]->GetXaxis()->SetTitle("ADC [ch]");
+	h_a2[i]->GetYaxis()->SetTitle("Counts");
 	}
 
 	for(int n=0;n<ENum;n++){
@@ -90,12 +94,8 @@ cout << " output file name is " << ofname << endl;
 	}
 
 cout << "Print is starting" << endl;
-	c1->Print(Form("%s[",ofname.c_str()));
-	c1->Print(Form("%s",ofname.c_str()));
-	c2->Print(Form("%s",ofname.c_str()));
-	c3->Print(Form("%s",ofname.c_str()));
-	c4->Print(Form("%s",ofname.c_str()));
-	c4->Print(Form("%s]",ofname.c_str()));
+	c2->Print("./pdf/ac1_p_view.pdf");
+	c4->Print("./pdf/ac2_p_view.pdf");
 
 	
 
