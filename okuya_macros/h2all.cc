@@ -1291,7 +1291,8 @@ cout<<"bin coin"<<bin_coin_c<<endl;
 void tuning::MakeHist(){
   cout<<"Make Hist "<<endl;
 	//file_out = new TFile("h2all_temp.root","recreate");
-	file_out = new TFile("h2all_Lsingle.root","recreate");
+	//file_out = new TFile("h2all_Lsingle.root","recreate");
+	file_out = new TFile("h2_Tkin_Lsingle.root","recreate");
 	tree_out = new TTree("tree_out","tree_out");
 	//`tree_out ->Branch("branch name",variable ,"branch name/type");
 	
@@ -4653,9 +4654,11 @@ int main(int argc, char** argv){
 
 	cout<<"nth = "<<nth<<endl;
 //  string ifname = "../small.list";//Run111157~111220
-  string ifname = "../small2.list";//Run111157~111220 & Run111480~111542
+  //string ifname = "../small2.list";//Run111157~111220 & Run111480~111542
+  string ifname = "../small_Tkin.list";//Run111552~111576 & Run111707~111716
 //    string ifname = "../test.list";//for debug
-    string pname = "./Lambda_H1.param";
+    //string pname = "./Lambda_H1.param";//(Htar, Hkin)
+    string pname = "./nnL_2.param";//(Htar, Tkin)
     string mtparam = "../matrix/matrix_new.list";
     string print_name = "./test_print.pdf";
     bool print_flag = false;//.pdf

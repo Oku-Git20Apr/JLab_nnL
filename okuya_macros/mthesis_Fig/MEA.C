@@ -1,11 +1,10 @@
-//-- Cointime  --//
-//NO CUT
+//-- Mixed Event Analysis  --//
 //
 //Chapter 3
 //
-//K. Okuyama (Nov. 15, 2020)
+//K. Okuyama (Nov. 17, 2020)
 //
-//This is taken over from ac_sum.C
+//This is taken over from cointime.C
 //No array branch mode 
 //
 double F_Voigt( double *x, double *par )
@@ -245,7 +244,7 @@ double FMM_Res( double *x, double *par ){
 
 }
 
-void cointime(){
+void MEA(){
   
   TFile *file = new TFile("../h2all_Lsingle.root","read");//input file of all H2 run(default: h2all4.root)
   TFile *file_dummy = new TFile("../dummy_Tkin/tritium_111325.root","read");//input file of all H2 run(default: h2all4.root)
@@ -253,6 +252,7 @@ void cointime(){
 	//ACCBGの引き算はmea_hist.ccから
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea6.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
   TFile *file_mea = new TFile("../MixedEventAnalysis/bgmea_llccrr_Lsingle_new.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
+  TFile *file_mthesis = new TFile("../MixedEventAnalysis/bgmea_mthesis.root","read");
   double nbunch = 6000.;//effetive bunches (6 bunches x 5 mixtures)
  // TTree *tree_old = (TTree*)file->Get("tree_out");
 //cout<<"Please wait a moment. CloneTree() is working..."<<endl;
@@ -610,10 +610,6 @@ cout << "Param file : " << AcceptanceR_table.c_str() << endl;
   h_coin_nocut->GetXaxis()->SetTitle("Coincidence Time [ns]");
   h_coin_nocut->GetYaxis()->SetTitle("Counts");
   h_coin_nocut->SetLineColor(kAzure);
-  TH1F* h_coin_strict  = new TH1F("h_coin_strict","",40.*1000./56.,-20.,20.);
-  h_coin_strict->GetXaxis()->SetTitle("Coincidence Time [ns]");
-  h_coin_strict->GetYaxis()->SetTitle("Counts");
-  h_coin_strict->SetLineColor(kAzure);
   TH2F* h_zz_dummy  = new TH2F("h_zz_dummy","h_zz_dummy",400,-25.*0.01,25.*0.01,400,-25.*0.01,25.*0.01);
   TH2F* h_zz    = new TH2F("h_zz"   ,""   , 1000,-25.,25.,1000,  -25., 25.); 
   h_zz->GetXaxis()->SetTitle("Z-vertex (HRS-R) [cm]");
@@ -765,7 +761,7 @@ cout<<"Entries: "<<ENum<<endl;
 		if(fabs(ct)<1.006)ct_cut=true;
 		else ct_cut=false;
 		//if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
-		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
+		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
 		else event_selection=false;
 
 		event_selection_nocut=false;
@@ -916,7 +912,6 @@ cout<<"Entries: "<<ENum<<endl;
 		if(R_Tr&&R_FP&&L_Tr&&L_FP){
 		h_coin_nocut->Fill(ct);
 		}
-		if(event_selection)h_coin_strict->Fill(ct);
 		h_ac1_sum->Fill(ac1sum);
 		h_ac2_sum->Fill(ac2sum);
 		//if(abs(R_tr_vz-L_tr_vz)<0.025&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP)h_zave->Fill((R_tr_vz+L_tr_vz)/2.);
@@ -925,13 +920,23 @@ cout<<"Entries: "<<ENum<<endl;
 		h_nrtrack->Fill(NRtr);
 
 }//ENum
-	TCanvas* c1 = new TCanvas("c1","c1");
-	h_coin_nocut->Draw("");
-	TCanvas* c2 = new TCanvas("c2","c2");
-	h_coin_strict->Draw("");
 	
-	c1->Print("./pdf/cointime_nocut.pdf");
-	c2->Print("./pdf/cointime_strict.pdf");
+	TH1F* hmm_original=(TH1F*)file_mthesis->Get("hmm_original");
+    hmm_original->GetXaxis()->SetTitle("Missing Mass - M_{#Lambda} [MeV/c^{2}]");
+    hmm_original->GetYaxis()->SetTitle("Counts/(MeV/c^{2})");
+    //hmm_original->GetXaxis()->SetRangeUser(-14.0,17.);
+	TCanvas* c1 = new TCanvas("c1","c1");
+	hmm_original->Draw("");
+	
+	TH1F* hmm_mixed=(TH1F*)file_mthesis->Get("hmm_mixed");
+    hmm_mixed->GetXaxis()->SetTitle("Missing Mass - M_{#Lambda} [MeV/c^{2}]");
+    hmm_mixed->GetYaxis()->SetTitle("Counts/(MeV/c^{2})");
+    //hmm_mixed->GetXaxis()->SetRangeUser(-14.0,17.);
+	TCanvas* c2 = new TCanvas("c2","c2");
+	hmm_mixed->Draw("");
+
+	c1->Print("./pdf/mea_original.pdf");
+	c2->Print("./pdf/mea_mixed.pdf");
 
 cout << "Well done!" << endl;
 }

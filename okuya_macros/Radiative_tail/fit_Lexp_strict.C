@@ -162,9 +162,9 @@ void fit_Lexp_strict(){
 	string pdfname = "fitting.pdf";
 cout << "Output pdf file name is " << pdfname << endl;
   
-  TFile *file = new TFile("h2all.root","read");//input file of all H2 run(default: h2all4.root)
+  TFile *file = new TFile("../h2all_Lsingle.root","read");//input file of all H2 run(default: h2all4.root)
 	//ACCBGの引き算はmea_hist.ccから
-  TFile *file_mea = new TFile("./temp/bgmea_llccrr_new.root","read");//input file of BG(MEA) histo.(default: bgmea6.root)
+  TFile *file_mea = new TFile("../MixedEventAnalysis/bgmea_llccrr_Lsingle_new.root","read");//input file of BG(MEA) histo.(default: bgmea6.root)
   double nbunch = 6000.;//effetive bunches (6 bunches x 1000 mixtures)
   
 //Systematic study

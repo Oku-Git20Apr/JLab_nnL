@@ -1,15 +1,19 @@
 //----------------------------------//
 //--  MIXED EVENT ANALYSIS        --//
 //----------------------------------//
+//For M-thesis
+//*MeV/c^2
+//*Label
+//*basically, it is not changed from "mea_llccrr_new.C"
 //
-//K. Okuyama (Sep. 23, 2020)
+//K. Okuyama (Nov. 17, 2020)
 //
-//taken over from mea_lcr.C
+//taken over from mea_llccrr_new.C
 //using {left, right, center} bunch
 
-void mea_llccrr_new(){
+void mea_mthesis(){
 	string pdfname = "temp.pdf";
-	string rootname= "bgmea_llccrr_Lsingle_new.root";
+	string rootname= "bgmea_mthesis.root";
 cout << "Output pdf file name is " << pdfname << endl;
 cout << "Output root file name is " << rootname << endl;
   
@@ -145,6 +149,14 @@ cout << "Output root file name is " << rootname << endl;
   hmm_nocut->GetXaxis()->SetTitle("M_{x} - M_{#Lambda} (GeV/c^{2})");
   hmm_nocut->GetYaxis()->SetTitle("Counts / MeV");
   hmm_nocut->SetLineColor(1);
+  TH1F* hmm_original  = new TH1F("hmm_original","",xbin,xmin*1000.,xmax*1000.);
+  hmm_original->GetXaxis()->SetTitle("Missing Mass - M_{#Lambda} [MeV/c^{2}]");
+  hmm_original->GetYaxis()->SetTitle("Counts / (MeV/c^{2})");
+  hmm_original->SetLineColor(kBlack);
+  TH1F* hmm_mixed  = new TH1F("hmm_mixed","",xbin,xmin*1000.,xmax*1000.);
+  hmm_mixed->GetXaxis()->SetTitle("Missing Mass - M_{#Lambda} [MeV/c^{2}]");
+  hmm_mixed->GetYaxis()->SetTitle("Counts / (MeV/c^{2})");
+  hmm_mixed->SetLineColor(kGreen);
   TH1F* hm2  = new TH1F("hm2","Mix region 1",xbin,xmin,xmax);
 
   TH1F* hmm_acc  = new TH1F("hmm_acc","ACC (original)",xbin,xmin,xmax);
@@ -365,6 +377,7 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
 		mass = Missing.M();
 	    mm=mass - mh;//shift by ML
 		if(event_selection)hmm_acc->Fill(mm);
+		if(event_selection_new)hmm_original->Fill(mm*1000.);//MeV
 		double before_mm=mm;
 
 
@@ -493,7 +506,8 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
 			if(event_selection_nocut)hmm_mixacc_result_nocut->Fill(mm_mixed);
 			if(event_selection_nocut_new)hmm_mixacc_result_nocut_new->Fill(mm_mixed);
 			if(event_selection_new)hmm_mixacc_result_new->Fill(mm_mixed);
-			if(event_selection_momcut)hmm_mixacc_result_momcut->Fill(mm_mixed);
+			if(event_selection_new)hmm_mixed->Fill(mm_mixed*1000.);
+			//if(event_selection_momcut)hmm_mixacc_result_new->Fill(mm_mixed);
 			if(event_selection_woac)hmm_mixacc_result_woac->Fill(mm_mixed);
 			if(event_selection_zdiff)hmm_mixacc_result_zdiff->Fill(mm_mixed);
 			if(ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP&&(fabs(R_tr_vz-L_tr_vz)<0.025)&&(fabs(fabs(R_tr_vz+L_tr_vz)/2.-0.12)<0.01||fabs(fabs(R_tr_vz+L_tr_vz)/2.+0.12)<0.01))hmm_mixacc_result_nocut_forAl->Fill(mm_mixed);//Al selection
