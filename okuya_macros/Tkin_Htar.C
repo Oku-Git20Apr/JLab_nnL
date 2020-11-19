@@ -143,7 +143,7 @@ double FMM_Response( double *x, double *par ){
 
 double FMM_Res( double *x, double *par ){
 
-	return FMM_Response(x,par)+FMM_Response(x,&par[7]);
+	return FMM_Response(x,par);
 
 }
 
@@ -154,7 +154,8 @@ cout << "Output pdf file name is " << pdfname << endl;
   TFile *file = new TFile("h2_Tkin_Lsingle.root","read");//input file of all H2 run(default: h2all4.root)
 	//ACCBGの引き算はmea_hist.ccから
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea6.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
-  TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_llccrr_Lsingle_new.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
+  //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_llccrr_Lsingle_new.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
+  TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_mthesis.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_Tkin.root","read");//from h2all_Lsingle.root, HRS-L: Single-tracking
   double nbunch = 6000.;//effetive bunches (6 bunches x 5 mixtures)
  // TTree *tree_old = (TTree*)file->Get("tree_out");
@@ -790,6 +791,7 @@ cout<<"Entries: "<<ENum<<endl;
 		
 		if(event_selection&&ct_cut)hmm_L_fom_best->Fill(mm);
 		if(event_selection_new&&ct_cut)hmm_L_fom_strict->Fill(mm);
+		if(event_selection_new&&ct_cut)hmm_wo_bg_fom_best->Fill(mm);
 		if(event_selection_nocut&&ct_cut)hmm_L_fom_nocut->Fill(mm);
 		double theta_ee = L_4vec.Theta();
 		//test double theta_ek = acos((phi_R*sin(phi0)+cos(phi0))/(sqrt(1+theta*theta+phi*phi)));//original frame
@@ -1017,7 +1019,7 @@ cout<<"Entries: "<<ENum<<endl;
 	
 //Tight Cut	
 	//hmm_wo_bg_fom_best->Add(hcs_L_fom_strict,hmm_bg_fom_strict,1.0,-1.0);//All
-	hmm_wo_bg_fom_best=(TH1F*)hmm_L_fom_strict->Clone();
+	//hmm_wo_bg_fom_best=(TH1F*)hmm_L_fom_strict->Clone();
 	//hmm_wo_bg_fom_best->Add(hcs_L_fom_strict,hmm_bg_fom_strict,1.0,-1.0);//All
 	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm2_1,hmm_bg_new_cm2_1,1.0,-1.0);//2 div.
 	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm2_2,hmm_bg_new_cm2_2,1.0,-1.0);//2 div.
@@ -1127,7 +1129,7 @@ cout<<"BEST CUT START"<<endl;
 /*%%%%%%%%%%%%%%%%%%%%%%%%*/
 	//--- w/ 4th Polynomial func.
 	 cout<<"4Poly MODE START"<<endl;
-	 fmm_best_4Poly=new TF1("fmm_best_4Poly",FMM_Res,fmin_mm,fmax_mm,14);
+	 fmm_best_4Poly=new TF1("fmm_best_4Poly",FMM_Res,fmin_mm,fmax_mm,7);
    //par[0]=Width (scale) parameter of Landau density
    //par[1]=Most Probable (MP, location) parameter of Landau density
    //par[2]=Total area (integral -inf to inf, normalization constant)
@@ -1150,7 +1152,7 @@ cout<<"BEST CUT START"<<endl;
 	 fmm_best_4Poly->SetParameter(0,0.0007);//Landau width
 	 fmm_best_4Poly->SetParameter(1,mean_L_best);
 	 fmm_best_4Poly->SetParLimits(1,def_mean_L-def_sig_L,def_mean_L+def_sig_L);
-	 fmm_best_4Poly->SetParameter(2,1.5);//total scale
+	 fmm_best_4Poly->SetParameter(2,0.4);//total scale
 	 fmm_best_4Poly->SetParameter(3,0.001);//sigma
 	 fmm_best_4Poly->SetParLimits(3,0.,0.01);
 	 fmm_best_4Poly->SetParameter(4,0.05);//att.
@@ -1160,18 +1162,6 @@ cout<<"BEST CUT START"<<endl;
 	 fmm_best_4Poly->SetParameter(6,0.6);//relative strength
 	 fmm_best_4Poly->SetParLimits(6,0.,1.5);//relative strength
 
-	 fmm_best_4Poly->SetParameter(7,0.0003);//Landau width
-	 fmm_best_4Poly->SetParameter(8,mean_S_best);//MPV
-	 fmm_best_4Poly->SetParLimits(8,def_mean_S-def_sig_S,def_mean_S+def_sig_S);
-	 fmm_best_4Poly->SetParameter(9,0.4);//total scale
-	 fmm_best_4Poly->SetParameter(10,0.0015);//sigma
-	 fmm_best_4Poly->SetParLimits(10,0.,0.01);
-	 fmm_best_4Poly->SetParameter(11,0.05);//att
-	 fmm_best_4Poly->SetParLimits(11,0.03,0.12);
-	 fmm_best_4Poly->SetParameter(12,0.080);//peak pos.
-	 //fmm_best_4Poly->SetParLimits(15,-0.085,-0.055);
-	 fmm_best_4Poly->SetParameter(13,0.6);
-	 fmm_best_4Poly->SetParLimits(13,0.,1.5);//relative strength
 
 	 hmm_wo_bg_fom_best->Fit("fmm_best_4Poly","","",fit_min_mm,fit_max_mm);//Total fitting w/ 4Poly BG
 	 double chisq = fmm_best_4Poly->GetChisquare();
@@ -1182,7 +1172,6 @@ cout<<"BEST CUT START"<<endl;
 
 
 	 TF1* fmm_Lambda_only = new TF1("fmm_Lambda_only",FMM_Response,fmin_mm,fmax_mm,7);
-	 TF1* fmm_Sigma_only  = new TF1("fmm_Sigma_only" ,FMM_Response, fmin_mm,fmax_mm,7);
 //Lambda_only
 	 fmm_Lambda_only->SetNpx(20000);
 	 fmm_Lambda_only->SetParameter(0,fmm_best_4Poly->GetParameter(0));
@@ -1192,15 +1181,6 @@ cout<<"BEST CUT START"<<endl;
 	 fmm_Lambda_only->SetParameter(4,fmm_best_4Poly->GetParameter(4));
 	 fmm_Lambda_only->SetParameter(5,fmm_best_4Poly->GetParameter(5));
 	 fmm_Lambda_only->SetParameter(6,fmm_best_4Poly->GetParameter(6));
-//Sigma_only
-	 fmm_Sigma_only->SetNpx(20000);
-	 fmm_Sigma_only->SetParameter(0,fmm_best_4Poly->GetParameter(7));
-	 fmm_Sigma_only->SetParameter(1,fmm_best_4Poly->GetParameter(8));
-	 fmm_Sigma_only->SetParameter(2,fmm_best_4Poly->GetParameter(9));
-	 fmm_Sigma_only->SetParameter(3,fmm_best_4Poly->GetParameter(10));
-	 fmm_Sigma_only->SetParameter(4,fmm_best_4Poly->GetParameter(11));
-	 fmm_Sigma_only->SetParameter(5,fmm_best_4Poly->GetParameter(12));
-	 fmm_Sigma_only->SetParameter(6,fmm_best_4Poly->GetParameter(13));
 
 	double nofL = fmm_Lambda_only->Integral(fmin_mm,fmax_mm);
 	double nofL_old = fmm_Lambda_only->Integral(-0.006,0.006);
@@ -1210,17 +1190,12 @@ cout<<"BEST CUT START"<<endl;
 	cout<<"Number of Lambda w/o radiative tail (TF1 Integral) = "<<nofL_old<<endl;
 	cout<<"Number of Lambda w/o radiative tail (TH1F Integral) = "<<hmm_wo_bg_fom_best->Integral(hmm_wo_bg_fom_best->FindBin(-0.006),hmm_wo_bg_fom_best->FindBin(0.006))<<endl;
 
-	double nofS = fmm_Sigma_only->Integral(fmin_mm,fmax_mm);
-	nofS = nofS/fit_bin_width;
-	cout<<"Number of Sigma (TF1 Integral) = "<<nofS<<endl;
 
 	 hmm_wo_bg_fom_best->Draw();
 	 fmm_best_4Poly->SetLineColor(kRed);
 	 fmm_best_4Poly->Draw("same");
 	 fmm_Lambda_only->SetLineColor(kAzure);
-	 fmm_Sigma_only->SetLineColor(kCyan);
 	 fmm_Lambda_only->Draw("same");
-	 fmm_Sigma_only->Draw("same");
 	 //fL_best->SetLineColor(kGreen);
 	 //fS_best->SetLineColor(kGreen);
 	 //fL_best->Draw("same");
@@ -1254,5 +1229,8 @@ cout<<"BEST CUT START"<<endl;
 	hmm_L_fom_strict->Draw("");
 	hmm_bg_fom_strict->SetLineColor(kGreen);
 	hmm_bg_fom_strict->Draw("same");
+	TCanvas* c7 = new TCanvas("c7","c7");
+	hmm_wo_bg_fom_best->Draw("");
+	fmm_best_4Poly->Draw("same");//total scale
 cout << "Well done!" << endl;
 }//fit

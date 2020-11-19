@@ -1,11 +1,21 @@
-//-- Cointime  --//
-//NO CUT
+//-- Cointime Parameter Check --//
+//For h2all_1(2)_2020Nov.root
+//*R_offset is changed for H2_2
+//*Parameter file is changed
+//*resolution is changed
+
+
+//Run111157~111220 (Lambda_H1.param) for Htar, Hkin
+//=>h2all_Lsingle_1.root
+//Run111480~111542 (Lambda_H2.param) for Htar, Hkin
+//=>h2all_Lsingle_2.root
+//Run111555~111576 (nnL_2.param) for Htar, Tkin
+//=>h2_Tkin_Lsingle.root
 //
-//Chapter 3
 //
-//K. Okuyama (Nov. 15, 2020)
+//K. Okuyama (Nov. 19, 2020)
 //
-//This is taken over from ac_sum.C
+//This is taken over from cointime.C
 //No array branch mode 
 //
 double F_Voigt( double *x, double *par )
@@ -245,16 +255,13 @@ double FMM_Res( double *x, double *par ){
 
 }
 
-void cointime(){
+void coin_param_for2020Nov(){
   
-  TFile *file = new TFile("../h2all_Lsingle_2_before.root","read");//input file of all H2 run(default: h2all4.root)
+  //TFile *file = new TFile("../h2all_1_2020Nov.root","read");//H2_1 (Lambda_H1)
+  //TFile *file = new TFile("../h2all_2_2020Nov.root","read");//H2_2 (Lambda_H2)
+  //TFile *file = new TFile("../h2_Tkin_Lsingle.root","read");//H_Tkin
 	//ACCBGの引き算はmea_hist.ccから
-  //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea6.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
-  TFile *file_mea = new TFile("../MixedEventAnalysis/bgmea_llccrr_Lsingle_new.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
-  double nbunch = 6000.;//effetive bunches (6 bunches x 5 mixtures)
- // TTree *tree_old = (TTree*)file->Get("tree_out");
-//cout<<"Please wait a moment. CloneTree() is working..."<<endl;
-  //TTree *tree = tree_old->CloneTree();
+	
   TTree *tree = (TTree*)file->Get("tree_out");
 
 
@@ -889,9 +896,13 @@ cout<<"Entries: "<<ENum<<endl;
 	h_coin_nocut->Draw("");
 	TCanvas* c2 = new TCanvas("c2","c2");
 	h_coin_strict->Draw("");
-	
-	c1->Print("./pdf/cointime_nocut.pdf");
-	c2->Print("./pdf/cointime_strict.pdf");
+	TCanvas* c3 = new TCanvas("c3","c3");
+//	h_coin_strict->Fit("gaus","","",-0.5,0.5);
+//	h_coin_strict->Fit("gaus","","",2.7,3.7);
 
+//SHIFT//
+	//h_coin_strict->Fit("gaus","","",13.5,14.5);
+	h_coin_strict->Fit("gaus","","",16.5,17.5);
+	
 cout << "Well done!" << endl;
 }

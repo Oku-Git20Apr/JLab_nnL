@@ -60,8 +60,12 @@ TARGET19= eff_ac
 OBJS19=   eff_ac.o Setting.o Tree.o ParamMan.o
 TARGET20= z_analyzer 
 OBJS20=   z_analyzer.o Setting.o Tree.o ParamMan.o
-TARGET21= h2all 
-OBJS21=   h2all.o Setting.o Tree.o ParamMan.o
+TARGET21= h2all_1 
+OBJS21=   h2all_1.o Setting.o Tree.o ParamMan.o
+TARGET22= h2all_2 
+OBJS22=   h2all_2.o Setting.o Tree.o ParamMan.o
+TARGET23= h2Tkin 
+OBJS23=   h2Tkin.o Setting.o Tree.o ParamMan.o
 #TARGET14= okuyana 
 #OBJS14=   okuyana.o Setting.o Tree.o ParamMan.o
 
@@ -69,7 +73,9 @@ OBJS21=   h2all.o Setting.o Tree.o ParamMan.o
 all:$(TARGET13)\
      $(TARGET17)\
      $(TARGET20)\
-     $(TARGET21)
+     $(TARGET21)\
+     $(TARGET22)\
+     $(TARGET23)
 #     $(TARGET11)
 #$(TARGET1)\
 #     $(TARGET2)\
@@ -129,6 +135,10 @@ $(TARGET19): $(patsubst %,$(LIBDIR)/%,$(OBJS19))
 $(TARGET20): $(patsubst %,$(LIBDIR)/%,$(OBJS20))
 	$(CXX) $(CFLAGS) -o $(BINDIR)/$@ $^ $(CXXLIBS) $(CXXFLAGS)
 $(TARGET21): $(patsubst %,$(LIBDIR)/%,$(OBJS21))
+	$(CXX) $(CFLAGS) -o $(BINDIR)/$@ $^ $(CXXLIBS) $(CXXFLAGS)
+$(TARGET22): $(patsubst %,$(LIBDIR)/%,$(OBJS22))
+	$(CXX) $(CFLAGS) -o $(BINDIR)/$@ $^ $(CXXLIBS) $(CXXFLAGS)
+$(TARGET23): $(patsubst %,$(LIBDIR)/%,$(OBJS23))
 	$(CXX) $(CFLAGS) -o $(BINDIR)/$@ $^ $(CXXLIBS) $(CXXFLAGS)
 .PHONY: clean
 clean:

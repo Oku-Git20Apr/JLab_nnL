@@ -1,0 +1,14 @@
+ttaching file h2all_1_2020Nov.root as _file0...
+(TFile *) 0x37b31a0
+root [1] tree_out->Draw("ct_orig>>(10000,-10000,10000)")
+Info in <TCanvas::MakeDefCanvas>:  created default TCanvas with name c1
+root [2] tree_out->Draw("ct_orig>>(1000,-3800,-3600)")
+root [3] TFitEditor::DoFit - using function PrevFitTMP  0x4e79b80
+ FCN=4851.27 FROM MIGRAD    STATUS=CONVERGED     101 CALLS         102 TOTAL
+                     EDM=6.56741e-07    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  Constant     2.81985e+04   1.13700e+02   2.64202e+00  -2.14160e-06
+   2  Mean        -3.66243e+03   1.25292e-03   1.74638e-03   3.44486e-01
+   3  Sigma        3.93400e-01   1.45924e-03   2.76170e-05   6.34504e-01
+

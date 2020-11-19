@@ -153,7 +153,8 @@ cout << "Output pdf file name is " << pdfname << endl;
 	//ACCBGの引き算はmea_hist.ccから
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea6.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_llccrr_new_new.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
-  TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_llccrr_Lsingle_new.root","read");//from h2all_Lsingle.root, HRS-L: Single-tracking
+  //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_llccrr_Lsingle_new.root","read");//from h2all_Lsingle.root, HRS-L: Single-tracking
+  TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_mthesis.root","read");//from h2all_Lsingle.root, HRS-L: Single-tracking
   double nbunch = 6000.;//effetive bunches (6 bunches x 5 mixtures)
  // TTree *tree_old = (TTree*)file->Get("tree_out");
 //cout<<"Please wait a moment. CloneTree() is working..."<<endl;

@@ -704,8 +704,7 @@ class tuning : public Tree
   string param_mt[100];
   bool MT_p[100];
   bool ploss;
-  double tdc_time;//[ns/ch]
-  //double tdc_time=0.05623;//[ns/ch]
+  double tdc_time=0.05623;//[ns/ch]
   bool Lp_scale=false;
   bool nnL_flag=false;
   double ac1_off[24],ac1_1pe[24],ac2_off[26],ac2_1pe[26];

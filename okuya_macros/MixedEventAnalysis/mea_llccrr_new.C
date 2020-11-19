@@ -3,6 +3,7 @@
 //----------------------------------//
 //
 //K. Okuyama (Sep. 23, 2020)
+//K. Okuyama (Nov. 19, 2020) CS factor
 //
 //taken over from mea_lcr.C
 //using {left, right, center} bunch
@@ -13,7 +14,7 @@ void mea_llccrr_new(){
 cout << "Output pdf file name is " << pdfname << endl;
 cout << "Output root file name is " << rootname << endl;
   
-  TFile *file = new TFile("../h2all_Lsingle.root","read");//input file (default: h2all2.root)
+  TFile *file = new TFile("../h2all_2020Nov.root","read");//input file (default: h2all2.root)
  // TFile *file = new TFile("../h2all5.root","read");//input file (default: h2all2.root)
   TFile *file_new = new TFile(rootname.c_str(),"recreate");//new root
  // TTree *tree_old = (TTree*)file->Get("tree_out");
@@ -22,6 +23,161 @@ cout << "Output root file name is " << rootname << endl;
   TTree *tree = (TTree*)file->Get("tree_out");
 //	tree->Write();
     
+//---  DAQ Efficiency ---//
+//H2 run (run111157~111222 & run111480~542)
+	string daq_file = "../information/daq.dat";//DAQ Efficiency from ELOG
+	int runnum;
+	double daq_eff;
+	double daq_eff_total=0.;
+	int daq_eff_bin=0;
+	double daq_table[600];
+	for(int nnn=0;nnn<600;nnn++){
+		daq_table[nnn]=0.0;
+	}
+	//for(int nnn=157;nnn<221;nnn++){
+	//	daq_table[nnn]=0.2;
+	//}
+	//for(int nnn=480;nnn<543;nnn++){
+	//	daq_table[nnn]=0.2;
+	//}
+	string buf;
+
+	ifstream ifp(daq_file.c_str(),ios::in);
+	if (ifp.fail()){ cout << "Failed" << endl; exit(1);}
+cout << "Param file : " << daq_file.c_str() << endl;
+	while(1){
+		getline(ifp,buf);
+		if(buf[0]=='#'){continue;}
+		if(ifp.eof())break;
+		stringstream sbuf(buf);
+		sbuf >> runnum >> daq_eff;
+		//cout << runnum << ", " << daq_eff <<endl;
+
+		daq_table[runnum] = daq_eff;
+		daq_eff_total+=daq_eff;
+		daq_eff_bin++;
+	}
+	cout<<"DAQ Efficiency (average)="<<daq_eff_total/(double)daq_eff_bin<<endl;
+
+//----------------HRS-R Acceptance-----------------//
+
+	int RHRS_bin;
+	double RHRS_SIMC;
+	double RHRS_table[150][5];//1.5<pk[GeV/c]<2.1, 150 partition --> 1bin=4MeV/c
+	double RHRS_total=0.;
+	int RHRS_total_bin=0;
+/*----- -10 < z < -6 -----*/
+	string AcceptanceR_table_z1 = "../information/RHRS_SIMC_z1.dat";//Acceptance Table (SIMC)
+	string buf_z1;
+
+	ifstream ifp_z1(AcceptanceR_table_z1.c_str(),ios::in);
+	if (ifp_z1.fail()){ cout << "Failed" << endl; exit(1);}
+cout << "Param file : " << AcceptanceR_table_z1.c_str() << endl;
+	while(1){
+		getline(ifp_z1,buf_z1);
+		if(buf_z1[0]=='#'){continue;}
+		if(ifp_z1.eof())break;
+		stringstream sbuf_z1(buf_z1);
+		sbuf_z1 >> RHRS_bin >> RHRS_SIMC;
+		//cout << RHRS_bin << ", " << RHRS_SIMC <<endl;
+
+		RHRS_table[RHRS_bin-1][0] = RHRS_SIMC*0.001;//sr
+		RHRS_total+=RHRS_SIMC;
+		if(RHRS_SIMC!=0)RHRS_total_bin++;
+	}
+	cout<<"HRS-R Acceptance (z1 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
+/*----- -6 < z < -2 -----*/
+	string AcceptanceR_table_z2 = "../information/RHRS_SIMC_z2.dat";//Acceptance Table (SIMC)
+	string buf_z2;
+	RHRS_total=0.;
+	RHRS_total_bin=0;
+
+	ifstream ifp_z2(AcceptanceR_table_z2.c_str(),ios::in);
+	if (ifp_z2.fail()){ cout << "Failed" << endl; exit(1);}
+cout << "Param file : " << AcceptanceR_table_z2.c_str() << endl;
+	while(1){
+		getline(ifp_z2,buf_z2);
+		if(buf_z2[0]=='#'){continue;}
+		if(ifp_z2.eof())break;
+		stringstream sbuf_z2(buf_z2);
+		sbuf_z2 >> RHRS_bin >> RHRS_SIMC;
+		//cout << RHRS_bin << ", " << RHRS_SIMC <<endl;
+
+		RHRS_table[RHRS_bin-1][1] = RHRS_SIMC*0.001;//sr
+		RHRS_total+=RHRS_SIMC;
+		if(RHRS_SIMC!=0)RHRS_total_bin++;
+	}
+	cout<<"HRS-R Acceptance (z2 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
+/*----- -2 < z < 2 -----*/
+	string AcceptanceR_table_z3 = "../information/RHRS_SIMC_z3.dat";//Acceptance Table (SIMC)
+	string buf_z3;
+	RHRS_total=0.;
+	RHRS_total_bin=0;
+
+	ifstream ifp_z3(AcceptanceR_table_z3.c_str(),ios::in);
+	if (ifp_z3.fail()){ cout << "Failed" << endl; exit(1);}
+cout << "Param file : " << AcceptanceR_table_z3.c_str() << endl;
+	while(1){
+		getline(ifp_z3,buf_z3);
+		if(buf_z3[0]=='#'){continue;}
+		if(ifp_z3.eof())break;
+		stringstream sbuf_z3(buf_z3);
+		sbuf_z3 >> RHRS_bin >> RHRS_SIMC;
+		//cout << RHRS_bin << ", " << RHRS_SIMC <<endl;
+
+		RHRS_table[RHRS_bin-1][2] = RHRS_SIMC*0.001;//sr
+		RHRS_total+=RHRS_SIMC;
+		if(RHRS_SIMC!=0)RHRS_total_bin++;
+	}
+	cout<<"HRS-R Acceptance (z3 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
+/*----- 2 < z < 6 -----*/
+	string AcceptanceR_table_z4 = "../information/RHRS_SIMC_z4.dat";//Acceptance Table (SIMC)
+	string buf_z4;
+	RHRS_total=0.;
+	RHRS_total_bin=0;
+
+	ifstream ifp_z4(AcceptanceR_table_z4.c_str(),ios::in);
+	if (ifp_z4.fail()){ cout << "Failed" << endl; exit(1);}
+cout << "Param file : " << AcceptanceR_table_z4.c_str() << endl;
+	while(1){
+		getline(ifp_z4,buf_z4);
+		if(buf_z4[0]=='#'){continue;}
+		if(ifp_z4.eof())break;
+		stringstream sbuf_z4(buf_z4);
+		sbuf_z4 >> RHRS_bin >> RHRS_SIMC;
+		//cout << RHRS_bin << ", " << RHRS_SIMC <<endl;
+
+		RHRS_table[RHRS_bin-1][3] = RHRS_SIMC*0.001;//sr
+		RHRS_total+=RHRS_SIMC;
+		if(RHRS_SIMC!=0)RHRS_total_bin++;
+	}
+	cout<<"HRS-R Acceptance (z4 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
+/*----- 6 < z < 10 -----*/
+	string AcceptanceR_table_z5 = "../information/RHRS_SIMC_z5.dat";//Acceptance Table (SIMC)
+	string buf_z5;
+	RHRS_total=0.;
+	RHRS_total_bin=0;
+
+	ifstream ifp_z5(AcceptanceR_table_z5.c_str(),ios::in);
+	if (ifp_z5.fail()){ cout << "Failed" << endl; exit(1);}
+cout << "Param file : " << AcceptanceR_table_z5.c_str() << endl;
+	while(1){
+		getline(ifp_z5,buf_z5);
+		if(buf_z5[0]=='#'){continue;}
+		if(ifp_z5.eof())break;
+		stringstream sbuf_z5(buf_z5);
+		sbuf_z5 >> RHRS_bin >> RHRS_SIMC;
+		//cout << RHRS_bin << ", " << RHRS_SIMC <<endl;
+
+		RHRS_table[RHRS_bin-1][4] = RHRS_SIMC*0.001;//sr
+		RHRS_total+=RHRS_SIMC;
+		if(RHRS_SIMC!=0)RHRS_total_bin++;
+	}
+	cout<<"HRS-R Acceptance (z5 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
+
+ double RHRS = 0.005;
+ double effDAQ = 0.95;
+ double cs = 0.;
 
 
 
@@ -77,6 +233,7 @@ cout << "Output root file name is " << rootname << endl;
 	double L_mom, R_mom, B_mom; 
 	double L_ene, R_ene, B_ene; 
 	double ac1sum, ac2sum;//NPE SUM
+	int nrun;//RUN NUMBER
 	
 //	string branchname[]={"tr.ntrack_l","tr.ntrack_r","tr.Ls2_pad[100]"};
 //	Int_t nbranch = sizeof(branchname)/sizeof(branchname[0]);
@@ -86,6 +243,7 @@ cout << "Output root file name is " << rootname << endl;
 //	}
 
 	tree->SetBranchStatus("*",0);
+	tree->SetBranchStatus("nrun",1);tree->SetBranchAddress("nrun",&nrun);
 	tree->SetBranchStatus("tr.ntrack_l",1);tree->SetBranchAddress("tr.ntrack_l",&NLtr);
 	tree->SetBranchStatus("tr.ntrack_r",1);tree->SetBranchAddress("tr.ntrack_r",&NRtr);
 	
@@ -155,14 +313,18 @@ cout << "Output root file name is " << rootname << endl;
 /*--RESULT OUTPUT--*/
 /*-----------------*/
   TH1F* hmm_mixacc_result_best  = new TH1F("hmm_mixacc_result_best","MEA result (best)",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_bestCT  = new TH1F("hmm_mixacc_result_bestCT","MEA result (best CT)",xbin,xmin,xmax);
   TH1F* hmm_mixacc_result_nocut  = new TH1F("hmm_mixacc_result_nocut","MEA result (no Z cut)",xbin,xmin,xmax);
   TH1F* hmm_mixacc_result_nocut_new  = new TH1F("hmm_mixacc_result_nocut_new","MEA result (no Z, new AC cut)",xbin,xmin,xmax);
-  TH1F* hmm_mixacc_result_new  = new TH1F("hmm_mixacc_result_new","MEA result (new AC best)",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_new  = new TH1F("hmm_mixacc_result_new","MEA result (strict)",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_newCT  = new TH1F("hmm_mixacc_result_newCT","MEA result (strict CT)",xbin,xmin,xmax);
   TH1F* hmm_mixacc_result_woac  = new TH1F("hmm_mixacc_result_woac","MEA result (no AC cut)",xbin,xmin,xmax);
   TH1F* hmm_mixacc_result_zdiff  = new TH1F("hmm_mixacc_result_zdiff","MEA result (Z diff cut)",xbin,xmin,xmax);
   TH1F* hmm_mixacc_result_nocut_forAl  = new TH1F("hmm_mixacc_result_nocut_forAl","ACC (Al (best))",xbin,xmin,xmax);
   TH1F* hmm_mixacc_result_nocut_new_forAl  = new TH1F("hmm_mixacc_result_nocut_new_forAl","ACC (Al (strict))",xbin,xmin,xmax);
   TH1F* hmm_mixacc_result_momcut  = new TH1F("hmm_mixacc_result_momcut","MEA result (Mom. cut)",xbin,xmin,xmax);
+// (NY/DAQ_Eff./RHRS)
+  TH1F* hcs_mixacc_result_new  = new TH1F("hcs_mixacc_result_new","MEA result (new AC best)",xbin,xmin,xmax);
 /*-------------------*/
 /*--Angle partition--*/
 /*-------------------*/
@@ -329,6 +491,26 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
 		if(fabs(L_tr_vz-R_tr_vz)<0.025&&ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection_zdiff=true;
 		else event_selection_zdiff=false;
 
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%//
+//%%DAQ Eff. & HRS-R Acceptance %%//
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%//
+
+		int kbin = (int)((R_mom-1.5)/0.004);
+		int zbin = (int)((((L_tr_vz+R_tr_vz)/2.)-0.1)/0.04);
+		if(event_selection&&kbin>=0 &&kbin<150){
+		if((L_tr_vz+R_tr_vz)/2.>-0.1&&(L_tr_vz+R_tr_vz)/2.<-0.06)RHRS = RHRS_table[kbin][0];
+		else if((L_tr_vz+R_tr_vz)/2.>-0.06&&(L_tr_vz+R_tr_vz)/2.<-0.02)RHRS = RHRS_table[kbin][1];
+		else if((L_tr_vz+R_tr_vz)/2.>-0.02&&(L_tr_vz+R_tr_vz)/2.<0.02)RHRS = RHRS_table[kbin][2];
+		else if((L_tr_vz+R_tr_vz)/2.>0.02&&(L_tr_vz+R_tr_vz)/2.<0.06)RHRS = RHRS_table[kbin][3];
+		else if((L_tr_vz+R_tr_vz)/2.>0.06&&(L_tr_vz+R_tr_vz)/2.<0.1)RHRS = RHRS_table[kbin][4];
+		else cout<<"Z Error"<<(L_tr_vz+R_tr_vz)/2.<<endl;
+
+		effDAQ = daq_table[nrun-111000];
+		if(effDAQ==0.2)cout<<"Starange!!! DAQ Eff. of run"<<nrun<<" does not exist."<<endl;
+		if(RHRS!=0.&&effDAQ!=0.)cs = 1./effDAQ/RHRS/100.;//[nb/sr]
+		else cs=0.;
+		}else{cs=0.;}
+
 
 	    //===== Right Hand Coordinate ====//
 	    //th and phi are originally meant tan(theta) and tan(phi),
@@ -366,6 +548,7 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
 	    mm=mass - mh;//shift by ML
 		if(event_selection)hmm_acc->Fill(mm);
 		double before_mm=mm;
+//cout<<"before_mm="<<before_mm<<endl;
 
 
 		/*--Electron information is saved.--*/
@@ -375,6 +558,59 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
 		L_tr_vz_saved  = L_tr_vz;
 		/*--Electron information is saved.--*/
 	
+
+		
+	for(int j=0 ; j<(int)nmix ; j++){
+	  
+	  int ENum_mixed = i+j;
+
+	  if(ENum_mixed<ENum){
+	    //tree->GetEntry(ENum_mixed);
+	    tree->GetEntry(elist->GetEntry(i+j));
+	  }
+	  else {
+	    //tree->GetEntry(ENum_mixed-ENum);
+	    tree->GetEntry(elist->GetEntry(i+j-ENum));
+	  }
+
+
+		//Electron info.
+		L_tr_vz=L_tr_vz_saved;
+	
+        R_Tr = R_FP = false;
+        // FP and chi2 cuts
+        if( R_tr_chi2<0.01 ) R_Tr = true;
+        if( R_tr_th<0.17*R_tr_x+0.025
+         && R_tr_th>0.17*R_tr_x-0.035
+         && R_tr_th<0.40*R_tr_x+0.130 ) R_FP = true;
+
+
+	// Change Only Kaon information
+	    double R_pz = R_mom/sqrt(1.0*1.0 + pow((R_tr_tg_th), 2.0) + pow(( R_tr_tg_ph),2.0) );
+	    double R_px = R_pz * (R_tr_tg_th );
+	    double R_py = R_pz * ( R_tr_tg_ph );
+	    double R_E =sqrt(R_mom*R_mom + MK*MK);
+		R_4vec.SetPxPyPzE(R_px, R_py, R_pz, R_E);
+	    R_4vec.RotateX(  13.2/180.*PI );
+	
+
+	
+	// Electron information is not changed.
+		L_4vec = L_4vec_saved;
+		B_4vec = B_4vec_saved;
+		T_4vec = T_4vec_saved;
+
+        double mass_mixed,mm_mixed;
+		Missing = B_4vec + T_4vec - L_4vec - R_4vec;
+		mass_mixed = Missing.M();
+	    mm_mixed=mass_mixed - mh;//shift by ML
+		double after_mm=mm_mixed;
+		//cout<<"mm(Before):mm(after)="<<before_mm<<":"<<after_mm<<" (i,j)=("<<i<<","<<j<<")"<<endl;
+		
+		
+//////////////////////////		
+// CM frame information //
+//////////////////////////		
 		double theta_ee = L_4vec.Theta();
 		//test double theta_ek = acos((phi_R*sin(phi0)+cos(phi0))/(sqrt(1+theta*theta+phi*phi)));//original frame
 		double theta_ek = R_4vec.Theta();
@@ -437,62 +673,17 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
 	if(theta_gk_cm*180./PI>=8. && theta_gk_cm*180./PI<11.)cm4_angle3_cut=true;
 	if(theta_gk_cm*180./PI>=11.)cm4_angle4_cut=true;
 
-		
-	for(int j=0 ; j<(int)nmix ; j++){
-	  
-	  int ENum_mixed = i+j;
-
-	  if(ENum_mixed<ENum){
-	    //tree->GetEntry(ENum_mixed);
-	    tree->GetEntry(elist->GetEntry(i+j));
-	  }
-	  else {
-	    //tree->GetEntry(ENum_mixed-ENum);
-	    tree->GetEntry(elist->GetEntry(i+j-ENum));
-	  }
-
-
-		//Electron info.
-		L_tr_vz=L_tr_vz_saved;
-	
-        R_Tr = R_FP = false;
-        // FP and chi2 cuts
-        if( R_tr_chi2<0.01 ) R_Tr = true;
-        if( R_tr_th<0.17*R_tr_x+0.025
-         && R_tr_th>0.17*R_tr_x-0.035
-         && R_tr_th<0.40*R_tr_x+0.130 ) R_FP = true;
-
-
-	// Change Only Kaon information
-	    double R_pz = R_mom/sqrt(1.0*1.0 + pow((R_tr_tg_th), 2.0) + pow(( R_tr_tg_ph),2.0) );
-	    double R_px = R_pz * (R_tr_tg_th );
-	    double R_py = R_pz * ( R_tr_tg_ph );
-	    double R_E =sqrt(R_mom*R_mom + MK*MK);
-		R_4vec.SetPxPyPzE(R_px, R_py, R_pz, R_E);
-	    R_4vec.RotateX(  13.2/180.*PI );
-	
-
-	
-	// Electron information is not changed.
-		L_4vec = L_4vec_saved;
-		B_4vec = B_4vec_saved;
-		T_4vec = T_4vec_saved;
-
-        double mass_mixed,mm_mixed;
-		Missing = B_4vec + T_4vec - L_4vec - R_4vec;
-		mass_mixed = Missing.M();
-	    mm_mixed=mass_mixed - mh;//shift by ML
-		double after_mm=mm_mixed;
-		//cout<<"mm(Before):mm(after)="<<before_mm<<":"<<after_mm<<" (i,j)=("<<i<<","<<j<<")"<<endl;
-
 			if(mix_region1)hm2->Fill(mm_mixed);
 			if(event_selection)hmm_mixacc->Fill(mm_mixed);
 			if(event_selection)hmm_mixacc2->Fill(mm_mixed);
 			if(event_selection)hmm_mixacc3->Fill(mm_mixed);
 			if(event_selection)hmm_mixacc_result_best->Fill(mm_mixed);
+			if(event_selection)hmm_mixacc_result_bestCT->Fill(mm_mixed);
 			if(event_selection_nocut)hmm_mixacc_result_nocut->Fill(mm_mixed);
 			if(event_selection_nocut_new)hmm_mixacc_result_nocut_new->Fill(mm_mixed);
 			if(event_selection_new)hmm_mixacc_result_new->Fill(mm_mixed);
+			if(event_selection_new)hmm_mixacc_result_newCT->Fill(mm_mixed);
+			if(event_selection_new)hcs_mixacc_result_new->Fill(mm_mixed,cs*labtocm);
 			if(event_selection_momcut)hmm_mixacc_result_momcut->Fill(mm_mixed);
 			if(event_selection_woac)hmm_mixacc_result_woac->Fill(mm_mixed);
 			if(event_selection_zdiff)hmm_mixacc_result_zdiff->Fill(mm_mixed);

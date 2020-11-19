@@ -2,7 +2,7 @@
 #include <fstream>
 using namespace std;
 #include "TApplication.h"
-#include "h2all.h"
+#include "h2Tkin.h"
 #include "Param.h"
 #include "Tree.h"
 #include "TMath.h"
@@ -796,6 +796,7 @@ void tuning::Calib(int rt, int lt ){
     
 
     // Lp = 2.2 GeV mode //
+    bool Lp_scale = true;//T kinematics
     if(Lp_scale)L_p=2.21807/2.1*L_p;
     //L_p=2.2/2.1*L_p;
 
@@ -4657,8 +4658,8 @@ int main(int argc, char** argv){
   //string ifname = "../small2.list";//Run111157~111220 & Run111480~111542
   string ifname = "../small_Tkin.list";//Run111552~111576 & Run111707~111716
 //    string ifname = "../test.list";//for debug
-    //string pname = "./Lambda_H1.param";//(Htar, Hkin)
-    string pname = "./nnL_2.param";//(Htar, Tkin)
+    string pname = "./Lambda_H1.param";//(Htar, Hkin)
+    //string pname = "./nnL_2.param";//(Htar, Tkin)
     string mtparam = "../matrix/matrix_new.list";
     string print_name = "./test_print.pdf";
     bool print_flag = false;//.pdf

@@ -1,0 +1,154 @@
+ttaching file h2all_2_2020Nov.root as _file0...
+(TFile *) 0x2e37290
+root [1] tree_out->Draw("ct_orig>>(10000,-10000,10000)")
+Info in <TCanvas::MakeDefCanvas>:  created default TCanvas with name c1
+root [2] tree_out->Draw("ct_orig>>(10000,-3700,-3600)")
+root [3] TFitEditor::DoFit - using function PrevFitTMP  0x459b7f0
+ FCN=1950.94 FROM MIGRAD    STATUS=CONVERGED      77 CALLS          78 TOTAL
+                     EDM=2.33323e-07    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  Constant     1.21657e+03   4.95405e+00   7.78248e-02  -1.17634e-05
+   2  Mean        -3.66239e+03   1.17403e-03   1.74636e-03  -5.29562e-01
+   3  Sigma        3.78014e-01   1.15526e-03   1.61401e-05   2.17323e-01
+tree_out->Draw("ct_orig>>(10000,-10000,10000)")
+root [4] tree_out->Draw("ct_orig>>(10000,-10000,10000)")
+root [5] tree_out->Draw("ct_orig>>(10000,-3050,-2950)")
+root [6] TFitEditor::DoFit - using function PrevFitTMP  0x459b7f0
+ FCN=184.974 FROM MIGRAD    STATUS=CONVERGED      80 CALLS          81 TOTAL
+                     EDM=1.03522e-08    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  Constant     1.09293e+01   5.63920e-01   2.53814e-03   1.24968e-04
+   2  Mean        -2.98454e+03   1.14752e-02   1.42314e-03   8.28447e-03
+   3  Sigma        3.06124e-01   1.32721e-02   6.38889e-05   9.72468e-03
+
+root [6] .q
+Error in <TList::Clear>: A list is accessing an object (0x44d4280) already deleted (list name = TList)
+[kazuki@farm41 okuya_macros]$ root h2all_2_2020Nov.root
+root [0] 
+Attaching file h2all_2_2020Nov.root as _file0...
+(TFile *) 0x2bab940
+root [1] tree_out->Draw("ct_orig>>(10000,-10000,10000)")
+Info in <TCanvas::MakeDefCanvas>:  created default TCanvas with name c1
+root [2] tree_out->Draw("ct_orig>>(1000,-2550,-2450)")
+root [3] TFitEditor::DoFit - using function PrevFitTMP  0x46a9220
+ FCN=106.449 FROM MIGRAD    STATUS=CONVERGED      81 CALLS          82 TOTAL
+                     EDM=5.17827e-09    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  Constant     1.92622e+02   6.61393e+00   2.28175e-02  -6.76523e-06
+   2  Mean        -2.52003e+03   9.18865e-03   1.20164e-03  -1.92289e-03
+   3  Sigma        3.80875e-01   1.00557e-02   2.83655e-05  -1.57648e-02
+
+root [3] tree_out->Draw("ct_orig>>(10000,-10000,10000)")
+root [4] tree_out->Draw("ct_orig>>(1000,-2200,-2100)")
+root [5] TFitEditor::DoFit - using function PrevFitTMP  0x46a9220
+ FCN=54.7581 FROM MIGRAD    STATUS=CONVERGED      81 CALLS          82 TOTAL
+                     EDM=8.2591e-09    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  Constant     1.79438e+02   6.08110e+00   1.60804e-02  -7.18525e-06
+   2  Mean        -2.18105e+03   1.08280e-02   1.04001e-03   9.45031e-03
+   3  Sigma        3.85433e-01   1.11152e-02   2.48136e-05   2.48324e-03
+tree_out->Draw("ct_orig>>(10000,-10000,10000)")
+root [6] tree_out->Draw("ct_orig>>(1000,-2100,-1800)")
+root [7] TFitEditor::DoFit - using function PrevFitTMP  0x46a9220
+ FCN=283.378 FROM MIGRAD    STATUS=CONVERGED     103 CALLS         104 TOTAL
+                     EDM=9.47191e-07    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  Constant     2.96894e+02   1.48385e+01   7.05345e-02   1.38432e-04
+   2  Mean        -2.01786e+03   1.43703e-02   9.62193e-04  -2.37157e-03
+   3  Sigma        4.85043e-01   2.00363e-02   4.59826e-05   2.44834e-01
+tree_out->Draw("ct_orig>>(10000,-10000,10000)")
+root [8] tree_out->Draw("ct_orig>>(1000,-1200,-1100)")
+root [9] input_line_218:2:55: error: use of undeclared identifier 'PrevFit'
+Double_t TFormula____id1977396489717819128(){ return {PrevFit}-3 ; }
+                                                      ^
+input_line_219:2:55: error: use of undeclared identifier 'PrevFit'
+Double_t TFormula____id1977396489717819128(){ return {PrevFit}-3 ; }
+                                                      ^
+Error in <prepareMethod>: Can't compile function TFormula____id1977396489717819128 prototype with arguments 
+Error in <TFormula::InputFormulaIntoCling>: Error compiling formula expression in Cling
+Error in <TFormula::ProcessFormula>: "PrevFit" has not been matched in the formula expression
+Error in <TFormula::ProcessFormula>: Formula "PrevFit-3" is invalid !
+TFitEditor::DoFit - using function PrevFitTMP  0x46a9220
+ FCN=183.107 FROM MIGRAD    STATUS=CONVERGED      72 CALLS          73 TOTAL
+                     EDM=4.64415e-09    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  Constant     3.55435e+02   9.25965e+00   4.11364e-02  -8.82561e-06
+   2  Mean        -1.15175e+03   6.45612e-03   5.49197e-04   5.95201e-03
+   3  Sigma        3.68043e-01   7.17015e-03   2.71197e-05  -2.13060e-02
+
+root [9] .q
+Error in <TList::Clear>: A list is accessing an object (0x45eb290) already deleted (list name = TList)
+[kazuki@farm41 okuya_macros]$ root h2all_2_2020Nov.root
+root [0] 
+Attaching file h2all_2_2020Nov.root as _file0...
+(TFile *) 0x1d51800
+root [1] tree_out->Draw("ct_orig>>(10000,-10000,10000)")
+Info in <TCanvas::MakeDefCanvas>:  created default TCanvas with name c1
+root [2] tree_out->Draw("ct_orig>>(1000,-750,-650)")
+root [3] TFitEditor::DoFit - using function PrevFitTMP  0x33df8a0
+ FCN=137.962 FROM MIGRAD    STATUS=CONVERGED      82 CALLS          83 TOTAL
+                     EDM=9.80942e-10    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  Constant     1.08863e+03   1.58326e+01   6.67255e-02  -2.91859e-06
+   2  Mean        -6.87248e+02   5.54671e-03   3.27705e-04   3.36986e-03
+   3  Sigma        3.63119e-01   5.64195e-03   2.05978e-05  -1.19889e-02
+tree_out->Draw("ct_orig>>(10000,-10000,10000)")
+root [4] tree_out->Draw("ct_orig>>(1000,-450,-350)")
+root [5] tree_out->Draw("ct_orig>>(1000,-550,-250)")
+root [6] input_line_197:2:55: error: use of undeclared identifier 'PrevFit'
+Double_t TFormula____id1660554109868138335(){ return {PrevFit}-1 ; }
+                                                      ^
+input_line_198:2:55: error: use of undeclared identifier 'PrevFit'
+Double_t TFormula____id1660554109868138335(){ return {PrevFit}-1 ; }
+                                                      ^
+Error in <prepareMethod>: Can't compile function TFormula____id1660554109868138335 prototype with arguments 
+Error in <TFormula::InputFormulaIntoCling>: Error compiling formula expression in Cling
+Error in <TFormula::ProcessFormula>: "PrevFit" has not been matched in the formula expression
+Error in <TFormula::ProcessFormula>: Formula "PrevFit-1" is invalid !
+TFitEditor::DoFit - using function PrevFitTMP  0x33df8a0
+ FCN=657.055 FROM MIGRAD    STATUS=CONVERGED      79 CALLS          80 TOTAL
+                     EDM=1.14773e-06    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  Constant     3.28893e+03   4.52400e+01   3.90812e-01  -2.09295e-05
+   2  Mean        -3.48284e+02   3.90373e-03   1.66075e-04  -2.36345e-01
+   3  Sigma        4.05476e-01   4.14790e-03   2.66056e-05  -5.60268e-01
+tree_out->Draw("ct_orig>>(10000,-10000,10000)")
+root [7] tree_out->Draw("ct_orig>>(1000,-250,-50)")
+root [8] TFitEditor::DoFit - using function PrevFitTMP  0x33df8a0
+ FCN=1355.42 FROM MIGRAD    STATUS=CONVERGED      82 CALLS          83 TOTAL
+                     EDM=2.42419e-07    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  Constant     1.67936e+03   2.80655e+01   2.99509e-01  -1.52418e-05
+   2  Mean        -1.85094e+02   4.96590e-03   8.82595e-05   9.21795e-02
+   3  Sigma        4.84654e-01   6.69660e-03   4.27501e-05  -2.22322e-01
+tree_out->Draw("ct_orig>>(10000,-10000,10000)")
+root [9] tree_out->Draw("ct_orig>>(1000,650,750)")
+root [10] TFitEditor::DoFit - using function PrevFitTMP  0x33df8a0
+ FCN=219.363 FROM MIGRAD    STATUS=CONVERGED      71 CALLS          72 TOTAL
+                     EDM=2.04954e-09    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  Constant     4.65854e+02   9.99126e+00   5.03216e-02  -5.92684e-06
+   2  Mean         6.81041e+02   5.79806e-03   3.24746e-04   8.46032e-03
+   3  Sigma        3.85914e-01   6.01123e-03   2.46824e-05  -7.40296e-03
+tree_out->Draw("ct_orig>>(10000,-10000,10000)")
+root [11] tree_out->Draw("ct_orig>>(1000,1100,1200)")
+root [12] TFitEditor::DoFit - using function PrevFitTMP  0x33df8a0
+ FCN=97.4442 FROM MIGRAD    STATUS=CONVERGED      66 CALLS          67 TOTAL
+                     EDM=9.33022e-10    STRATEGY= 1      ERROR MATRIX ACCURATE 
+  EXT PARAMETER                                   STEP         FIRST   
+  NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE 
+   1  Constant     4.34332e+02   9.50298e+00   3.33016e-02  -2.87775e-07
+   2  Mean         1.14554e+03   5.94631e-03   5.46238e-04   3.22121e-03
+   3  Sigma        3.68286e-01   5.78622e-03   1.81487e-05  -7.92072e-03
+tree_out->Draw("ct_orig>>(10000,-10000,10000)")
+
