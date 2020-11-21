@@ -33,6 +33,13 @@ MM.C (w/ bgmea_mthesis.root)
 % mm_tight.pdf
 % mm_wobg_tight.pdf
 
+MM_divide.C
+% MM vs Qsq
+% MM vs W 
+% MM vs theta_gk_cm
+% MM vs VP polarization (epsilon)
+
+
 %%%%%%%%%%%%%%
 %%%Chapter4%%%
 %%%%%%%%%%%%%%

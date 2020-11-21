@@ -5,6 +5,7 @@
 //*MeV/c^2
 //*Label
 //*basically, it is not changed from "mea_llccrr_new.C"
+//*Update using "2020Nov" (Nov. 20, 2020)
 //
 //K. Okuyama (Nov. 17, 2020)
 //
@@ -13,11 +14,11 @@
 
 void mea_mthesis(){
 	string pdfname = "temp.pdf";
-	string rootname= "bgmea_mthesis.root";
+	string rootname= "bgmea_mthesis_2020Nov.root";
 cout << "Output pdf file name is " << pdfname << endl;
 cout << "Output root file name is " << rootname << endl;
   
-  TFile *file = new TFile("../h2all_Lsingle.root","read");//input file (default: h2all2.root)
+  TFile *file = new TFile("../h2all_2020Nov.root","read");//input file (default: h2all2.root)
  // TFile *file = new TFile("../h2all5.root","read");//input file (default: h2all2.root)
   TFile *file_new = new TFile(rootname.c_str(),"recreate");//new root
  // TTree *tree_old = (TTree*)file->Get("tree_out");

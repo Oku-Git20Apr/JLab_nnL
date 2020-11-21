@@ -74,6 +74,16 @@ struct TreeBranch{
   double tg_th_r;
   double tg_ph_r;
   double vz_r;
+//2020/11/21 Okuyama
+  double pathl_r;
+  double pathl_l;
+  double trpath_l;
+  double trpath_r;
+  double theta_gk_cm;
+  double Qsq;
+  double W;
+  double eps;
+
 
 };
 static TreeBranch tr;

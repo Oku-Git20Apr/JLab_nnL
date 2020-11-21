@@ -10,7 +10,7 @@
 
 void mea_llccrr_new(){
 	string pdfname = "temp.pdf";
-	string rootname= "bgmea_llccrr_Lsingle_new.root";
+	string rootname= "bgmea_csbase.root";
 cout << "Output pdf file name is " << pdfname << endl;
 cout << "Output root file name is " << rootname << endl;
   
@@ -491,25 +491,6 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
 		if(fabs(L_tr_vz-R_tr_vz)<0.025&&ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection_zdiff=true;
 		else event_selection_zdiff=false;
 
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%//
-//%%DAQ Eff. & HRS-R Acceptance %%//
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%//
-
-		int kbin = (int)((R_mom-1.5)/0.004);
-		int zbin = (int)((((L_tr_vz+R_tr_vz)/2.)-0.1)/0.04);
-		if(event_selection&&kbin>=0 &&kbin<150){
-		if((L_tr_vz+R_tr_vz)/2.>-0.1&&(L_tr_vz+R_tr_vz)/2.<-0.06)RHRS = RHRS_table[kbin][0];
-		else if((L_tr_vz+R_tr_vz)/2.>-0.06&&(L_tr_vz+R_tr_vz)/2.<-0.02)RHRS = RHRS_table[kbin][1];
-		else if((L_tr_vz+R_tr_vz)/2.>-0.02&&(L_tr_vz+R_tr_vz)/2.<0.02)RHRS = RHRS_table[kbin][2];
-		else if((L_tr_vz+R_tr_vz)/2.>0.02&&(L_tr_vz+R_tr_vz)/2.<0.06)RHRS = RHRS_table[kbin][3];
-		else if((L_tr_vz+R_tr_vz)/2.>0.06&&(L_tr_vz+R_tr_vz)/2.<0.1)RHRS = RHRS_table[kbin][4];
-		else cout<<"Z Error"<<(L_tr_vz+R_tr_vz)/2.<<endl;
-
-		effDAQ = daq_table[nrun-111000];
-		if(effDAQ==0.2)cout<<"Starange!!! DAQ Eff. of run"<<nrun<<" does not exist."<<endl;
-		if(RHRS!=0.&&effDAQ!=0.)cs = 1./effDAQ/RHRS/100.;//[nb/sr]
-		else cs=0.;
-		}else{cs=0.;}
 
 
 	    //===== Right Hand Coordinate ====//
@@ -546,7 +527,7 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
 		Missing = B_4vec + T_4vec - L_4vec - R_4vec;
 		mass = Missing.M();
 	    mm=mass - mh;//shift by ML
-		if(event_selection)hmm_acc->Fill(mm);
+		//if(event_selection)hmm_acc->Fill(mm);
 		double before_mm=mm;
 //cout<<"before_mm="<<before_mm<<endl;
 
@@ -599,6 +580,22 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
 		L_4vec = L_4vec_saved;
 		B_4vec = B_4vec_saved;
 		T_4vec = T_4vec_saved;
+
+	// Event Selection Again (R_tr_vz is changed)/2020/11/21
+		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
+		else event_selection=false;
+		if(ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection_nocut=true;
+		else event_selection_nocut=false;
+		if(ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection_nocut_new=true;
+		else event_selection_nocut_new=false;
+		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection_new=true;
+		else event_selection_new=false;
+		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&L_tr_p>2.12&&L_tr_p<2.18&&R_tr_p>1.81&&R_tr_p<1.88)event_selection_momcut=true;
+		else event_selection_momcut=false;
+		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection_woac=true;
+		else event_selection_woac=false;
+		if(fabs(L_tr_vz-R_tr_vz)<0.025&&ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection_zdiff=true;
+		else event_selection_zdiff=false;
 
         double mass_mixed,mm_mixed;
 		Missing = B_4vec + T_4vec - L_4vec - R_4vec;
@@ -654,6 +651,26 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
 		double tan_lab1 = sin(theta_gk_cm)/(gamma*(cos(theta_gk_cm)+beta*sqrt(MK*MK+pR_cm*pR_cm)/pR_cm));
 		double tan_lab2 = sin(theta_gk_cm)/(gamma*(cos(theta_gk_cm)+(omega*Mp-Qsq*Qsq)/(omega*Mp+Mp*Mp)));
 
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%//
+//%%DAQ Eff. & HRS-R Acceptance %%//
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%//
+
+		int kbin = (int)((R_mom-1.5)/0.004);
+		int zbin = (int)((((L_tr_vz+R_tr_vz)/2.)-0.1)/0.04);
+		if(event_selection&&kbin>=0 &&kbin<150){
+		if((L_tr_vz+R_tr_vz)/2.>-0.1&&(L_tr_vz+R_tr_vz)/2.<-0.06)RHRS = RHRS_table[kbin][0];
+		else if((L_tr_vz+R_tr_vz)/2.>-0.06&&(L_tr_vz+R_tr_vz)/2.<-0.02)RHRS = RHRS_table[kbin][1];
+		else if((L_tr_vz+R_tr_vz)/2.>-0.02&&(L_tr_vz+R_tr_vz)/2.<0.02)RHRS = RHRS_table[kbin][2];
+		else if((L_tr_vz+R_tr_vz)/2.>0.02&&(L_tr_vz+R_tr_vz)/2.<0.06)RHRS = RHRS_table[kbin][3];
+		else if((L_tr_vz+R_tr_vz)/2.>0.06&&(L_tr_vz+R_tr_vz)/2.<0.1)RHRS = RHRS_table[kbin][4];
+		else cout<<"Z Error"<<(L_tr_vz+R_tr_vz)/2.<<endl;
+
+		effDAQ = daq_table[nrun-111000];
+		if(effDAQ==0.2)cout<<"Starange!!! DAQ Eff. of run"<<nrun<<" does not exist."<<endl;
+		if(RHRS!=0.&&effDAQ!=0.)cs = labtocm/effDAQ/RHRS/10.;//[nb/sr]
+		else cs=0.;
+		}else{cs=0.;}
+
     cm2_angle1_cut=false;
     cm2_angle2_cut=false;
     cm3_angle1_cut=false;
@@ -683,7 +700,7 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
 			if(event_selection_nocut_new)hmm_mixacc_result_nocut_new->Fill(mm_mixed);
 			if(event_selection_new)hmm_mixacc_result_new->Fill(mm_mixed);
 			if(event_selection_new)hmm_mixacc_result_newCT->Fill(mm_mixed);
-			if(event_selection_new)hcs_mixacc_result_new->Fill(mm_mixed,cs*labtocm);
+			if(event_selection_new)hcs_mixacc_result_new->Fill(mm_mixed,cs);
 			if(event_selection_momcut)hmm_mixacc_result_momcut->Fill(mm_mixed);
 			if(event_selection_woac)hmm_mixacc_result_woac->Fill(mm_mixed);
 			if(event_selection_zdiff)hmm_mixacc_result_zdiff->Fill(mm_mixed);

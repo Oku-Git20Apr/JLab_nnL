@@ -3,10 +3,11 @@
 //--  Differential Cross Section  --//
 //----------------------------------//
 //
-//K. Okuyama (Oct. 13, 2020)
+//K. Okuyama (Nov. 21, 2020)
 //
-//This is taken over from result.C
+//This is taken over from result_2D.C
 //Use 2D Acceptance Map (Z, pK)
+//Lab => CM (event by event)
 //No array branch mode 
 
 
@@ -145,7 +146,7 @@ double FMM_Res( double *x, double *par ){
 
 }
 
-void result_2D(){
+void result_2D_Nov(){
 	string pdfname = "fitting.pdf";
 cout << "Output pdf file name is " << pdfname << endl;
   
@@ -884,7 +885,7 @@ cout<<"Entries: "<<ENum<<endl;
 		if(effDAQ==0.2)cout<<"Starange!!! DAQ Eff. of run"<<nrun<<" does not exist."<<endl;
 		efficiency = effAC*effZ*effFP*effch2*effct*effDAQ*efftr*effK;
 		//if(RHRS!=0.)cs = pow(10.,33.)/(ntar_h2*efficiency*RHRS*Ng);//[nb/sr]
-		if(RHRS!=0.&&effDAQ!=0.)cs = 1./effDAQ/RHRS/100.;//[nb/sr]
+		if(RHRS!=0.&&effDAQ!=0.)cs = labtocm/effDAQ/RHRS/10.;//[nb/sr]
 		else cs=0.;
 		}else{cs=0.;}
 		double cs_temp = cs*labtocm;
@@ -973,7 +974,10 @@ cout<<"Entries: "<<ENum<<endl;
 	hmm_bg_fom_best->Scale(1./nbunch);
 	hmm_bg_fom_strict->Scale(1./nbunch);
 	//cs	 = pow(10.,33.)/(ntar_h2*efficiency*RHRS*Ng);//[nb/sr]
-	cs	 = 1./(effDAQ*RHRS*100.);//[nb/sr]
+	effDAQ= 0.950;
+	RHRS  = 0.0055;
+	double labtocm = 0.126;
+	cs	 = labtocm/(effDAQ*RHRS*10.);
 	hmm_bg_fom_best->Scale(cs);
 	hmm_bg_fom_strict->Scale(cs);
 	hmm_bg_cm2_1->Scale(1./nbunch/cs);

@@ -1,10 +1,10 @@
-//-- Mixed Event Analysis  --//
+//--  Missing Mass   --//
+//	vs. Q2
+//	vs. theta_gk_cm
 //
-//Chapter 3
+//K. Okuyama (Nov. 20, 2020)
 //
-//K. Okuyama (Nov. 17, 2020)
-//
-//This is taken over from cointime.C
+//This is taken over from CTMM.C
 //No array branch mode 
 //
 double F_Voigt( double *x, double *par )
@@ -126,58 +126,6 @@ double F_VZ( double *x, double *par )
   return pol2gaus(x,par)+par[5]*TMath::Gaus(x[0],par[6],par[7],1)+par[8]*TMath::Gaus(x[0],par[9],par[10],1)+par[11]*TMath::Gaus(x[0],par[12],par[13],1)+par[14]*TMath::Gaus(x[0],par[15],par[16],1);
 }
 
-double F_VZ_cell( double *x, double *par)
-{
-double a1, a2;
-double b1, b2;
-a1=par[0]*exp(-0.5*pow((x[0]-par[1])/par[2],2.));
-a2=par[0]*par[3]*exp(-0.5*pow((x[0]-par[1]+par[4])/par[5],2.));
-b1=par[6]*exp(-0.5*pow((x[0]-par[7])/par[2],2.));
-b2=par[6]*par[3]*exp(-0.5*pow((x[0]-par[7]+par[4])/par[5],2.));
-double a = a1+a2;
-double b = b1+b2;
-return a+b;
-}
-
-double F_VZ2( double *x, double *par)
-{
-//par[0]: Al front scale
-//par[1]: Al front pos.
-//par[2]: Al Gauss sigma
-//par[3]: Al second gauss strength
-//par[4]: Al(front) second gauss pos. 
-//par[5]: Al second gauss sigma 
-//par[6]: Al rear scale
-//par[7]: Al(rear) second gauss pos. 
-//par[8]: pol2 coeff.1
-//par[9]: pol2 coeff.2
-//par[10]: total scale 
-
-double a1, a2;
-double b1, b2;
-a1=par[0]*exp(-0.5*pow((x[0]-par[1])/par[2],2.));
-a2=par[0]*par[3]*exp(-0.5*pow((x[0]-par[1]+par[4])/par[5],2.));
-b1=par[6]*exp(-0.5*pow((x[0]-par[7])/par[2],2.));
-b2=par[6]*par[3]*exp(-0.5*pow((x[0]-par[7]+par[4])/par[5],2.));
-double a = a1+a2;
-double b = b1+b2;
-
-double c = 0.;
-int np = 2000;
-for(int i=0;i<np;i++){
- double d = par[8]*pow((x[0]-par[9]),2.)+1.;
- double step = -1.+(double)i/1000.;
- if(step<-0.125) d = 0.;
- if(step> 0.125) d = 0.;
-
- double aa;
- aa = exp(-0.5*pow((x[0]-step)/par[2],2.))+par[3]*exp(-0.5*pow((x[0]+par[4]-step)/par[5],2.));
- c = c + d*aa;
-}
-c = par[10]*c;
-return a+b+c;
-}
-
 double FMM_Response( double *x, double *par ){
 
    //par[0]=Width (scale) parameter of Landau density
@@ -244,36 +192,20 @@ double FMM_Res( double *x, double *par ){
 
 }
 
-void MEA(){
+void MM_divide(){
+	string pdfname = "fitting.pdf";
+cout << "Output pdf file name is " << pdfname << endl;
   
   TFile *file = new TFile("../h2all_2020Nov.root","read");//input file of all H2 run(default: h2all4.root)
-  TFile *file_dummy = new TFile("../dummy_Tkin/tritium_111325.root","read");//input file of all H2 run(default: h2all4.root)
-  TFile *file_true = new TFile("../dummy_Tkin/tritium_111157.root","read");//input file of all H2 run(default: h2all4.root)
 	//ACCBGの引き算はmea_hist.ccから
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea6.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
   TFile *file_mea = new TFile("../MixedEventAnalysis/bgmea_2020Nov.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
-  TFile *file_mthesis = new TFile("../MixedEventAnalysis/bgmea_mthesis_2020Nov.root","read");
+  //TFile *file_mea_mthesis = new TFile("../MixedEventAnalysis/bgmea_mthesis.root","read");//MeV
   double nbunch = 6000.;//effetive bunches (6 bunches x 5 mixtures)
  // TTree *tree_old = (TTree*)file->Get("tree_out");
 //cout<<"Please wait a moment. CloneTree() is working..."<<endl;
   //TTree *tree = tree_old->CloneTree();
   TTree *tree = (TTree*)file->Get("tree_out");
-  TChain *chain_dummy = new TChain("T");
-	//chain_dummy = (TChain*)file_dummy->Get("T");
-  TChain *chain_true = new TChain("T");// = (TChain*)file_true->Get("T");
-  //TChain *chain_dummy = new TChain("tree_dummy","");
-  //TChain *chain_true = new TChain("tree_true","");
-	chain_dummy->Add("../dummy_Tkin/tritium_111325.root");
-	chain_dummy->Add("../dummy_Tkin/tritium_111325_1.root");
-	chain_dummy->Add("../dummy_Tkin/tritium_111323.root");
-	chain_dummy->Add("../dummy_Tkin/tritium_111324.root");
-	chain_dummy->Add("../dummy_Tkin/tritium_111324_1.root");
-	chain_true->Add("~/data_okuyama/rootfiles/nnL_temp/tritium_111157_1.root");
-	chain_true->Add("~/data_okuyama/rootfiles/nnL_temp/tritium_111157_2.root");
-	chain_true->Add("~/data_okuyama/rootfiles/nnL_temp/tritium_111157_3.root");
-	chain_true->Add("~/data_okuyama/rootfiles/nnL_temp/tritium_111157_4.root");
-	chain_true->Add("~/data_okuyama/rootfiles/nnL_temp/tritium_111157_5.root");
-//	tree->Write();
 
 
 //---  DAQ Efficiency ---//
@@ -567,6 +499,53 @@ cout << "Param file : " << AcceptanceR_table.c_str() << endl;
   TH1F* hmm_pi_wobg_fom_nocut  = new TH1F("hmm_pi_wobg_fom_nocut","hmm_pi_wobg_fom_nocut",xbin,xmin,xmax);
   TH1F* hm2   = (TH1F*)hmm_L_fom_best->Clone("hm2");
   TH1F* hm4   = (TH1F*)hmm_L_fom_best->Clone("hm4");
+  TH1F* hmm_L_strict  = new TH1F("hmm_L_strict","",xbin,xmin*1000.,xmax*1000.);
+  hmm_L_strict->GetXaxis()->SetTitle("Missing Mass - M_{#Lambda} [MeV/c^{2}]");
+  hmm_L_strict->GetYaxis()->SetTitle("Counts/(MeV/c^{2})");
+  hmm_L_strict->SetLineColor(kBlack);
+  TH1F* hmm_wobg_strict  = new TH1F("hmm_wobg_strict","",xbin,xmin*1000.,xmax*1000.);
+  hmm_wobg_strict->GetXaxis()->SetTitle("Missing Mass - M_{#Lambda} [MeV/c^{2}]");
+  hmm_wobg_strict->GetYaxis()->SetTitle("Counts/(MeV/c^{2})");
+  hmm_wobg_strict->SetLineColor(kBlack);
+  TH1F* hmm_wobg_fom_best  = new TH1F("hmm_wobg_fom_best","",xbin,xmin,xmax);
+  hmm_wobg_fom_best->GetXaxis()->SetTitle("Missing Mass - M_{#Lambda} [GeV/c^{2}]");
+  hmm_wobg_fom_best->GetYaxis()->SetTitle("Counts/(GeV/c^{2})");
+  hmm_wobg_fom_best->SetLineColor(kBlack);
+  TH2F* h_mm_Qsq = new TH2F("h_mm_Qsq","",100,-0.1,0.2,50,0.2,0.8);
+  h_mm_Qsq->GetYaxis()->SetTitle("Q^{2} [(GeV/c)^{2}]");
+  h_mm_Qsq->GetXaxis()->SetTitle("Missing Mass - M_{#Lambda} [GeV/c^{2}]");
+  TH2F* h_mm_W = new TH2F("h_mm_W","",100,-0.1,0.2,50,2.05,2.25);
+  h_mm_W->GetYaxis()->SetTitle("W [GeV]");
+  h_mm_W->GetXaxis()->SetTitle("Missing Mass - M_{#Lambda} [GeV/c^{2}]");
+  TH2F* h_mm_theta_gk_cm = new TH2F("h_mm_theta_gk_cm","",100,-0.1,0.2,50,-5.,25.);
+  h_mm_theta_gk_cm->GetYaxis()->SetTitle("#theta_{#gamma K}^{CM} [deg]");
+  h_mm_theta_gk_cm->GetXaxis()->SetTitle("Missing Mass - M_{#Lambda} [GeV/c^{2}]");
+  TH2F* h_mm_eps = new TH2F("h_mm_eps","",100,-0.1,0.2,50,0.72,0.8);
+  h_mm_eps->GetYaxis()->SetTitle("#epsilon");
+  h_mm_eps->GetXaxis()->SetTitle("Missing Mass - M_{#Lambda} [GeV/c^{2}]");
+  TH2F* h_Qsq_eps = new TH2F("h_Qsq_eps","",50,0.2,0.8,50,0.72,0.8);
+  h_Qsq_eps->GetYaxis()->SetTitle("#epsilon");
+  h_Qsq_eps->GetXaxis()->SetTitle("Q^{2} [(GeV/c)^{2}]");
+  TH2F* h_W_eps = new TH2F("h_W_eps","",50,2.05,2.25,50,0.72,0.8);
+  h_W_eps->GetYaxis()->SetTitle("#epsilon");
+  h_W_eps->GetXaxis()->SetTitle("W [GeV]");
+  TH2F* h_theta_gk_cm_eps = new TH2F("h_theta_gk_cm_eps","",50,-5.,25.,50,0.72,0.8);
+  h_theta_gk_cm_eps->GetYaxis()->SetTitle("#epsilon");
+  h_theta_gk_cm_eps->GetXaxis()->SetTitle("#theta_{#gamma K}^{CM} [deg]");
+
+
+
+
+
+  TH1F* h_ct  = new TH1F("h_ct","h_ct",1000/0.056,-5000,5000.);
+  TH1F* h_ct2  = new TH1F("h_ct2","h_ct2",1000/0.056,-5000,5000.);
+  TH1F* hmm_ctout_only  = new TH1F("hmm_ctout_only","hmm_ctout_only",300,-0.1,0.2);
+  TH1F* hmm_ctout  = new TH1F("hmm_ctout","hmm_ctout",300,-0.1,0.2);
+  TH1F* hmm_ctout2  = new TH1F("hmm_ctout2","hmm_ctout2",300,-0.1,0.2);
+  TH1F* hmm_ctout3  = new TH1F("hmm_ctout3","hmm_ctout3",300,-0.1,0.2);
+  TH1F* hmm_ctout4  = new TH1F("hmm_ctout4","hmm_ctout4",300,-0.1,0.2);
+  TH2F* h_ctmm = new TH2F("h_ctmm","Cointime vs MM",100/0.056,-20.,20.,100,-0.1,0.2);
+  TH2F* h_ctmm2 = new TH2F("h_ctmm2","Cointime vs MM (strict)",100/0.056,-20.,20.,100,-0.1,0.2);
   TH2F* gklab_gkcm = new TH2F("gklab_gkcm","#theta_{gk}^{lab} vs #theta_{gk}^{CM}",100,0.,0.15,100,0.,0.4);
   TH2F* gklab_eklab = new TH2F("gklab_eklab","#theta_{gk}^{lab} vs #theta_{ek}^{lab}",100,0.,0.15,100,0.15,0.3);
   TH2F* eelab_eklab = new TH2F("eelab_eklab","#theta_{ee}^{lab} vs #theta_{ek}^{lab}",100,0.15,0.3,100,0.15,0.3);
@@ -598,43 +577,7 @@ cout << "Param file : " << AcceptanceR_table.c_str() << endl;
   TH1F* h_nltrack  = new TH1F("h_nltrack","NLtr",10,-2,8);
   TH1F* h_nrtrack  = new TH1F("h_nrtrack","NRtr",10,-2,8);
   TH2F* h_pepk  = new TH2F("h_pepk","h_pepk (tight)",40,1.73,1.93,40,1.95,2.25);
-  TH1F* h_ac1_sum  = new TH1F("h_ac1_sum","",1000,-1.,40.);
-  h_ac1_sum->GetXaxis()->SetTitle("NPE (AC1)");
-  h_ac1_sum->GetYaxis()->SetTitle("Counts");
-  h_ac1_sum->SetLineColor(kAzure);
-  TH1F* h_ac2_sum  = new TH1F("h_ac2_sum","",1000,-1.,80.);
-  h_ac2_sum->GetXaxis()->SetTitle("NPE (AC2)");
-  h_ac2_sum->GetYaxis()->SetTitle("Counts");
-  h_ac2_sum->SetLineColor(kAzure);
-  TH1F* h_coin_nocut  = new TH1F("h_coin_nocut","",40.*1000./56.,-20.,20.);
-  h_coin_nocut->GetXaxis()->SetTitle("Coincidence Time [ns]");
-  h_coin_nocut->GetYaxis()->SetTitle("Counts");
-  h_coin_nocut->SetLineColor(kAzure);
-  TH2F* h_zz_dummy  = new TH2F("h_zz_dummy","h_zz_dummy",400,-25.*0.01,25.*0.01,400,-25.*0.01,25.*0.01);
-  TH2F* h_zz    = new TH2F("h_zz"   ,""   , 1000,-25.,25.,1000,  -25., 25.); 
-  h_zz->GetXaxis()->SetTitle("Z-vertex (HRS-R) [cm]");
-  h_zz->GetYaxis()->SetTitle("Z-vertex (HRS-L) [cm]");
-  h_zz->GetXaxis()->SetTitleColor(kGreen+2);
-  h_zz->GetYaxis()->SetTitleColor(kRed);
-  h_zz->GetZaxis()->SetLabelOffset(-0.005);
-  TH1F* h_zL  = new TH1F("h_zL","",1000.,-15.,15.);
-  h_zL->GetXaxis()->SetTitle("Z-vertex (HRS-L) [cm]");
-  h_zL->GetXaxis()->SetTitleColor(kRed);
-  h_zL->GetXaxis()->SetTitleSize(0.07);
-  h_zL->GetXaxis()->SetTitleOffset(0.6);
-  h_zL->GetYaxis()->SetTitle("Counts");
-  h_zL->GetYaxis()->SetTitleSize(0.07);
-  h_zL->GetYaxis()->SetTitleOffset(0.3);
-  h_zL->SetLineColor(kAzure);
-  TH1F* h_zR  = new TH1F("h_zR","",1000.,-15.,15.);
-  h_zR->GetXaxis()->SetTitle("Z-vertex (HRS-R) [cm]");
-  h_zR->GetXaxis()->SetTitleColor(kGreen+2);
-  h_zR->GetXaxis()->SetTitleSize(0.07);
-  h_zR->GetXaxis()->SetTitleOffset(0.6);
-  h_zR->GetYaxis()->SetTitle("Counts");
-  h_zR->GetYaxis()->SetTitleSize(0.07);
-  h_zR->GetYaxis()->SetTitleOffset(0.3);
-  h_zR->SetLineColor(kAzure);
+  TH2F* h_zz_dummy  = new TH2F("h_zz_dummy","h_zz_dummy",100,-0.15,0.15,100,-0.15,0.15);
 
   TH1F* h_zave  = new TH1F("h_zave","Z-vertex (Ave.)",1000,-0.25,0.25);
   TH1F* h_zave_dummy  = new TH1F("h_zave_dummy","Z-vertex (Ave.)",1000,-0.15,0.15);
@@ -649,7 +592,12 @@ cout << "Param file : " << AcceptanceR_table.c_str() << endl;
   bool R_Tr = false;
   bool R_FP = false;
   bool ct_cut = false;
+  bool ct_cut_ctout = false;
   bool event_selection = false;
+  bool event_selection_ctout = false;
+  bool event_selection_ctout2 = false;
+  bool event_selection_ctout3 = false;
+  bool event_selection_ctout4 = false;
   bool event_selection_nocut = false;
   double z_par[100], ac_par[100], ct_par[100];
   double z2_par[100][100], ac2_par[100][100];
@@ -698,24 +646,8 @@ cout<<"cs="<<cs<<endl;
 
 
 
-  int ENum_dummy = chain_dummy->GetEntries();
-cout<<"Entries(dummy): "<<ENum_dummy<<endl;
- // for(int i=0;i<ENum_dummy;i++){
-//	chain_dummy->GetEntry(i);
-	//if(abs(R_tr_vz2-L_tr_vz2)<0.025)h_zave_dummy->Fill((R_tr_vz2+L_tr_vz2)/2.);
-	chain_dummy->Project("h_zave_dummy","(R.tr.vz+L.tr.vz)/2.","abs(R.tr.vz-L.tr.vz)<0.025","");
-	chain_dummy->Project("h_zz_dummy","R.tr.vz:L.tr.vz","","");
-//	}
-  int ENum_true = chain_true->GetEntries();
-cout<<"Entries(true): "<<ENum_true<<endl;
- // for(int i=0;i<ENum_true;i++){
-//	chain_true->GetEntry(i);
-	//if(abs(R_tr_vz3-L_tr_vz3)<0.025)h_zave_true->Fill((R_tr_vz3+L_tr_vz3)/2.);
-	chain_true->Project("h_zave_true","(R.tr.vz+L.tr.vz)/2.","abs(R.tr.vz-L.tr.vz)<0.025","");
-//	}
-
   //tree->Draw(">>elist" , "fabs(ct_orig[0][0])<1.0");
-  //tree->Draw(">>elist" , "fabs(ct_orig)<1.006");//ctsum (does NOT dintinguish #track)
+  //tree->Draw(">>elist" , "fabs(ct_orig)<3.");//ctsum (does NOT dintinguish #track)
   //TEventList *elist = (TEventList*)gROOT->FindObject("elist");
   //int ENum = elist->GetN(); 
   int ENum = tree->GetEntries(); 
@@ -757,12 +689,26 @@ cout<<"Entries: "<<ENum<<endl;
 
 	
 
+		double pi_pos = 3.18;//ns
 
 		if(fabs(ct)<1.006)ct_cut=true;
 		else ct_cut=false;
+		//if(fabs(ct+pi_pos+147.455)<1.006||fabs(ct+pi_pos+185.081)<1.006||fabs(ct+pi_pos+348.277)<1.006||fabs(ct+pi_pos+687.262)<1.006||fabs(ct+pi_pos+1151.74)<1.006||fabs(ct+pi_pos+2181.05)<1.006||fabs(ct+pi_pos+2017.86)<1.006||fabs(ct+pi_pos+2520.02)<1.006||fabs(ct+pi_pos+2984.54)<1.006||fabs(ct+pi_pos+3673.55)<1.006)ct_cut_ctout=true;
+		if(fabs(ct+pi_pos+3650.07)<10.)ct_cut_ctout=true;
+		else ct_cut_ctout=false;
 		//if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
-		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
+		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
 		else event_selection=false;
+		//if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum>3.&&ac2sum>5.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
+		//else event_selection=false;
+		if(ct<-80.)event_selection_ctout=true;
+		else event_selection_ctout=false;
+		if(ct<-80.&&fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection_ctout2=true;
+		else event_selection_ctout2=false;
+		if(ct>150.)event_selection_ctout3=true;
+		else event_selection_ctout3=false;
+		if(ct>150.&&fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection_ctout4=true;
+		else event_selection_ctout4=false;
 
 		event_selection_nocut=false;
 		if(zcut_flag){
@@ -817,7 +763,15 @@ cout<<"Entries: "<<ENum<<endl;
 		mass = Missing.M();
 	    mm=mass - mh;//shift by ML
 		
-		if(event_selection&&ct_cut)hmm_L_fom_best->Fill(mm);
+		h_ctmm->Fill(ct,mm);
+		h_ct->Fill(ct);
+		if(event_selection)h_ctmm2->Fill(ct,mm);
+		if(event_selection)h_ct2->Fill(ct);
+		if(event_selection&&ct_cut_ctout)hmm_ctout_only->Fill(mm);
+		if(event_selection_ctout)hmm_ctout->Fill(mm);
+		if(event_selection_ctout2)hmm_ctout2->Fill(mm);
+		if(event_selection_ctout3)hmm_ctout3->Fill(mm);
+		if(event_selection_ctout4)hmm_ctout4->Fill(mm);
 		if(event_selection_nocut&&ct_cut)hmm_L_fom_nocut->Fill(mm);
 		double theta_ee = L_4vec.Theta();
 		//test double theta_ek = acos((phi_R*sin(phi0)+cos(phi0))/(sqrt(1+theta*theta+phi*phi)));//original frame
@@ -857,6 +811,7 @@ cout<<"Entries: "<<ENum<<endl;
 //theta_gk_cm=0.12;
 		double gamma=1./sqrt(1-beta*beta);
 		double ER_cm=sqrt(pR_cm*pR_cm+MK*MK);
+		double W = sqrt((omega+Mp)*(omega+Mp)-mom_g*mom_g);
 //cout<<"beta="<<beta<<endl;
 //cout<<"gamma="<<gamma<<endl;
 
@@ -865,7 +820,28 @@ cout<<"Entries: "<<ENum<<endl;
 		double tan_lab1 = sin(theta_gk_cm)/(gamma*(cos(theta_gk_cm)+beta*sqrt(MK*MK+pR_cm*pR_cm)/pR_cm));
 		double tan_lab2 = sin(theta_gk_cm)/(gamma*(cos(theta_gk_cm)+(omega*Mp-Qsq*Qsq)/(omega*Mp+Mp*Mp)));
 		//if(tan_lab1!=tan_lab2)cout<<"tan1="<<atan(tan_lab1)<<", tan2="<<atan(tan_lab2)<<"theta_gk_lab="<<theta_gk_lab<<endl;
+		
+		double q2=Qsq+omega*omega;
+		double eps=1/(1+2*(q2/Qsq)*tan(theta_ee/2)*tan(theta_ee/2));
 
+
+// Qsq = -qsq = mom_g*mom_g - omega*omega
+		//cout<<"Qsq="<<Qsq<<endl;
+		//cout<<"q2="<<q2<<endl;
+		//cout<<"mog_g^2="<<mom_g*mom_g<<endl;
+		//cout<<"omega^2="<<omega*omega<<endl;
+
+		if(event_selection&&ct_cut){
+			hmm_L_fom_best->Fill(mm);
+			hmm_L_strict->Fill(mm*1000.);
+			h_mm_Qsq->Fill(mm,Qsq);
+			h_mm_W->Fill(mm,W);
+			h_mm_theta_gk_cm->Fill(mm,theta_gk_cm*180./PI);
+			h_mm_eps->Fill(mm,eps);
+			h_Qsq_eps->Fill(Qsq,eps);
+			h_W_eps->Fill(W,eps);
+			h_theta_gk_cm_eps->Fill(theta_gk_cm*180./PI,eps);
+		}
 
 		//int ebin = (int)((L_mom-1.8)/0.004);
 		//if(ebin>=0 &&ebin<150){
@@ -903,40 +879,65 @@ cout<<"Entries: "<<ENum<<endl;
 			cos_ekcm_gkcm->Fill(cos(theta_gk_cm),cos(theta_ek_cm));
 			if(theta_gk_cm*180./PI>=8.)h_pepk->Fill(R_mom,L_mom);
 		}
-		if(R_Tr&&R_FP&&L_Tr&&L_FP){
-		h_zz->Fill(R_tr_vz*100.,L_tr_vz*100.);
-		h_zL->Fill(L_tr_vz*100.);
-		h_zR->Fill(R_tr_vz*100.);
-		}
-		//if(R_Tr&&R_FP&&L_Tr&&L_FP&&abs(R_tr_vz-L_tr_vz)<0.025&&abs(R_tr_vz+L_tr_vz)<0.1)
-		if(R_Tr&&R_FP&&L_Tr&&L_FP){
-		h_coin_nocut->Fill(ct);
-		}
-		h_ac1_sum->Fill(ac1sum);
-		h_ac2_sum->Fill(ac2sum);
+
 		//if(abs(R_tr_vz-L_tr_vz)<0.025&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP)h_zave->Fill((R_tr_vz+L_tr_vz)/2.);
 		if(abs(R_tr_vz-L_tr_vz)<0.025)h_zave->Fill((R_tr_vz+L_tr_vz)/2.);
 		h_nltrack->Fill(NLtr);
 		h_nrtrack->Fill(NRtr);
 
 }//ENum
-	
-	TH1F* hmm_original=(TH1F*)file_mthesis->Get("hmm_original");
-    hmm_original->GetXaxis()->SetTitle("Missing Mass - M_{#Lambda} [MeV/c^{2}]");
-    hmm_original->GetYaxis()->SetTitle("Counts/(MeV/c^{2})");
-    //hmm_original->GetXaxis()->SetRangeUser(-14.0,17.);
+//	cout<<"nbunch="<<nbunch<<endl;
 	TCanvas* c1 = new TCanvas("c1","c1");
-	hmm_original->Draw("");
-	
-	TH1F* hmm_mixed=(TH1F*)file_mthesis->Get("hmm_mixed");
-    hmm_mixed->GetXaxis()->SetTitle("Missing Mass - M_{#Lambda} [MeV/c^{2}]");
-    hmm_mixed->GetYaxis()->SetTitle("Counts/(MeV/c^{2})");
-    //hmm_mixed->GetXaxis()->SetRangeUser(-14.0,17.);
-	TCanvas* c2 = new TCanvas("c2","c2");
-	hmm_mixed->Draw("");
+	hmm_L_fom_best->Draw("");
+	TH1F* hmm_bg_fom_best=(TH1F*)file_mea->Get("hmm_mixacc_result_best");
+	hmm_bg_fom_best->Sumw2();
+	hmm_bg_fom_best->Scale(1./nbunch);
+	hmm_bg_fom_best->SetLineColor(kGreen);
+	hmm_bg_fom_best->Draw("same");
 
-	c1->Print("./pdf/mea_original.pdf");
-	c2->Print("./pdf/mea_mixed.pdf");
+	TCanvas* c2 = new TCanvas("c2","c2");
+	hmm_wobg_fom_best->Add(hmm_L_fom_best,hmm_bg_fom_best,1.,-1.);
+	hmm_wobg_fom_best->Draw("");
+
+	TCanvas* c3 = new TCanvas("c3","c3");
+	hmm_L_strict->Draw("");
+	//TH1F* hmm_bg_strict=(TH1F*)file_mea_mthesis->Get("hmm_mixed");
+	//hmm_bg_strict->Sumw2();
+	//hmm_bg_strict->Scale(1./nbunch);
+	//hmm_bg_strict->SetLineColor(kGreen);
+	//hmm_bg_strict->SetFillColor(kGreen);
+	//hmm_bg_strict->SetMarkerColor(kGreen);
+	//hmm_bg_strict->Draw("same");
+
+	TCanvas* c4 = new TCanvas("c4","c4");
+	//hmm_wobg_strict->Add(hmm_L_strict,hmm_bg_strict,1.,-1.);
+	//hmm_wobg_strict->Draw("");
+
+	TCanvas* c5 = new TCanvas("c5","c5");
+	h_mm_Qsq->Draw("colz");
+	
+	TCanvas* c6 = new TCanvas("c6","c6");
+	h_mm_W->Draw("colz");
+
+	TCanvas* c7 = new TCanvas("c7","c7");
+	h_mm_theta_gk_cm->Draw("colz");
+
+	TCanvas* c8 = new TCanvas("c8","c8");
+	h_mm_eps->Draw("colz");
+
+	TCanvas* c9 = new TCanvas("c9","c9");
+	h_Qsq_eps->Draw("colz");
+
+	TCanvas* c10 = new TCanvas("c10","c10");
+	h_W_eps->Draw("colz");
+
+	TCanvas* c11 = new TCanvas("c11","c11");
+	h_theta_gk_cm_eps->Draw("colz");
+
+
+
+//	c3->Print("./pdf/mm_tight.pdf");
+//	c4->Print("./pdf/mm_wobg_tight.pdf");
 
 cout << "Well done!" << endl;
-}
+}//fit

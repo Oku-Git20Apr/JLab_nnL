@@ -247,10 +247,12 @@ double FMM_Res( double *x, double *par ){
 
 void cointime(){
   
-  TFile *file = new TFile("../h2all_Lsingle_2_before.root","read");//input file of all H2 run(default: h2all4.root)
+  //TFile *file = new TFile("../h2all_2020Nov.root","read");//2020Nov updated
+  //TFile *file = new TFile("../h2all_Lsingle.root","read");//before 2020Nov
+  TFile *file = new TFile("../CointimeCorrectionNov/h2all_old.root","read");//w/o Cointime shift
 	//ACCBGの引き算はmea_hist.ccから
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea6.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
-  TFile *file_mea = new TFile("../MixedEventAnalysis/bgmea_llccrr_Lsingle_new.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
+  TFile *file_mea = new TFile("../MixedEventAnalysis/bgmea_2020Nov.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
   double nbunch = 6000.;//effetive bunches (6 bunches x 5 mixtures)
  // TTree *tree_old = (TTree*)file->Get("tree_out");
 //cout<<"Please wait a moment. CloneTree() is working..."<<endl;
@@ -887,8 +889,10 @@ cout<<"Entries: "<<ENum<<endl;
 }//ENum
 	TCanvas* c1 = new TCanvas("c1","c1");
 	h_coin_nocut->Draw("");
+	cout<<"Coin_all_ENum="<<h_coin_nocut->Integral(h_coin_nocut->FindBin(-20.),h_coin_nocut->FindBin(20.))<<endl;
 	TCanvas* c2 = new TCanvas("c2","c2");
 	h_coin_strict->Draw("");
+	cout<<"Coin_kaon_ENum="<<h_coin_strict->Integral(h_coin_strict->FindBin(-1.006),h_coin_strict->FindBin(1.006))<<endl;
 	
 	c1->Print("./pdf/cointime_nocut.pdf");
 	c2->Print("./pdf/cointime_strict.pdf");

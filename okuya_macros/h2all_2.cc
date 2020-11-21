@@ -1094,12 +1094,12 @@ if(dataflag==1){//H2-1
 	if(fabs(ctime - 185.09)<25.){
  	   ctime = ctime - 185.09 - pion_pos;
  	}
-	if(fabs(ctime + 681.04)<25.){
- 	   ctime = ctime - 681.04 - pion_pos;
- 	}
-	if(fabs(ctime + 1145.54)<25.){
- 	   ctime = ctime - 1145.54 - pion_pos;
- 	}
+	//if(fabs(ctime + 681.04)<25.){
+ 	//   ctime = ctime + 681.04 - pion_pos;
+ 	//}
+	//if(fabs(ctime + 1145.54)<25.){
+ 	//   ctime = ctime + 1145.54 - pion_pos;
+ 	//}
 }
 
 /////////////////////////	
@@ -1364,8 +1364,8 @@ cout<<"bin coin"<<bin_coin_c<<endl;
 
 void tuning::MakeHist(){
   cout<<"Make Hist "<<endl;
-	//file_out = new TFile("h2all_temp.root","recreate");
-	file_out = new TFile("h2all_2_2020Nov.root","recreate");
+	file_out = new TFile("h2all_2_temp.root","recreate");
+	//file_out = new TFile("h2all_2_2020Nov.root","recreate");
 	tree_out = new TTree("tree_out","tree_out");
 	//`tree_out ->Branch("branch name",variable ,"branch name/type");
 	
@@ -1484,6 +1484,15 @@ void tuning::MakeHist(){
     tree_out->Branch("R.tr.tg_th"  ,&tr.tg_th_r   ,"R.tr.tg_th/D"  );
     tree_out->Branch("R.tr.tg_ph"  ,&tr.tg_ph_r   ,"R.tr.tg_ph/D"  );
     tree_out->Branch("R.tr.vz"  ,&tr.vz_r   ,"R.tr.vz/D"  );
+//ADD 2020/11/21
+    tree_out->Branch("R.tr.pathl"  ,&tr.pathl_r   ,"R.tr.pathl/D"  );
+    tree_out->Branch("L.tr.pathl"  ,&tr.pathl_l   ,"L.tr.pathl/D"  );
+    tree_out->Branch("R.s2.trpath"  ,&tr.trpath_r   ,"R.s2.trpath/D"  );
+    tree_out->Branch("L.s2.trpath"  ,&tr.trpath_l   ,"L.s2.trpath/D"  );
+    tree_out->Branch("theta_gk_cm"  ,&tr.theta_gk_cm   ,"theta_gk_cm/D"  );
+    tree_out->Branch("Qsq"  ,&tr.Qsq   ,"Qsq/D"  );
+    tree_out->Branch("W"  ,&tr.W   ,"W/D"  );
+    tree_out->Branch("eps"  ,&tr.eps   ,"eps/D"  );
 
 
 /////////////
@@ -2262,6 +2271,14 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 		tr.tg_th_r= -1000.;
 		tr.tg_ph_r= -1000.;
 		tr.vz_r   = -1000.;
+		tr.pathl_r= -1000.; 
+    	tr.pathl_l= -1000.; 
+    	tr.trpath_r= -1000.;
+    	tr.trpath_l= -1000.;
+    	tr.theta_gk_cm= -1000.;
+    	tr.Qsq= -1000.;
+    	tr.W= -1000.;
+    	tr.eps= -1000.;
 		tr.ct_orig= -1000.;
 		tr.ct_itabashi = -1000.;
 
@@ -2464,6 +2481,10 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 		tr.tg_th_r= R_tr_tg_th[rt];
 		tr.tg_ph_r= R_tr_tg_ph[rt];
 		tr.vz_r   = R_tr_vz[rt];
+		tr.pathl_r= R_tr_pathl[rt]; 
+    	tr.pathl_l= L_tr_pathl[lt]; 
+    	tr.trpath_r= R_s2_trpath[rt];
+    	tr.trpath_l= L_s2_trpath[lt];
 
 
 
@@ -2617,6 +2638,16 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 		//double theta_gk_cm=acos(pkzcm/(sqrt(pkxcm*pkxcm+pkycm*pkycm+pkzcm*pkzcm)));
 		//--Lorentz Transformation in another frame--//
 		double theta_gk_cm=atan(pR*sin(theta_gk_lab)/(-gamma_cm*beta_cm*sqrt(pR*pR+MK*MK)+gamma_cm*pR*cos(theta_gk_lab)));
+
+//2020/11/21
+		double W = sqrt((omega+Mp)*(omega+Mp)-mom_g*mom_g);
+		double q2=Qsq+omega*omega;
+		double eps=1/(1+2*(q2/Qsq)*tan(theta_ee/2)*tan(theta_ee/2));
+    	tr.theta_gk_cm= theta_gk_cm;
+    	tr.Qsq= Qsq;
+    	tr.W= W;
+    	tr.eps= eps;
+		
 
 		double A=Me*Me*omega*omega/(4*Einc*Einc*Escat*Escat);
 		double sinterm=sin(theta_ee/2)*sin(theta_ee/2);
@@ -4764,7 +4795,8 @@ cout << "AC->ACtune() is done" << endl;
     if(root_flag)AC->Write();
   
 cout<<"=========== Output files ============="<<endl;
-cout<<"output rootfile: h2all_2_2020Nov.root"<<endl;
+cout<<"h2all_2_temp.root was created!"<<endl;
+cout<<"If you want to confirm, please rename it to h2all_2_Nov.root"<<endl;
   
   
 	
