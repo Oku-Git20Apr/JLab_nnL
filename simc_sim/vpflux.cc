@@ -70,7 +70,7 @@ int main(int argc, char** argv){
 	string filename = "LHRS_big";//thetawidth=0.1 rad
 	//string filename = "BOTH";
 	//string filename = "RHRS";
-	bool BatchFlag = true;
+	bool BatchFlag = false;
 	bool PDFFlag = true;
 	while((option=getopt(argc, argv, "f:bp"))!=-1){
 		switch(option){
@@ -144,15 +144,15 @@ int main(int argc, char** argv){
 	double thetamax = 1.*(1.*centraltheta + thetawidth);
 	double phimin = 1.*(centralphi - phiwidth);
 	double phimax = 1.*(centralphi + phiwidth);
-	double omega = 2.*PI* (1-cos(thetawidth))*1000.; // [msr]
+	double Domega = 2.*PI* (1-cos(thetawidth))*1000.; // [msr]
 	double momwidth = 0.5;
 	double MAX = 0.01;
-	double volume = omega*MAX/1000.; 
+	double volume = Domega*MAX/1000.; 
 	cout<< "thetamin = " << thetamin*180/PI << " [deg]" <<endl;
 	cout<< "thetamax = " << thetamax*180/PI << " [deg]" <<endl;
 	cout<< "phimin = " << phimin*180/PI << " [deg]" <<endl;
 	cout<< "phimax = " << phimax*180/PI << " [deg]" <<endl;
-	cout<< "omega = " << omega << " [msr]" <<endl;
+	cout<< "Domega = " << Domega << " [msr]" <<endl;
 	cout<< "volume = " << volume <<endl;
 
 
@@ -185,6 +185,7 @@ int main(int argc, char** argv){
 	TH1D *h_vp_mom_result2 = new TH1D("h_vp_mom_result2", "", bin_mom, min_mom, max_mom);//w/ RHRS Acceptance
 	TH2D *h_th_mom = new TH2D( "h_th_mom", "", bin_2D_th, 0.,20.,bin_2D_mom, 1.95, 2.25);
 	TH2D *h_momL_momR = new TH2D( "h_momL_momR", "", 50, 1.73, 1.93 ,50., 1.95, 2.25);
+	TH1D *h_momL = new TH1D( "h_momL", "", 200,1.95,2.25);
 	TH1D *h_th_cm = new TH1D( "h_th_cm", "", 100.,0.,20.);
 	TH1D *h_th_cm2 = new TH1D( "h_th_cm2", "", 100.,0.,20.);
 
@@ -366,17 +367,20 @@ int main(int argc, char** argv){
 		double tan_lab2 = sin(theta_gk_cm)/(gamma*(cos(theta_gk_cm)+(omega*Mp-Qsq*Qsq)/(omega*Mp+Mp*Mp)));
 
 //===Angle partition===//
-		h_mom_result->Fill(L_mom);
-		//if(theta_gk_cm*180./PI>=8.)h_mom_result->Fill(L_mom);
+		//h_mom_result->Fill(L_mom);
+		//if(theta_gk_cm*180./PI>=6.&&theta_gk_cm*180./PI<10.)h_mom_result->Fill(L_mom);
+		if(Qsq>=0.5)h_mom_result->Fill(L_mom);
 		//h_mom_result->Fill(L_mom);
 		h_th_mom->Fill(theta_gk_cm*180./PI,L_mom);
 		h_momL_momR->Fill(R_mom,L_mom);
+		if(R_mom>1.74&&R_mom<1.91)h_momL->Fill(L_mom);
 		h_th_cm->Fill(theta_gk_cm*180./PI);
-		if(L_mom>2.08)h_th_cm2->Fill(theta_gk_cm*180./PI);
+		if(L_mom<2.12)h_th_cm2->Fill(theta_gk_cm*180./PI);
 	 if(vpflux>k){//Full
 		h_vp_mom->Fill(L_mom);
-		//if(L_mom>2.08&&theta_gk_cm*180./PI>=8.){
-		if(L_mom>2.08){//L_mom>2.08(Lambda), L_mom<2.12(Simga0)
+		//if(L_mom>2.08&&theta_gk_cm*180./PI>=6.&&theta_gk_cm*180./PI<10.){
+		if(L_mom<2.12&&Qsq>=0.5){
+		//if(L_mom>2.08){//L_mom>2.08(Lambda), L_mom<2.12(Simga0)
 		h_vp_mom2->Fill(L_mom);
 		//if(L_mom>2.1)h_vp_mom2->Fill(L_mom);
 		}
@@ -397,7 +401,7 @@ int main(int argc, char** argv){
 		//cout<<"nbin_mom:"<<i<<endl;
 		//cout<<"n1="<<n1<<endl;
 		//cout<<"n2="<<n2<<endl;
-		if(n1!=0 && n2!=0)val = omega*(1.0*n2/n1);
+		if(n1!=0 && n2!=0)val = Domega*(1.0*n2/n1);
 		h_sa_mom_result->SetBinContent(i+1, val);
 		if(n1!=0 && n2!=0)err = val * sqrt(1./n2 + 1./n1 - 2./sqrt(1.*n1*n2));
 		h_sa_mom_result->SetBinError(i+1, err);
@@ -439,8 +443,8 @@ int main(int argc, char** argv){
 // Draw histgrams //
 ////////////////////
 	TH1D *hframe;
-	TLine *lmom = new TLine( centralmom, 0., centralmom, omega);
-	TLine *lth = new TLine( centraltheta, 0., centraltheta, omega);
+	TLine *lmom = new TLine( centralmom, 0., centralmom, Domega);
+	TLine *lth = new TLine( centraltheta, 0., centraltheta, Domega);
 	lmom->SetLineColor(4);
 	lth->SetLineColor(4);
 
@@ -451,7 +455,7 @@ int main(int argc, char** argv){
 	//======= Momentum Acceptance (Lab) ======
 	c1->Divide(2,2);
 	c1->cd(1);
-//	hframe = (TH1D*)gPad->DrawFrame( min_mom_gen, 0., max_mom_gen, omega + 0.5);
+//	hframe = (TH1D*)gPad->DrawFrame( min_mom_gen, 0., max_mom_gen, Domega + 0.5);
 	//SetTitle(h_sa_mom_result, "Solid Angle vs. Momentum at Reference Plane", "Momentum [GeV/c]", "Solid Angle [msr]");
 	SetTitle(h_sa_mom_result, "Solid Angle vs. Momentum (w/ all Cuts)", "Momentum [GeV/c]", "Solid Angle [msr]");
 //	h_sa_mom_result->GetXaxis()->SetNdivisions(506, kFALSE);
@@ -482,14 +486,14 @@ int main(int argc, char** argv){
 	//SetTitle(h_vp_mom_result, "Integrated VP Flux vs. Momentum (w/ all Cuts)", "Momentum [GeV/c]", "Integrated VP Flux [/GeV]");
 		//h_vp_mom_result->Scale(bin_mom);
 	h_vp_mom_result->GetXaxis()->SetNdivisions(505, kFALSE);
-	h_vp_mom_result->Draw();
+	h_vp_mom_result2->Draw();
 	c2->cd(2);
 	h_vp_mom_result->GetXaxis()->SetNdivisions(505, kFALSE);
 	h_vp_mom_result->Draw();
 		//h_vp_mom_result2->Scale(bin_mom);
 	h_vp_mom_result2->GetXaxis()->SetNdivisions(505, kFALSE);
 	h_vp_mom_result2->SetLineColor(kAzure);
-	h_vp_mom_result2->Draw("same");
+	h_vp_mom_result2->Draw("");
 	double ymax = (h_vp_mom_result->GetBinContent(h_vp_mom_result->GetMaximumBin()));
 	TLine *RHRS_min = new TLine( 2.08, 0., 2.08, 1.1*ymax);
 	TLine *RHRS_max = new TLine( 2.12, 0., 2.12, 1.1*ymax);
@@ -512,6 +516,8 @@ int main(int argc, char** argv){
 	h_th_cm2->Draw("same");
 	c3->cd(3);
 	h_momL_momR->Draw("colz");
+	c3->cd(4);
+	h_momL->Draw("");
 
 	if(!BatchFlag){
 		theApp.Run();
@@ -525,9 +531,9 @@ int main(int argc, char** argv){
 		c3 ->Print(Form("%s" ,PDFFile.str().c_str()) );
 		c3 ->Print(Form("%s]" ,PDFFile.str().c_str()) );
 	}
-c1->Close();
-c2->Close();
-c3->Close();
+//c1->Close();
+//c2->Close();
+//c3->Close();
 	
 	//label
 	ofstream fout("vpflux_SIMC.dat");//LHRS

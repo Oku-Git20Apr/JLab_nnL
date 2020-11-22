@@ -10,7 +10,7 @@
 
 void mea_llccrr_new(){
 	string pdfname = "temp.pdf";
-	string rootname= "bgmea_csbase.root";
+	string rootname= "bgmea_temp.root";
 cout << "Output pdf file name is " << pdfname << endl;
 cout << "Output root file name is " << rootname << endl;
   
@@ -346,6 +346,25 @@ cout << "Param file : " << AcceptanceR_table_z5.c_str() << endl;
   TH1F* hmm_mixacc_result_new_cm4_2  = new TH1F("hmm_mixacc_result_new_cm4_2","(tight) 5<#theta_{#gamma K}^{CM}<8 deg",xbin,xmin,xmax);
   TH1F* hmm_mixacc_result_new_cm4_3  = new TH1F("hmm_mixacc_result_new_cm4_3","(tight) 8<#theta_{#gamma K}^{CM}<11 deg",xbin,xmin,xmax);
   TH1F* hmm_mixacc_result_new_cm4_4  = new TH1F("hmm_mixacc_result_new_cm4_4","(tight) #theta_{#gamma K}^{CM}>11 deg",xbin,xmin,xmax);
+//hmm => hcs(Lab) 2020/11/22
+  TH1F* hcs_mixacc_result_cm2_1  = new TH1F("hcs_mixacc_result_cm2_1","#theta_{#gamma K}^{CM}<8 deg",xbin,xmin,xmax);
+  TH1F* hcs_mixacc_result_cm2_2  = new TH1F("hcs_mixacc_result_cm2_2","#theta_{#gamma K}^{CM}>8 deg",xbin,xmin,xmax);
+  TH1F* hcs_mixacc_result_cm3_1  = new TH1F("hcs_mixacc_result_cm3_1","#theta_{#gamma K}^{CM}<6 deg",xbin,xmin,xmax);
+  TH1F* hcs_mixacc_result_cm3_2  = new TH1F("hcs_mixacc_result_cm3_2","6<#theta_{#gamma K}^{CM}<10 deg",xbin,xmin,xmax);
+  TH1F* hcs_mixacc_result_cm3_3  = new TH1F("hcs_mixacc_result_cm3_3","#theta_{#gamma K}^{CM}>10 deg",xbin,xmin,xmax);
+  TH1F* hcs_mixacc_result_cm4_1  = new TH1F("hcs_mixacc_result_cm4_1","#theta_{#gamma K}^{CM}<5 deg",xbin,xmin,xmax);
+  TH1F* hcs_mixacc_result_cm4_2  = new TH1F("hcs_mixacc_result_cm4_2","5<#theta_{#gamma K}^{CM}<8 deg",xbin,xmin,xmax);
+  TH1F* hcs_mixacc_result_cm4_3  = new TH1F("hcs_mixacc_result_cm4_3","8<#theta_{#gamma K}^{CM}<11 deg",xbin,xmin,xmax);
+  TH1F* hcs_mixacc_result_cm4_4  = new TH1F("hcs_mixacc_result_cm4_4","#theta_{#gamma K}^{CM}>11 deg",xbin,xmin,xmax);
+  TH1F* hcs_mixacc_result_new_cm2_1  = new TH1F("hcs_mixacc_result_new_cm2_1","(tight) #theta_{#gamma K}^{CM}<8 deg",xbin,xmin,xmax);
+  TH1F* hcs_mixacc_result_new_cm2_2  = new TH1F("hcs_mixacc_result_new_cm2_2","(tight) #theta_{#gamma K}^{CM}>8 deg",xbin,xmin,xmax);
+  TH1F* hcs_mixacc_result_new_cm3_1  = new TH1F("hcs_mixacc_result_new_cm3_1","(tight) #theta_{#gamma K}^{CM}<6 deg",xbin,xmin,xmax);
+  TH1F* hcs_mixacc_result_new_cm3_2  = new TH1F("hcs_mixacc_result_new_cm3_2","(tight) 6<#theta_{#gamma K}^{CM}<10 deg",xbin,xmin,xmax);
+  TH1F* hcs_mixacc_result_new_cm3_3  = new TH1F("hcs_mixacc_result_new_cm3_3","(tight) #theta_{#gamma K}^{CM}>10 deg",xbin,xmin,xmax);
+  TH1F* hcs_mixacc_result_new_cm4_1  = new TH1F("hcs_mixacc_result_new_cm4_1","(tight) #theta_{#gamma K}^{CM}<5 deg",xbin,xmin,xmax);
+  TH1F* hcs_mixacc_result_new_cm4_2  = new TH1F("hcs_mixacc_result_new_cm4_2","(tight) 5<#theta_{#gamma K}^{CM}<8 deg",xbin,xmin,xmax);
+  TH1F* hcs_mixacc_result_new_cm4_3  = new TH1F("hcs_mixacc_result_new_cm4_3","(tight) 8<#theta_{#gamma K}^{CM}<11 deg",xbin,xmin,xmax);
+  TH1F* hcs_mixacc_result_new_cm4_4  = new TH1F("hcs_mixacc_result_new_cm4_4","(tight) #theta_{#gamma K}^{CM}>11 deg",xbin,xmin,xmax);
 /*-----------------*/
 /*--RESULT OUTPUT--*/
 /*-----------------*/
@@ -724,6 +743,26 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
 			if(event_selection_new&&cm4_angle2_cut)hmm_mixacc_result_new_cm4_2->Fill(mm_mixed);
 			if(event_selection_new&&cm4_angle3_cut)hmm_mixacc_result_new_cm4_3->Fill(mm_mixed);
 			if(event_selection_new&&cm4_angle4_cut)hmm_mixacc_result_new_cm4_4->Fill(mm_mixed);
+
+//hmm => hcs(Lab) 2020/11/22
+			if(event_selection&&cm2_angle1_cut)hcs_mixacc_result_cm2_1->Fill(mm_mixed*labtocm);
+			if(event_selection&&cm2_angle2_cut)hcs_mixacc_result_cm2_2->Fill(mm_mixed*labtocm);
+			if(event_selection&&cm3_angle1_cut)hcs_mixacc_result_cm3_1->Fill(mm_mixed*labtocm);
+			if(event_selection&&cm3_angle2_cut)hcs_mixacc_result_cm3_2->Fill(mm_mixed*labtocm);
+			if(event_selection&&cm3_angle3_cut)hcs_mixacc_result_cm3_3->Fill(mm_mixed*labtocm);
+			if(event_selection&&cm4_angle1_cut)hcs_mixacc_result_cm4_1->Fill(mm_mixed*labtocm);
+			if(event_selection&&cm4_angle2_cut)hcs_mixacc_result_cm4_2->Fill(mm_mixed*labtocm);
+			if(event_selection&&cm4_angle3_cut)hcs_mixacc_result_cm4_3->Fill(mm_mixed*labtocm);
+			if(event_selection&&cm4_angle4_cut)hcs_mixacc_result_cm4_4->Fill(mm_mixed*labtocm);
+			if(event_selection_new&&cm2_angle1_cut)hcs_mixacc_result_new_cm2_1->Fill(mm_mixed*labtocm);
+			if(event_selection_new&&cm2_angle2_cut)hcs_mixacc_result_new_cm2_2->Fill(mm_mixed*labtocm);
+			if(event_selection_new&&cm3_angle1_cut)hcs_mixacc_result_new_cm3_1->Fill(mm_mixed*labtocm);
+			if(event_selection_new&&cm3_angle2_cut)hcs_mixacc_result_new_cm3_2->Fill(mm_mixed*labtocm);
+			if(event_selection_new&&cm3_angle3_cut)hcs_mixacc_result_new_cm3_3->Fill(mm_mixed*labtocm);
+			if(event_selection_new&&cm4_angle1_cut)hcs_mixacc_result_new_cm4_1->Fill(mm_mixed*labtocm);
+			if(event_selection_new&&cm4_angle2_cut)hcs_mixacc_result_new_cm4_2->Fill(mm_mixed*labtocm);
+			if(event_selection_new&&cm4_angle3_cut)hcs_mixacc_result_new_cm4_3->Fill(mm_mixed*labtocm);
+			if(event_selection_new&&cm4_angle4_cut)hcs_mixacc_result_new_cm4_4->Fill(mm_mixed*labtocm);
 //cout<<"mm="<<mm<<endl;
 //cout<<"mm_mixed="<<mm_mixed<<endl;
 	}//Mix (j loop)
@@ -815,4 +854,6 @@ file_new->Write();
 //file_new->Close();
 
 cout << "Well done!" << endl;
+cout << "bgmea_temp.root was successfully created."<<endl;
+cout << "Please change filename."<<endl;
 }//mea_hist

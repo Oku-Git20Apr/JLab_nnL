@@ -155,7 +155,8 @@ cout << "Output pdf file name is " << pdfname << endl;
 	//ACCBGの引き算はmea_hist.ccから
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea6.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_llccrr_new_new.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
-  TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_2020Nov.root","read");// 2020/11/19 rootfile
+  //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_2020Nov.root","read");// 2020/11/19 rootfile
+  TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_csbase.root","read");// 2020/11/22 rootfile
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_llccrr_Lsingle.root","read");// 2020/11/19 rootfile
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_mthesis.root","read");//from h2all_Lsingle.root, HRS-L: Single-tracking
   double nbunch = 6000.;//effetive bunches (6 bunches x 5 mixtures)
@@ -956,6 +957,7 @@ cout<<"Entries: "<<ENum<<endl;
 	//TH1F* hmm_pi_fom_best=(TH1F*)file->Get("hmm_pi_fom_best");
 	TH1F* hmm_bg_fom_best=(TH1F*)file_mea->Get("hmm_mixacc_result_best");
 	TH1F* hmm_bg_fom_strict=(TH1F*)file_mea->Get("hmm_mixacc_result_new");
+	TH1F* hcs_bg_fom_strict=(TH1F*)file_mea->Get("hcs_mixacc_result_new");
 	TH1F* hmm_bg_fom_nocut=(TH1F*)file_mea->Get("hmm_mixacc_result_nocut");
 	TH1F* hmm_Albg_fom_nocut=(TH1F*)file_mea->Get("hmm_mixacc_result_nocut_forAl");
 	//TH1F* hmm_bg_fom_nocut=(TH1F*)file_mea->Get("hmm_mixacc_nocut_result");
@@ -970,9 +972,11 @@ cout<<"Entries: "<<ENum<<endl;
 	hmm_bg_fom_best->Sumw2();
 	hmm_bg_fom_strict->Sumw2();
 	hmm_bg_fom_nocut->Sumw2();
+	hcs_bg_fom_strict->Sumw2();
 	hmm_Albg_fom_nocut->Sumw2();
 	hmm_bg_fom_best->Scale(1./nbunch);
 	hmm_bg_fom_strict->Scale(1./nbunch);
+	hcs_bg_fom_strict->Scale(1./nbunch);
 	//cs	 = pow(10.,33.)/(ntar_h2*efficiency*RHRS*Ng);//[nb/sr]
 	effDAQ= 0.950;
 	RHRS  = 0.0055;
@@ -1021,7 +1025,8 @@ cout<<"Entries: "<<ENum<<endl;
 	//hmm_wo_bg_fom_best->Add(hcs_L_cm4_4,hmm_bg_cm4_4,1.0,-1.0);//4 div.
 	
 //Tight Cut	
-	hmm_wo_bg_fom_best->Add(hcs_L_fom_strict,hmm_bg_fom_strict,1.0,-1.0);//All
+	//hmm_wo_bg_fom_best->Add(hcs_L_fom_strict,hmm_bg_fom_strict,1.0,-1.0);//All
+	hmm_wo_bg_fom_best->Add(hcs_L_fom_strict,hcs_bg_fom_strict,1.0,-1.0);//All by hcs
 	//hmm_wo_bg_fom_best->Add(hcs_L_fom_strict,hmm_bg_fom_strict,1.0,-1.0);//All
 	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm2_1,hmm_bg_new_cm2_1,1.0,-1.0);//2 div.
 	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm2_2,hmm_bg_new_cm2_2,1.0,-1.0);//2 div.

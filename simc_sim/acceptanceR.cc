@@ -36,9 +36,10 @@ int main(int argc, char** argv){
 	int option;
 	//string filename = "1H_kaon";
 	//string filename = "RHRS_new";//0<theta_max<0.067
-	string filename = "RHRS_big";//0<theta_max<0.01
+	//string filename = "RHRS_big";//0<theta_max<0.01
+	string filename = "RHRS_cm";//0<theta_max<0.01
 	//string filename = "RHRS2";//0<theta_max<0.01
-	bool BatchFlag = true;
+	bool BatchFlag = false;
 	bool PDFFlag = true;
 
   TApplication theApp("App", &argc, argv);
@@ -70,7 +71,8 @@ int main(int argc, char** argv){
 	
 	centraltheta=13.2*PI/180.;
 	//thetawidth=0.067;//new
-	thetawidth=0.1;//big
+	//thetawidth=0.1;//big
+	thetawidth=PI;//CM
 	centralphi=0.;
 	phiwidth=2*PI;
 	cout<< "central theta = " << centraltheta*180/PI << " [deg]" << endl;
@@ -85,15 +87,15 @@ int main(int argc, char** argv){
 	double thetamax = 1.*(1.*centraltheta + thetawidth);
 	double phimin = 1.*(centralphi - phiwidth);
 	double phimax = 1.*(centralphi + phiwidth);
-	double omega = 2.*PI* (1-cos(thetawidth))*1000.; // [msr]
+	double Domega = 2.*PI* (1-cos(thetawidth))*1000.; // [msr]
 	double momwidth = 0.5;
 	double MAX = 0.00001;
-	double volume = omega*MAX/1000.; 
+	double volume = Domega*MAX/1000.; 
 	cout<< "thetamin = " << thetamin*180/PI << " [deg]" <<endl;
 	cout<< "thetamax = " << thetamax*180/PI << " [deg]" <<endl;
 	cout<< "phimin = " << phimin*180/PI << " [deg]" <<endl;
 	cout<< "phimax = " << phimax*180/PI << " [deg]" <<endl;
-	cout<< "omega = " << omega << " [msr]" <<endl;
+	cout<< "Domega = " << Domega << " [msr]" <<endl;
 	cout<< "volume = " << volume <<endl;
 
 
@@ -122,6 +124,7 @@ int main(int argc, char** argv){
 	TH1D *h_mom_result_cm = new TH1D( "h_mom_result_cm", "", bin_mom, min_mom_cm, max_mom_cm);
 	TH1D *h_sa_mom_result_cm = new TH1D("h_sa_mom_result_cm", "", bin_mom, min_mom_cm, max_mom_cm);
 
+	TH1D *h_momR = new TH1D( "h_momR", "", 200,1.73,1.93);
 	int n1, n2;
 	double val;
 	double err;
@@ -178,9 +181,11 @@ int main(int argc, char** argv){
 		for(int i=0;i<bin_mom;i++){
 		//h_mom_gen->SetBinContent(i,26147*(1./189.)*(max_mom-min_mom)/bin_mom);//first try
 		//h_mom_gen->SetBinContent(i,2547932*(1./163.8)*1000.*(max_mom-min_mom)/bin_mom);//RHRS_new 1,000,000 (2020/10/18)
-		h_mom_gen->SetBinContent(i,5682429*(1./163.8)*1000.*(max_mom-min_mom)/bin_mom);//RHRS2 1,000,000 (2020/11/2)// true density
+		//h_mom_gen->SetBinContent(i,5682429*(1./163.8)*1000.*(max_mom-min_mom)/bin_mom);//RHRS2 1,000,000 (2020/11/2)// true density
+		h_mom_gen->SetBinContent(i,168647157*(1./163.8)*1000.*(max_mom-min_mom)/bin_mom);//RHRS_cm 1,000,000 (2020/11/21)// true density
 		//h_mom_gen->SetBinContent(i,5710184*(1./163.8)*1000.*(max_mom-min_mom)/bin_mom);//RHRS_big 1,000,000 (2020/10/27)// true density
-		h_mom_gen_cm->SetBinContent(i,2547932*(4./25.)*1000.*(1./163.8)*(max_mom_cm-min_mom_cm)/bin_mom);//RHRS_new 1,000,000 (2020/10/18)
+		//h_mom_gen_cm->SetBinContent(i,2547932*(4./25.)*1000.*(1./163.8)*(max_mom_cm-min_mom_cm)/bin_mom);//RHRS_new 1,000,000 (2020/10/18)
+		h_mom_gen_cm->SetBinContent(i,168647157*1000.*(1./163.8)*(max_mom_cm-min_mom_cm)/bin_mom);//RHRS_cm 1,000,000 (2020/11/21)
 		//h_mom_gen->SetBinContent(i,2549979*(1./163.8)*1000.*(max_mom-min_mom)/bin_mom);//RHRS 1,000,000 (2020/10/4), w/ z dep.
 		//h_mom_gen_cm->SetBinContent(i,2549979*(4./25.)*1000.*(1./163.8)*(max_mom_cm-min_mom_cm)/bin_mom);//RHRS 1,000,000 (2020/10/4), w/ z dep.
 		//h_mom_gen->SetBinContent(i,2549979*(1./163.8)*1000.*(max_mom-min_mom)/bin_mom);//RHRS 1,000,000 (2020/10/4)
@@ -309,6 +314,8 @@ int main(int argc, char** argv){
 		//if(6.<=vertex&&vertex<10.)h_mom_result->Fill(R_mom);
 		h_mom_result->Fill(R_mom);
 
+
+		if(L_mom>2.&&L_mom<2.21)h_momR->Fill(R_mom);
 	}
 
 	for(int i=0; i<bin_mom; i++){
@@ -323,7 +330,7 @@ int main(int argc, char** argv){
 		//cout<<"nbin_mom:"<<i<<endl;
 		//cout<<"n1="<<n1<<endl;
 		//cout<<"n2="<<n2<<endl;
-		if(n1!=0 && n2!=0)val = omega*(1.0*n2/n1);
+		if(n1!=0 && n2!=0)val = Domega*(1.0*n2/n1);
 		h_sa_mom_result->SetBinContent(i+1, val);
 		if(n1!=0 && n2!=0)err = val * sqrt(1./n2 + 1./n1 - 2./sqrt(1.*n1*n2));
 		h_sa_mom_result->SetBinError(i+1, err);
@@ -335,7 +342,7 @@ int main(int argc, char** argv){
 		val = 0.;
 		err = 0.;
 		n2 = (int)h_mom_result_cm->GetBinContent(i+1);
-		if(n1!=0 && n2!=0)val = omega*(1.0*n2/n1);
+		if(n1!=0 && n2!=0)val = Domega*(1.0*n2/n1);
 		h_sa_mom_result_cm->SetBinContent(i+1, val);
 		if(n1!=0 && n2!=0)err = val * sqrt(1./n2 + 1./n1 - 2./sqrt(1.*n1*n2));
 		h_sa_mom_result_cm->SetBinError(i+1, err);
@@ -345,8 +352,8 @@ int main(int argc, char** argv){
 // Draw histgrams //
 ////////////////////
 	TH1D *hframe;
-	TLine *lmom = new TLine( centralmom, 0., centralmom, omega);
-	TLine *lth = new TLine( centraltheta, 0., centraltheta, omega);
+	TLine *lmom = new TLine( centralmom, 0., centralmom, Domega);
+	TLine *lth = new TLine( centraltheta, 0., centraltheta, Domega);
 	lmom->SetLineColor(4);
 	lth->SetLineColor(4);
 
@@ -357,7 +364,7 @@ int main(int argc, char** argv){
 	//======= Momentum Acceptance (Lab) ======
 	c1->Divide(2,2);
 	c1->cd(1);
-//	hframe = (TH1D*)gPad->DrawFrame( min_mom_gen, 0., max_mom_gen, omega + 0.5);
+//	hframe = (TH1D*)gPad->DrawFrame( min_mom_gen, 0., max_mom_gen, Domega + 0.5);
 	//SetTitle(h_sa_mom_result, "Solid Angle vs. Momentum at Reference Plane", "Momentum [GeV/c]", "Solid Angle [msr]");
 	SetTitle(h_sa_mom_result, "Solid Angle vs. Momentum (w/ all Cuts)", "Momentum [GeV/c]", "Solid Angle [msr]");
 //	h_sa_mom_result->GetXaxis()->SetNdivisions(506, kFALSE);
@@ -385,7 +392,7 @@ int main(int argc, char** argv){
 	//======= Momentum Acceptance (CM) ======
 	c2->Divide(2,2);
 	c2->cd(1);
-//	hframe = (TH1D*)gPad->DrawFrame( min_mom_gen_cm, 0., max_mom_gen_cm, omega + 0.5);
+//	hframe = (TH1D*)gPad->DrawFrame( min_mom_gen_cm, 0., max_mom_gen_cm, Domega + 0.5);
 	//SetTitle(h_sa_mom_result_cm, "Solid Angle vs. Momentum at Reference Plane (CM)", "Momentum [GeV/c]", "Solid Angle [msr]");
 	SetTitle(h_sa_mom_result_cm, "Solid Angle vs. Momentum in CM (w/ all Cuts)", "Momentum [GeV/c]", "Solid Angle [msr]");
 //	h_sa_mom_result_cm->GetXaxis()->SetNdivisions(506, kFALSE);
@@ -406,6 +413,8 @@ int main(int argc, char** argv){
 	h_mom_result_cm->SetLineColor(kAzure);
 	h_mom_result_cm->Draw("same");
 
+	TCanvas *c3 = new TCanvas("c3", "c3");
+	h_momR->Draw("");
 
 	if(!BatchFlag){
 		theApp.Run();
