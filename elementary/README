@@ -1,0 +1,34 @@
+%%%%%%%%%%%%%%%%%%%%
+% from Nagao-san   %
+%  (Oct. 13, 2020) %
+%%%%%%%%%%%%%%%%%%%%
+*Exp_KpLambda_cos.C
+-p(e,e'K+)Lambda
+-Original
+
+*Exp_KpSigmaZ_cos.C
+-p(e,e'K+)Sigma0
+-Original
+
+*Exp_KpLambda.C
+-p(e,e'K+)Lambda
+-cos(theta_gk^CM)-->theta_gk^CM
+-W~2.13 GeV
+-Q^2~0
+
+*Exp_KpSigmaZ.C
+-p(e,e'K+)Sigma0
+-cos(theta_gk^CM)-->theta_gk^CM
+-W~2.13 GeV
+-Q^2~0
+
+*dcs_angdep.C
+-RPR calc.
+-(rpr-2007;RPR3), (rpr-2011;RPR2011) are available
+-W=2.130 GeV
+-Q^2=0.5 (GeV)^2
+-epsilon=0.
+-phi=0
+-isospin=1 (KL channel?)
+
+-output is written in "dcs.dat" (cos(theta_gk^CM),CS(FULL))
