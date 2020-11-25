@@ -805,7 +805,7 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
 //%%DAQ Eff. & HRS-R Acceptance %%//
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%//
 
-		int kbin = (int)((R_mom-1.5)/0.004);
+		int kbin = (int)((R_mom-1.6)*150./0.4);
 		int zbin = (int)((((L_tr_vz+R_tr_vz)/2.)-0.1)/0.04);
 		if(event_selection&&kbin>=0 &&kbin<150){
 		if((L_tr_vz+R_tr_vz)/2.>=-0.10&&(L_tr_vz+R_tr_vz)/2.<-0.08)RHRS = RHRS_table[kbin][0];
@@ -822,7 +822,7 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
 
 		effDAQ = daq_table[nrun-111000];
 		if(effDAQ==0.2)cout<<"Starange!!! DAQ Eff. of run"<<nrun<<" does not exist."<<endl;
-		if(RHRS!=0.&&effDAQ!=0.)cs = labtocm/effDAQ/RHRS/10.;//[nb/sr]
+		if(RHRS!=0.&&effDAQ!=0.)cs = labtocm/effDAQ/RHRS;//[nb/sr]
 		else cs=0.;
 		}else{cs=0.;}
 

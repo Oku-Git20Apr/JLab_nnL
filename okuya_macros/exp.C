@@ -13,20 +13,53 @@ double FMM_4Poly_wRes( double *x, double *par )
     return val;
 }//&&(x[0]-par[4]+2*par[5])<0
 
-double expgaus2(double *x, double *par) {
-  //par[0]=Total area
-  //par[1]=tau of exp function
-  //par[2]=Width (sigma) of convoluted Gaussian function
-  //par[3]=Shift of Function Peak
-  double invsq2pi = 0.3989422804014;   // (2 pi)^(-1/2)
-  double np = 500.0;      // number of convolution steps
-  double sc =   8.0;      // convolution extends to +-sc Gaussian sigmas
-  double xx, fland, sum = 0.0, xlow, xupp, step, i;
-  double val;
+//double expgaus2(double *x, double *par) {
+//  //par[0]=Total area
+//  //par[1]=tau of exp function
+//  //par[2]=Width (sigma) of convoluted Gaussian function
+//  //par[3]=Shift of Function Peak
+//  double invsq2pi = 0.3989422804014;   // (2 pi)^(-1/2)
+//  double np = 500.0;      // number of convolution steps
+//  double sc =   8.0;      // convolution extends to +-sc Gaussian sigmas
+//  double xx, fland, sum = 0.0, xlow, xupp, step, i;
+//  double val;
+//// Range of convolution integral
+//  xlow = 0.;
+//  xupp = x[0] + sc * par[2];
+//  step = (xupp-xlow) / np;
+//// Convolution integral
+//  for(i=1.0; i<=np/2; i++){
+//     xx = xlow + (i-0.5) * step - par[3];
+//     fland = TMath::Gaus(xx,x[0],par[2]);
+//     sum += fland * TMath::Exp(-xx/par[1]);
+//     xx = xupp - (i-.5) * step - par[3];
+//     fland = TMath::Gaus(xx,x[0],par[2]);
+//     sum += fland * TMath::Exp(-xx/par[1]);
+//  }
+//  //val = par[2] * step * sum * invsq2pi / par[3];
+//  val = par[0] * step * sum * invsq2pi / (par[2]*par[1]*exp(par[3]/par[1]));
+//  return val;
+//}
+
+
+double expgaus2(double *x,double *par){
+//  //par[0]=Total area
+//  //par[1]=tau of exp function
+//  //par[2]=Width (sigma) of convoluted Gaussian function
+//  //par[3]=Shift of Function Peak
 // Range of convolution integral
-  xlow = 0.;
-  xupp = x[0] + sc * par[2];
-  step = (xupp-xlow) / np;
+double  sc   = 5.;
+double  np   = 500.;
+double  sum  = 0.;
+double  xlow = 0.;
+double  val2 = 0.;
+double invsq2pi = 0.3989422804014;   // (2 pi)^(-1/2)
+double fland = 0.;
+double    xx = 0.;
+double     i = 0.;
+double  xupp = x[0] + 1.6 * sc * par[2];
+double  step = (xupp-xlow) / np;
+  if(step<0.)step = 0.;
 // Convolution integral
   for(i=1.0; i<=np/2; i++){
      xx = xlow + (i-0.5) * step - par[3];
@@ -37,9 +70,12 @@ double expgaus2(double *x, double *par) {
      sum += fland * TMath::Exp(-xx/par[1]);
   }
   //val = par[2] * step * sum * invsq2pi / par[3];
-  val = par[0] * step * sum * invsq2pi / (par[2]*par[1]*exp(par[3]/par[1]));
-  return val;
+  val2 =  par[0] * step * sum * invsq2pi / (par[2]*par[1]*exp(par[3]/par[1]));
+  //val2 =  step * sum * invsq2pi / (par[3]*par[4]);
+/*------Exp * Gauss convluted------*/
+	return val2;
 }
+
 
 void exp(){
 
@@ -67,11 +103,12 @@ void exp(){
 ////f1->SetParameter(17,0.0107);
 //f1->SetParLimits(0,0.,1000000);//positive
 
- TF1 *f4 = new TF1("f4", expgaus2, -0.1, 0.2, 4);
+ TF1 *f4 = new TF1("f4", expgaus2, -1, 10, 4);
  f4->SetNpx(2000);
  f4->SetParameter(0,10.);//scale
- f4->SetParameter(1,5000.);//att.
+ f4->SetParameter(1,0.5);//att.
  f4->SetParameter(2,0.003);//sigma
- f4->SetParameter(3,0.);//peak pos.
+ f4->SetParameter(3,-0.08);//peak pos.
  f4->Draw("");
+cout<<"Integral="<<f4->Integral(-100.,10.)<<endl;
 }
