@@ -507,9 +507,9 @@ cout << "Param file : " << AcceptanceR_table_z9.c_str() << endl;
  //const double fit_min_mm=-0.01;
  //const double fit_max_mm=0.085;
  const double fit_min_mm=-0.005;
- const double fit_max_mm=0.095;
- const double fmin_mm=-0.1;
- const double fmax_mm=0.2;
+ const double fit_max_mm=0.085;
+ const double fmin_mm=-1;
+ const double fmax_mm=2;
  //const double fmin_mm=-0.01;
  //const double fmax_mm=0.12;
  //const double fmax_mm=10.;
@@ -670,7 +670,7 @@ cout << "Param file : " << AcceptanceR_table_z9.c_str() << endl;
   hcs_L_fom_strict->SetLineColor(1);
   TH1F* hmm_L_fom_nocut  = new TH1F("hmm_L_fom_nocut","hmm_L_fom_nocut",xbin,xmin,xmax);
 //  TH1F* hmm_bg_fom_best  = new TH1F("hmm_bg_fom_best","hmm_bg_fom_best",xbin,xmin,xmax);
-  TH1F* hmm_wo_bg_fom_best  = new TH1F("hmm_wo_bg_fom_best","RESULT (N_{#Lambda}/#Delta#Omega_{K}/#epsilon_{DAQ})",xbin,xmin,xmax);
+  TH1F* hmm_wo_bg_fom_best  = new TH1F("hmm_wo_bg_fom_best","RESULT (N_{Y}/#Delta#Omega_{K}/#epsilon_{DAQ})",xbin,xmin,xmax);
   TH1F* hmm_wo_bg_fom_nocut  = new TH1F("hmm_wo_bg_fom_nocut","hmm_wo_bg_fom_nocut",xbin,xmin,xmax);
   TH1F* hmm_pi_wobg_fom_best  = new TH1F("hmm_pi_wobg_fom_best","hmm_pi_wobg_fom_best",xbin,xmin,xmax);
   TH1F* hmm_pi_wobg_fom_nocut  = new TH1F("hmm_pi_wobg_fom_nocut","hmm_pi_wobg_fom_nocut",xbin,xmin,xmax);
@@ -1219,7 +1219,7 @@ cout<<"Entries: "<<ENum<<endl;
 	double labtocm = 0.126;
 	cs	 = labtocm/(effDAQ*RHRS*10.);
 	hmm_bg_fom_best->Scale(cs);
-	hmm_bg_fom_strict->Scale(cs);
+//	hmm_bg_fom_strict->Scale(cs);
 	hmm_bg_cm2_1->Scale(1./nbunch/cs);
 	hmm_bg_cm2_2->Scale(1./nbunch/cs);
 	hmm_bg_cm3_1->Scale(1./nbunch/cs);
@@ -1253,46 +1253,43 @@ cout<<"Entries: "<<ENum<<endl;
 //MM spctrum to be fitted (2020/10/18)
 //Choose one from the list below
 //===CHANGE===//
-//Loose Cut
-	//hmm_wo_bg_fom_best->Add(hcs_L_fom_best,hmm_bg_fom_best,1.0,-1.0);//All
-	//hmm_wo_bg_fom_best->Add(hcs_L_cm2_1,hmm_bg_cm2_1,1.0,-1.0);//2 div.
-	//hmm_wo_bg_fom_best->Add(hcs_L_cm2_2,hmm_bg_cm2_2,1.0,-1.0);//2 div.
-	//hmm_wo_bg_fom_best->Add(hcs_L_cm3_1,hmm_bg_cm3_1,1.0,-1.0);//3 div.
-	//hmm_wo_bg_fom_best->Add(hcs_L_cm3_2,hmm_bg_cm3_2,1.0,-1.0);//3 div.
-	//hmm_wo_bg_fom_best->Add(hcs_L_cm3_3,hmm_bg_cm3_3,1.0,-1.0);//3 div.
-	//hmm_wo_bg_fom_best->Add(hcs_L_cm4_1,hmm_bg_cm4_1,1.0,-1.0);//4 div.
-	//hmm_wo_bg_fom_best->Add(hcs_L_cm4_2,hmm_bg_cm4_2,1.0,-1.0);//4 div.
-	//hmm_wo_bg_fom_best->Add(hcs_L_cm4_3,hmm_bg_cm4_3,1.0,-1.0);//4 div.
-	//hmm_wo_bg_fom_best->Add(hcs_L_cm4_4,hmm_bg_cm4_4,1.0,-1.0);//4 div.
-	
-//Tight Cut	
 	//hmm_wo_bg_fom_best->Add(hcs_L_fom_strict,hmm_bg_fom_strict,1.0,-1.0);//All
 	//hmm_wo_bg_fom_best->Add(hcs_L_fom_strict,hcs_bg_fom_strict,1.0,-1.0);//All by hcs
-	hmm_wo_bg_fom_best->Add(hmm_L_fom_strict,hmm_bg_fom_strict,1.0,-1.0);//All
+	//hmm_wo_bg_fom_best->Add(hmm_L_fom_strict,hmm_bg_fom_strict,1.0,-1.0);//All
 	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm2_1,hcs_bg_new_cm2_1,1.0,-1.0);//2 div.
 	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm2_2,hcs_bg_new_cm2_2,1.0,-1.0);//2 div.
-	//hmm_wo_bg_fom_best->Add(hmm_L_new_Qsq2_1,hmm_bg_new_Qsq2_1,1.0,-1.0);//2 div.
-	//hmm_wo_bg_fom_best->Add(hcs_L_new_Qsq2_2,hcs_bg_new_Qsq2_2,1.0,-1.0);//2 div.
-	//hmm_wo_bg_fom_best->Add(hcs_L_new_Qsq3_1,hcs_bg_new_Qsq3_1,1.0,-1.0);//2 div.
-	//hmm_wo_bg_fom_best->Add(hcs_L_new_Qsq3_2,hcs_bg_new_Qsq3_2,1.0,-1.0);//2 div.
-	//hmm_wo_bg_fom_best->Add(hcs_L_new_Qsq3_3,hcs_bg_new_Qsq3_3,1.0,-1.0);//2 div.
 	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm3_1,hcs_bg_new_cm3_1,1.0,-1.0);//3 div.
 	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm3_2,hcs_bg_new_cm3_2,1.0,-1.0);//3 div.
 	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm3_3,hcs_bg_new_cm3_3,1.0,-1.0);//3 div.
+	//hmm_wo_bg_fom_best->Add(hcs_L_new_Qsq2_1,hcs_bg_new_Qsq2_1,1.0,-1.0);//2 div.
+	//hmm_wo_bg_fom_best->Add(hcs_L_new_Qsq2_2,hcs_bg_new_Qsq2_2,1.0,-1.0);//2 div.
+	//hmm_wo_bg_fom_best->Add(hcs_L_new_Qsq3_1,hcs_bg_new_Qsq3_1,1.0,-1.0);//3 div.
+	//hmm_wo_bg_fom_best->Add(hcs_L_new_Qsq3_2,hcs_bg_new_Qsq3_2,1.0,-1.0);//3 div.
+	//hmm_wo_bg_fom_best->Add(hcs_L_new_Qsq3_3,hcs_bg_new_Qsq3_3,1.0,-1.0);//3 div.
 	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm4_1,hcs_bg_new_cm4_1,1.0,-1.0);//4 div.
 	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm4_2,hcs_bg_new_cm4_2,1.0,-1.0);//4 div.
 	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm4_3,hcs_bg_new_cm4_3,1.0,-1.0);//4 div.
 	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm4_4,hcs_bg_new_cm4_4,1.0,-1.0);//4 div.
-//===CHANGE===//
+//MM
+	//hmm_wo_bg_fom_best->Add(hmm_L_new_cm2_1,hmm_bg_new_cm2_1,1.0,-1.0);//2 div.
+	//hmm_wo_bg_fom_best->Add(hmm_L_new_cm2_2,hmm_bg_new_cm2_2,1.0,-1.0);//2 div.
+	//hmm_wo_bg_fom_best->Add(hmm_L_new_cm3_1,hmm_bg_new_cm3_1,1.0,-1.0);//3 div.
+	//hmm_wo_bg_fom_best->Add(hmm_L_new_cm3_2,hmm_bg_new_cm3_2,1.0,-1.0);//3 div.
+	//hmm_wo_bg_fom_best->Add(hmm_L_new_cm3_3,hmm_bg_new_cm3_3,1.0,-1.0);//3 div.
+	//hmm_wo_bg_fom_best->Add(hmm_L_new_Qsq2_1,hmm_bg_new_Qsq2_1,1.0,-1.0);//2 div.
+	//hmm_wo_bg_fom_best->Add(hmm_L_new_Qsq2_2,hmm_bg_new_Qsq2_2,1.0,-1.0);//2 div.
+	//hmm_wo_bg_fom_best->Add(hmm_L_new_Qsq3_1,hmm_bg_new_Qsq3_1,1.0,-1.0);//3 div.
+	//hmm_wo_bg_fom_best->Add(hmm_L_new_Qsq3_2,hmm_bg_new_Qsq3_2,1.0,-1.0);//3 div.
+	hmm_wo_bg_fom_best->Add(hmm_L_new_Qsq3_3,hmm_bg_new_Qsq3_3,1.0,-1.0);//3 div.
 
 	
-	for(int i=90;i<200;i++){
-	if(hcs_L_new_cm2_1->GetBinContent(i)==0){
-	cout<<"Empty bin at "<<((double)i*0.001-0.1)<<endl;
-	hmm_wo_bg_fom_best->SetBinContent(i,0);
-	hmm_wo_bg_fom_best->SetBinError(i,0);
-	}
-	}
+	//for(int i=90;i<200;i++){
+	//if(hcs_L_new_cm2_1->GetBinContent(i)==0){
+	//cout<<"Empty bin at "<<((double)i*0.001-0.1)<<endl;
+	//hmm_wo_bg_fom_best->SetBinContent(i,0);
+	//hmm_wo_bg_fom_best->SetBinError(i,0);
+	//}
+	//}
 
 	hmm_wo_bg_fom_nocut->Add(hmm_L_fom_nocut,hmm_bg_fom_nocut,1.0,-1.0);
 	//hmm_pi_wobg_fom_best->Add(hmm_pi_fom_best,hmm_bg_fom_best,1.0,-1.0);
@@ -1411,7 +1408,7 @@ cout<<"BEST CUT START"<<endl;
 	 //fmm_best_4Poly->SetParLimits(1,def_mean_L-def_sig_L,def_mean_L+def_sig_L);
 	 //fmm_best_4Poly->SetParLimits(3,0.,0.01);
 	 //fmm_best_4Poly->SetParLimits(4,0.005,0.08);
-	 //fmm_best_4Poly->SetParLimits(5,-0.05,0.05);
+	 //fmm_best_4Poly->SetParLimits(5,def_mean_L-def_sig_L,def_mean_L+def_sig_L);
 	 //fmm_best_4Poly->SetParLimits(6,0.,1.5);//relative strength
 
 //default
@@ -1420,22 +1417,22 @@ cout<<"BEST CUT START"<<endl;
 	 //fmm_best_4Poly->SetParameter(2,48.);//total scale
 	 //fmm_best_4Poly->SetParameter(3,0.001);//sigma
 	 //fmm_best_4Poly->SetParameter(4,0.05);//att.
-	 //fmm_best_4Poly->SetParameter(5,-0.004);//peak pos.
+	 //fmm_best_4Poly->SetParameter(5,-1.*mean_L_best);//peak pos.
 	 //fmm_best_4Poly->SetParameter(6,0.6);//relative strength
 //default
-	 fmm_best_4Poly->FixParameter(0,0.000615786);//Landau width
+	 fmm_best_4Poly->FixParameter(0,0.000658270);//Landau width
 	 //fmm_best_4Poly->SetParLimits(0,0.00061,0.00062);//Landau width
-	 fmm_best_4Poly->FixParameter(1,-0.00131102);
+	 fmm_best_4Poly->FixParameter(1,-0.00125805);
 	 //fmm_best_4Poly->SetParLimits(1,-0.0014,-0.0013);
-	 fmm_best_4Poly->SetParameter(2,46.7699/2.);//total scale
+	 fmm_best_4Poly->SetParameter(2,49./2);//total scale
 	 //fmm_best_4Poly->SetParLimits(2,20.,30.);//total scale
-	 fmm_best_4Poly->FixParameter(3,0.00114199);//sigma
+	 fmm_best_4Poly->FixParameter(3,0.00108656);//sigma
 	 //fmm_best_4Poly->SetParLimits(3,0.0011,0.0012);//sigma
-	 fmm_best_4Poly->FixParameter(4,0.0577627);//att.
+	 fmm_best_4Poly->FixParameter(4,0.0649346);//att.
 	 //fmm_best_4Poly->SetParLimits(4,0.05775,0.05777);//att.
-	 fmm_best_4Poly->FixParameter(5,-0.00186698);//peak pos.
+	 fmm_best_4Poly->FixParameter(5,0.003);//peak pos.
 	 //fmm_best_4Poly->SetParLimits(5,-0.00187,-0.00186);//peak pos.
-	 fmm_best_4Poly->FixParameter(6,0.577265);//relative strength
+	 fmm_best_4Poly->FixParameter(6,0.692215);//relative strength
 	 //fmm_best_4Poly->SetParLimits(6,0.577,0.578);//relative strength
 
 
@@ -1443,6 +1440,7 @@ cout<<"BEST CUT START"<<endl;
 	 //fmm_best_4Poly->SetParLimits(8,def_mean_S-def_sig_S,def_mean_S+def_sig_S);
 	 //fmm_best_4Poly->SetParLimits(10,0.,0.01);
 	 //fmm_best_4Poly->SetParLimits(11,0.03,0.12);
+	 //fmm_best_4Poly->SetParLimits(12,-1.*def_mean_S-def_sig_S,-1.*def_mean_S+def_sig_S);
 	 //fmm_best_4Poly->SetParLimits(13,0.,1.5);//relative strength
 
 //default
@@ -1451,25 +1449,25 @@ cout<<"BEST CUT START"<<endl;
 	 //fmm_best_4Poly->SetParameter(9,14.);//total scale
 	 //fmm_best_4Poly->SetParameter(10,0.0015);//sigma
 	 //fmm_best_4Poly->SetParameter(11,0.05);//att
-	 //fmm_best_4Poly->SetParameter(12,-0.050);//peak pos.
+	 //fmm_best_4Poly->SetParameter(12,-1.*def_mean_S);//peak pos.
 	 //fmm_best_4Poly->SetParameter(13,0.6);
 //default
-	 fmm_best_4Poly->FixParameter(7,0.000300777);//Landau width
+	 fmm_best_4Poly->FixParameter(7,0.000157968);//Landau width
 	 //fmm_best_4Poly->SetParLimits(7,0.000300,0.003100);//Landau width
-	 fmm_best_4Poly->FixParameter(8,0.0759381);//MPV
+	 fmm_best_4Poly->FixParameter(8,0.0761140);//MPV
 	 //fmm_best_4Poly->SetParLimits(8,0.075,0.076);//MPV
-	 fmm_best_4Poly->SetParameter(9,10.1616/2.);//total scale
+	 fmm_best_4Poly->SetParameter(9,17./2.);//total scale
 	 //fmm_best_4Poly->SetParLimits(9,3.,10.);//total scale
-	 fmm_best_4Poly->FixParameter(10,0.00126421);//sigma
+	 fmm_best_4Poly->FixParameter(10,0.00168394);//sigma
 	 //fmm_best_4Poly->SetParLimits(10,0.0012,0.0013);//sigma
-	 fmm_best_4Poly->FixParameter(11,0.03);//att
+	 fmm_best_4Poly->FixParameter(11,0.110712);//att
 	 //fmm_best_4Poly->SetParLimits(11,0.025,0.035);//att
-	 fmm_best_4Poly->FixParameter(12,-0.704120);//peak pos.
+	 fmm_best_4Poly->FixParameter(12,-0.0809590);//peak pos.
 	 //fmm_best_4Poly->SetParLimits(12,-0.705,-0.704);//peak pos.
-	 fmm_best_4Poly->FixParameter(13,0.649592);
+	 fmm_best_4Poly->FixParameter(13,1.49999);
 	 //fmm_best_4Poly->SetParLimits(13,0.645,0.655);
 
-	 hmm_wo_bg_fom_best->Fit("fmm_best_4Poly","","",fit_min_mm,fit_max_mm);//Total fitting w/ 4Poly BG
+	 hmm_wo_bg_fom_best->Fit("fmm_best_4Poly","LL","",fit_min_mm,fit_max_mm);//Total fitting w/ 4Poly BG
 	 double chisq = fmm_best_4Poly->GetChisquare();
 	 double dof  = fmm_best_4Poly->GetNDF();
 	 cout<<"chisq="<<chisq<<endl;
@@ -1567,27 +1565,42 @@ cout<<"BEST CUT START"<<endl;
 //	hmm_bg_fom_strict->Draw("same");
 
 	TCanvas* c8 = new TCanvas("c8","c8");
-	hcs_L_new_cm2_1->SetLineColor(kBlack);
-	hcs_L_new_cm2_1->Draw("");
-	hcs_bg_new_cm2_1->SetLineColor(kGreen);
-	hcs_bg_new_cm2_1->Draw("same");
+	hmm_L_new_Qsq2_1->SetLineColor(kBlack);
+	hmm_L_new_Qsq2_1->Draw("");
+	hmm_bg_new_Qsq2_1->SetLineColor(kGreen);
+	hmm_bg_new_Qsq2_1->Draw("same");
 	TCanvas* c9 = new TCanvas("c9","c9");
-	hcs_L_new_cm2_2->SetLineColor(kBlack);
-	hcs_L_new_cm2_2->Draw("");
-	hcs_bg_new_cm2_2->SetLineColor(kGreen);
-	hcs_bg_new_cm2_2->Draw("same");
+	hmm_L_new_Qsq2_2->SetLineColor(kBlack);
+	hmm_L_new_Qsq2_2->Draw("");
+	hmm_bg_new_Qsq2_2->SetLineColor(kGreen);
+	hmm_bg_new_Qsq2_2->Draw("same");
 	TCanvas* c10 = new TCanvas("c10","c10");
-	hmm_L_new_cm2_1->SetLineColor(kBlack);
-	hmm_L_new_cm2_1->Draw("");
-	hmm_bg_new_cm2_1->SetLineColor(kGreen);
-	hmm_bg_new_cm2_1->Draw("same");
+	hmm_L_new_Qsq3_1->SetLineColor(kBlack);
+	hmm_L_new_Qsq3_1->Draw("");
+	hmm_bg_new_Qsq3_1->SetLineColor(kGreen);
+	hmm_bg_new_Qsq3_1->Draw("same");
 	TCanvas* c11 = new TCanvas("c11","c11");
-	hmm_L_new_cm2_2->SetLineColor(kBlack);
-	hmm_L_new_cm2_2->Draw("");
-	hmm_bg_new_cm2_2->SetLineColor(kGreen);
-	hmm_bg_new_cm2_2->Draw("same");
+	hmm_L_new_Qsq3_2->SetLineColor(kBlack);
+	hmm_L_new_Qsq3_2->Draw("");
+	hmm_bg_new_Qsq3_2->SetLineColor(kGreen);
+	hmm_bg_new_Qsq3_2->Draw("same");
+	TCanvas* c12 = new TCanvas("c12","c12");
+	hmm_L_new_Qsq3_3->SetLineColor(kBlack);
+	hmm_L_new_Qsq3_3->Draw("");
+	hmm_bg_new_Qsq3_3->SetLineColor(kGreen);
+	hmm_bg_new_Qsq3_3->Draw("same");
 
 	TCanvas* c7 = new TCanvas("c7","c7");
+	//hmm_wo_bg_fom_best->Draw("");
+	fmm_Lambda_only->SetFillStyle(3004);
+	fmm_Lambda_only->SetFillColor(kAzure);
+	fmm_Lambda_only->SetLineWidth(2);
+	fmm_Sigma_only->SetFillStyle(3005);
+	fmm_Sigma_only->SetFillColor(kCyan);
+	fmm_Sigma_only->SetLineWidth(2);
+	fmm_Lambda_only->Draw("");
+	fmm_Sigma_only ->Draw("same");
+	hmm_wo_bg_fom_best->Draw("same");
 	//Acceptance_map->Draw("lego2z");
 cout << "Well done!" << endl;
 
