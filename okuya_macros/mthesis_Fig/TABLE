@@ -24,12 +24,13 @@ cointime.C
 % cointime_nocut.pdf
 % cointime_strict.pdf
 
-MEA.C (w/ bgmea_mthesis.root)
-% mea_result.pdf
+MEA.C (w/ bgmea_mthesis_2020Nov.root)
+% mea_original.pdf
+% mea_mixed.pdf
 "bgmea_mthesis.root" is created using "../MixedEventAnalysis/mea_mthesis.C".
 GeV-->MeV
 
-MM.C (w/ bgmea_mthesis.root)
+MM.C (w/ bgmea_mthesis_2020Nov.root)
 % mm_tight.pdf
 % mm_wobg_tight.pdf
 

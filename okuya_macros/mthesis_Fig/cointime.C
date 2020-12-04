@@ -247,16 +247,9 @@ double FMM_Res( double *x, double *par ){
 
 void cointime(){
   
-  //TFile *file = new TFile("../h2all_2020Nov.root","read");//2020Nov updated
+  TFile *file = new TFile("../h2all_2020Nov.root","read");//2020Nov updated
   //TFile *file = new TFile("../h2all_Lsingle.root","read");//before 2020Nov
-  TFile *file = new TFile("../CointimeCorrectionNov/h2all_old.root","read");//w/o Cointime shift
-	//ACCBGの引き算はmea_hist.ccから
-  //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea6.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
-  TFile *file_mea = new TFile("../MixedEventAnalysis/bgmea_2020Nov.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
-  double nbunch = 6000.;//effetive bunches (6 bunches x 5 mixtures)
- // TTree *tree_old = (TTree*)file->Get("tree_out");
-//cout<<"Please wait a moment. CloneTree() is working..."<<endl;
-  //TTree *tree = tree_old->CloneTree();
+  //TFile *file = new TFile("../CointimeCorrectionNov/h2all_old.root","read");//w/o Cointime shift
   TTree *tree = (TTree*)file->Get("tree_out");
 
 

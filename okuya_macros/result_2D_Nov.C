@@ -1255,7 +1255,6 @@ cout<<"Entries: "<<ENum<<endl;
 //===CHANGE===//
 	//hmm_wo_bg_fom_best->Add(hcs_L_fom_strict,hmm_bg_fom_strict,1.0,-1.0);//All
 	//hmm_wo_bg_fom_best->Add(hcs_L_fom_strict,hcs_bg_fom_strict,1.0,-1.0);//All by hcs
-	//hmm_wo_bg_fom_best->Add(hmm_L_fom_strict,hmm_bg_fom_strict,1.0,-1.0);//All
 	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm2_1,hcs_bg_new_cm2_1,1.0,-1.0);//2 div.
 	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm2_2,hcs_bg_new_cm2_2,1.0,-1.0);//2 div.
 	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm3_1,hcs_bg_new_cm3_1,1.0,-1.0);//3 div.
@@ -1271,6 +1270,7 @@ cout<<"Entries: "<<ENum<<endl;
 	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm4_3,hcs_bg_new_cm4_3,1.0,-1.0);//4 div.
 	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm4_4,hcs_bg_new_cm4_4,1.0,-1.0);//4 div.
 //MM
+	hmm_wo_bg_fom_best->Add(hmm_L_fom_strict,hmm_bg_fom_strict,1.0,-1.0);//All
 	//hmm_wo_bg_fom_best->Add(hmm_L_new_cm2_1,hmm_bg_new_cm2_1,1.0,-1.0);//2 div.
 	//hmm_wo_bg_fom_best->Add(hmm_L_new_cm2_2,hmm_bg_new_cm2_2,1.0,-1.0);//2 div.
 	//hmm_wo_bg_fom_best->Add(hmm_L_new_cm3_1,hmm_bg_new_cm3_1,1.0,-1.0);//3 div.
@@ -1280,7 +1280,7 @@ cout<<"Entries: "<<ENum<<endl;
 	//hmm_wo_bg_fom_best->Add(hmm_L_new_Qsq2_2,hmm_bg_new_Qsq2_2,1.0,-1.0);//2 div.
 	//hmm_wo_bg_fom_best->Add(hmm_L_new_Qsq3_1,hmm_bg_new_Qsq3_1,1.0,-1.0);//3 div.
 	//hmm_wo_bg_fom_best->Add(hmm_L_new_Qsq3_2,hmm_bg_new_Qsq3_2,1.0,-1.0);//3 div.
-	hmm_wo_bg_fom_best->Add(hmm_L_new_Qsq3_3,hmm_bg_new_Qsq3_3,1.0,-1.0);//3 div.
+	//hmm_wo_bg_fom_best->Add(hmm_L_new_Qsq3_3,hmm_bg_new_Qsq3_3,1.0,-1.0);//3 div.
 
 	
 	//for(int i=90;i<200;i++){
@@ -1518,7 +1518,8 @@ cout<<"BEST CUT START"<<endl;
 	cout<<"Number of Lambda w/o radiative tail (TF1 Integral) = "<<nofL_old<<endl;
 	cout<<"Number of Lambda w/o radiative tail (TH1F Integral) = "<<hmm_wo_bg_fom_best->Integral(hmm_wo_bg_fom_best->FindBin(-0.006),hmm_wo_bg_fom_best->FindBin(0.006))<<endl;
 
-	double nofS = fmm_Sigma_only->Integral(fmin_mm,fmax_mm);
+	double nofS = fmm_Sigma_only->Integral(-0.05,0.085);
+	//double nofS = fmm_Sigma_only->Integral(fmin_mm,fmax_mm);
 	nofS = nofS/fit_bin_width;
 	cout<<"Number of Sigma (TF1 Integral) = "<<nofS<<endl;
 
