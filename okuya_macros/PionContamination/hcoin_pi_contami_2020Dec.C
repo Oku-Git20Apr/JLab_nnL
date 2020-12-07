@@ -2,7 +2,7 @@
 //--  Cointime Histo.        --//
 //-----------------------------//
 //
-//K. Okuyama (Oct. 10, 2020)
+//K. Okuyama (Dec. 5, 2020)
 
 #include "TF1.h"
 #include "TH1.h"
@@ -43,7 +43,7 @@ double fcoin_total( double *x, double *par ){
 
 }
 
-void hcoin_pi_contami_improved_V(){
+void hcoin_pi_contami_2020Dec(){
 //ROOT::Math::IntegratorOneDimOptions::SetDefaultRelTolerance(1.E-6);
 	string pdfname = "temp.pdf";
 cout << "Output pdf file name is " << pdfname << endl;
@@ -341,7 +341,8 @@ cout<<"Entries: "<<ENum<<endl;
 		if(ac_cut_new)hcoin_new->Fill(ct);
 		if(ac_cut_pi)hcoin_pi->Fill(ct);
 		if(ac_cut_p)hcoin_p->Fill(ct);
-		if(best_cut)hcoin_best->Fill(ct);
+		//if(best_cut)hcoin_best->Fill(ct);
+		if(strict_cut)hcoin_best->Fill(ct);
 		if(strict_cut)hcoin_strict->Fill(ct);
 		if(ac_cut&&20.<ct && ct<60.){
 		   double ct_ = ct;
@@ -1224,7 +1225,7 @@ cout<<"%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 	 fcoin_strict->SetParLimits(16,0.,100000.);//p scale
 	 fcoin_strict->SetParameter(17,-7.9);
 	 fcoin_strict->FixParameter(18,proton_strict_par2);
-	 fcoin_strict->FixParameter(19,proton_strict_par3);
+	 fcoin_strict->SetParameter(19,proton_strict_par3);
 
 	 hcoin_strict->Fit("fcoin_strict","","",-20.,20.);
 	 cout<<"%%%%%Information%%%%%"<<endl;
