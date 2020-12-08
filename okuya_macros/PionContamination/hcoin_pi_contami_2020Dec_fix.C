@@ -60,7 +60,7 @@ double fcoin_total( double *x, double *par ){
 
 }
 
-void hcoin_pi_contami_2020Dec(){
+void hcoin_pi_contami_2020Dec_fix(){
 //ROOT::Math::IntegratorOneDimOptions::SetDefaultRelTolerance(1.E-6);
 	string pdfname = "temp.pdf";
 cout << "Output pdf file name is " << pdfname << endl;
@@ -635,10 +635,10 @@ cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 	 fcoin_strict->SetParameter(8,16000.);//pi scale
 	 fcoin_strict->SetParLimits(8,0.,100000.);//pi scale
 	 fcoin_strict->SetParameter(9,3.18);
-	 fcoin_strict->SetParameter(10,pion_strict_par2);
-	 fcoin_strict->SetParLimits(10,0.,0.8);
-	 fcoin_strict->SetParameter(11,pion_strict_par3);
-	 fcoin_strict->SetParLimits(11,0.,10.);
+	 fcoin_strict->FixParameter(10,pion_strict_par2);
+	 //fcoin_strict->SetParLimits(10,0.,0.8);
+	 fcoin_strict->FixParameter(11,pion_strict_par3);
+	 //fcoin_strict->SetParLimits(11,0.,10.);
 //kaon
 	 fcoin_strict->SetParameter(12,500.);//k scale
 	 fcoin_strict->SetParLimits(12,0.,50000.);//k scale
@@ -656,15 +656,15 @@ cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 	 	fcoin_strict->SetParameter(16,500.);
 		fcoin_strict->SetParLimits(16,0.,50000.);
 	 	fcoin_strict->FixParameter(17,-8.303);
-	 	//fcoin_strict->FixParameter(18,proton_strict_par2);
-	 	fcoin_strict->SetParameter(18,0.4);
-	 	fcoin_strict->SetParLimits(18,0.,0.8);
+	 	fcoin_strict->FixParameter(18,proton_strict_par2);
+	 	//fcoin_strict->SetParameter(18,0.4);
+	 	//fcoin_strict->SetParLimits(18,0.,0.8);
 	 	fcoin_strict->SetParameter(19,500.);
 		fcoin_strict->SetParLimits(19,0.,50000.);
 	 	fcoin_strict->FixParameter(20,-7.463);
-	 	//fcoin_strict->FixParameter(21,proton_strict_par3);
-	 	fcoin_strict->SetParameter(21,0.4);
-	 	fcoin_strict->SetParLimits(21,0.,0.8);
+	 	fcoin_strict->FixParameter(21,proton_strict_par3);
+	 	//fcoin_strict->SetParameter(21,0.4);
+	 	//fcoin_strict->SetParLimits(21,0.,0.8);
 
 	 hcoin_strict->Fit("fcoin_strict","","",-20.,20.);
 
