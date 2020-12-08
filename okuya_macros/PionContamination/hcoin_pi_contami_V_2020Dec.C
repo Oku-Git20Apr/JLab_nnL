@@ -8,7 +8,6 @@
 #include "TF1.h"
 #include "TH1.h"
 bool reject_flag = false;
-double PI=4.*atan(1.);
 
 double F_Voigt( double *x, double *par )
   {
@@ -17,19 +16,6 @@ double F_Voigt( double *x, double *par )
     // par[2] : gaussian sigma
     // par[3] : lorentz fwhm
     double val = par[0] * TMath::Voigt(x[0]-par[1],par[2],par[3],4);
-    return val;
-  }
-
-double Dgauss( double *x, double *par )
-  {
-    // par[0] : scale1 
-    // par[1] : location1
-    // par[2] : sigma1
-    // par[3] : scale2 
-    // par[4] : location2
-    // par[5] : sigma2
-    double val = par[0] * TMath::Gaus(x[0],par[1],par[2]);
-    val += par[3] * TMath::Gaus(x[0],par[4],par[5]);
     return val;
   }
 
@@ -44,10 +30,8 @@ double fcoin_acc( double *x, double *par)
 	double val=0.;
 	for(int i=0;i<=80;i++){
 	//val += par[num]*TMath::Gaus(x[0],par[num+1]+par[num+12]*i-20,par[num+2]);
-    val += par[0] * (1.-par[5]) * TMath::Voigt(x[0]-3.179-par[1]-par[4]*(double)i+30.,par[2],par[3],4);
-    //val += par[0] * par[5] * TMath::Voigt(x[0]+7.925-par[1]-par[4]*i+30.,par[6],par[7],4);
-    val += par[0] * par[5] * 0.6 * TMath::Gaus(x[0],-8.303+par[1]+par[4]*(double)i-30.,par[6])/(sqrt(2.*PI)*par[6]);
-    val += par[0] * par[5] * 0.4 * TMath::Gaus(x[0],-7.463+par[1]+par[4]*(double)i-30.,par[7])/(sqrt(2.*PI)*par[7]);
+    val += par[0] * (1.-par[5]) * TMath::Voigt(x[0]-3.179-par[1]-par[4]*i+30.,par[2],par[3],4);
+    val += par[0] * par[5] * TMath::Voigt(x[0]+7.925-par[1]-par[4]*i+30.,par[6],par[7],4);
 	}
 	return val;
 }
@@ -56,12 +40,12 @@ double fcoin_total( double *x, double *par ){
 
 	if(reject_flag&&x[0]>-12.&&x[0]<10.){TF1::RejectPoint();return 0;}
 	//return fcoin_template(x,par,-10,0)+expgaus2(x,par,6)+expgaus2(x,par,10);//+expgaus2(x,par,14);
-	else return fcoin_acc(x,par)+par[8]*TMath::Voigt(x[0]-par[9],par[10],par[11],4)+par[12]*TMath::Voigt(x[0]-par[13],par[14],par[15],4)+par[16]*TMath::Gaus(x[0],par[17],par[18])+par[19]*TMath::Gaus(x[0],par[20],par[21]);
+	else return fcoin_acc(x,par)+par[8]*TMath::Voigt(x[0]-par[9],par[10],par[11],4)+par[12]*TMath::Voigt(x[0]-par[13],par[14],par[15],4)+par[16]*TMath::Voigt(x[0]-par[17],par[18],par[19],4);
 
 }
 
-void hcoin_pi_contami_2020Dec(){
-//ROOT::Math::IntegratorOneDimOptions::SetDefaultRelTolerance(1.E-6);
+void hcoin_pi_contami_V_2020Dec(){
+//ROOT::Math::IntegratorOneDimOptions::SetDefaultRelTolerance(1.E-9);
 	string pdfname = "temp.pdf";
 cout << "Output pdf file name is " << pdfname << endl;
   
@@ -319,7 +303,7 @@ cout<<"Entries: "<<ENum<<endl;
 		if(ac1sum<3.75&&ac2sum>3.&&ac2sum<20.)ac_cut=true;
 		if(ac1sum<3.75&&ac2sum>3.&&ac2sum<10.)ac_cut_new=true;
 		if(ac1sum>3.75&&ac2sum>10.)ac_cut_pi=true;
-		if(ac1sum<3.75&&ac2sum<0.001&&fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2)ac_cut_p=true;
+		if(ac1sum<3.75&&ac2sum<2.)ac_cut_p=true;
 		if(ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2)best_cut=true;
 		if(ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2)strict_cut=true;
 
@@ -483,10 +467,218 @@ cout<<"Entries: "<<ENum<<endl;
 	double chisq, chisq2, chisq3;
 	double dof, dof2, dof3;
 
+////Pion Fitting
+//	 TF1 *fcoin_first=new TF1("fcoin_first",F_Voigt,0.,6.,4);
+//    // par[0] : area
+//    // par[1] : location
+//    // par[2] : gaussian sigma
+//    // par[3] : lorentz fwhm
+//	 fcoin_first->SetNpx(20000);
+//	 fcoin_first->SetParameter(0,15500.);
+//	 fcoin_first->SetParameter(1,3.18);
+//	 fcoin_first->SetParameter(2,0.2);
+//	 fcoin_first->SetParameter(3,0.4);
+//	 hcoin_piwobg->Fit("fcoin_first","","",2.,4.);
+//	 double pion_par0 = fcoin_first->GetParameter(0);
+//	 double pion_par1 = fcoin_first->GetParameter(1);
+//	 double pion_par2 = fcoin_first->GetParameter(2);
+//	 double pion_par3 = fcoin_first->GetParameter(3);
+//	 cout<<"%%%%%Information%%%%%"<<endl;
+//	 cout<<"Pion Fitting after BG subtraction (fcoin_first) "<<endl;
+//	 double chisq = fcoin_first->GetChisquare();
+//	 double dof  = fcoin_first->GetNDF();
+//	 cout<<"chisq="<<chisq<<endl;
+//	 cout<<"dof="<<dof<<endl;
+//	 cout<<"Reduced chi-square = "<<chisq/dof<<endl;
+//
+////Proton Fitting
+//	 TF1 *fcoin_firstp=new TF1("fcoin_firstp",F_Voigt,-10,-6.,4);
+//    // par[0] : area
+//    // par[1] : location
+//    // par[2] : gaussian sigma
+//    // par[3] : lorentz fwhm
+//	 fcoin_firstp->SetNpx(20000);
+//	 fcoin_firstp->SetParameter(0,1550.);
+//	 fcoin_firstp->SetParameter(1,-8.1);
+//	 fcoin_firstp->SetParameter(2,0.4);
+//	 fcoin_firstp->SetParameter(3,0.4);
+//	 hcoin_pwobg->Fit("fcoin_firstp","","",-10.,-6.);
+//	 double proton_par0 = fcoin_firstp->GetParameter(0);
+//	 double proton_par1 = fcoin_firstp->GetParameter(1);
+//	 double proton_par2 = fcoin_firstp->GetParameter(2);
+//	 double proton_par3 = fcoin_firstp->GetParameter(3);
+//	 cout<<"%%%%%Information%%%%%"<<endl;
+//	 cout<<"Proton Fitting after BG subtraction (fcoin_first) "<<endl;
+//	 chisq = fcoin_firstp->GetChisquare();
+//	 dof  = fcoin_firstp->GetNDF();
+//	 cout<<"chisq="<<chisq<<endl;
+//	 cout<<"dof="<<dof<<endl;
+//	 cout<<"Reduced chi-square = "<<chisq/dof<<endl;
+//
+//	 reject_flag=true;
+////Accidentals Fitting
+//	 TF1 *fcoin=new TF1("fcoin",fcoin_total,-30.,100.,20);
+//	 fcoin->SetNpx(20000);
+//	 fcoin->SetParameter(0,200.);//acc
+//	 fcoin->FixParameter(1,0.);//
+//	 fcoin->FixParameter(2,pion_par2);//
+//	 fcoin->FixParameter(3,pion_par3);//
+//	 fcoin->SetParameter(4,2.012);//shift
+//	 fcoin->SetParameter(5,0.1);//
+//	 fcoin->SetParLimits(5,0.,1.0);//
+//	 fcoin->FixParameter(6,proton_par2);//
+//	 fcoin->FixParameter(7,proton_par3);//
+//	 fcoin->FixParameter(8,0.);//pi
+//	 fcoin->FixParameter(12,0.);//k
+//	 fcoin->FixParameter(16,0.);//p
+//	 fcoin->SetLineColor(kCyan);
+//	 hcoin->Fit("fcoin","N","",-30.,30.);
+//	 cout<<"%%%%%Information%%%%%"<<endl;
+//	 cout<<"Accidentals Fitting [12,60] (fcoin) "<<endl;
+//	 double chisq2 = fcoin->GetChisquare();
+//	 double dof2  = fcoin->GetNDF();
+//	 cout<<"chisq="<<chisq2<<endl;
+//	 cout<<"dof="<<dof2<<endl;
+//	 cout<<"Reduced chi-square = "<<chisq2/dof2<<endl;
+//	 hcoin->Draw("");
+//	 fcoin->Draw("same");
+//	reject_flag=false;
+////
+//////Kaon Fitting
+////	 double area=fcoin->GetParameter(0);
+////	 double location=fcoin->GetParameter(1);
+////	 double gsigma=fcoin->GetParameter(2);
+////	 double lwidth=fcoin->GetParameter(3);
+////	 double bwidth=fcoin->GetParameter(16);
+////	 fcoin->FixParameter(0,area);
+////	 fcoin->FixParameter(1,location);
+////	 fcoin->FixParameter(2,gsigma);
+////	 fcoin->FixParameter(3,lwidth);
+////	 fcoin->FixParameter(16,bwidth);
+////	 fcoin->FixParameter(4,fcoin_first->GetParameter(0));//pi
+////	 fcoin->FixParameter(5,fcoin_first->GetParameter(1));
+////	 fcoin->FixParameter(6,fcoin_first->GetParameter(2));
+////	 fcoin->FixParameter(7,fcoin_first->GetParameter(3));
+////	 fcoin->SetParameter(8,2000.);//k
+////	 fcoin->SetParLimits(8,0.,100000.);
+////	 fcoin->SetParameter(9,0.);//k
+////	 fcoin->SetParLimits(9,-0.5,0.5);
+////	 fcoin->SetParameter(10,fcoin_first->GetParameter(2));//k G Fix
+////	 fcoin->SetParLimits(10,0.,0.6);
+////	 fcoin->FixParameter(11,fcoin_first->GetParameter(3));//k L Fix
+//////L	 //fcoin->SetParLimits(11,0.,1.0);
+////	 //hcoin->Fit("fcoin","","",-0.7,0.7);
+////
+//
+//
+////Global Fitting
+////	 double karea=fcoin->GetParameter(8);
+////	 double klocation=fcoin->GetParameter(9);
+//	 fcoin->ReleaseParameter(0);
+//	 fcoin->ReleaseParameter(1);
+//	 fcoin->ReleaseParameter(2);
+//	 fcoin->ReleaseParameter(3);
+//	 fcoin->ReleaseParameter(4);
+//	 fcoin->ReleaseParameter(5);
+//	 fcoin->ReleaseParameter(6);
+//	 fcoin->ReleaseParameter(7);
+//	 fcoin->ReleaseParameter(8);
+//	 fcoin->ReleaseParameter(9);
+//	 fcoin->ReleaseParameter(10);
+//	 fcoin->ReleaseParameter(11);
+//	 fcoin->ReleaseParameter(12);
+//	 fcoin->ReleaseParameter(13);
+//	 fcoin->ReleaseParameter(14);
+//	 fcoin->ReleaseParameter(15);
+//	 fcoin->ReleaseParameter(16);
+//	 fcoin->ReleaseParameter(17);
+//	 fcoin->ReleaseParameter(18);
+//	 fcoin->ReleaseParameter(19);
+//	 fcoin->FixParameter(0,fcoin->GetParameter(0));
+//	 fcoin->FixParameter(1,fcoin->GetParameter(1));
+//	 fcoin->FixParameter(2,fcoin->GetParameter(2));
+//	 fcoin->FixParameter(3,fcoin->GetParameter(3));
+//	 fcoin->FixParameter(4,fcoin->GetParameter(4));
+//	 fcoin->FixParameter(5,fcoin->GetParameter(5));
+//	 fcoin->FixParameter(6,fcoin->GetParameter(6));
+//	 fcoin->FixParameter(7,fcoin->GetParameter(7));
+//	 fcoin->SetParameter(8,16000.);//pi scale
+//	 fcoin->SetParLimits(8,0.,100000.);//pi scale
+//	 fcoin->SetParameter(9,3.18);
+//	 fcoin->SetParameter(10,pion_par2);
+//	 fcoin->SetParameter(11,pion_par3);
+//	 fcoin->SetParameter(12,500.);//k scale
+//	 fcoin->SetParLimits(12,0.,50000.);//k scale
+//	 fcoin->SetParameter(13,0.);
+//	 fcoin->SetParLimits(13,-0.5,0.5);
+//	 fcoin->SetParameter(14,0.5);
+//	 fcoin->SetParLimits(14,0.,0.7);
+//	 fcoin->SetParameter(15,0.4);
+//	 fcoin->SetParLimits(15,0.,0.7);
+//	 fcoin->SetParameter(16,2000.);//p scale
+//	 fcoin->SetParLimits(16,0.,100000.);//p scale
+//	 fcoin->SetParameter(17,-7.9);
+//	 fcoin->FixParameter(18,proton_par2);
+//	 fcoin->FixParameter(19,proton_par3);
+//
+//	 hcoin->Fit("fcoin","","",-20.,20.);
+//	 cout<<"%%%%%Information%%%%%"<<endl;
+//	 double chisq3 = fcoin->GetChisquare();
+//	 double dof3  = fcoin->GetNDF();
+//	 cout<<"chisq="<<chisq3<<endl;
+//	 cout<<"dof="<<dof3<<endl;
+//	 cout<<"Reduced chi-square = "<<chisq3/dof3<<endl;
+//	 TF1 *fcoin_pi=new TF1("fcoin_pi",F_Voigt,-20.,20.,4);
+//	 TF1 *fcoin_k=new TF1("fcoin_k",F_Voigt,-20.,20.,4);
+//	 TF1 *fcoin_p=new TF1("fcoin_p",F_Voigt,-20.,20.,4);
+//	 fcoin_pi->SetNpx(20000);
+//	 fcoin_k->SetNpx(20000);
+//	 fcoin_p->SetNpx(20000);
+//	 fcoin_pi->SetParameter(0,fcoin->GetParameter(8));
+//	 fcoin_pi->SetParameter(1,fcoin->GetParameter(9));
+//	 fcoin_pi->SetParameter(2,fcoin->GetParameter(10));
+//	 fcoin_pi->SetParameter(3,fcoin->GetParameter(11));
+//	 fcoin_k->SetParameter(0,fcoin->GetParameter(12));
+//	 fcoin_k->SetParameter(1,fcoin->GetParameter(13));
+//	 fcoin_k->SetParameter(2,fcoin->GetParameter(14));
+//	 fcoin_k->SetParameter(3,fcoin->GetParameter(15));
+//	 fcoin_p->SetParameter(0,fcoin->GetParameter(16));
+//	 fcoin_p->SetParameter(1,fcoin->GetParameter(17));
+//	 fcoin_p->SetParameter(2,fcoin->GetParameter(18));
+//	 fcoin_p->SetParameter(3,fcoin->GetParameter(19));
+////
+////cout<<"fcoin(4)="<<fcoin->GetParameter(4)<<endl;
+////
+//		TCanvas *c2 = new TCanvas("c2", "c2", 800, 800);
+//		hcoin_piwobg->Draw("");
+//		fcoin_first->SetLineColor(kPink);
+//		fcoin_first->Draw("same");
+//		TCanvas *c3 = new TCanvas("c3", "c3", 800, 800);
+//		c3->SetLogy(0);
+//		TH1 *frame = c3->DrawFrame(-20.,1.,20.,2000.);
+//		frame->Draw("");
+//		hcoin->Draw("same");
+//		double ktegrated = fcoin_k->Integral(-1.006,1.006);
+//		cout<<"Kaon (-1.006ns<ct<1.006ns): "<<ktegrated/0.056<<endl;
+//		double pitegrated = fcoin_pi->Integral(-1.006,1.006);
+//		cout<<"Pion (-1.006ns<ct<1.006ns): "<<pitegrated/0.056<<endl;
+//		cout<<"Pion Contamination (-1.006ns<ct<1.006ns): "<<pitegrated*100./(ktegrated+pitegrated)<<endl;
+//		fcoin_pi->SetLineColor(kOrange);
+//		fcoin_k->SetLineColor(kGreen);
+//		fcoin_p->SetLineColor(kRed);
+//		fcoin->Draw("same");
+//		fcoin_pi->Draw("same");
+//		fcoin_k->Draw("same");
+//		fcoin_p->Draw("same");
+////		
+////	cout<<"left bunch = "<<hcoin->Integral(hcoin->FindBin(-17.),hcoin->FindBin(-15.))<<endl;		
+////	cout<<"right bunch = "<<hcoin->Integral(hcoin->FindBin(75.),hcoin->FindBin(77.))<<endl;		
+////	cout<<"center bunch = "<<hcoin->Integral(hcoin->FindBin(-5.),hcoin->FindBin(-3.))<<endl;		
 
-/*---------------*/
+
+/*-------------*/
 /*   strict Cut  */
-/*---------------*/
+/*-------------*/
 cout<<"%%%%%%%%%%%%%%%%%%%%"<<endl;
 cout<<"%%% strict Cut %%%%%%%"<<endl;
 cout<<"%%%%%%%%%%%%%%%%%%%%"<<endl;
@@ -525,38 +717,23 @@ cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 //Proton Fitting
 cout<<"Proton Fitting is performed as a next step"<<endl;
 cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
-	 TF1 *fcoin_firstp_strict= new TF1("fcoin_firstp_strict",Dgauss,-9,-7.,6);
+	 TF1 *fcoin_firstp_strict= new TF1("fcoin_firstp_strict",F_Voigt,-9,-7.,4);
     // par[0] : area
     // par[1] : location
     // par[2] : gaussian sigma
     // par[3] : lorentz fwhm
-		fcoin_firstp_strict->SetNpx(20000);
-	 	fcoin_firstp_strict->SetParameter(0,2000.);
-	 	fcoin_firstp_strict->FixParameter(1,-8.303);
-	 	//fcoin_firstp_strict->SetParLimits(1,-8.8,-8.1);
-	 	fcoin_firstp_strict->SetParameter(2,0.4);
-	 	fcoin_firstp_strict->SetParLimits(2,0.,0.8);
-	 	fcoin_firstp_strict->SetParameter(3,2000.);
-	 	fcoin_firstp_strict->FixParameter(4,-7.463);
-	 	//fcoin_firstp_strict->SetParLimits(4,-8.1,-7.5);
-	 	fcoin_firstp_strict->SetParameter(5,0.4);
-	 	fcoin_firstp_strict->SetParLimits(5,0.,0.8);
-//sosina
-//	 fcoin_firstp_strict->SetNpx(20000);
-//	 fcoin_firstp_strict->SetParameter(0,15500.);
-//	 fcoin_firstp_strict->SetParameter(1,-8.1);
-//	 fcoin_firstp_strict->SetParameter(2,0.4);
-//	 fcoin_firstp_strict->SetParameter(3,0.8);
+	 fcoin_firstp_strict->SetNpx(20000);
+	 fcoin_firstp_strict->SetParameter(0,15500.);
+	 fcoin_firstp_strict->SetParameter(1,-8.1);
+	 fcoin_firstp_strict->SetParameter(2,0.4);
+	 fcoin_firstp_strict->SetParameter(3,0.8);
 	 //hcoin_pwobg->Fit("fcoin_firstp_strict","","",-10.,-6.);
 	 //change
 	 hcoin_p->Fit("fcoin_firstp_strict","","",-10.,-6.);
 	 double proton_strict_par0 = fcoin_firstp_strict->GetParameter(0);
 	 double proton_strict_par1 = fcoin_firstp_strict->GetParameter(1);
-//sosina
-	 //double proton_strict_par2 = fcoin_firstp_strict->GetParameter(2);
-	 //double proton_strict_par3 = fcoin_firstp_strict->GetParameter(3);
 	 double proton_strict_par2 = fcoin_firstp_strict->GetParameter(2);
-	 double proton_strict_par3 = fcoin_firstp_strict->GetParameter(5);
+	 double proton_strict_par3 = fcoin_firstp_strict->GetParameter(3);
 	 cout<<"%%%%%Information%%%%%"<<endl;
 	 //cout<<"Proton Fitting after BG subtraction (fcoin_firstp_strict) "<<endl;
 	 cout<<"Proton Fitting w/o BG subtraction (fcoin_firstp_strict) "<<endl;
@@ -568,7 +745,7 @@ cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 
 //Accidentals Fitting
 	 reject_flag=true;//flag for ignoring pi,K,p
-	 TF1 *fcoin_strict= new TF1("fcoin_strict",fcoin_total,-30.,100.,22);
+	 TF1 *fcoin_strict= new TF1("fcoin_strict",fcoin_total,-30.,100.,20);
 	 fcoin_strict->SetNpx(20000);
 	 fcoin_strict->SetParameter(0,20.);//acc
 	 fcoin_strict->FixParameter(1,0.);//if par[1]=0, then no meaning. (Not used)
@@ -591,8 +768,6 @@ cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 	 fcoin_strict->FixParameter(17,0.);//p
 	 fcoin_strict->FixParameter(18,0.);//p
 	 fcoin_strict->FixParameter(19,0.);//p
-	 fcoin_strict->FixParameter(20,0.);//p
-	 fcoin_strict->FixParameter(21,0.);//p
 	 fcoin_strict->SetLineColor(kCyan);
 	 hcoin_strict->Fit("fcoin_strict","","",-30.,30.);
 	 cout<<"%%%%%Information%%%%%"<<endl;
@@ -629,8 +804,6 @@ cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 	 fcoin_strict->ReleaseParameter(17);
 	 fcoin_strict->ReleaseParameter(18);
 	 fcoin_strict->ReleaseParameter(19);
-	 fcoin_strict->ReleaseParameter(20);
-	 fcoin_strict->ReleaseParameter(21);
 //ACC
 	 fcoin_strict->FixParameter(0,fcoin_strict->GetParameter(0));
 	 fcoin_strict->FixParameter(1,fcoin_strict->GetParameter(1));
@@ -645,9 +818,8 @@ cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 	 fcoin_strict->SetParLimits(8,0.,100000.);//pi scale
 	 fcoin_strict->SetParameter(9,3.18);
 	 fcoin_strict->FixParameter(10,pion_strict_par2);
-	 //fcoin_strict->SetParLimits(10,0.,0.8);
-	 fcoin_strict->FixParameter(11,pion_strict_par3);
-	 //fcoin_strict->SetParLimits(11,0.,10.);
+	 fcoin_strict->SetParameter(11,pion_strict_par3);
+	 fcoin_strict->SetParLimits(11,0.,10.);
 //kaon
 	 fcoin_strict->SetParameter(12,500.);//k scale
 	 fcoin_strict->SetParLimits(12,0.,50000.);//k scale
@@ -661,33 +833,19 @@ cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 	 fcoin_strict->SetParameter(15,0.4);
 	 fcoin_strict->SetParLimits(15,0.,0.7);
 //proton
-//sosina
-	 //fcoin_strict->SetParameter(16,2000.);//p scale
-	 //fcoin_strict->SetParLimits(16,0.,100000.);//p scale
-	 //fcoin_strict->SetParameter(17,-7.9);
-	 //fcoin_strict->FixParameter(18,proton_strict_par2);
-	 //fcoin_strict->SetParameter(19,proton_strict_par3);
-	 //fcoin_strict->SetParLimits(19,0.,10.);
-		fcoin_strict->SetNpx(20000);
-	 	fcoin_strict->SetParameter(16,500.);
-		fcoin_strict->SetParLimits(16,0.,50000.);
-	 	fcoin_strict->FixParameter(17,-8.303);
-	 	//fcoin_strict->SetParameter(18,0.4);
-	 	//fcoin_strict->SetParLimits(18,0.,0.8);
-	 	fcoin_strict->FixParameter(18,proton_strict_par2);
-	 	fcoin_strict->SetParameter(19,500.);
-		fcoin_strict->SetParLimits(19,0.,50000.);
-	 	fcoin_strict->FixParameter(20,-7.463);
-	 	fcoin_strict->FixParameter(21,proton_strict_par3);
-	 	//fcoin_strict->SetParameter(21,0.4);
-	 	//fcoin_strict->SetParLimits(21,0.,0.8);
+	 fcoin_strict->SetParameter(16,2000.);//p scale
+	 fcoin_strict->SetParLimits(16,0.,100000.);//p scale
+	 fcoin_strict->SetParameter(17,-7.9);
+	 fcoin_strict->FixParameter(18,proton_strict_par2);
+	 fcoin_strict->SetParameter(19,proton_strict_par3);
+	 fcoin_strict->SetParLimits(19,0.,10.);
 
 	 hcoin_strict->Fit("fcoin_strict","","",-20.,20.);
 
 	 TF1 *fcoin_bg_strict= new TF1("fcoin_bg_strict",fcoin_acc,-20.,20.,8);
 	 TF1 *fcoin_pi_strict= new TF1("fcoin_pi_strict",F_Voigt,-20.,20.,4);
 	 TF1 *fcoin_k_strict= new TF1("fcoin_k_strict",F_Voigt,-20.,20.,4);
-	 TF1 *fcoin_p_strict= new TF1("fcoin_p_strict",Dgauss,-20.,20.,6);
+	 TF1 *fcoin_p_strict= new TF1("fcoin_p_strict",F_Voigt,-20.,20.,4);
 	 fcoin_pi_strict->SetNpx(20000);
 	 fcoin_k_strict->SetNpx(20000);
 	 fcoin_p_strict->SetNpx(20000);
@@ -711,8 +869,6 @@ cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 	 fcoin_p_strict->SetParameter(1,fcoin_strict->GetParameter(17));
 	 fcoin_p_strict->SetParameter(2,fcoin_strict->GetParameter(18));
 	 fcoin_p_strict->SetParameter(3,fcoin_strict->GetParameter(19));
-	 fcoin_p_strict->SetParameter(4,fcoin_strict->GetParameter(20));
-	 fcoin_p_strict->SetParameter(5,fcoin_strict->GetParameter(21));
 //
 //cout<<"fcoin(4)="<<fcoin->GetParameter(4)<<endl;
 //
@@ -749,7 +905,6 @@ cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 		TCanvas *c5 = new TCanvas("c5", "c5", 800, 800);
 		c5->SetLogy(1);
 		TH1 *frame2_strict = c5->DrawFrame(-20.,1.,20.,400.);
-		//fcoin_bg_strict->Draw("same");
 		fcoin_strict->Draw("same");
 		fcoin_pi_strict->Draw("same");
 		fcoin_k_strict->Draw("same");
@@ -758,29 +913,19 @@ cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 		TCanvas *c7 = new TCanvas("c7", "c7", 800, 800);
 		TH1 *frame7 = c7->DrawFrame(-20.,1.,20.,40000.);
 		//hcoin_piwobg->Draw("");
-		hcoin_pi->Draw("same");
-		fcoin_first_strict->SetLineColor(kMagenta);
+		hcoin_pi->Draw("");
+		fcoin_first_strict->SetLineColor(kPink);
 		fcoin_first_strict->Draw("same");
 		TCanvas *c8 = new TCanvas("c8", "c8", 800, 800);
 		TH1 *frame8 = c8->DrawFrame(-20.,1.,20.,1000.);
 		//hcoin_pwobg->Draw("");
-		hcoin_p->Draw("same");
-		fcoin_firstp_strict->SetLineColor(kMagenta);
+		hcoin_p->Draw("");
+		fcoin_firstp_strict->SetLineColor(kPink);
 		fcoin_firstp_strict->Draw("same");
 
-	//	TCanvas *c9 = new TCanvas("c9", "c9", 800, 800);
-	//	hcoin_strict->Fit("gausn","","",-10.,-6.);
-	//	hcoin_strict->Fit("gausn","","",-1.,1.);
-	//	hcoin_strict->Fit("gausn","","",2.,4.);
-	//	TCanvas *c10 = new TCanvas("c10", "c10", 800, 800);
-	//	TF1 *fcoinp_dg_strict= new TF1("fcoinp_dg_strict",Dgauss,-20.,20.,6);
-	//	fcoinp_dg_strict->SetNpx(20000);
-	// 	fcoinp_dg_strict->SetParameter(0,500.);
-	// 	fcoinp_dg_strict->SetParameter(1,-8.3);
-	// 	fcoinp_dg_strict->SetParameter(2,0.4);
-	// 	fcoinp_dg_strict->SetParameter(3,500.);
-	// 	fcoinp_dg_strict->SetParameter(4,-7.9);
-	// 	fcoinp_dg_strict->SetParameter(5,0.4);
-	//	hcoin_strict->Fit("fcoinp_dg_strict","","",-10.,-6.);
+		//TCanvas *c9 = new TCanvas("c9", "c9", 800, 800);
+		//hcoin_strict->Fit("gausn","","",-10.,-6.);
+		//hcoin_strict->Fit("gausn","","",-1.,1.);
+		//hcoin_strict->Fit("gausn","","",2.,4.);
 
 }//fit
