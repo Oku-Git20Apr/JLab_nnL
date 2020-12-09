@@ -3,6 +3,7 @@
 //----------------------------------//
 //
 //K. Okuyama (Sep. 13, 2020)
+//K. Okuyama (Dec.  8, 2020)//after Cointime collection 
 //
 //taken over from mea_lcr.C
 //using {left, left, left} bunch
@@ -13,7 +14,8 @@ void mea_lll(){
 cout << "Output pdf file name is " << pdfname << endl;
 cout << "Output root file name is " << rootname << endl;
   
-  TFile *file = new TFile("../h2all5.root","read");//input file (default: h2all2.root)
+  //TFile *file = new TFile("../h2all5.root","read");//input file (default: h2all2.root)
+  TFile *file = new TFile("../h2all_2020Nov.root","read");//input file (default: h2all2.root)
   TFile *file_new = new TFile(rootname.c_str(),"recreate");//new root
  // TTree *tree_old = (TTree*)file->Get("tree_out");
 //cout<<"Please wait a moment. CloneTree() is working..."<<endl;

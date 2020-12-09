@@ -508,8 +508,8 @@ cout << "Param file : " << AcceptanceR_table_z9.c_str() << endl;
  //const double fit_max_mm=0.085;
  const double fit_min_mm=-0.005;
  const double fit_max_mm=0.085;
- const double fmin_mm=-1;
- const double fmax_mm=2;
+ const double fmin_mm=-1.;
+ const double fmax_mm=2.;
  //const double fmin_mm=-0.01;
  //const double fmax_mm=0.12;
  //const double fmax_mm=10.;
@@ -874,7 +874,8 @@ cout<<"Entries: "<<ENum<<endl;
 	
 
 
-		if(fabs(ct)<1.006)ct_cut=true;
+		//if(fabs(ct)<1.006)ct_cut=true;
+		if(fabs(ct)<0.2)ct_cut=true;
 		else ct_cut=false;
 		//if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
 		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
@@ -1197,7 +1198,7 @@ cout<<"Entries: "<<ENum<<endl;
 	//hcs_bg_new_Qsq3_3->Sumw2();
 	hmm_Albg_fom_nocut->Sumw2();
 	hmm_bg_fom_best->Scale(1./nbunch);
-	hmm_bg_fom_strict->Scale(1./nbunch);
+	hmm_bg_fom_strict->Scale(0.2/nbunch/1.006);
 	hcs_bg_fom_strict->Scale(1./nbunch);
 	hcs_bg_new_cm2_1->Scale(1./nbunch);
 	hcs_bg_new_cm2_2->Scale(1./nbunch);
@@ -1518,8 +1519,8 @@ cout<<"BEST CUT START"<<endl;
 	cout<<"Number of Lambda w/o radiative tail (TF1 Integral) = "<<nofL_old<<endl;
 	cout<<"Number of Lambda w/o radiative tail (TH1F Integral) = "<<hmm_wo_bg_fom_best->Integral(hmm_wo_bg_fom_best->FindBin(-0.006),hmm_wo_bg_fom_best->FindBin(0.006))<<endl;
 
-	double nofS = fmm_Sigma_only->Integral(-0.05,0.085);
-	//double nofS = fmm_Sigma_only->Integral(fmin_mm,fmax_mm);
+	//double nofS = fmm_Sigma_only->Integral(-0.05,0.085);
+	double nofS = fmm_Sigma_only->Integral(fmin_mm,fmax_mm);
 	nofS = nofS/fit_bin_width;
 	cout<<"Number of Sigma (TF1 Integral) = "<<nofS<<endl;
 

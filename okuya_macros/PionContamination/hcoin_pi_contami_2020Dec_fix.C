@@ -728,6 +728,8 @@ cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 		fcoin_pi_strict->Draw("same");
 		fcoin_k_strict->Draw("same");
 		fcoin_p_strict->Draw("same");
+		cout<<"Kaon func.(-1.006ns<ct<1.006ns): "<<ktegrated_strict/0.056<<endl;
+		cout<<"Kaon func.(-0.2ns  <ct<	0.2ns): "<<fcoin_k_strict->Integral(-0.2,0.2)/0.056<<endl;
 
 
 		TCanvas *c5 = new TCanvas("c5", "c5", 800, 800);
