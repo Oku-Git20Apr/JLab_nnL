@@ -1,0 +1,11 @@
+#error estimation
+#1 --> nominator
+#2 --> denominator
+#
+# by Clopper-Pearson
+#
+#flag | True(All-BG) | Kaon | Pion 
+1 2297.14 2194.53 51.0606 #Double Gauss, fixed 
+2 2297.14 2208.46 39.7472 #Double Gauss, free 
+3 2296.72 2193.97 51.0474 #Voigt, fixed 
+4 2296.88 2177.18 46.5459 #Voigt, free 

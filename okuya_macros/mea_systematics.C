@@ -1,9 +1,12 @@
 //----------------------------------//
-//--  Fitting w/ Response func.   --//
-//--  Differential Cross Section  --//
+//--  Mixed Event Analysis
+//--   Evaluation of Systematic Errors
+//--   ==> Ana#28
+//--   Fitting w/ Response func.   --//
 //----------------------------------//
 //
 //K. Okuyama (Nov. 21, 2020)
+//K. Okuyama (Dec. 12, 2020)
 //
 //This is taken over from result_2D.C
 //Use 2D Acceptance Map (Z, pK)
@@ -146,7 +149,7 @@ double FMM_Res( double *x, double *par ){
 
 }
 
-void result_2D_Nov(){
+void mea_systematics(){
 	string pdfname = "fitting.pdf";
 cout << "Output pdf file name is " << pdfname << endl;
   
@@ -156,11 +159,11 @@ cout << "Output pdf file name is " << pdfname << endl;
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea6.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_llccrr_new_new.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_2020Nov.root","read");// 2020/11/19 rootfile
-  TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_csbase.root","read");// 2020/11/22 rootfile
-  //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_rrr.root","read");// 2020/12/10 rootfile
+  //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_csbase.root","read");// 2020/11/22 rootfile
+  TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_rrr.root","read");// 2020/12/12 rootfile
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_llccrr_Lsingle.root","read");// 2020/11/19 rootfile
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_mthesis.root","read");//from h2all_Lsingle.root, HRS-L: Single-tracking
-  double nbunch = 6000.;//effetive bunches (6 bunches x 1000 mixtures)
+  double nbunch = 1500.;//effetive bunches (3 bunches x 500 mixtures)
  // TTree *tree_old = (TTree*)file->Get("tree_out");
 //cout<<"Please wait a moment. CloneTree() is working..."<<endl;
   //TTree *tree = tree_old->CloneTree();

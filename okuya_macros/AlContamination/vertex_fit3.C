@@ -151,9 +151,9 @@ double gas = 0.;
 int np = 2000;
 for(int i=0;i<np;i++){
  double pol2 = par[4]*pow((x[0]-par[5]),2.)+1.;
- double step = -1.+(double)i/1000.;
- if(step<-0.125) pol2 = 0.;
- if(step> 0.125) pol2 = 0.;
+ double step = -100.+(double)i/10.;
+ if(step<-0.125*100.) pol2 = 0.;
+ if(step> 0.125*100.) pol2 = 0.;
 
  double fland;
  fland = exp(-0.5*pow((x[0]-step)/par[0],2.))+par[1]*exp(-0.5*pow((x[0]+par[2]-step)/par[3],2.));
@@ -190,9 +190,9 @@ double gas = 0.;
 int np = 2000;
 for(int i=0;i<np;i++){
  double pol2 = par[8]*pow((x[0]-par[9]),2.)+1.;
- double step = -1.+(double)i/1000.;
- if(step<-0.125) pol2 = 0.;
- if(step> 0.125) pol2 = 0.;
+ double step = -100.+(double)i/10.;
+ if(step<-0.125*100.) pol2 = 0.;
+ if(step> 0.125*100.) pol2 = 0.;
 
  double fland;
  fland = exp(-0.5*pow((x[0]-step)/par[2],2.))+par[3]*exp(-0.5*pow((x[0]+par[4]-step)/par[5],2.));
@@ -269,7 +269,7 @@ double FMM_Res( double *x, double *par ){
 
 }
 
-void vertex_fit2(){
+void vertex_fit3(){
 	string pdfname = "fitting.pdf";
 cout << "Output pdf file name is " << pdfname << endl;
   
@@ -628,7 +628,7 @@ cout << "Param file : " << AcceptanceR_table.c_str() << endl;
   TH2F* h_pepk  = new TH2F("h_pepk","h_pepk (tight)",40,1.73,1.93,40,1.95,2.25);
   TH2F* h_zz_dummy  = new TH2F("h_zz_dummy","h_zz_dummy",100,-0.15,0.15,100,-0.15,0.15);
 
-  TH1F* h_zave  = new TH1F("h_zave","Z-vertex (Ave.)",1000,-0.25,0.25);
+  TH1F* h_zave  = new TH1F("h_zave","Z-vertex (Ave.)",1000,-25.,25.);
   TH1F* h_zave_dummy  = new TH1F("h_zave_dummy","Z-vertex (Ave.)",1000,-0.15,0.15);
   TH1F* h_zave_true  = new TH1F("h_zave_true","Z-vertex (Ave.)",1000,-0.15,0.15);
   h1 ->SetLineColor(2);
@@ -895,7 +895,7 @@ cout<<"Entries: "<<ENum<<endl;
 		}
 
 		//if(abs(R_tr_vz-L_tr_vz)<0.025&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP)h_zave->Fill((R_tr_vz+L_tr_vz)/2.);
-		if(abs(R_tr_vz-L_tr_vz)<0.025)h_zave->Fill((R_tr_vz+L_tr_vz)/2.);
+		if(abs(R_tr_vz-L_tr_vz)<0.025)h_zave->Fill((R_tr_vz+L_tr_vz)*100./2.);
 		h_nltrack->Fill(NLtr);
 		h_nrtrack->Fill(NRtr);
 
@@ -1156,9 +1156,9 @@ cout<<"Entries: "<<ENum<<endl;
 	 TF1* fz_corr_front = new TF1("fz_corr_front","F_VZ",-0.15,0.15,13);
 	 TF1* fz_corr_back  = new TF1("fz_corr_back ","F_VZ",-0.15,0.15,13);
 	 //TF1* fz_corr  = new TF1("fz_corr","F_VZ",-0.15,0.15,17);
-	 TF1* fz_corr  = new TF1("fz_corr","F_VZ2",-0.16,0.16,11);//total
-	 TF1* fz_cell  = new TF1("fz_cell","F_VZ_cell",-0.16,0.16,8);//cell
-	 TF1* fz_gas  = new TF1("fz_gas","F_gas",-0.25,0.25,7);//gas
+	 TF1* fz_corr  = new TF1("fz_corr","F_VZ2",-16.,16.,11);//total
+	 TF1* fz_cell  = new TF1("fz_cell","F_VZ_cell",-16.,16.,8);//cell
+	 TF1* fz_gas  = new TF1("fz_gas","F_gas",-25.,25.,7);//gas
 //-------------------------------//
 //    NEW Z FUNCTION             //
 //-------------------------------//
@@ -1174,15 +1174,15 @@ cout<<"Entries: "<<ENum<<endl;
 //par[9]: pol2 coeff.2
 //par[10]: total scale 
     fz_corr->SetParameter(0,380.);
-    fz_corr->SetParameter(1,-0.125);
-    fz_corr->SetParameter(2,0.005);
-    fz_corr->SetParameter(3,0.05);
-    fz_corr->SetParameter(4,-0.002);
-    fz_corr->SetParameter(5,0.006);
+    fz_corr->SetParameter(1,-0.125*100.);
+    fz_corr->SetParameter(2,0.005*100.);
+    fz_corr->SetParameter(3,0.4);
+    fz_corr->SetParameter(4,-0.002*100.);
+    fz_corr->SetParameter(5,0.006*100.);
     fz_corr->SetParameter(6,337.);
-    fz_corr->SetParameter(7,0.125);
-    fz_corr->SetParameter(8,-0.5);
-    fz_corr->SetParameter(9,0.4);
+    fz_corr->SetParameter(7,0.125*100.);
+    fz_corr->SetParameter(8,-0.016/100.);
+    fz_corr->SetParameter(9,-1.6*100.);
     fz_corr->SetParameter(10,0.9);
 
 	fz_corr->SetNpx(20000);
@@ -1254,7 +1254,7 @@ cout<<"Entries: "<<ENum<<endl;
 	//h_zave->Fit("fz_corr_back ","","",0.105,0.145);
 	TCanvas* c9 = new TCanvas("c9","c9");
 	//h_zave_dummy->Draw("");
-	h_zave->Fit("fz_corr","","",-0.15,0.15);
+	h_zave->Fit("fz_corr","","",-15.,15.);
 //	fz_front->SetParameter(0,fz_corr->GetParameter(5));
 //	fz_front->SetParameter(1,fz_corr->GetParameter(6));
 //	fz_front->SetParameter(2,fz_corr->GetParameter(7));
@@ -1294,9 +1294,9 @@ cout<<"Entries: "<<ENum<<endl;
 	fz_gas->SetParameter(5,fz_corr->GetParameter(9));
 	fz_gas->SetParameter(6,fz_corr->GetParameter(10));
 	
-	fz_corr->Draw("same");
 	fz_cell->Draw("same");
 	fz_gas->Draw("same");
+	fz_corr->Draw("same");
 	//fz_corr->Draw("");
 	 double chisq = fz_corr->GetChisquare();
 	 double dof  = fz_corr->GetNDF();
@@ -1304,42 +1304,66 @@ cout<<"Entries: "<<ENum<<endl;
 	 cout<<"dof="<<dof<<endl;
 	 cout<<"Reduced chi-square = "<<chisq/dof<<endl;
 
-	double Al_contami_corr = fz_corr->Integral(-0.1,0.1);
-	Al_contami_corr+=fz_corr->Integral(-0.1,0.1);
-	Al_contami_corr/=0.0005;
+	double Al_contami_corr = fz_corr->Integral(-10.,10.);
+	Al_contami_corr+=fz_corr->Integral(-10.,10.);
+	Al_contami_corr/=0.05;
 	cout<<"Al (gas)  = "<<Al_contami_corr<<endl;
-	double Al_contami_cell = fz_cell->Integral(-0.1,0.1);
-	Al_contami_cell+=fz_cell->Integral(-0.1,0.1);
-	Al_contami_cell/=0.0005;
+	double Al_contami_cell = fz_cell->Integral(-10.,10.);
+	Al_contami_cell+=fz_cell->Integral(-10.,10.);
+	Al_contami_cell/=0.05;
 	cout<<"Al (cell) = "<<Al_contami_cell<<endl;
 	cout<<"Al Contamination = "<<Al_contami_cell*100./(Al_contami_cell+Al_contami_corr)<<endl;
-	double Al_res1 = fz_corr->Integral(-0.16,-0.145);
-	double Al_res2 = fz_corr->Integral(0.145,0.16);
-	double Al_res_hist1 = h_zave->Integral(h_zave->FindBin(-0.16),h_zave->FindBin(-0.145));
-	double Al_res_hist2 = h_zave->Integral(h_zave->FindBin(0.145),h_zave->FindBin(0.16));
-	cout<<"Al (res from func.) = "<<(Al_res1+Al_res2)/0.0005<<endl;
+	double Al_res1 = fz_corr->Integral(-16.,-14.5);
+	double Al_res2 = fz_corr->Integral(14.5,16.);
+	double Al_res_hist1 = h_zave->Integral(h_zave->FindBin(-16.),h_zave->FindBin(-14.5));
+	double Al_res_hist2 = h_zave->Integral(h_zave->FindBin(14.5),h_zave->FindBin(16.));
+	cout<<"Al (res from func.) = "<<(Al_res1+Al_res2)/0.05<<endl;
 	cout<<"Al (res from hist.) = "<<(Al_res_hist1+Al_res_hist2)<<endl;
-	cout<<"Al Contamination Systematice Error = "<<((Al_res_hist1+Al_res_hist2)-((Al_res1+Al_res2)/0.0005))*100./(Al_contami_cell+Al_contami_corr)<<endl;
+	cout<<"Al Contamination Systematice Error [%] = "<<((Al_res_hist1+Al_res_hist2)-((Al_res1+Al_res2)/0.05))*100./(Al_contami_cell+Al_contami_corr)<<endl;
 
-	TH1F* h_den  = new TH1F("h_den","denominator",25,0.,0.25);
-	TH1F* h_num  = new TH1F("h_num","numerator",25,0.,0.25);
+	TH1F* h_den  = new TH1F("h_den","denominator",25,0.,25.);
+	TH1F* h_num  = new TH1F("h_num","numerator",25,0.,25.);
 	double den, num;
 	h_den->SetBinContent(1,0.);
 	h_num->SetBinContent(1,0.);
 	for(int i=1;i<25;i++){
 	//den = h_zave->Integral(h_zave->FindBin((double)i*(-0.01)),h_zave->FindBin((double)i*(0.01)));
-	den = h_zave->Integral(h_zave->FindBin(-0.25),h_zave->FindBin(0.25));
-	num = fz_gas->Integral((double)i*(-0.01),(double)i*(0.01))/0.0005;
+	//den = h_zave->Integral(h_zave->FindBin(-25.),h_zave->FindBin(0.25));
+	den = fz_gas->Integral(-25.,25.)/0.05;
+	num = fz_gas->Integral((double)i*(-1.),(double)i)/0.05;
 	h_den->SetBinContent(i+1,den);
 	h_num->SetBinContent(i+1,num);
 	}
-	cout << "TEfficiency!" << endl;
+
+	TH1F* h_den2  = new TH1F("h_den2","denominator",25,0.,25.);
+	TH1F* h_num2  = new TH1F("h_num2","numerator",25,0.,25.);
+	double den2, num2;
+	h_den2->SetBinContent(1,0.);
+	h_num2->SetBinContent(1,0.);
+	for(int i=1;i<25;i++){
+	//den = h_zave->Integral(h_zave->FindBin((double)i*(-0.01)),h_zave->FindBin((double)i*(0.01)));
+	//den = h_zave->Integral(h_zave->FindBin(-25.),h_zave->FindBin(0.25));
+	den2 = fz_corr->Integral((double)i*(-1.),(double)i)/0.05;
+	num2 = fz_cell->Integral((double)i*(-1.),(double)i)/0.05;
+	h_den2->SetBinContent(i+1,den2);
+	h_num2->SetBinContent(i+1,num2);
+	}
+	cout << "TEfficiency! (Gas SR)" << endl;
 	TEfficiency *pEff1;
 	if(TEfficiency::CheckConsistency(*h_num,*h_den,"w")){
 	pEff1 = new TEfficiency(*h_num,*h_den);
 	}
+	cout << "TEfficiency2! (Al Contamination)" << endl;
+	TEfficiency *pEff2;
+	if(TEfficiency::CheckConsistency(*h_num2,*h_den2,"w")){
+	pEff2 = new TEfficiency(*h_num2,*h_den2);
+	}
 	TCanvas* c10 = new TCanvas("c10","c10");
 	pEff1->Draw("");
+	TCanvas* c11 = new TCanvas("c11","c11");
+	pEff1->Draw("");
+	pEff2->SetLineColor(kRed);
+	pEff2->Draw("same");
 //	h_zz_dummy->Draw("colz");
 
 cout << "Well done!" << endl;

@@ -629,8 +629,7 @@ cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 	 fcoin_strict->FixParameter(3,fcoin_strict->GetParameter(3));
 	 fcoin_strict->FixParameter(4,fcoin_strict->GetParameter(4));
 	 fcoin_strict->FixParameter(5,fcoin_strict->GetParameter(5));
-	 fcoin_strict->FixParameter(6,fcoin_strict->GetParameter(6));
-	 fcoin_strict->FixParameter(7,fcoin_strict->GetParameter(7));
+	 fcoin_strict->FixParameter(6,fcoin_strict->GetParameter(6)); fcoin_strict->FixParameter(7,fcoin_strict->GetParameter(7));
 //pion
 	 fcoin_strict->SetParameter(8,16000.);//pi scale
 	 fcoin_strict->SetParLimits(8,0.,100000.);//pi scale
@@ -717,7 +716,8 @@ cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 	 	cout<<"chisq="<<chisq3<<endl;
 	 	cout<<"dof="<<dof3<<endl;
 	 	cout<<"Reduced chi-square = "<<chisq3/dof3<<endl;
-		cout<<"Kaon (-1.006ns<ct<1.006ns): "<<k_strict<<endl;
+		cout<<"True (-1.006ns<ct<1.006ns): "<<k_strict<<endl;
+		cout<<"Kaon (-1.006ns<ct<1.006ns): "<<ktegrated_strict/0.056<<endl;
 		cout<<"Pion (-1.006ns<ct<1.006ns): "<<pitegrated_strict/0.056<<endl;
 		cout<<"Pion Contamination (-1.006ns<ct<1.006ns): "<<pitegrated_strict*100./(k_strict*0.056)<<endl;
 		cout<<"Pion Contamination (-1.006ns<ct<1.006ns): "<<pitegrated_strict*100./(ktegrated_strict+pitegrated_strict)<<endl;
