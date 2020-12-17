@@ -156,7 +156,7 @@ cout << "Output pdf file name is " << pdfname << endl;
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea6.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_llccrr_new_new.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_2020Nov.root","read");// 2020/11/19 rootfile
-  TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_csbase.root","read");// 2020/11/22 rootfile
+  TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_csbase.root","read");// 2020/11/22 SNP
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_rrr.root","read");// 2020/12/10 rootfile
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_llccrr_Lsingle.root","read");// 2020/11/19 rootfile
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_mthesis.root","read");//from h2all_Lsingle.root, HRS-L: Single-tracking
@@ -509,8 +509,8 @@ cout << "Param file : " << AcceptanceR_table_z9.c_str() << endl;
  //const double fit_max_mm=0.085;
  const double fit_min_mm=-0.005;
  const double fit_max_mm=0.085;
- const double fmin_mm=-1.;
- const double fmax_mm=2.;
+ const double fmin_mm=-0.1;
+ const double fmax_mm=0.10;//0.14
  //const double fmin_mm=-0.01;
  //const double fmax_mm=0.12;
  //const double fmax_mm=10.;

@@ -456,9 +456,10 @@ void radiative(){
 	SNT->SetBranchStatus("missmass",1);SNT->SetBranchAddress("missmass",&mm_simc);
   int ENum_simc = SNT->GetEntries(); 
 cout<<"Entries(SIMC): "<<ENum_simc<<endl;
+  TRandom3 ran;
   for(int l=0;l<ENum_simc;l++){
 	SNT->GetEntry(l);
-	hmm_simc->Fill((mm_simc-ML)*1000.);
+	hmm_simc->Fill(ran.Gaus((mm_simc-ML)*1000.,2.));
 	}
 
 	//hmm_simc->Scale(1./1000.);

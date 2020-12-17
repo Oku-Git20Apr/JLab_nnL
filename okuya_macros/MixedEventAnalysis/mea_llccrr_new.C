@@ -4,6 +4,7 @@
 //
 //K. Okuyama (Sep. 23, 2020)
 //K. Okuyama (Nov. 19, 2020) CS factor
+//K. Okuyama (Dec. 14, 2020) Mom cut 
 //
 //taken over from mea_lcr.C
 //using {left, right, center} bunch
