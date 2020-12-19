@@ -1,6 +1,8 @@
 //------------------//
 // VP Flux Integral //
 //------------------//
+//K. Okuyama (2020.12.17)
+//mom bin: 150=>100
 
 
 
@@ -118,8 +120,8 @@ int main(int argc, char** argv){
   gStyle->SetTitleOffset(0.9, "X");
   gStyle->SetTitleOffset(0.9, "Y");
 	gStyle->SetOptStat(0);
-	gStyle->SetPadGridX(1);
-	gStyle->SetPadGridY(1);
+	gStyle->SetPadGridX(0);
+	gStyle->SetPadGridY(0);
 
 	FILE *fp;
 	const int SizeOfBuffer = 32;
@@ -158,10 +160,10 @@ int main(int argc, char** argv){
 	cout<< "volume = " << volume <<endl;
 
 
-	int bin_mom = 150;
+	int bin_mom = 100;
 	double min_mom = 1.9;//nnL
 	double max_mom = 2.3;//nnL
-	int bin_th = 150;
+	int bin_th = 100;
 	//double min_th = 0.10;
 	//double max_th = 0.35;
 	double min_th = 0.95;//cos
@@ -389,7 +391,7 @@ int main(int argc, char** argv){
 //L_mom<2.12&&Qsq<0.5 (Sigma0, Qsq)
 //L_mom>2.08&&theta_gk_cm*180./PI<8 (Lambda, theta_gk_cm*180./PI)
 //L_mom<2.12&&theta_gk_cm*180./PI<8 (Sigma0, theta_gk_cm*180./PI)
-		if(L_mom>2.10){//L_mom>2.08(Lambda), L_mom<2.12(Simga0)
+		if(L_mom>2.08){//L_mom>2.08(Lambda), L_mom<2.12(Simga0)
 		h_vp_mom2->Fill(L_mom);
 		//if(L_mom>2.1)h_vp_mom2->Fill(L_mom);
 		}
@@ -527,16 +529,31 @@ int main(int argc, char** argv){
 	h_momL->Draw("");
 
 	TCanvas *c4 = new TCanvas("c4", "c4");
-	h_sa_mom_result->Draw("e2");
+	SetTitle(h_sa_mom_result, "", "Momentum [GeV/c]", "Solid Angle [msr]");
+	h_sa_mom_result->SetMaximum(6.);
+	h_sa_mom_result->SetNdivisions(505);
+	h_sa_mom_result->Draw("e2 same");
 	h_sa_mom_result->Draw("p same");
 
 	TCanvas *c5 = new TCanvas("c5", "c5");
+	SetTitle(h_mom_gen, "", "Momentum [GeV/c]", "Events");
+	h_mom_gen->SetNdivisions(505);
 	h_mom_gen->Draw();
+	h_mom_result->SetNdivisions(505);
 	h_mom_result->SetLineColor(kAzure);
 	h_mom_result->Draw("same");
 
+	TCanvas *c6 = new TCanvas("c6", "c6");
+	SetTitle(h_vp_mom_result, "", "Momentum [GeV/c]", "Integrated VP Flux [#gamma#lower[-0.2]{#scale[0.5]{#bullet}}GeV^{-1}#lower[-0.2]{#scale[0.5]{#bullet}}electron^{-1}]");
+	h_vp_mom_result->SetNdivisions(505);
+	h_vp_mom_result->Draw("");
+	
+
 //c4->Print("LHRS_acceptance.pdf");
 //c5->Print("LHRS_mc_gen.pdf");
+c4->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/mthesis_Fig/pdf/acceptance_LHRS.pdf");
+c5->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/mthesis_Fig/pdf/acceptance_howtoL.pdf");
+c6->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/mthesis_Fig/pdf/vpflux_full.pdf");
 
 	if(!BatchFlag){
 		theApp.Run();

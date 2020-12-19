@@ -1,23 +1,78 @@
-If you want to get "Acceptance", every vpflux***.cc will work. same program.
-If you want to get "VP Flux Integral", you need to care its algorithm.
+2020.10.4  LHRS.root (2583235)
+- SpectMode: e
+- 1,000,000 events
+
+2020.10.4  RHRS.root (2549979)
+- SpectMode: p
+- 1,000,000 events
+
+2020.10.11 RHRS+10.root (???)
+- SpectMode: p
+- 1,000,000 events
+
+2020.10.11 BOTH.root (5248172)
+- SpectMode: e+p
+- 1,000,000 events
+
+2020.10.17 LHRS_new.root (2582007)
+- thick: 70.8 [mg/cm^2], rho=0.002832 [g/cm^3]
+- SpectMode: e
+- 1,000,000 events
+
+2020.10.18 RHRS_new.root (2547932)
+- thick: 70.8 [mg/cm^2], rho=0.002832 [g/cm^3]
+- SpectMode: p
+- 1,000,000 events
+
+2020.10.27 LHRS_big.root (5710184)
+- thick: 70.8 [mg/cm^2], rho=0.002832 [g/cm^3]
+- SpectMode: e
+- 1,000,000 events
+
+2020.10.27 RHRS_big.root (5688035)
+- thick: 70.8 [mg/cm^2], rho=0.002832 [g/cm^3]
+- SpectMode: p
+- 1,000,000 events
+
+2020.11.2 RHRS2.root (5682429)
+- thick: 70.8 [mg/cm^2], rho=0.002832 [g/cm^3]
+- SpectMode: p
+- 1,000,000 events
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+2020.11.22 LHRS_Lambda_grnd.root  (5695419)
+- thick: 70.8 [mg/cm^2], rho=0.002832 [g/cm^3]
+- SpectMode: e
+- 1,000,000 events
+- Uniform (theta_gen 0~0.1)
+- Lambda production is set in nml_default.data
+
+2020.11.22 LHRS_SigmaZ_grnd.root  (5696881)
+- thick: 70.8 [mg/cm^2], rho=0.002832 [g/cm^3]
+- SpectMode: e
+- 1,000,000 events
+- Uniform (theta_gen 0~0.1)
+- Sigma0 production is set in nml_default.data
+
+2020.11.22 RHRS_grnd.root  (5676226)
+- thick: 70.8 [mg/cm^2], rho=0.002832 [g/cm^3]
+- SpectMode: p
+- 1,000,000 events
+- Uniform (theta_gen 0~0.1)
 
 
-vpflux_mc.cc
-- Monte Carlo Integral
-
-vpflux.cc
-- Monte Carlo (Acceptance) & Function integration by quadrature
-- Gamma(omega,theta) x (Delta p) x (Delta Omega ~10msr)
-- Solid angle is not divided into bins.
-
-vpflux_improved
-- Monte Carlo (Acceptance) & Function integration by quadrature
-- Solid angle can be divided into bins.
-- More realistic function integration
-
-
-
-//---For more information---//
-See ELS#100(Okuyama)
-Monte Carlo method is the best, maybe.(2020/8/7)
-I recommend using vpflux_mc.cc
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+2020.12.10 BOTH_L.root 
+- thick: 70.8 [mg/cm^2], rho=0.002832 [g/cm^3]
+- SpectMode: p+e
+- Lambda production
+- 900,000 events
+- Uniform (theta_gen 0~0.1)
+2020.12.10 BOTH_S.root 
+- thick: 70.8 [mg/cm^2], rho=0.002832 [g/cm^3]
+- SpectMode: p+e
+- Sigma0 production
+- 300,000 events
+- Uniform (theta_gen 0~0.1)
+2020.12.10 BOTH_LS.root 
+- BOTH_L.root + BOTH_S.root

@@ -27,16 +27,21 @@ CXXLIBS = $(ROOTLIBS)
 
 INCLUDE= -I./ -I$(PHCDIR) -I../../
 
-TARGET1=    vpflux_mc 
-OBJS1  =    vpflux_mc.o
+TARGET1=    Acceptance 
+OBJS1  =    Acceptance.o
 TARGET2=    vpflux 
 OBJS2  =    vpflux.o
-TARGET3=    vpflux_improved 
-OBJS3  =    vpflux_improved.o
+TARGET3=    acceptanceR 
+OBJS3  =    acceptanceR.o
+TARGET4=    vpflux_mthesis 
+OBJS4  =    vpflux_mthesis.o
+TARGET5=    acceptanceR_mthesis 
+OBJS5  =    acceptanceR_mthesis.o
 
-all: $(TARGET1) \
-	$(TARGET2) \
-	$(TARGET3)
+all: $(TARGET2)\
+		$(TARGET3)\
+		$(TARGET4)\
+		$(TARGET5)
 
 $(LIBDIR)/%.o : %.cc
 	$(CXX) $(CFLAGS) -c -o $@ $< $(CXXFLAGS)
@@ -54,6 +59,12 @@ $(TARGET2): $(patsubst %,$(LIBDIR)/%,$(OBJS2))
 	$(CXX) $(CFLAGS) -o $(BINDIR)/$@ $< $(CXXLIBS) $(CXXFLAGS)
 
 $(TARGET3): $(patsubst %,$(LIBDIR)/%,$(OBJS3))
+	$(CXX) $(CFLAGS) -o $(BINDIR)/$@ $< $(CXXLIBS) $(CXXFLAGS)
+
+$(TARGET4): $(patsubst %,$(LIBDIR)/%,$(OBJS4))
+	$(CXX) $(CFLAGS) -o $(BINDIR)/$@ $< $(CXXLIBS) $(CXXFLAGS)
+
+$(TARGET5): $(patsubst %,$(LIBDIR)/%,$(OBJS5))
 	$(CXX) $(CFLAGS) -o $(BINDIR)/$@ $< $(CXXLIBS) $(CXXFLAGS)
 
 .PHONY: clean
