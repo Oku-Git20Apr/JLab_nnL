@@ -40,6 +40,25 @@ MM_divide.C
 % MM vs theta_gk_cm
 % MM vs VP polarization (epsilon)
 
+
+
+%%%%%%%%%%%%%%
+%%%Chapter4%%%
+%%%%%%%%%%%%%%
+hcoin_fit_fix.C (2020.12.20)
+% Pion Contamination
+% 2Gauss(p) + Voigt(K) + Voigt(pi) + Acc.(pi+p)
+hcoin_fit_free.C (2020.12.20)
+% Pion Contamination
+% 2Gauss(p) + Voigt(K) + Voigt(pi) + Acc.(pi+p)
+hcoin_fit_V_fix.C (2020.12.20)
+% Pion Contamination
+% Voigt(p) + Voigt(K) + Voigt(pi) + Acc.(pi+p)
+hcoin_fit_V_free.C (2020.12.20)
+% Pion Contamination
+% Voigt(p) + Voigt(K) + Voigt(pi) + Acc.(pi+p)
+
+
 data_vs_simc.C
 % MM (data vs SIMC)
 
@@ -49,11 +68,3 @@ radiative.C (TEST)
 radiative2.C
 % Data vs SIMC vs Geant4
 % TTree
-
-hcoin_fit.C
-% Pion Contamination
-% 2Gauss(p) + Voigt(K) + Voigt(pi) + Acc.(pi+p)
-
-%%%%%%%%%%%%%%
-%%%Chapter4%%%
-%%%%%%%%%%%%%%

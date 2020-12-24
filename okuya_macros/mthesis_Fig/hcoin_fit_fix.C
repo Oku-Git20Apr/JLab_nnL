@@ -7,6 +7,7 @@
 //K. Okuyama (Dec. 7, 2020)
 //K. Okuyama (Dec.11, 2020)
 //K. Okuyama (Dec.13, 2020)//Cointime SR
+//K. Okuyama (Dec.20, 2020)//M-thesis design
 
 //Pion Contamination (Ana#25)
 //Voigt(pion) + Voigt(kaon) + 2Gauss(proton) + Acc.
@@ -67,7 +68,7 @@ double fcoin_total( double *x, double *par ){
 
 }
 
-void hcoin_fit(){
+void hcoin_fit_fix(){
 //ROOT::Math::IntegratorOneDimOptions::SetDefaultRelTolerance(1.E-6);
 	string pdfname = "temp.pdf";
 cout << "Output pdf file name is " << pdfname << endl;
@@ -486,7 +487,7 @@ cout<<"Entries: "<<ENum<<endl;
      hcoin_piwobg->Add(hcoin_pi,hcoin_pi_bg,1.0,-1.0);
      hcoin_pwobg->Add(hcoin_p,hcoin_p_bg,1.0,-1.0);
      hcoin_bestwobg->Add(hcoin_best,hcoin_best_bg,1.0,-1.0);
-     hcoin_strictwobg->Add(hcoin_strict,hcoin_strict_bg,1.0,-1.0);
+     //hcoin_strictwobg->Add(hcoin_strict,hcoin_strict_bg,1.0,-1.0);
 	double chisq, chisq2, chisq3;
 	double dof, dof2, dof3;
 
@@ -499,7 +500,7 @@ cout<<"%%% strict Cut %%%%%%%"<<endl;
 cout<<"%%%%%%%%%%%%%%%%%%%%"<<endl;
 
 
-		TCanvas *c4 = new TCanvas("c4", "c4", 1000, 800);
+		TCanvas *c4 = new TCanvas("c4", "c4", 800, 800);
 //Pion Fitting
 cout<<"Pion Fitting is performed as a first step"<<endl;
 cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
@@ -778,6 +779,7 @@ cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 	// 	fcoinp_dg_strict->SetParameter(5,0.4);
 	//	hcoin_strict->Fit("fcoinp_dg_strict","","",-10.,-6.);
 		TCanvas *c88 = new TCanvas("c88", "c88", 800, 800);
+		TH1 *frame_88 = c88->DrawFrame(0.,0.,1.25,1.);
 		TH1F* h_den  = new TH1F("h_den","denominator",25,0.,1.25);
 		TH1F* h_num  = new TH1F("h_num","numerator",25,0.,1.25);
 		double den, num;
@@ -796,8 +798,13 @@ cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 		if(TEfficiency::CheckConsistency(*h_num,*h_den,"w")){
 		pEff1 = new TEfficiency(*h_num,*h_den);
 		}
-		pEff1->Draw("");
+		frame_88->GetXaxis()->SetTitle("X [ns]");
+		frame_88->GetYaxis()->SetTitle("K^{+} Survival Ratio");
+		frame_88->GetYaxis()->SetDecimals();
+		frame_88->Draw("");
+		pEff1->Draw("same");
 	
-		//c4->Print("./pdf/hcoin_fit.pdf");
+		c4->Print("./pdf/hcoin_fit_fix.pdf");
+		c88->Print("./pdf/hcoin_kSR.pdf");
 
 }//fit

@@ -8,6 +8,8 @@
 //K. Okuyama (Sep. 29, 2020)//Add CT
 //K. Okuyama (Dec. 13, 2020)//After Cointime coll., Modify CT
 //							//Scaling from Strict cut
+//K. Okuyama (Dec. 21, 2020)//Check for M-thesis
+//K. Okuyama (Dec. 24, 2020)//Check for M-thesis
 //
 //
 //
@@ -93,7 +95,7 @@ double FMM_Lambda_Sigma( double *x, double *par , int num)
   return val;
 }
 
-double FMM_Response( double *x, double *par ){
+double FMM_Response( double *x, double *par ){//copied from result_2D.C (2020/12/21)
 
    //par[0]=Width (scale) parameter of Landau density
    //par[1]=Most Probable (MP, location) parameter of Landau density
@@ -149,9 +151,68 @@ double FMM_Response( double *x, double *par ){
   //val2 =  step * sum * invsq2pi / (par[3]*par[4]);
 /*------Exp * Gauss convluted------*/
 
-  return par[2]*(val1+par[6]*val2);//N x (Landau*Gauss) + N' x (Exp*Gauss)
+  return par[2]*(val1+par[6]*val2)/(1.+par[6]);//N x (Landau*Gauss) + N' x (Exp*Gauss)
 
 }
+//double FMM_Response( double *x, double *par ){
+//
+//   //par[0]=Width (scale) parameter of Landau density
+//   //par[1]=Most Probable (MP, location) parameter of Landau density
+//   //par[2]=Total area (integral -inf to inf, normalization constant)
+//   //par[3]=Width (sigma) of convoluted Gaussian function
+//   //par[4]=tau of exp function
+//   //par[5]=Shift of Function Peak
+//   //par[6]=Relative Strength
+//  double invsq2pi = 0.3989422804014;   // (2 pi)^(-1/2)
+//  double mpshift  = -0.22278298;       // Landau maximum location
+//  double np = 500.0;      // number of convolution steps
+//  double sc =   5.0;      // convolution extends to +-sc Gaussian sigmas
+//  double xx, mpc, fland, sum = 0.0, xlow,xupp, step, i;
+//  double val1, val2;
+//
+//// MP shift correction
+//  mpc = par[1] - mpshift * par[0];
+//// Range of convolution integral
+//  xlow = x[0] - sc * par[3];
+//  xupp = x[0] + sc * par[3];
+//  step = (xupp-xlow) / np;
+//// Convolution integral of Landau and Gaussian by sum
+//  for(i=1.0; i<=np/2; i++) {
+//     xx = xlow + (i-.5) * step;
+//     fland = TMath::Landau(xx,mpc,par[0]) / par[0];
+//     sum += fland * TMath::Gaus(x[0],xx,par[3]);
+//
+//     xx = xupp - (i-.5) * step;
+//     fland = TMath::Landau(xx,mpc,par[0]) / par[0];
+//     sum += fland * TMath::Gaus(x[0],xx,par[3]);
+//  }
+//  val1 = step * sum * invsq2pi / par[3];
+//
+///*------Landau * Gauss convluted------*/
+//
+//// Range of convolution integral
+//  sum  = 0.;
+//  xlow = 0.;
+//  xupp = x[0] + 1.6 * sc * par[3];
+//  step = (xupp-xlow) / np;
+//  if(step<0.)step = 0.;
+//// Convolution integral
+//  for(i=1.0; i<=np/2; i++){
+//     xx = xlow + (i-0.5) * step - par[5];
+//     fland = TMath::Gaus(xx,x[0],par[3]);
+//     sum += fland * TMath::Exp(-xx/par[4]);
+//     xx = xupp - (i-.5) * step - par[5];
+//     fland = TMath::Gaus(xx,x[0],par[3]);
+//     sum += fland * TMath::Exp(-xx/par[4]);
+//  }
+//  //val = par[2] * step * sum * invsq2pi / par[3];
+//  val2 =  step * sum * invsq2pi / (par[3]*par[4]*exp(par[5]/par[4]));
+//  //val2 =  step * sum * invsq2pi / (par[3]*par[4]);
+///*------Exp * Gauss convluted------*/
+//
+//  return par[2]*(val1+par[6]*val2);//N x (Landau*Gauss) + N' x (Exp*Gauss)
+//
+//}
 
 double FMM_Res( double *x, double *par ){
 
@@ -237,8 +298,8 @@ cout << "Output pdf file name is " << pdfname << endl;
  const double fmax_mm=0.2;
  //const double fit_min_mm=-0.01;
  //const double fit_max_mm=0.078;
- const double fit_min_mm=-0.01;
- const double fit_max_mm=0.11;
+ const double fit_min_mm=-0.005;
+ const double fit_max_mm=0.085;
  const int fit_bin_mm = (fit_max_mm-fit_min_mm)/0.001;
  const double fit_bin_width = (fit_max_mm-fit_min_mm)/fit_bin_mm;
 
@@ -370,10 +431,12 @@ cout << "Output pdf file name is " << pdfname << endl;
 
 
 
-  TH1F* h1  = new TH1F("h1","",400,-20.,20.0);
-  h1->GetXaxis()->SetTitle("coin time (ns)");
-  h1->GetYaxis()->SetTitle("Counts / 100 ps");
-  h1->GetXaxis()->SetRangeUser(-14.0,17.);
+  TH1F* hcoin  = new TH1F("hcoin","",400,-20.,20.0);
+  hcoin->GetXaxis()->SetTitle("coin time (ns)");
+  hcoin->GetYaxis()->SetTitle("Counts / 100 ps");
+  hcoin->GetXaxis()->SetRangeUser(-14.0,17.);
+  hcoin->SetLineColor(2);
+  hcoin->SetLineWidth(2);
   double xmin = -0.1, xmax = 0.2; int xbin = 300; // 1 MeV / bin
   TH1F* hmm_L_fom_best  = new TH1F("hmm_L_fom_best","hmm_L_fom_best",xbin,xmin,xmax);
   hmm_L_fom_best->GetXaxis()->SetTitle("M_{x} - M_{#Lambda} (GeV/c^{2})");
@@ -420,8 +483,6 @@ cout << "Output pdf file name is " << pdfname << endl;
   TH2D* h_thph_ek = new TH2D("h_thph_ek", "theta_ek:phi_ek" ,1000,0.1,0.35,1000,3*PI/2-1.,3*PI/2+1.);
   TH2D* h_thph_g = new TH2D("h_thph_g", "theta_g:phi_g" ,1000,0.1,0.35,1000,3*PI/2-1.,3*PI/2+1.);
   
-  h1 ->SetLineColor(2);
-  h1->SetLineWidth(2);
 
   TH1F* h_test  = new TH1F("h_test","",1000,1.8,2.4);
 
@@ -459,7 +520,7 @@ cout << "Output pdf file name is " << pdfname << endl;
 
 
   //tree->Draw(">>elist" , "fabs(ct_orig[0][0])<1.0");
-  tree->Draw(">>elist" , "fabs(ct_orig)<2.012");//ctsum (does NOT dintinguish #track)
+  tree->Draw(">>elist" , "fabs(ct_orig)<2.012");
   TEventList *elist = (TEventList*)gROOT->FindObject("elist");
   int ENum = elist->GetN(); 
   int ENum_strict = 0;
@@ -505,6 +566,8 @@ cout<<"Entries: "<<ENum<<endl;
 		else ct_cut=false;
 		if(fabs(ct)<2.012)noct_cut=true;
 		else noct_cut=false;
+		if(noct_cut==false)cout<<"Error: elist was wrong, |ct|>=2.012"<<endl;
+		hcoin->Fill(ct);
 		//if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
 		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
 		else event_selection=false;
@@ -571,8 +634,6 @@ cout<<"Entries: "<<ENum<<endl;
 
 	cout<<"nbunch="<<nbunch<<endl;
 	TCanvas* c1 = new TCanvas("c1","c1");
-	hmm_L_fom_best->Draw("");
-	TCanvas* c2 = new TCanvas("c2","c2");
 	TH1F* hmm_pi_fom_nocut=(TH1F*)file->Get("hmm_pi_fom_noZ");
 	TH1F* hmm_Al_fom_nocut=(TH1F*)file->Get("hmm_Al_fom_best");
 	TH1F* hmm_pi_fom_best=(TH1F*)file->Get("hmm_pi_fom_best");//best cut pion
@@ -612,8 +673,6 @@ cout<<"Entries: "<<ENum<<endl;
 	hmm_bg_fom_best->Scale(1./nbunch);
 	hmm_bg_fom_noCT_best->Scale(2./nbunch);
 	hmm_bg_fom_strict->Scale(1./nbunch);
-	TCanvas* c_temp = new TCanvas("c_temp","c_temp");
-	hmm_bg_fom_strict->Draw("");
 	hmm_bg_fom_noCT_strict->Scale(2./nbunch);
 	hmm_bg_fom_noZ->Scale(1./nbunch);
 	hmm_bg_fom_noZ_new->Scale(1./nbunch);
@@ -627,17 +686,13 @@ cout<<"Entries: "<<ENum<<endl;
 	hmm_wo_bg_fom_noZ_new->Add(hmm_L_fom_noZ_new,hmm_bg_fom_noZ_new,1.0,-1.0);
 	hmm_wo_bg_fom_noAC->Add(hmm_L_fom_noAC,hmm_bg_fom_noAC,1.0,-1.0);
 	hmm_wo_bg_fom_noCT_best->Add(hmm_L_fom_noCT_best,hmm_bg_fom_noCT_best,1.0,-1.0);
-	TH1F* hmm_bg_fom_temp = (TH1F*)hmm_bg_fom_strict->Clone();
-	hmm_bg_fom_temp->Scale(2.);
 	hmm_wo_bg_fom_noCT_strict->Add(hmm_L_fom_noCT_strict,hmm_bg_fom_noCT_strict,1.0,-1.0);
-	//hmm_wo_bg_fom_noCT_strict->Add(hmm_L_fom_noCT_strict,hmm_bg_fom_temp,1.0,-1.0);
-	hmm_bg_fom_temp->Draw("same");
 	hmm_pi_wobg_fom_best->Add(hmm_pi_fom_best,hmm_bg_fom_best,1.0,-1.0);
 	//hmm_pi_wobg_fom_nocut->Add(hmm_pi_fom_nocut,hmm_bg_fom_nocut,1.0,-1.0);
 	hmm_Al_wobg_fom_noZ->Add(hmm_Al_fom_noZ,hmm_Albg_fom_noZ,1.0,-1.0);
 	hmm_Al_wobg_fom_noZ_new->Add(hmm_Al_fom_noZ_new,hmm_Albg_fom_noZ_new,1.0,-1.0);
 
-	TCanvas* c_temp2 = new TCanvas("c_temp2","c_temp2");
+	TCanvas* c2 = new TCanvas("c2","c2");
 
 	 double constL=0.;
 	 double meanL=0.;
@@ -683,27 +738,15 @@ cout<<"BEST CUT START"<<endl;
 	 fmm_best->SetParLimits(0,0.,1000000.);//positive
 	 fmm_best->SetParLimits(3,0.,1000000.);//positive
 		
-	 hmm_wo_bg_fom_best->Fit("fL_best","N","",def_mean_L-def_sig_L,def_mean_L+def_sig_L);
+	 hmm_wo_bg_fom_strict->Fit("fL_best","N","",def_mean_L-def_sig_L,def_mean_L+def_sig_L);
 	 const_L_best=fL_best->GetParameter(0);
 	 mean_L_best=fL_best->GetParameter(1);
 	 sig_L_best=fL_best->GetParameter(2);
 	
-	 hmm_wo_bg_fom_best->Fit("fS_best","N","",def_mean_S-def_sig_S,def_mean_S+def_sig_S);
+	 hmm_wo_bg_fom_strict->Fit("fS_best","N","",def_mean_S-def_sig_S,def_mean_S+def_sig_S);
 	 const_S_best=fS_best->GetParameter(0);
 	 mean_S_best=fS_best->GetParameter(1);
 	 sig_S_best=fS_best->GetParameter(2);
-
-	 TF1 *fAl=new TF1("fAl",F_Voigt,fit_min_mm,fit_max_mm,4);
-	 fAl->SetNpx(2000);
-	 fAl->SetTitle("Al selected");
-	 fAl->SetParameters(3.,0.05,0.04,0.001);
-	 fAl->SetParLimits(0,0.,10000.);
-	 fAl->SetLineColor(kRed);
-	 hmm_Al_wobg_fom_noZ->Fit("fAl","N","",0.,0.1);
-	 double Al_par0 = fAl->GetParameter(0);
-	 double Al_par1 = fAl->GetParameter(1);
-	 double Al_par2 = fAl->GetParameter(2);
-	 double Al_par3 = fAl->GetParameter(3);
 
 	 TF1 *fAl_new=new TF1("fAl_new",F_Voigt,fit_min_mm,fit_max_mm,4);
 	 fAl_new->SetNpx(2000);
@@ -712,10 +755,10 @@ cout<<"BEST CUT START"<<endl;
 	 fAl_new->SetParLimits(0,0.,10000.);
 	 fAl_new->SetLineColor(kRed);
 	 hmm_Al_wobg_fom_noZ_new->Fit("fAl_new","N","",0.,0.1);
-	 double Al_new_par0 = fAl_new->GetParameter(0);
-	 double Al_new_par1 = fAl_new->GetParameter(1);
-	 double Al_new_par2 = fAl_new->GetParameter(2);
-	 double Al_new_par3 = fAl_new->GetParameter(3);
+	 double Al_par0 = fAl_new->GetParameter(0);
+	 double Al_par1 = fAl_new->GetParameter(1);
+	 double Al_par2 = fAl_new->GetParameter(2);
+	 double Al_par3 = fAl_new->GetParameter(3);
 
 	 TF1 *fpion=new TF1("fpion",F_Voigt,fit_min_mm,fit_max_mm,4);
 	 fpion->SetNpx(2000);
@@ -745,280 +788,16 @@ cout<<"BEST CUT START"<<endl;
 	 double integralS_best = 0.;
 	 n_L_best=0.;
 	 n_S_best=0.;
+	double nofL_best=0.;
+	double nofL_old_best=0.;
+	double nofL_old_hist_best=0.;
+	double nofS_best=0.;
+	double nofS_old_best=0.;
+	double nofS_old_hist_best=0.;
 
 /*%%%%%%%%%%%%%%%%*/
-/*%%    Lexp	%%*/
+/*%%    Strict	%%*/
 /*%%%%%%%%%%%%%%%%*/
-	 cout<<"Best Cut START"<<endl;
-	 cout<<"(Landau+Exp)*(Gauss) START"<<endl;
-	 fmm_best_Lexp=new TF1("fmm_best_Lexp",FMM_Res,fmin_mm,fmax_mm,14);
-   //par[0]=Width (scale) parameter of Landau density
-   //par[1]=Most Probable (MP, location) parameter of Landau density
-   //par[2]=Total area (integral -inf to inf, normalization constant)
-   //par[3]=Width (sigma) of convoluted Gaussian function
-   //par[4]=tau of exp function
-   //par[5]=Shift of Function Peak
-   //par[6]=Relative Strength
-   //
-   //
-   //
-   //par[0]=Width (scale) parameter of Landau density
-   //par[1]=Most Probable (MP, location) parameter of Landau density
-   //par[2]=Total area (integral -inf to inf, normalization constant)
-   //par[3]=Width (sigma) of convoluted Gaussian function
-	 fmm_best_Lexp->SetNpx(20000);
-	 fmm_best_Lexp->SetTitle("Missing Mass (best)");
-	 fmm_best_Lexp->SetParLimits(2,0.,1000.);//positive
-	 fmm_best_Lexp->SetParLimits(9,0.,300.);//positive
-	 fmm_best_Lexp->SetParameter(0,0.0007);//Landau width
-	 fmm_best_Lexp->SetParameter(1,mean_L_best);
-	 fmm_best_Lexp->SetParLimits(1,def_mean_L-def_sig_L,def_mean_L+def_sig_L);
-	 fmm_best_Lexp->SetParameter(2,1.5);//total scale
-	 fmm_best_Lexp->SetParameter(3,0.001);//sigma
-	 fmm_best_Lexp->SetParLimits(3,0.,0.01);
-	 fmm_best_Lexp->SetParameter(4,0.05);//att.
-	 fmm_best_Lexp->SetParLimits(4,0.005,0.08);
-	 fmm_best_Lexp->SetParameter(5,-0.004);//peak pos.
-	 fmm_best_Lexp->SetParLimits(5,-0.05,0.05);
-	 fmm_best_Lexp->SetParameter(6,0.6);//relative strength
-	 fmm_best_Lexp->SetParLimits(6,0.,1.5);//relative strength
-
-	 fmm_best_Lexp->SetParameter(7,0.0003);//Landau width
-	 fmm_best_Lexp->SetParameter(8,mean_S_best);//MPV
-	 fmm_best_Lexp->SetParLimits(8,def_mean_S-def_sig_S,def_mean_S+def_sig_S);
-	 fmm_best_Lexp->SetParameter(9,0.4);//total scale
-	 fmm_best_Lexp->SetParameter(10,0.0015);//sigma
-	 fmm_best_Lexp->SetParLimits(10,0.,0.01);
-	 fmm_best_Lexp->SetParameter(11,0.05);//att
-	 fmm_best_Lexp->SetParLimits(11,0.03,0.12);
-	 fmm_best_Lexp->SetParameter(12,0.080);//peak pos.
-	 //fmm_best_Lexp->SetParLimits(15,-0.085,-0.055);
-	 fmm_best_Lexp->SetParameter(13,0.6);
-	 fmm_best_Lexp->SetParLimits(13,0.,1.5);//relative strength
-
-	 hmm_wo_bg_fom_best->Fit("fmm_best_Lexp","","",fit_min_mm,fit_max_mm);//Total fitting w/ 4Poly BG
-	 double chisq_best = fmm_best_Lexp->GetChisquare();
-	 double dof_best  = fmm_best_Lexp->GetNDF();
-	 cout<<"chisq_best="<<chisq_best<<endl;
-	 cout<<"dof="<<dof_best<<endl;
-	 cout<<"Reduced chi-square = "<<chisq_best/dof_best<<endl;
-
-
-	 TF1* fmm_Lambda_only_best = new TF1("fmm_Lambda_only_best",FMM_Response,fmin_mm,fmax_mm,7);
-	 TF1* fmm_Sigma_only_best  = new TF1("fmm_Sigma_only_best" ,FMM_Response, fmin_mm,fmax_mm,7);
-//Lambda_only_best
-	 fmm_Lambda_only_best->SetNpx(20000);
-	 fmm_Lambda_only_best->SetParameter(0,fmm_best_Lexp->GetParameter(0));
-	 fmm_Lambda_only_best->SetParameter(1,fmm_best_Lexp->GetParameter(1));
-	 fmm_Lambda_only_best->SetParameter(2,fmm_best_Lexp->GetParameter(2));
-	 fmm_Lambda_only_best->SetParameter(3,fmm_best_Lexp->GetParameter(3));
-	 fmm_Lambda_only_best->SetParameter(4,fmm_best_Lexp->GetParameter(4));
-	 fmm_Lambda_only_best->SetParameter(5,fmm_best_Lexp->GetParameter(5));
-	 fmm_Lambda_only_best->SetParameter(6,fmm_best_Lexp->GetParameter(6));
-//Sigma_only_best
-	 fmm_Sigma_only_best->SetNpx(20000);
-	 fmm_Sigma_only_best->SetParameter(0,fmm_best_Lexp->GetParameter(7));
-	 fmm_Sigma_only_best->SetParameter(1,fmm_best_Lexp->GetParameter(8));
-	 fmm_Sigma_only_best->SetParameter(2,fmm_best_Lexp->GetParameter(9));
-	 fmm_Sigma_only_best->SetParameter(3,fmm_best_Lexp->GetParameter(10));
-	 fmm_Sigma_only_best->SetParameter(4,fmm_best_Lexp->GetParameter(11));
-	 fmm_Sigma_only_best->SetParameter(5,fmm_best_Lexp->GetParameter(12));
-	 fmm_Sigma_only_best->SetParameter(6,fmm_best_Lexp->GetParameter(13));
-
-	double nofL_best = fmm_Lambda_only_best->Integral(fmin_mm,fmax_mm);
-	double nofL_old_best = fmm_Lambda_only_best->Integral(-0.006,0.006);
-	nofL_best = nofL_best/fit_bin_width;
-	nofL_old_best = nofL_old_best/fit_bin_width;
-	double nofL_old_hist_best=hmm_wo_bg_fom_best->Integral(hmm_wo_bg_fom_best->FindBin(-0.006),hmm_wo_bg_fom_best->FindBin(0.006));
-	cout<<"Number of Lambda (TF1 Integral) = "<<nofL_best<<endl;
-	cout<<"Number of Lambda w/o radiative tail (TF1 Integral) = "<<nofL_old_best<<endl;
-	cout<<"Number of Lambda w/o radiative tail (TH1F Integral) = "<<nofL_old_hist_best<<endl;
-
-	double nofS_best = fmm_Sigma_only_best->Integral(fmin_mm,fmax_mm);
-	double nofS_old_best = fmm_Sigma_only_best->Integral(def_mean_S-0.008,def_mean_S+0.008);
-	nofS_best = nofS_best/fit_bin_width;
-	nofS_old_best = nofS_old_best/fit_bin_width;
-	double nofS_old_hist_best=hmm_wo_bg_fom_best->Integral(hmm_wo_bg_fom_best->FindBin(def_mean_S-0.008),hmm_wo_bg_fom_best->FindBin(def_mean_S+0.008));
-	cout<<"Number of Sigma (TF1 Integral) = "<<nofS_best<<endl;
-	cout<<"Number of Sigma w/o radiative tail (TF1 Integral) = "<<nofS_old_best<<endl;
-	cout<<"Number of Sigma w/o radiative tail (TH1F Integral) = "<<nofS_old_hist_best<<endl;
-
-	 //hmm_wo_bg_fom_best->Draw();
-	 //fmm_best_Lexp->SetLineColor(kRed);
-	 //fmm_best_Lexp->Draw("same");
-	 //fmm_Lambda_only_best->SetLineColor(kAzure);
-	 //fmm_Sigma_only_best->SetLineColor(kCyan);
-	 //fmm_Lambda_only_best->Draw("same");
-	 //fmm_Sigma_only_best->Draw("same");
-	 //fL_best->SetLineColor(kGreen);
-	 //fS_best->SetLineColor(kGreen);
-	 //fL_best->Draw("same");
-	 //fS_best->Draw("same");
-
-
-/*%%%%%%%%%%%%%%%%%%%%*/
-/*%%    No Z cut	%%*/
-/*%%%%%%%%%%%%%%%%%%%%*/
-	TCanvas* c3 = new TCanvas("c3","c3");
-	 cout<<"noZ START"<<endl;
-	 cout<<"(Landau+Exp)*(Gauss) MODE START"<<endl;
-	 fmm_noZ_Lexp=new TF1("fmm_noZ_Lexp",FMM_Res_nocut,fmin_mm,fmax_mm,22);
-   //par[0]=Width (scale) parameter of Landau density
-   //par[1]=Most Probable (MP, location) parameter of Landau density
-   //par[2]=Total area (integral -inf to inf, normalization constant)
-   //par[3]=Width (sigma) of convoluted Gaussian function
-   //par[4]=tau of exp function
-   //par[5]=Shift of Function Peak
-   //par[6]=Relative Strength
-   //
-   //
-   //
-   //par[0]=Width (scale) parameter of Landau density
-   //par[1]=Most Probable (MP, location) parameter of Landau density
-   //par[2]=Total area (integral -inf to inf, normalization constant)
-   //par[3]=Width (sigma) of convoluted Gaussian function
-	 fmm_noZ_Lexp->SetNpx(20000);
-	 fmm_noZ_Lexp->SetTitle("Missing Mass (noZ)");
-	 fmm_noZ_Lexp->FixParameter(0,fmm_best_Lexp->GetParameter(0));
-	 fmm_noZ_Lexp->FixParameter(1,fmm_best_Lexp->GetParameter(1));
-	 fmm_noZ_Lexp->SetParameter(2,fmm_best_Lexp->GetParameter(2));//L scale
-	 fmm_noZ_Lexp->FixParameter(3,fmm_best_Lexp->GetParameter(3));
-	 fmm_noZ_Lexp->FixParameter(4,fmm_best_Lexp->GetParameter(4));
-	 fmm_noZ_Lexp->FixParameter(5,fmm_best_Lexp->GetParameter(5));
-	 fmm_noZ_Lexp->FixParameter(6,fmm_best_Lexp->GetParameter(6));
-	 fmm_noZ_Lexp->FixParameter(7,fmm_best_Lexp->GetParameter(7));
-	 fmm_noZ_Lexp->FixParameter(8,fmm_best_Lexp->GetParameter(8));
-	 fmm_noZ_Lexp->SetParameter(9,fmm_best_Lexp->GetParameter(9));//S scale
-	 fmm_noZ_Lexp->FixParameter(10,fmm_best_Lexp->GetParameter(10));
-	 fmm_noZ_Lexp->FixParameter(11,fmm_best_Lexp->GetParameter(11));
-	 fmm_noZ_Lexp->FixParameter(12,fmm_best_Lexp->GetParameter(12));
-	 fmm_noZ_Lexp->FixParameter(13,fmm_best_Lexp->GetParameter(13));
-	 //fmm_noZ_Lexp->SetParameter(14,500.);//scale
-	 //fmm_noZ_Lexp->SetParLimits(14,0.,1000000.);//scale
-	 //fmm_noZ_Lexp->SetParameter(15,0.05);//mean
-	 //fmm_noZ_Lexp->SetParameter(16,0.04);//Gsigma
-	 //fmm_noZ_Lexp->SetParameter(17,0.01);//Lfwhm
-	 fmm_noZ_Lexp->SetParameter(14,6.);//scale
-	 fmm_noZ_Lexp->SetParLimits(14,0.,1000000.);//scale
-	 fmm_noZ_Lexp->FixParameter(15,Al_par1);//mean
-	 fmm_noZ_Lexp->FixParameter(16,Al_par2);//Gsigma
-	 fmm_noZ_Lexp->FixParameter(17,Al_par3);//Lfwhm
-	 fmm_noZ_Lexp->FixParameter(18,pion_par1);//mean
-	 fmm_noZ_Lexp->FixParameter(19,pion_par2);//Gsigma
-	 fmm_noZ_Lexp->FixParameter(20,pion_par3);//Lfwhm
-	 fmm_noZ_Lexp->FixParameter(21,0.9);//Al vs Pi
-	 fmm_noZ_Lexp->SetParLimits(21,0.8,1.);
-	 //fmm_noZ_Lexp->SetParLimits(2,0.,1000.);//positive
-	 //fmm_noZ_Lexp->SetParLimits(9,0.,300.);//positive
-	 //fmm_noZ_Lexp->SetParameter(0,0.0007);//Landau width
-	 //fmm_noZ_Lexp->SetParameter(1,mean_L_noZ);
-	 //fmm_noZ_Lexp->SetParLimits(1,def_mean_L-def_sig_L,def_mean_L+def_sig_L);
-	 //fmm_noZ_Lexp->SetParameter(2,1.5);//total scale
-	 //fmm_noZ_Lexp->SetParameter(3,0.001);//sigma
-	 //fmm_noZ_Lexp->SetParLimits(3,0.,0.01);
-	 //fmm_noZ_Lexp->SetParameter(4,0.05);//att.
-	 //fmm_noZ_Lexp->SetParLimits(4,0.005,0.08);
-	 //fmm_noZ_Lexp->SetParameter(5,-0.004);//peak pos.
-	 //fmm_noZ_Lexp->SetParLimits(5,-0.05,0.05);
-	 //fmm_noZ_Lexp->SetParameter(6,0.6);//relative strength
-	 //fmm_noZ_Lexp->SetParLimits(6,0.,1.5);//relative strength
-
-	 //fmm_noZ_Lexp->SetParameter(7,0.0003);//Landau width
-	 //fmm_noZ_Lexp->SetParameter(8,mean_S_noZ);//MPV
-	 //fmm_noZ_Lexp->SetParLimits(8,def_mean_S-def_sig_S,def_mean_S+def_sig_S);
-	 //fmm_noZ_Lexp->SetParameter(9,0.4);//total scale
-	 //fmm_noZ_Lexp->SetParameter(10,0.0015);//sigma
-	 //fmm_noZ_Lexp->SetParLimits(10,0.,0.01);
-	 //fmm_noZ_Lexp->SetParameter(11,0.05);//att
-	 //fmm_noZ_Lexp->SetParLimits(11,0.03,0.12);
-	 //fmm_noZ_Lexp->SetParameter(12,0.080);//peak pos.
-	 ////fmm_noZ_Lexp->SetParLimits(15,-0.085,-0.055);
-	 //fmm_noZ_Lexp->SetParameter(13,0.6);
-	 //fmm_noZ_Lexp->SetParLimits(13,0.,1.5);//relative strength
-
-	 hmm_wo_bg_fom_noZ->Fit("fmm_noZ_Lexp","","",fit_min_mm,fit_max_mm);//Total fitting w/ 4Poly BG
-	 double chisq_noZ = fmm_noZ_Lexp->GetChisquare();
-	 double dof_noZ  = fmm_noZ_Lexp->GetNDF();
-	 cout<<"chisq_noZ="<<chisq_noZ<<endl;
-	 cout<<"dof="<<dof_noZ<<endl;
-	 cout<<"Reduced chi-square = "<<chisq_noZ/dof_noZ<<endl;
-
-
-	 TF1* fmm_Lambda_only_noZ = new TF1("fmm_Lambda_only_noZ",FMM_Response,fmin_mm,fmax_mm,7);
-	 TF1* fmm_Sigma_only_noZ  = new TF1("fmm_Sigma_only_noZ" ,FMM_Response, fmin_mm,fmax_mm,7);
-	 TF1* fmm_bg_only_noZ  = new TF1("fmm_bg_only_noZ" ,FMM_2BG, fmin_mm,fmax_mm,8);
-//Lambda_only_noZ
-	 fmm_Lambda_only_noZ->SetNpx(20000);
-	 fmm_Lambda_only_noZ->SetParameter(0,fmm_noZ_Lexp->GetParameter(0));
-	 fmm_Lambda_only_noZ->SetParameter(1,fmm_noZ_Lexp->GetParameter(1));
-	 fmm_Lambda_only_noZ->SetParameter(2,fmm_noZ_Lexp->GetParameter(2));
-	 fmm_Lambda_only_noZ->SetParameter(3,fmm_noZ_Lexp->GetParameter(3));
-	 fmm_Lambda_only_noZ->SetParameter(4,fmm_noZ_Lexp->GetParameter(4));
-	 fmm_Lambda_only_noZ->SetParameter(5,fmm_noZ_Lexp->GetParameter(5));
-	 fmm_Lambda_only_noZ->SetParameter(6,fmm_noZ_Lexp->GetParameter(6));
-//Sigma_only_noZ
-	 fmm_Sigma_only_noZ->SetNpx(20000);
-	 fmm_Sigma_only_noZ->SetParameter(0,fmm_noZ_Lexp->GetParameter(7));
-	 fmm_Sigma_only_noZ->SetParameter(1,fmm_noZ_Lexp->GetParameter(8));
-	 fmm_Sigma_only_noZ->SetParameter(2,fmm_noZ_Lexp->GetParameter(9));
-	 fmm_Sigma_only_noZ->SetParameter(3,fmm_noZ_Lexp->GetParameter(10));
-	 fmm_Sigma_only_noZ->SetParameter(4,fmm_noZ_Lexp->GetParameter(11));
-	 fmm_Sigma_only_noZ->SetParameter(5,fmm_noZ_Lexp->GetParameter(12));
-	 fmm_Sigma_only_noZ->SetParameter(6,fmm_noZ_Lexp->GetParameter(13));
-//bg_only_noZ
-	 fmm_bg_only_noZ->SetNpx(20000);
-	 fmm_bg_only_noZ->SetParameter(0,fmm_noZ_Lexp->GetParameter(14));
-	 fmm_bg_only_noZ->SetParameter(1,fmm_noZ_Lexp->GetParameter(15));
-	 fmm_bg_only_noZ->SetParameter(2,fmm_noZ_Lexp->GetParameter(16));
-	 fmm_bg_only_noZ->SetParameter(3,fmm_noZ_Lexp->GetParameter(17));
-	 fmm_bg_only_noZ->SetParameter(4,fmm_noZ_Lexp->GetParameter(18));
-	 fmm_bg_only_noZ->SetParameter(5,fmm_noZ_Lexp->GetParameter(19));
-	 fmm_bg_only_noZ->SetParameter(6,fmm_noZ_Lexp->GetParameter(20));
-	 fmm_bg_only_noZ->SetParameter(7,fmm_noZ_Lexp->GetParameter(21));
-
-	double nofL_noZ = fmm_Lambda_only_noZ->Integral(fmin_mm,fmax_mm);
-	double nofL_old_noZ = fmm_Lambda_only_noZ->Integral(-0.006,0.006);
-	double nofL_bg_noZ = fmm_bg_only_noZ->Integral(-0.006,0.006);
-	nofL_noZ = nofL_noZ/fit_bin_width;
-	nofL_old_noZ = nofL_old_noZ/fit_bin_width;
-	nofL_bg_noZ = nofL_bg_noZ/fit_bin_width;
-	double nofL_old_hist_noZ=hmm_wo_bg_fom_noZ->Integral(hmm_wo_bg_fom_noZ->FindBin(-0.006),hmm_wo_bg_fom_noZ->FindBin(0.006))-nofL_bg_noZ;
-	cout<<"Number of Lambda (TF1 Integral) = "<<nofL_noZ<<endl;
-	cout<<"Number of Lambda w/o radiative tail (TF1 Integral) = "<<nofL_old_noZ<<endl;
-	cout<<"Number of Lambda w/o radiative tail (TH1F Integral) = "<<nofL_old_hist_noZ<<endl;
-
-	double nofS_noZ = fmm_Sigma_only_noZ->Integral(fmin_mm,fmax_mm);
-	double nofS_old_noZ = fmm_Sigma_only_noZ->Integral(def_mean_S-0.008,def_mean_S+0.008);
-	double nofS_bg_noZ = fmm_bg_only_noZ->Integral(def_mean_S-0.008,def_mean_S+0.008);
-	nofS_noZ = nofS_noZ/fit_bin_width;
-	nofS_old_noZ = nofS_old_noZ/fit_bin_width;
-	nofS_bg_noZ = nofS_bg_noZ/fit_bin_width;
-	double nofS_old_hist_noZ=hmm_wo_bg_fom_noZ->Integral(hmm_wo_bg_fom_noZ->FindBin(def_mean_S-0.008),hmm_wo_bg_fom_noZ->FindBin(def_mean_S+0.008))-nofS_bg_noZ;
-	cout<<"Number of Sigma (TF1 Integral) = "<<nofS_noZ<<endl;
-	cout<<"Number of Sigma w/o radiative tail (TF1 Integral) = "<<nofS_old_noZ<<endl;
-	cout<<"Number of Sigma w/o radiative tail (TH1F Integral) = "<<nofS_old_hist_noZ<<endl;
-
-//	 hmm_wo_bg_fom_noZ->Draw();
-//	 fmm_noZ_Lexp->SetLineColor(kRed);
-//	 fmm_noZ_Lexp->Draw("same");
-//	 fmm_Lambda_only_noZ->SetLineColor(kAzure);
-//	 fmm_Sigma_only_noZ->SetLineColor(kCyan);
-//	 fmm_bg_only_noZ->SetLineColor(kOrange);
-//	 fmm_Lambda_only_noZ->Draw("same");
-//	 fmm_Sigma_only_noZ->Draw("same");
-//	 fmm_bg_only_noZ->Draw("same");
-//	 //fL_noZ->SetLineColor(kGreen);
-	 //fS_noZ->SetLineColor(kGreen);
-	 //fL_noZ->Draw("same");
-	 //fS_noZ->Draw("same");
-	TCanvas* c4 = new TCanvas("c4","c4");
-	hmm_Al_wobg_fom_noZ->Draw("");
-	fAl->Draw("same");
-
-/*%%%%%%%%%%%%%%%%%%%%*/
-/*%%    Strict cut	%%*/
-/*%%%%%%%%%%%%%%%%%%%%*/
-	TCanvas* c5 = new TCanvas("c5","c5");
 	 cout<<"strict cut START"<<endl;
 	 cout<<"(Landau+Exp)*(Gauss) MODE START"<<endl;
 	 fmm_strict_Lexp=new TF1("fmm_strict_Lexp",FMM_Res_nocut,fmin_mm,fmax_mm,22);
@@ -1038,22 +817,33 @@ cout<<"BEST CUT START"<<endl;
    //par[3]=Width (sigma) of convoluted Gaussian function
 	 fmm_strict_Lexp->SetNpx(20000);
 	 fmm_strict_Lexp->SetTitle("Missing Mass (strict)");
-	 fmm_strict_Lexp->FixParameter(0,fmm_best_Lexp->GetParameter(0));
-	 fmm_strict_Lexp->FixParameter(1,fmm_best_Lexp->GetParameter(1));
-	 fmm_strict_Lexp->SetParameter(2,fmm_best_Lexp->GetParameter(2));//L scale
-	 fmm_strict_Lexp->SetParLimits(2,0.,100000.);//L scale
-	 fmm_strict_Lexp->FixParameter(3,fmm_best_Lexp->GetParameter(3));
-	 fmm_strict_Lexp->FixParameter(4,fmm_best_Lexp->GetParameter(4));
-	 fmm_strict_Lexp->FixParameter(5,fmm_best_Lexp->GetParameter(5));
-	 fmm_strict_Lexp->FixParameter(6,fmm_best_Lexp->GetParameter(6));
-	 fmm_strict_Lexp->FixParameter(7,fmm_best_Lexp->GetParameter(7));
-	 fmm_strict_Lexp->FixParameter(8,fmm_best_Lexp->GetParameter(8));
-	 fmm_strict_Lexp->SetParameter(9,fmm_best_Lexp->GetParameter(9));//S scale
-	 fmm_strict_Lexp->SetParLimits(9,0.,100000.);//L scale
-	 fmm_strict_Lexp->FixParameter(10,fmm_best_Lexp->GetParameter(10));
-	 fmm_strict_Lexp->FixParameter(11,fmm_best_Lexp->GetParameter(11));
-	 fmm_strict_Lexp->FixParameter(12,fmm_best_Lexp->GetParameter(12));
-	 fmm_strict_Lexp->FixParameter(13,fmm_best_Lexp->GetParameter(13));
+	 fmm_strict_Lexp->SetParLimits(2,0.,1000.);//positive
+	 fmm_strict_Lexp->SetParLimits(9,0.,300.);//positive
+	 fmm_strict_Lexp->SetParameter(0,0.0007);//Landau width
+	 fmm_strict_Lexp->SetParameter(1,mean_L_best);
+	 fmm_strict_Lexp->SetParLimits(1,def_mean_L-def_sig_L,def_mean_L+def_sig_L);
+	 fmm_strict_Lexp->SetParameter(2,1.5);//total scale
+	 fmm_strict_Lexp->SetParameter(3,0.001);//sigma
+	 fmm_strict_Lexp->SetParLimits(3,0.,0.01);
+	 fmm_strict_Lexp->SetParameter(4,0.05);//att.
+	 fmm_strict_Lexp->SetParLimits(4,0.005,0.08);
+	 fmm_strict_Lexp->SetParameter(5,-0.004);//peak pos.
+	 fmm_strict_Lexp->SetParLimits(5,-0.05,0.05);
+	 fmm_strict_Lexp->SetParameter(6,0.6);//relative strength
+	 fmm_strict_Lexp->SetParLimits(6,0.,1.5);//relative strength
+
+	 fmm_strict_Lexp->SetParameter(7,0.0003);//Landau width
+	 fmm_strict_Lexp->SetParameter(8,mean_S_best);//MPV
+	 fmm_strict_Lexp->SetParLimits(8,def_mean_S-def_sig_S,def_mean_S+def_sig_S);
+	 fmm_strict_Lexp->SetParameter(9,0.4);//total scale
+	 fmm_strict_Lexp->SetParameter(10,0.0015);//sigma
+	 fmm_strict_Lexp->SetParLimits(10,0.,0.01);
+	 fmm_strict_Lexp->SetParameter(11,0.05);//att
+	 fmm_strict_Lexp->SetParLimits(11,0.03,0.12);
+	 fmm_strict_Lexp->SetParameter(12,0.080);//peak pos.
+	 //fmm_strict_Lexp->SetParLimits(15,-0.085,-0.055);
+	 fmm_strict_Lexp->SetParameter(13,0.6);
+	 fmm_strict_Lexp->SetParLimits(13,0.,1.5);//relative strength
 	 //fmm_strict_Lexp->SetParameter(14,500.);//scale
 	 //fmm_strict_Lexp->SetParLimits(14,0.,1000000.);//scale
 	 //fmm_strict_Lexp->SetParameter(15,0.05);//mean
@@ -1061,14 +851,14 @@ cout<<"BEST CUT START"<<endl;
 	 //fmm_strict_Lexp->SetParameter(17,0.01);//Lfwhm
 //change	 fmm_strict_Lexp->SetParameter(14,6.);//scale
 //change	 fmm_strict_Lexp->SetParLimits(14,0.,1000000.);//scale
-	 fmm_strict_Lexp->FixParameter(14,(double)ENum_strict*0.015*0.001);//scale
+	 fmm_strict_Lexp->FixParameter(14,(double)ENum_strict*0.023*0.001);//scale(2%(pion)+0.3%(Al))
 	 fmm_strict_Lexp->FixParameter(15,Al_par1);//mean
 	 fmm_strict_Lexp->FixParameter(16,Al_par2);//Gsigma
 	 fmm_strict_Lexp->FixParameter(17,Al_par3);//Lfwhm
 	 fmm_strict_Lexp->FixParameter(18,pion_par1);//mean
 	 fmm_strict_Lexp->FixParameter(19,pion_par2);//Gsigma
 	 fmm_strict_Lexp->FixParameter(20,pion_par3);//Lfwhm
-	 fmm_strict_Lexp->FixParameter(21,1./6.);//Al vs Pi
+	 fmm_strict_Lexp->FixParameter(21,0.3/2.);//Al vs Pi
 //change	 fmm_strict_Lexp->FixParameter(21,0.1);//Al vs Pi
 //change	 fmm_strict_Lexp->SetParLimits(21,0.0,0.2);
 	 //fmm_strict_Lexp->SetParLimits(2,0.,1000.);//positive
@@ -1099,7 +889,7 @@ cout<<"BEST CUT START"<<endl;
 	 //fmm_strict_Lexp->SetParameter(13,0.6);
 	 //fmm_strict_Lexp->SetParLimits(13,0.,1.5);//relative strength
 
-	 hmm_wo_bg_fom_strict->Fit("fmm_strict_Lexp","","",fit_min_mm,0.097);//Total fitting w/ 4Poly BG
+	 hmm_wo_bg_fom_strict->Fit("fmm_strict_Lexp","","",fit_min_mm,fit_max_mm);//Total fitting w/ 4Poly BG
 	 double chisq_strict = fmm_strict_Lexp->GetChisquare();
 	 double dof_strict  = fmm_strict_Lexp->GetNDF();
 	 cout<<"chisq_strict="<<chisq_strict<<endl;
@@ -1161,20 +951,383 @@ cout<<"BEST CUT START"<<endl;
 	cout<<"Number of Sigma w/o radiative tail (TF1 Integral) = "<<nofS_old_strict<<endl;
 	cout<<"Number of Sigma w/o radiative tail (TH1F Integral) = "<<nofS_old_hist_strict<<endl;
 
-	 hmm_wo_bg_fom_strict->Draw();
+	 TH1D* hf2 = (TH1D*)c2->DrawFrame(-0.1,-20.,0.2,250.);
+	 hf2->GetXaxis()->SetTitle("Missing Mass - M_{#Lambda} [MeV/c^{2}]");
+	 hf2->GetYaxis()->SetTitle("Counts/(MeV/c^{2})");
+	 hf2->GetXaxis()->SetTitleOffset(1.10);
+	 hf2->GetYaxis()->SetTitleOffset(1.10);
+	 hf2->GetXaxis()->SetLabelOffset(100);
+	 hf2->GetYaxis()->SetLabelOffset(100);
+	 TGaxis* ax_strict = new TGaxis(-0.1,-20.,0.2,-20.,-100.,200.,510);
+	 TGaxis* ay_strict = new TGaxis(-0.1,-20.,-0.1,250.,-20.,250.,510);
+	 hmm_wo_bg_fom_strict->Draw("same");
+	 ax_strict->Draw("same");
+	 ay_strict->Draw("same");
 	 fmm_strict_Lexp->SetLineColor(kRed);
-	 fmm_strict_Lexp->Draw("same");
 	 fmm_Lambda_only_strict->SetLineColor(kAzure);
 	 fmm_Sigma_only_strict->SetLineColor(kCyan);
+	 fmm_Lambda_only_strict->SetFillStyle(3004);
+	 fmm_Lambda_only_strict->SetFillColor(kAzure);
+	 fmm_Lambda_only_strict->SetLineWidth(2);
+	 fmm_Sigma_only_strict->SetFillStyle(3005);
+	 fmm_Sigma_only_strict->SetFillColor(kCyan);
+	 fmm_Sigma_only_strict->SetLineWidth(2);
 	 fmm_bg_only_strict->SetLineColor(kOrange);
+	 fmm_bg_only_strict->SetFillStyle(3017);
+	 fmm_bg_only_strict->SetFillColor(kOrange);
+	 fmm_bg_only_strict->SetLineWidth(2);
+	 fmm_bg_only_strict->Draw("same");
 	 fmm_Lambda_only_strict->Draw("same");
 	 fmm_Sigma_only_strict->Draw("same");
-	 fmm_bg_only_strict->Draw("same");
+	 fmm_strict_Lexp->Draw("same");
+	 TLegend *tl_strict = new TLegend(0.55,0.65,0.85,0.85,Form("#chi^{2}/ndf=%d/%d",(int)chisq_strict,(int)dof_strict));
+	 tl_strict->SetBorderSize(0);
+	 tl_strict->Draw("same");
 	 //fL_strict->SetLineColor(kGreen);
 	 //fS_strict->SetLineColor(kGreen);
 	 //fL_strict->Draw("same");
 	 //fS_strict->Draw("same");
+	 
+/*%%%%%%%%%%%%%%%%%%%%*/
+/*%%    No Z cut	%%*/
+/*%%%%%%%%%%%%%%%%%%%%*/
+	TCanvas* c3 = new TCanvas("c3","c3");
+	 cout<<"noZ START"<<endl;
+	 cout<<"(Landau+Exp)*(Gauss) MODE START"<<endl;
+	 fmm_noZ_Lexp=new TF1("fmm_noZ_Lexp",FMM_Res_nocut,fmin_mm,fmax_mm,22);
+   //par[0]=Width (scale) parameter of Landau density
+   //par[1]=Most Probable (MP, location) parameter of Landau density
+   //par[2]=Total area (integral -inf to inf, normalization constant)
+   //par[3]=Width (sigma) of convoluted Gaussian function
+   //par[4]=tau of exp function
+   //par[5]=Shift of Function Peak
+   //par[6]=Relative Strength
+   //
+   //
+   //
+   //par[0]=Width (scale) parameter of Landau density
+   //par[1]=Most Probable (MP, location) parameter of Landau density
+   //par[2]=Total area (integral -inf to inf, normalization constant)
+   //par[3]=Width (sigma) of convoluted Gaussian function
+	 fmm_noZ_Lexp->SetNpx(20000);
+	 fmm_noZ_Lexp->SetTitle("Missing Mass (noZ)");
+	 fmm_noZ_Lexp->FixParameter(0,fmm_strict_Lexp->GetParameter(0));
+	 fmm_noZ_Lexp->FixParameter(1,fmm_strict_Lexp->GetParameter(1));
+	 fmm_noZ_Lexp->SetParameter(2,fmm_strict_Lexp->GetParameter(2));//L scale
+	 fmm_noZ_Lexp->FixParameter(3,fmm_strict_Lexp->GetParameter(3));
+	 fmm_noZ_Lexp->FixParameter(4,fmm_strict_Lexp->GetParameter(4));
+	 fmm_noZ_Lexp->FixParameter(5,fmm_strict_Lexp->GetParameter(5));
+	 fmm_noZ_Lexp->FixParameter(6,fmm_strict_Lexp->GetParameter(6));
+	 fmm_noZ_Lexp->FixParameter(7,fmm_strict_Lexp->GetParameter(7));
+	 fmm_noZ_Lexp->FixParameter(8,fmm_strict_Lexp->GetParameter(8));
+	 fmm_noZ_Lexp->SetParameter(9,fmm_strict_Lexp->GetParameter(9));//S scale
+	 fmm_noZ_Lexp->FixParameter(10,fmm_strict_Lexp->GetParameter(10));
+	 fmm_noZ_Lexp->FixParameter(11,fmm_strict_Lexp->GetParameter(11));
+	 fmm_noZ_Lexp->FixParameter(12,fmm_strict_Lexp->GetParameter(12));
+	 fmm_noZ_Lexp->FixParameter(13,fmm_strict_Lexp->GetParameter(13));
+	 //fmm_noZ_Lexp->SetParameter(14,500.);//scale
+	 //fmm_noZ_Lexp->SetParLimits(14,0.,1000000.);//scale
+	 //fmm_noZ_Lexp->SetParameter(15,0.05);//mean
+	 //fmm_noZ_Lexp->SetParameter(16,0.04);//Gsigma
+	 //fmm_noZ_Lexp->SetParameter(17,0.01);//Lfwhm
+	 fmm_noZ_Lexp->SetParameter(14,6.);//scale
+	 fmm_noZ_Lexp->SetParLimits(14,0.,1000000.);//scale
+	 fmm_noZ_Lexp->FixParameter(15,Al_par1);//mean
+	 fmm_noZ_Lexp->FixParameter(16,Al_par2);//Gsigma
+	 fmm_noZ_Lexp->FixParameter(17,Al_par3);//Lfwhm
+	 fmm_noZ_Lexp->FixParameter(18,pion_par1);//mean
+	 fmm_noZ_Lexp->FixParameter(19,pion_par2);//Gsigma
+	 fmm_noZ_Lexp->FixParameter(20,pion_par3);//Lfwhm
+	 fmm_noZ_Lexp->FixParameter(21,0.9);//Al vs Pi
+	 fmm_noZ_Lexp->SetParLimits(21,0.8,1.);
+	 //fmm_noZ_Lexp->SetParLimits(2,0.,1000.);//positive
+	 //fmm_noZ_Lexp->SetParLimits(9,0.,300.);//positive
+	 //fmm_noZ_Lexp->SetParameter(0,0.0007);//Landau width
+	 //fmm_noZ_Lexp->SetParameter(1,mean_L_noZ);
+	 //fmm_noZ_Lexp->SetParLimits(1,def_mean_L-def_sig_L,def_mean_L+def_sig_L);
+	 //fmm_noZ_Lexp->SetParameter(2,1.5);//total scale
+	 //fmm_noZ_Lexp->SetParameter(3,0.001);//sigma
+	 //fmm_noZ_Lexp->SetParLimits(3,0.,0.01);
+	 //fmm_noZ_Lexp->SetParameter(4,0.05);//att.
+	 //fmm_noZ_Lexp->SetParLimits(4,0.005,0.08);
+	 //fmm_noZ_Lexp->SetParameter(5,-0.004);//peak pos.
+	 //fmm_noZ_Lexp->SetParLimits(5,-0.05,0.05);
+	 //fmm_noZ_Lexp->SetParameter(6,0.6);//relative strength
+	 //fmm_noZ_Lexp->SetParLimits(6,0.,1.5);//relative strength
 
+	 //fmm_noZ_Lexp->SetParameter(7,0.0003);//Landau width
+	 //fmm_noZ_Lexp->SetParameter(8,mean_S_noZ);//MPV
+	 //fmm_noZ_Lexp->SetParLimits(8,def_mean_S-def_sig_S,def_mean_S+def_sig_S);
+	 //fmm_noZ_Lexp->SetParameter(9,0.4);//total scale
+	 //fmm_noZ_Lexp->SetParameter(10,0.0015);//sigma
+	 //fmm_noZ_Lexp->SetParLimits(10,0.,0.01);
+	 //fmm_noZ_Lexp->SetParameter(11,0.05);//att
+	 //fmm_noZ_Lexp->SetParLimits(11,0.03,0.12);
+	 //fmm_noZ_Lexp->SetParameter(12,0.080);//peak pos.
+	 ////fmm_noZ_Lexp->SetParLimits(15,-0.085,-0.055);
+	 //fmm_noZ_Lexp->SetParameter(13,0.6);
+	 //fmm_noZ_Lexp->SetParLimits(13,0.,1.5);//relative strength
+
+	 hmm_wo_bg_fom_noZ_new->Fit("fmm_noZ_Lexp","","",fit_min_mm,fit_max_mm);//Total fitting w/ 4Poly BG
+	 double chisq_noZ = fmm_noZ_Lexp->GetChisquare();
+	 double dof_noZ  = fmm_noZ_Lexp->GetNDF();
+	 cout<<"chisq_noZ="<<chisq_noZ<<endl;
+	 cout<<"dof="<<dof_noZ<<endl;
+	 cout<<"Reduced chi-square = "<<chisq_noZ/dof_noZ<<endl;
+
+
+	 TF1* fmm_Lambda_only_noZ = new TF1("fmm_Lambda_only_noZ",FMM_Response,fmin_mm,fmax_mm,7);
+	 TF1* fmm_Sigma_only_noZ  = new TF1("fmm_Sigma_only_noZ" ,FMM_Response, fmin_mm,fmax_mm,7);
+	 TF1* fmm_bg_only_noZ  = new TF1("fmm_bg_only_noZ" ,FMM_2BG, fmin_mm,fmax_mm,8);
+//Lambda_only_noZ
+	 fmm_Lambda_only_noZ->SetNpx(20000);
+	 fmm_Lambda_only_noZ->SetParameter(0,fmm_noZ_Lexp->GetParameter(0));
+	 fmm_Lambda_only_noZ->SetParameter(1,fmm_noZ_Lexp->GetParameter(1));
+	 fmm_Lambda_only_noZ->SetParameter(2,fmm_noZ_Lexp->GetParameter(2));
+	 fmm_Lambda_only_noZ->SetParameter(3,fmm_noZ_Lexp->GetParameter(3));
+	 fmm_Lambda_only_noZ->SetParameter(4,fmm_noZ_Lexp->GetParameter(4));
+	 fmm_Lambda_only_noZ->SetParameter(5,fmm_noZ_Lexp->GetParameter(5));
+	 fmm_Lambda_only_noZ->SetParameter(6,fmm_noZ_Lexp->GetParameter(6));
+//Sigma_only_noZ
+	 fmm_Sigma_only_noZ->SetNpx(20000);
+	 fmm_Sigma_only_noZ->SetParameter(0,fmm_noZ_Lexp->GetParameter(7));
+	 fmm_Sigma_only_noZ->SetParameter(1,fmm_noZ_Lexp->GetParameter(8));
+	 fmm_Sigma_only_noZ->SetParameter(2,fmm_noZ_Lexp->GetParameter(9));
+	 fmm_Sigma_only_noZ->SetParameter(3,fmm_noZ_Lexp->GetParameter(10));
+	 fmm_Sigma_only_noZ->SetParameter(4,fmm_noZ_Lexp->GetParameter(11));
+	 fmm_Sigma_only_noZ->SetParameter(5,fmm_noZ_Lexp->GetParameter(12));
+	 fmm_Sigma_only_noZ->SetParameter(6,fmm_noZ_Lexp->GetParameter(13));
+//bg_only_noZ
+	 fmm_bg_only_noZ->SetNpx(20000);
+	 fmm_bg_only_noZ->SetParameter(0,fmm_noZ_Lexp->GetParameter(14));
+	 fmm_bg_only_noZ->SetParameter(1,fmm_noZ_Lexp->GetParameter(15));
+	 fmm_bg_only_noZ->SetParameter(2,fmm_noZ_Lexp->GetParameter(16));
+	 fmm_bg_only_noZ->SetParameter(3,fmm_noZ_Lexp->GetParameter(17));
+	 fmm_bg_only_noZ->SetParameter(4,fmm_noZ_Lexp->GetParameter(18));
+	 fmm_bg_only_noZ->SetParameter(5,fmm_noZ_Lexp->GetParameter(19));
+	 fmm_bg_only_noZ->SetParameter(6,fmm_noZ_Lexp->GetParameter(20));
+	 fmm_bg_only_noZ->SetParameter(7,fmm_noZ_Lexp->GetParameter(21));
+
+	double nofL_noZ = fmm_Lambda_only_noZ->Integral(fmin_mm,fmax_mm);
+	double nofL_old_noZ = fmm_Lambda_only_noZ->Integral(-0.006,0.006);
+	double nofL_bg_noZ = fmm_bg_only_noZ->Integral(-0.006,0.006);
+	nofL_noZ = nofL_noZ/fit_bin_width;
+	nofL_old_noZ = nofL_old_noZ/fit_bin_width;
+	nofL_bg_noZ = nofL_bg_noZ/fit_bin_width;
+	double nofL_old_hist_noZ=hmm_wo_bg_fom_noZ_new->Integral(hmm_wo_bg_fom_noZ_new->FindBin(-0.006),hmm_wo_bg_fom_noZ_new->FindBin(0.006))-nofL_bg_noZ;
+	cout<<"Number of Lambda (TF1 Integral) = "<<nofL_noZ<<endl;
+	cout<<"Number of Lambda w/o radiative tail (TF1 Integral) = "<<nofL_old_noZ<<endl;
+	cout<<"Number of Lambda w/o radiative tail (TH1F Integral) = "<<nofL_old_hist_noZ<<endl;
+
+	double nofS_noZ = fmm_Sigma_only_noZ->Integral(fmin_mm,fmax_mm);
+	double nofS_old_noZ = fmm_Sigma_only_noZ->Integral(def_mean_S-0.008,def_mean_S+0.008);
+	double nofS_bg_noZ = fmm_bg_only_noZ->Integral(def_mean_S-0.008,def_mean_S+0.008);
+	nofS_noZ = nofS_noZ/fit_bin_width;
+	nofS_old_noZ = nofS_old_noZ/fit_bin_width;
+	nofS_bg_noZ = nofS_bg_noZ/fit_bin_width;
+	double nofS_old_hist_noZ=hmm_wo_bg_fom_noZ_new->Integral(hmm_wo_bg_fom_noZ_new->FindBin(def_mean_S-0.008),hmm_wo_bg_fom_noZ_new->FindBin(def_mean_S+0.008))-nofS_bg_noZ;
+	cout<<"Number of Sigma (TF1 Integral) = "<<nofS_noZ<<endl;
+	cout<<"Number of Sigma w/o radiative tail (TF1 Integral) = "<<nofS_old_noZ<<endl;
+	cout<<"Number of Sigma w/o radiative tail (TH1F Integral) = "<<nofS_old_hist_noZ<<endl;
+
+	 TH1D* hf3 = (TH1D*)c3->DrawFrame(-0.1,-20.,0.2,310.);
+	 hf3->GetXaxis()->SetTitle("Missing Mass - M_{#Lambda} [MeV/c^{2}]");
+	 hf3->GetYaxis()->SetTitle("Counts/(MeV/c^{2})");
+	 hf3->GetXaxis()->SetTitleOffset(1.10);
+	 hf3->GetYaxis()->SetTitleOffset(1.10);
+	 hf3->GetXaxis()->SetLabelOffset(100);
+	 hf3->GetYaxis()->SetLabelOffset(100);
+	 hf3->Draw("");
+	 TGaxis* ax_noZ_new = new TGaxis(-0.1,-20.,0.2,-20.,-100.,200.,510);
+	 TGaxis* ay_noZ_new = new TGaxis(-0.1,-20.,-0.1,310.,-20.,310.,510);
+	 hmm_wo_bg_fom_noZ_new->Draw("same");
+	 ax_noZ_new->Draw("same");
+	 ay_noZ_new->Draw("same");
+	 fmm_noZ_Lexp->SetLineColor(kRed);
+	 fmm_Lambda_only_noZ->SetLineColor(kAzure);
+	 fmm_Sigma_only_noZ->SetLineColor(kCyan);
+	 fmm_Lambda_only_noZ->SetFillStyle(3004);
+	 fmm_Lambda_only_noZ->SetFillColor(kAzure);
+	 fmm_Lambda_only_noZ->SetLineWidth(2);
+	 fmm_Sigma_only_noZ->SetFillStyle(3005);
+	 fmm_Sigma_only_noZ->SetFillColor(kCyan);
+	 fmm_Sigma_only_noZ->SetLineWidth(2);
+	 fmm_bg_only_noZ->SetLineColor(kOrange);
+	 fmm_bg_only_noZ->SetFillStyle(3017);
+	 fmm_bg_only_noZ->SetFillColor(kOrange);
+	 fmm_bg_only_noZ->SetLineWidth(2);
+	 fmm_bg_only_noZ->Draw("same");
+	 fmm_Lambda_only_noZ->Draw("same");
+	 fmm_Sigma_only_noZ->Draw("same");
+	 fmm_noZ_Lexp->Draw("same");
+	 TLegend *tl_noZ = new TLegend(0.55,0.65,0.85,0.85,Form("#chi^{2}/ndf=%d/%d",(int)chisq_noZ,(int)dof_noZ));
+	 tl_noZ->SetBorderSize(0);
+	 tl_noZ->Draw("same");
+	 //fL_noZ->SetLineColor(kGreen);
+	 //fS_noZ->SetLineColor(kGreen);
+	 //fL_noZ->Draw("same");
+	 //fS_noZ->Draw("same");
+
+/////*%%%%%%%%%%%%%%%%%%%%*/
+/////*%%    Strict cut	%%*/
+/////*%%%%%%%%%%%%%%%%%%%%*/
+//	TCanvas* c5 = new TCanvas("c5","c5");
+////	 cout<<"strict cut START"<<endl;
+////	 cout<<"(Landau+Exp)*(Gauss) MODE START"<<endl;
+////	 fmm_strict_Lexp=new TF1("fmm_strict_Lexp",FMM_Res_nocut,fmin_mm,fmax_mm,22);
+////   //par[0]=Width (scale) parameter of Landau density
+////   //par[1]=Most Probable (MP, location) parameter of Landau density
+////   //par[2]=Total area (integral -inf to inf, normalization constant)
+////   //par[3]=Width (sigma) of convoluted Gaussian function
+////   //par[4]=tau of exp function
+////   //par[5]=Shift of Function Peak
+////   //par[6]=Relative Strength
+////   //
+////   //
+////   //
+////   //par[0]=Width (scale) parameter of Landau density
+////   //par[1]=Most Probable (MP, location) parameter of Landau density
+////   //par[2]=Total area (integral -inf to inf, normalization constant)
+////   //par[3]=Width (sigma) of convoluted Gaussian function
+////	 fmm_strict_Lexp->SetNpx(20000);
+////	 fmm_strict_Lexp->SetTitle("Missing Mass (strict)");
+////	 fmm_strict_Lexp->FixParameter(0,fmm_best_Lexp->GetParameter(0));
+////	 fmm_strict_Lexp->FixParameter(1,fmm_best_Lexp->GetParameter(1));
+////	 fmm_strict_Lexp->SetParameter(2,fmm_best_Lexp->GetParameter(2));//L scale
+////	 fmm_strict_Lexp->SetParLimits(2,0.,100000.);//L scale
+////	 fmm_strict_Lexp->FixParameter(3,fmm_best_Lexp->GetParameter(3));
+////	 fmm_strict_Lexp->FixParameter(4,fmm_best_Lexp->GetParameter(4));
+////	 fmm_strict_Lexp->FixParameter(5,fmm_best_Lexp->GetParameter(5));
+////	 fmm_strict_Lexp->FixParameter(6,fmm_best_Lexp->GetParameter(6));
+////	 fmm_strict_Lexp->FixParameter(7,fmm_best_Lexp->GetParameter(7));
+////	 fmm_strict_Lexp->FixParameter(8,fmm_best_Lexp->GetParameter(8));
+////	 fmm_strict_Lexp->SetParameter(9,fmm_best_Lexp->GetParameter(9));//S scale
+////	 fmm_strict_Lexp->SetParLimits(9,0.,100000.);//L scale
+////	 fmm_strict_Lexp->FixParameter(10,fmm_best_Lexp->GetParameter(10));
+////	 fmm_strict_Lexp->FixParameter(11,fmm_best_Lexp->GetParameter(11));
+////	 fmm_strict_Lexp->FixParameter(12,fmm_best_Lexp->GetParameter(12));
+////	 fmm_strict_Lexp->FixParameter(13,fmm_best_Lexp->GetParameter(13));
+////	 //fmm_strict_Lexp->SetParameter(14,500.);//scale
+////	 //fmm_strict_Lexp->SetParLimits(14,0.,1000000.);//scale
+////	 //fmm_strict_Lexp->SetParameter(15,0.05);//mean
+////	 //fmm_strict_Lexp->SetParameter(16,0.04);//Gsigma
+////	 //fmm_strict_Lexp->SetParameter(17,0.01);//Lfwhm
+//////change	 fmm_strict_Lexp->SetParameter(14,6.);//scale
+//////change	 fmm_strict_Lexp->SetParLimits(14,0.,1000000.);//scale
+////	 fmm_strict_Lexp->FixParameter(14,(double)ENum_strict*0.015*0.001);//scale
+////	 fmm_strict_Lexp->FixParameter(15,Al_par1);//mean
+////	 fmm_strict_Lexp->FixParameter(16,Al_par2);//Gsigma
+////	 fmm_strict_Lexp->FixParameter(17,Al_par3);//Lfwhm
+////	 fmm_strict_Lexp->FixParameter(18,pion_par1);//mean
+////	 fmm_strict_Lexp->FixParameter(19,pion_par2);//Gsigma
+////	 fmm_strict_Lexp->FixParameter(20,pion_par3);//Lfwhm
+////	 fmm_strict_Lexp->FixParameter(21,1./6.);//Al vs Pi
+//////change	 fmm_strict_Lexp->FixParameter(21,0.1);//Al vs Pi
+//////change	 fmm_strict_Lexp->SetParLimits(21,0.0,0.2);
+////	 //fmm_strict_Lexp->SetParLimits(2,0.,1000.);//positive
+////	 //fmm_strict_Lexp->SetParLimits(9,0.,300.);//positive
+////	 //fmm_strict_Lexp->SetParameter(0,0.0007);//Landau width
+////	 //fmm_strict_Lexp->SetParameter(1,mean_L_strict);
+////	 //fmm_strict_Lexp->SetParLimits(1,def_mean_L-def_sig_L,def_mean_L+def_sig_L);
+////	 //fmm_strict_Lexp->SetParameter(2,1.5);//total scale
+////	 //fmm_strict_Lexp->SetParameter(3,0.001);//sigma
+////	 //fmm_strict_Lexp->SetParLimits(3,0.,0.01);
+////	 //fmm_strict_Lexp->SetParameter(4,0.05);//att.
+////	 //fmm_strict_Lexp->SetParLimits(4,0.005,0.08);
+////	 //fmm_strict_Lexp->SetParameter(5,-0.004);//peak pos.
+////	 //fmm_strict_Lexp->SetParLimits(5,-0.05,0.05);
+////	 //fmm_strict_Lexp->SetParameter(6,0.6);//relative strength
+////	 //fmm_strict_Lexp->SetParLimits(6,0.,1.5);//relative strength
+////
+////	 //fmm_strict_Lexp->SetParameter(7,0.0003);//Landau width
+////	 //fmm_strict_Lexp->SetParameter(8,mean_S_strict);//MPV
+////	 //fmm_strict_Lexp->SetParLimits(8,def_mean_S-def_sig_S,def_mean_S+def_sig_S);
+////	 //fmm_strict_Lexp->SetParameter(9,0.4);//total scale
+////	 //fmm_strict_Lexp->SetParameter(10,0.0015);//sigma
+////	 //fmm_strict_Lexp->SetParLimits(10,0.,0.01);
+////	 //fmm_strict_Lexp->SetParameter(11,0.05);//att
+////	 //fmm_strict_Lexp->SetParLimits(11,0.03,0.12);
+////	 //fmm_strict_Lexp->SetParameter(12,0.080);//peak pos.
+////	 ////fmm_strict_Lexp->SetParLimits(15,-0.085,-0.055);
+////	 //fmm_strict_Lexp->SetParameter(13,0.6);
+////	 //fmm_strict_Lexp->SetParLimits(13,0.,1.5);//relative strength
+////
+////	 hmm_wo_bg_fom_strict->Fit("fmm_strict_Lexp","","",fit_min_mm,0.097);//Total fitting w/ 4Poly BG
+////	 double chisq_strict = fmm_strict_Lexp->GetChisquare();
+////	 double dof_strict  = fmm_strict_Lexp->GetNDF();
+////	 cout<<"chisq_strict="<<chisq_strict<<endl;
+////	 cout<<"dof="<<dof_strict<<endl;
+////	 cout<<"Reduced chi-square = "<<chisq_strict/dof_strict<<endl;
+////
+////
+////	 TF1* fmm_Lambda_only_strict = new TF1("fmm_Lambda_only_strict",FMM_Response,fmin_mm,fmax_mm,7);
+////	 TF1* fmm_Sigma_only_strict  = new TF1("fmm_Sigma_only_strict" ,FMM_Response, fmin_mm,fmax_mm,7);
+////	 TF1* fmm_bg_only_strict  = new TF1("fmm_bg_only_strict" ,FMM_2BG, fmin_mm,fmax_mm,8);
+//////Lambda_only_strict
+////	 fmm_Lambda_only_strict->SetNpx(20000);
+////	 fmm_Lambda_only_strict->SetParameter(0,fmm_strict_Lexp->GetParameter(0));
+////	 fmm_Lambda_only_strict->SetParameter(1,fmm_strict_Lexp->GetParameter(1));
+////	 fmm_Lambda_only_strict->SetParameter(2,fmm_strict_Lexp->GetParameter(2));
+////	 fmm_Lambda_only_strict->SetParameter(3,fmm_strict_Lexp->GetParameter(3));
+////	 fmm_Lambda_only_strict->SetParameter(4,fmm_strict_Lexp->GetParameter(4));
+////	 fmm_Lambda_only_strict->SetParameter(5,fmm_strict_Lexp->GetParameter(5));
+////	 fmm_Lambda_only_strict->SetParameter(6,fmm_strict_Lexp->GetParameter(6));
+//////Sigma_only_strict
+////	 fmm_Sigma_only_strict->SetNpx(20000);
+////	 fmm_Sigma_only_strict->SetParameter(0,fmm_strict_Lexp->GetParameter(7));
+////	 fmm_Sigma_only_strict->SetParameter(1,fmm_strict_Lexp->GetParameter(8));
+////	 fmm_Sigma_only_strict->SetParameter(2,fmm_strict_Lexp->GetParameter(9));
+////	 fmm_Sigma_only_strict->SetParameter(3,fmm_strict_Lexp->GetParameter(10));
+////	 fmm_Sigma_only_strict->SetParameter(4,fmm_strict_Lexp->GetParameter(11));
+////	 fmm_Sigma_only_strict->SetParameter(5,fmm_strict_Lexp->GetParameter(12));
+////	 fmm_Sigma_only_strict->SetParameter(6,fmm_strict_Lexp->GetParameter(13));
+//////bg_only_strict
+////	 fmm_bg_only_strict->SetNpx(20000);
+////	 fmm_bg_only_strict->SetParameter(0,fmm_strict_Lexp->GetParameter(14));
+////	 fmm_bg_only_strict->SetParameter(1,fmm_strict_Lexp->GetParameter(15));
+////	 fmm_bg_only_strict->SetParameter(2,fmm_strict_Lexp->GetParameter(16));
+////	 fmm_bg_only_strict->SetParameter(3,fmm_strict_Lexp->GetParameter(17));
+////	 fmm_bg_only_strict->SetParameter(4,fmm_strict_Lexp->GetParameter(18));
+////	 fmm_bg_only_strict->SetParameter(5,fmm_strict_Lexp->GetParameter(19));
+////	 fmm_bg_only_strict->SetParameter(6,fmm_strict_Lexp->GetParameter(20));
+////	 fmm_bg_only_strict->SetParameter(7,fmm_strict_Lexp->GetParameter(21));
+////
+////	double nofL_strict = fmm_Lambda_only_strict->Integral(fmin_mm,fmax_mm);
+////	double nofL_old_strict = fmm_Lambda_only_strict->Integral(-0.006,0.006);
+////	double nofL_bg_strict = fmm_bg_only_strict->Integral(-0.006,0.006);
+////	nofL_strict = nofL_strict/fit_bin_width;
+////	nofL_old_strict = nofL_old_strict/fit_bin_width;
+////	nofL_bg_strict = nofL_bg_strict/fit_bin_width;
+////	double nofL_old_hist_strict=hmm_wo_bg_fom_strict->Integral(hmm_wo_bg_fom_strict->FindBin(-0.006),hmm_wo_bg_fom_strict->FindBin(0.006)-nofL_bg_strict);
+////	cout<<"Number of Lambda (TF1 Integral) = "<<nofL_strict<<endl;
+////	cout<<"Number of Lambda w/o radiative tail (TF1 Integral) = "<<nofL_old_strict<<endl;
+////	cout<<"Number of Lambda w/o radiative tail (TH1F Integral) = "<<nofL_old_hist_strict<<endl;
+////
+////	double nofS_strict = fmm_Sigma_only_strict->Integral(fmin_mm,fmax_mm);
+////	double nofS_old_strict = fmm_Sigma_only_strict->Integral(def_mean_S-0.008,def_mean_S+0.008);
+////	double nofS_bg_strict = fmm_bg_only_strict->Integral(def_mean_S-0.008,def_mean_S+0.008);
+////	nofS_strict = nofS_strict/fit_bin_width;
+////	nofS_old_strict = nofS_old_strict/fit_bin_width;
+////	nofS_bg_strict = nofS_bg_strict/fit_bin_width;
+////	double nofS_old_hist_strict=hmm_wo_bg_fom_strict->Integral(hmm_wo_bg_fom_strict->FindBin(def_mean_S-0.008),hmm_wo_bg_fom_strict->FindBin(def_mean_S+0.008))-nofS_bg_strict;
+////	cout<<"Number of Sigma (TF1 Integral) = "<<nofS_strict<<endl;
+////	cout<<"Number of Sigma w/o radiative tail (TF1 Integral) = "<<nofS_old_strict<<endl;
+////	cout<<"Number of Sigma w/o radiative tail (TH1F Integral) = "<<nofS_old_hist_strict<<endl;
+////
+////	 hmm_wo_bg_fom_strict->Draw();
+////	 fmm_strict_Lexp->SetLineColor(kRed);
+////	 fmm_strict_Lexp->Draw("same");
+////	 fmm_Lambda_only_strict->SetLineColor(kAzure);
+////	 fmm_Sigma_only_strict->SetLineColor(kCyan);
+////	 fmm_bg_only_strict->SetLineColor(kOrange);
+////	 fmm_Lambda_only_strict->Draw("same");
+////	 fmm_Sigma_only_strict->Draw("same");
+////	 fmm_bg_only_strict->Draw("same");
+////	 //fL_strict->SetLineColor(kGreen);
+////	 //fS_strict->SetLineColor(kGreen);
+////	 //fL_strict->Draw("same");
+////	 //fS_strict->Draw("same");
+////
 /*%%%%%%%%%%%%%%%%%%%%*/
 /*%%    No AC cut	%%*/
 /*%%%%%%%%%%%%%%%%%%%%*/
@@ -1198,20 +1351,20 @@ cout<<"BEST CUT START"<<endl;
    //par[3]=Width (sigma) of convoluted Gaussian function
 	 fmm_noAC_Lexp->SetNpx(20000);
 	 fmm_noAC_Lexp->SetTitle("Missing Mass (noAC)");
-	 fmm_noAC_Lexp->FixParameter(0,fmm_best_Lexp->GetParameter(0));
-	 fmm_noAC_Lexp->FixParameter(1,fmm_best_Lexp->GetParameter(1));
-	 fmm_noAC_Lexp->SetParameter(2,fmm_best_Lexp->GetParameter(2));//L scale
-	 fmm_noAC_Lexp->FixParameter(3,fmm_best_Lexp->GetParameter(3));
-	 fmm_noAC_Lexp->FixParameter(4,fmm_best_Lexp->GetParameter(4));
-	 fmm_noAC_Lexp->FixParameter(5,fmm_best_Lexp->GetParameter(5));
-	 fmm_noAC_Lexp->FixParameter(6,fmm_best_Lexp->GetParameter(6));
-	 fmm_noAC_Lexp->FixParameter(7,fmm_best_Lexp->GetParameter(7));
-	 fmm_noAC_Lexp->FixParameter(8,fmm_best_Lexp->GetParameter(8));
-	 fmm_noAC_Lexp->SetParameter(9,fmm_best_Lexp->GetParameter(9));//S scale
-	 fmm_noAC_Lexp->FixParameter(10,fmm_best_Lexp->GetParameter(10));
-	 fmm_noAC_Lexp->FixParameter(11,fmm_best_Lexp->GetParameter(11));
-	 fmm_noAC_Lexp->FixParameter(12,fmm_best_Lexp->GetParameter(12));
-	 fmm_noAC_Lexp->FixParameter(13,fmm_best_Lexp->GetParameter(13));
+	 fmm_noAC_Lexp->FixParameter(0,fmm_strict_Lexp->GetParameter(0));
+	 fmm_noAC_Lexp->FixParameter(1,fmm_strict_Lexp->GetParameter(1));
+	 fmm_noAC_Lexp->SetParameter(2,fmm_strict_Lexp->GetParameter(2));//L scale
+	 fmm_noAC_Lexp->FixParameter(3,fmm_strict_Lexp->GetParameter(3));
+	 fmm_noAC_Lexp->FixParameter(4,fmm_strict_Lexp->GetParameter(4));
+	 fmm_noAC_Lexp->FixParameter(5,fmm_strict_Lexp->GetParameter(5));
+	 fmm_noAC_Lexp->FixParameter(6,fmm_strict_Lexp->GetParameter(6));
+	 fmm_noAC_Lexp->FixParameter(7,fmm_strict_Lexp->GetParameter(7));
+	 fmm_noAC_Lexp->FixParameter(8,fmm_strict_Lexp->GetParameter(8));
+	 fmm_noAC_Lexp->SetParameter(9,fmm_strict_Lexp->GetParameter(9));//S scale
+	 fmm_noAC_Lexp->FixParameter(10,fmm_strict_Lexp->GetParameter(10));
+	 fmm_noAC_Lexp->FixParameter(11,fmm_strict_Lexp->GetParameter(11));
+	 fmm_noAC_Lexp->FixParameter(12,fmm_strict_Lexp->GetParameter(12));
+	 fmm_noAC_Lexp->FixParameter(13,fmm_strict_Lexp->GetParameter(13));
 	 //fmm_noAC_Lexp->SetParameter(14,500.);//scale
 	 //fmm_noAC_Lexp->SetParLimits(14,0.,1000000.);//scale
 	 //fmm_noAC_Lexp->SetParameter(15,0.05);//mean
@@ -1317,15 +1470,39 @@ cout<<"BEST CUT START"<<endl;
 	cout<<"Number of Sigma w/o radiative tail (TF1 Integral) = "<<nofS_old_noAC<<endl;
 	cout<<"Number of Sigma w/o radiative tail (TH1F Integral) = "<<nofS_old_hist_noAC<<endl;
 
-	 hmm_wo_bg_fom_noAC->Draw();
+	 TH1D* hf6 = (TH1D*)c6->DrawFrame(-0.1,-20.,0.2,440.);
+	 hf6->GetXaxis()->SetTitle("Missing Mass - M_{#Lambda} [MeV/c^{2}]");
+	 hf6->GetYaxis()->SetTitle("Counts/(MeV/c^{2})");
+	 hf6->GetXaxis()->SetTitleOffset(1.10);
+	 hf6->GetYaxis()->SetTitleOffset(1.10);
+	 hf6->GetXaxis()->SetLabelOffset(100);
+	 hf6->GetYaxis()->SetLabelOffset(100);
+	 hf6->Draw("");
+	 TGaxis* ax_noAC = new TGaxis(-0.1,-20.,0.2,-20.,-100.,200.,510);
+	 TGaxis* ay_noAC = new TGaxis(-0.1,-20.,-0.1,440.,-20.,440.,510);
+	 hmm_wo_bg_fom_noAC->Draw("same");
+	 ax_noAC->Draw("same");
+	 ay_noAC->Draw("same");
 	 fmm_noAC_Lexp->SetLineColor(kRed);
-	 fmm_noAC_Lexp->Draw("same");
 	 fmm_Lambda_only_noAC->SetLineColor(kAzure);
 	 fmm_Sigma_only_noAC->SetLineColor(kCyan);
 	 fmm_bg_only_noAC->SetLineColor(kOrange);
+	 fmm_Lambda_only_noAC->SetFillStyle(3004);
+	 fmm_Lambda_only_noAC->SetFillColor(kAzure);
+	 fmm_Lambda_only_noAC->SetLineWidth(2);
+	 fmm_Sigma_only_noAC->SetFillStyle(3005);
+	 fmm_Sigma_only_noAC->SetFillColor(kCyan);
+	 fmm_Sigma_only_noAC->SetLineWidth(2);
+	 fmm_bg_only_noAC->SetFillStyle(3017);
+	 fmm_bg_only_noAC->SetFillColor(kOrange);
+	 fmm_bg_only_noAC->SetLineWidth(2);
+	 fmm_bg_only_noAC->Draw("same");
 	 fmm_Lambda_only_noAC->Draw("same");
 	 fmm_Sigma_only_noAC->Draw("same");
-	 fmm_bg_only_noAC->Draw("same");
+	 fmm_noAC_Lexp->Draw("same");
+	 TLegend *tl_noAC = new TLegend(0.55,0.65,0.85,0.85,Form("#chi^{2}/ndf=%d/%d",(int)chisq_noAC,(int)dof_noAC));
+	 tl_noAC->SetBorderSize(0);
+	 tl_noAC->Draw("same");
 	 //fL_noAC->SetLineColor(kGreen);
 	 //fS_noAC->SetLineColor(kGreen);
 	 //fL_noAC->Draw("same");
@@ -1356,20 +1533,20 @@ cout<<"BEST CUT START"<<endl;
    //par[3]=Width (sigma) of convoluted Gaussian function
 	 fmm_noCT_best_Lexp->SetNpx(20000);
 	 fmm_noCT_best_Lexp->SetTitle("Missing Mass (noCT_best)");
-	 fmm_noCT_best_Lexp->FixParameter(0,fmm_best_Lexp->GetParameter(0));
-	 fmm_noCT_best_Lexp->FixParameter(1,fmm_best_Lexp->GetParameter(1));
-	 fmm_noCT_best_Lexp->SetParameter(2,fmm_best_Lexp->GetParameter(2));//L scale
-	 fmm_noCT_best_Lexp->FixParameter(3,fmm_best_Lexp->GetParameter(3));
-	 fmm_noCT_best_Lexp->FixParameter(4,fmm_best_Lexp->GetParameter(4));
-	 fmm_noCT_best_Lexp->FixParameter(5,fmm_best_Lexp->GetParameter(5));
-	 fmm_noCT_best_Lexp->FixParameter(6,fmm_best_Lexp->GetParameter(6));
-	 fmm_noCT_best_Lexp->FixParameter(7,fmm_best_Lexp->GetParameter(7));
-	 fmm_noCT_best_Lexp->FixParameter(8,fmm_best_Lexp->GetParameter(8));
-	 fmm_noCT_best_Lexp->SetParameter(9,fmm_best_Lexp->GetParameter(9));//S scale
-	 fmm_noCT_best_Lexp->FixParameter(10,fmm_best_Lexp->GetParameter(10));
-	 fmm_noCT_best_Lexp->FixParameter(11,fmm_best_Lexp->GetParameter(11));
-	 fmm_noCT_best_Lexp->FixParameter(12,fmm_best_Lexp->GetParameter(12));
-	 fmm_noCT_best_Lexp->FixParameter(13,fmm_best_Lexp->GetParameter(13));
+	 fmm_noCT_best_Lexp->FixParameter(0,fmm_strict_Lexp->GetParameter(0));
+	 fmm_noCT_best_Lexp->FixParameter(1,fmm_strict_Lexp->GetParameter(1));
+	 fmm_noCT_best_Lexp->SetParameter(2,fmm_strict_Lexp->GetParameter(2));//L scale
+	 fmm_noCT_best_Lexp->FixParameter(3,fmm_strict_Lexp->GetParameter(3));
+	 fmm_noCT_best_Lexp->FixParameter(4,fmm_strict_Lexp->GetParameter(4));
+	 fmm_noCT_best_Lexp->FixParameter(5,fmm_strict_Lexp->GetParameter(5));
+	 fmm_noCT_best_Lexp->FixParameter(6,fmm_strict_Lexp->GetParameter(6));
+	 fmm_noCT_best_Lexp->FixParameter(7,fmm_strict_Lexp->GetParameter(7));
+	 fmm_noCT_best_Lexp->FixParameter(8,fmm_strict_Lexp->GetParameter(8));
+	 fmm_noCT_best_Lexp->SetParameter(9,fmm_strict_Lexp->GetParameter(9));//S scale
+	 fmm_noCT_best_Lexp->FixParameter(10,fmm_strict_Lexp->GetParameter(10));
+	 fmm_noCT_best_Lexp->FixParameter(11,fmm_strict_Lexp->GetParameter(11));
+	 fmm_noCT_best_Lexp->FixParameter(12,fmm_strict_Lexp->GetParameter(12));
+	 fmm_noCT_best_Lexp->FixParameter(13,fmm_strict_Lexp->GetParameter(13));
 	 //fmm_noCT_best_Lexp->SetParameter(14,500.);//scale
 	 //fmm_noCT_best_Lexp->SetParLimits(14,0.,1000000.);//scale
 	 //fmm_noCT_best_Lexp->SetParameter(15,0.05);//mean
@@ -1477,13 +1654,25 @@ cout<<"BEST CUT START"<<endl;
 
 	 hmm_wo_bg_fom_noCT_best->Draw();
 	 fmm_noCT_best_Lexp->SetLineColor(kRed);
-	 fmm_noCT_best_Lexp->Draw("same");
 	 fmm_Lambda_only_noCT_best->SetLineColor(kAzure);
 	 fmm_Sigma_only_noCT_best->SetLineColor(kCyan);
 	 fmm_bg_only_noCT_best->SetLineColor(kOrange);
+	 fmm_Lambda_only_noCT_best->SetFillStyle(3004);
+	 fmm_Lambda_only_noCT_best->SetFillColor(kAzure);
+	 fmm_Lambda_only_noCT_best->SetLineWidth(2);
+	 fmm_Sigma_only_noCT_best->SetFillStyle(3005);
+	 fmm_Sigma_only_noCT_best->SetFillColor(kCyan);
+	 fmm_Sigma_only_noCT_best->SetLineWidth(2);
+	 fmm_bg_only_noCT_best->SetFillStyle(3017);
+	 fmm_bg_only_noCT_best->SetFillColor(kOrange);
+	 fmm_bg_only_noCT_best->SetLineWidth(2);
+	 fmm_bg_only_noCT_best->Draw("same");
 	 fmm_Lambda_only_noCT_best->Draw("same");
 	 fmm_Sigma_only_noCT_best->Draw("same");
-	 fmm_bg_only_noCT_best->Draw("same");
+	 fmm_noCT_best_Lexp->Draw("same");
+	 TLegend *tl_noCT_best = new TLegend(0.55,0.65,0.85,0.85,Form("#chi^{2}/ndf=%d/%d",(int)chisq_noCT_best,(int)dof_noCT_best));
+	 tl_noCT_best->SetBorderSize(0);
+	 tl_noCT_best->Draw("same");
 	 //fL_noCT_best->SetLineColor(kGreen);
 	 //fS_noCT_best->SetLineColor(kGreen);
 	 //fL_noCT_best->Draw("same");
@@ -1514,20 +1703,20 @@ cout<<"BEST CUT START"<<endl;
    //par[3]=Width (sigma) of convoluted Gaussian function
 	 fmm_noCT_strict_Lexp->SetNpx(20000);
 	 fmm_noCT_strict_Lexp->SetTitle("Missing Mass (noCT_strict)");
-	 fmm_noCT_strict_Lexp->FixParameter(0,fmm_best_Lexp->GetParameter(0));
-	 fmm_noCT_strict_Lexp->FixParameter(1,fmm_best_Lexp->GetParameter(1));
-	 fmm_noCT_strict_Lexp->SetParameter(2,fmm_best_Lexp->GetParameter(2));//L scale
-	 fmm_noCT_strict_Lexp->FixParameter(3,fmm_best_Lexp->GetParameter(3));
-	 fmm_noCT_strict_Lexp->FixParameter(4,fmm_best_Lexp->GetParameter(4));
-	 fmm_noCT_strict_Lexp->FixParameter(5,fmm_best_Lexp->GetParameter(5));
-	 fmm_noCT_strict_Lexp->FixParameter(6,fmm_best_Lexp->GetParameter(6));
-	 fmm_noCT_strict_Lexp->FixParameter(7,fmm_best_Lexp->GetParameter(7));
-	 fmm_noCT_strict_Lexp->FixParameter(8,fmm_best_Lexp->GetParameter(8));
-	 fmm_noCT_strict_Lexp->SetParameter(9,fmm_best_Lexp->GetParameter(9));//S scale
-	 fmm_noCT_strict_Lexp->FixParameter(10,fmm_best_Lexp->GetParameter(10));
-	 fmm_noCT_strict_Lexp->FixParameter(11,fmm_best_Lexp->GetParameter(11));
-	 fmm_noCT_strict_Lexp->FixParameter(12,fmm_best_Lexp->GetParameter(12));
-	 fmm_noCT_strict_Lexp->FixParameter(13,fmm_best_Lexp->GetParameter(13));
+	 fmm_noCT_strict_Lexp->FixParameter(0,fmm_strict_Lexp->GetParameter(0));
+	 fmm_noCT_strict_Lexp->FixParameter(1,fmm_strict_Lexp->GetParameter(1));
+	 fmm_noCT_strict_Lexp->SetParameter(2,fmm_strict_Lexp->GetParameter(2));//L scale
+	 fmm_noCT_strict_Lexp->FixParameter(3,fmm_strict_Lexp->GetParameter(3));
+	 fmm_noCT_strict_Lexp->FixParameter(4,fmm_strict_Lexp->GetParameter(4));
+	 fmm_noCT_strict_Lexp->FixParameter(5,fmm_strict_Lexp->GetParameter(5));
+	 fmm_noCT_strict_Lexp->FixParameter(6,fmm_strict_Lexp->GetParameter(6));
+	 fmm_noCT_strict_Lexp->FixParameter(7,fmm_strict_Lexp->GetParameter(7));
+	 fmm_noCT_strict_Lexp->FixParameter(8,fmm_strict_Lexp->GetParameter(8));
+	 fmm_noCT_strict_Lexp->SetParameter(9,fmm_strict_Lexp->GetParameter(9));//S scale
+	 fmm_noCT_strict_Lexp->FixParameter(10,fmm_strict_Lexp->GetParameter(10));
+	 fmm_noCT_strict_Lexp->FixParameter(11,fmm_strict_Lexp->GetParameter(11));
+	 fmm_noCT_strict_Lexp->FixParameter(12,fmm_strict_Lexp->GetParameter(12));
+	 fmm_noCT_strict_Lexp->FixParameter(13,fmm_strict_Lexp->GetParameter(13));
 	 //fmm_noCT_strict_Lexp->SetParameter(14,500.);//scale
 	 //fmm_noCT_strict_Lexp->SetParLimits(14,0.,1000000.);//scale
 	 //fmm_noCT_strict_Lexp->SetParameter(15,0.05);//mean
@@ -1633,24 +1822,45 @@ cout<<"BEST CUT START"<<endl;
 	cout<<"Number of Sigma w/o radiative tail (TF1 Integral) = "<<nofS_old_noCT_strict<<endl;
 	cout<<"Number of Sigma w/o radiative tail (TH1F Integral) = "<<nofS_old_hist_noCT_strict<<endl;
 
-	 hmm_wo_bg_fom_noCT_strict->Draw();
+
+	 TH1D* hf8 = (TH1D*)c8->DrawFrame(-0.1,-20.,0.2,260.);
+	 hf8->GetXaxis()->SetTitle("Missing Mass - M_{#Lambda} [MeV/c^{2}]");
+	 hf8->GetYaxis()->SetTitle("Counts/(MeV/c^{2})");
+	 hf8->GetXaxis()->SetTitleOffset(1.10);
+	 hf8->GetYaxis()->SetTitleOffset(1.10);
+	 hf8->GetXaxis()->SetLabelOffset(100);
+	 hf8->GetYaxis()->SetLabelOffset(100);
+	 hf8->Draw("");
+	 TGaxis* ax_noCT_strict = new TGaxis(-0.1,-20.,0.2,-20.,-100.,200.,510);
+	 TGaxis* ay_noCT_strict = new TGaxis(-0.1,-20.,-0.1,260.,-20.,260.,510);
+	 hmm_wo_bg_fom_noCT_strict->Draw("same");
+	 ax_noCT_strict->Draw("same");
+	 ay_noCT_strict->Draw("same");
 	 fmm_noCT_strict_Lexp->SetLineColor(kRed);
-	 fmm_noCT_strict_Lexp->Draw("same");
 	 fmm_Lambda_only_noCT_strict->SetLineColor(kAzure);
 	 fmm_Sigma_only_noCT_strict->SetLineColor(kCyan);
 	 fmm_bg_only_noCT_strict->SetLineColor(kOrange);
+	 fmm_Lambda_only_noCT_strict->SetFillStyle(3004);
+	 fmm_Lambda_only_noCT_strict->SetFillColor(kAzure);
+	 fmm_Lambda_only_noCT_strict->SetLineWidth(2);
+	 fmm_Sigma_only_noCT_strict->SetFillStyle(3005);
+	 fmm_Sigma_only_noCT_strict->SetFillColor(kCyan);
+	 fmm_Sigma_only_noCT_strict->SetLineWidth(2);
+	 fmm_bg_only_noCT_strict->SetFillStyle(3017);
+	 fmm_bg_only_noCT_strict->SetFillColor(kOrange);
+	 fmm_bg_only_noCT_strict->SetLineWidth(2);
+	 fmm_bg_only_noCT_strict->Draw("same");
 	 fmm_Lambda_only_noCT_strict->Draw("same");
 	 fmm_Sigma_only_noCT_strict->Draw("same");
-	 fmm_bg_only_noCT_strict->Draw("same");
+	 fmm_noCT_strict_Lexp->Draw("same");
+	 TLegend *tl_noCT_strict = new TLegend(0.55,0.65,0.85,0.85,Form("#chi^{2}/ndf=%d/%d",(int)chisq_noCT_strict,(int)dof_noCT_strict));
+	 tl_noCT_strict->SetBorderSize(0);
+	 tl_noCT_strict->Draw("same");
 	 //fL_noCT_strict->SetLineColor(kGreen);
 	 //fS_noCT_strict->SetLineColor(kGreen);
 	 //fL_noCT_strict->Draw("same");
 	 //fS_noCT_strict->Draw("same");
 
-	TCanvas* c9 = new TCanvas("c9","c9");
-	 fAl->SetLineColor(kRed);
-	 hmm_Al_wobg_fom_noZ->Draw("");
-	 fAl->Draw("same");
 
 	TCanvas* c10 = new TCanvas("c10","c10");
 	 fAl_new->SetLineColor(kRed);
@@ -1680,6 +1890,7 @@ cout<<"BEST CUT START"<<endl;
 	//cout<<"Z : "<<nofL_strict/nofL_noZ<<endl;
 	cout<<"AC: "<<nofL_strict/nofL_noAC<<endl;
 	cout<<"CT: "<<nofL_strict/nofL_noCT_strict<<endl;
+	cout<<"Z : "<<nofL_strict/nofL_noZ<<endl;
 
 	cout<<"Number of Sigma w/ radiative tail (TF1 Integral)"<<endl;
 	cout<<"best   = "<<nofS_best<<endl;
@@ -1697,6 +1908,7 @@ cout<<"BEST CUT START"<<endl;
 	//cout<<"Z : "<<nofS_strict/nofS_noZ<<endl;
 	cout<<"AC: "<<nofS_strict/nofS_noAC<<endl;
 	cout<<"CT: "<<nofS_strict/nofS_noCT_strict<<endl;
+	cout<<"Z : "<<nofS_strict/nofS_noZ<<endl;
 
 
 //TF1 w/o radiative tail
@@ -1772,20 +1984,26 @@ cout<<"BEST CUT START"<<endl;
 
 
 	
-/*--- Print ---*/
+///*--- Print ---*/
 cout << "Print is starting" << endl;
-	c1->Print(Form("%s[",pdfname.c_str()));
-	c1->Print(Form("%s",pdfname.c_str()));
-	c2->Print(Form("%s",pdfname.c_str()));
-	c3->Print(Form("%s",pdfname.c_str()));
-	c4->Print(Form("%s",pdfname.c_str()));
-	c5->Print(Form("%s",pdfname.c_str()));
-	c6->Print(Form("%s",pdfname.c_str()));
-	c7->Print(Form("%s",pdfname.c_str()));
-	c8->Print(Form("%s",pdfname.c_str()));
-	c9->Print(Form("%s",pdfname.c_str()));
-	c10->Print(Form("%s",pdfname.c_str()));
-	c11->Print(Form("%s",pdfname.c_str()));
-	c11->Print(Form("%s]",pdfname.c_str()));
+	c2->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/mthesis_Fig/pdf/hmm_rad_strict.pdf");
+	c3->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/mthesis_Fig/pdf/hmm_rad_noZ.pdf");
+	c6->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/mthesis_Fig/pdf/hmm_rad_noAC.pdf");
+	c8->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/mthesis_Fig/pdf/hmm_rad_noCT.pdf");
+//	c1->Print(Form("%s[",pdfname.c_str()));
+//	c1->Print(Form("%s",pdfname.c_str()));
+//	c2->Print(Form("%s",pdfname.c_str()));
+//	c3->Print(Form("%s",pdfname.c_str()));
+//	c4->Print(Form("%s",pdfname.c_str()));
+//	c5->Print(Form("%s",pdfname.c_str()));
+//	c6->Print(Form("%s",pdfname.c_str()));
+//	c7->Print(Form("%s",pdfname.c_str()));
+//	c8->Print(Form("%s",pdfname.c_str()));
+//	c9->Print(Form("%s",pdfname.c_str()));
+//	c10->Print(Form("%s",pdfname.c_str()));
+//	c11->Print(Form("%s",pdfname.c_str()));
+//	c11->Print(Form("%s]",pdfname.c_str()));
 cout << "Well done!" << endl;
+//	TCanvas *ctest = new TCanvas("ctest","ctest",800,800);
+//	hcoin->Draw("");
 }//fit
