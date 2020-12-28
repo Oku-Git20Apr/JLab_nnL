@@ -492,7 +492,7 @@ cout<<"%%% strict Cut %%%%%%%"<<endl;
 cout<<"%%%%%%%%%%%%%%%%%%%%"<<endl;
 
 
-		TCanvas *c4 = new TCanvas("c4", "c4", 800, 800);
+		TCanvas *c4 = new TCanvas("c4", "c4", 1000, 800);
 //Pion Fitting
 cout<<"Pion Fitting is performed as a first step"<<endl;
 cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
@@ -768,6 +768,32 @@ cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 	// 	fcoinp_dg_strict->SetParameter(4,-7.9);
 	// 	fcoinp_dg_strict->SetParameter(5,0.4);
 	//	hcoin_strict->Fit("fcoinp_dg_strict","","",-10.,-6.);
+		TCanvas *c88 = new TCanvas("c88", "c88", 800, 800);
+		TH1 *frame_88 = c88->DrawFrame(0.,0.,1.25,1.);
+		TH1F* h_den  = new TH1F("h_den","denominator",25,0.,1.25);
+		TH1F* h_num  = new TH1F("h_num","numerator",25,0.,1.25);
+		double den, num;
+		h_den->SetBinContent(1,0.);
+		h_num->SetBinContent(1,0.);
+		for(int i=1;i<25;i++){
+		//den = fcoin_k_strict->Integral(-1.25,1.25)/0.056;
+		den = fcoin_k_strict->Integral(-20.,20.)/0.056;
+		num = fcoin_k_strict->Integral((double)i*(-0.05),(double)i*0.05)/0.056;
+		h_den->SetBinContent(i+1,den);
+		h_num->SetBinContent(i+1,num);
+		cout<<"ct="<<(double)i*0.05<<" ns, SR="<<num*100./den<<" %"<<endl;
+		}
+		cout << "TEfficiency! (Gas SR)" << endl;
+		TEfficiency *pEff1;
+		if(TEfficiency::CheckConsistency(*h_num,*h_den,"w")){
+		pEff1 = new TEfficiency(*h_num,*h_den);
+		}
+		frame_88->GetXaxis()->SetTitle("X [ns]");
+		frame_88->GetYaxis()->SetTitle("K^{+} Survival Ratio");
+		frame_88->GetYaxis()->SetDecimals();
+		frame_88->Draw("");
+		pEff1->Draw("same");
 
 		c4->Print("./pdf/hcoin_fit_free.pdf");
+		c88->Print("./pdf/hcoin_kSR.pdf");
 }//fit

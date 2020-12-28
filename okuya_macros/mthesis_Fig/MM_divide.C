@@ -3,6 +3,7 @@
 //	vs. theta_gk_cm
 //
 //K. Okuyama (Nov. 20, 2020)
+//K. Okuyama (Dec. 28, 2020)//GeV-->MeV
 //
 //This is taken over from CTMM.C
 //No array branch mode 
@@ -511,18 +512,18 @@ cout << "Param file : " << AcceptanceR_table.c_str() << endl;
   hmm_wobg_fom_best->GetXaxis()->SetTitle("Missing Mass - M_{#Lambda} [GeV/c^{2}]");
   hmm_wobg_fom_best->GetYaxis()->SetTitle("Counts/(GeV/c^{2})");
   hmm_wobg_fom_best->SetLineColor(kBlack);
-  TH2F* h_mm_Qsq = new TH2F("h_mm_Qsq","",100,-0.1,0.2,50,0.2,0.8);
+  TH2F* h_mm_Qsq = new TH2F("h_mm_Qsq","",100,-100.,200.,50,0.2,0.8);
   h_mm_Qsq->GetYaxis()->SetTitle("Q^{2} [(GeV/c)^{2}]");
-  h_mm_Qsq->GetXaxis()->SetTitle("Missing Mass - M_{#Lambda} [GeV/c^{2}]");
-  TH2F* h_mm_W = new TH2F("h_mm_W","",100,-0.1,0.2,50,2.05,2.25);
+  h_mm_Qsq->GetXaxis()->SetTitle("Missing Mass - M_{#Lambda} [MeV/c^{2}]");
+  TH2F* h_mm_W = new TH2F("h_mm_W","",100,-100.,200.,50,2.05,2.25);
   h_mm_W->GetYaxis()->SetTitle("W [GeV]");
-  h_mm_W->GetXaxis()->SetTitle("Missing Mass - M_{#Lambda} [GeV/c^{2}]");
-  TH2F* h_mm_theta_gk_cm = new TH2F("h_mm_theta_gk_cm","",100,-0.1,0.2,50,-5.,25.);
+  h_mm_W->GetXaxis()->SetTitle("Missing Mass - M_{#Lambda} [MeV/c^{2}]");
+  TH2F* h_mm_theta_gk_cm = new TH2F("h_mm_theta_gk_cm","",100,-100.,200.,50,-5.,25.);
   h_mm_theta_gk_cm->GetYaxis()->SetTitle("#theta_{#gamma K}^{CM} [deg]");
-  h_mm_theta_gk_cm->GetXaxis()->SetTitle("Missing Mass - M_{#Lambda} [GeV/c^{2}]");
-  TH2F* h_mm_eps = new TH2F("h_mm_eps","",100,-0.1,0.2,50,0.72,0.8);
+  h_mm_theta_gk_cm->GetXaxis()->SetTitle("Missing Mass - M_{#Lambda} [MeV/c^{2}]");
+  TH2F* h_mm_eps = new TH2F("h_mm_eps","",100,-100.,200.,50,0.72,0.8);
   h_mm_eps->GetYaxis()->SetTitle("#epsilon");
-  h_mm_eps->GetXaxis()->SetTitle("Missing Mass - M_{#Lambda} [GeV/c^{2}]");
+  h_mm_eps->GetXaxis()->SetTitle("Missing Mass - M_{#Lambda} [MeV/c^{2}]");
   TH2F* h_Qsq_eps = new TH2F("h_Qsq_eps","",50,0.2,0.8,50,0.72,0.8);
   h_Qsq_eps->GetYaxis()->SetTitle("#epsilon");
   h_Qsq_eps->GetXaxis()->SetTitle("Q^{2} [(GeV/c)^{2}]");
@@ -834,10 +835,10 @@ cout<<"Entries: "<<ENum<<endl;
 		if(event_selection&&ct_cut){
 			hmm_L_fom_best->Fill(mm);
 			hmm_L_strict->Fill(mm*1000.);
-			h_mm_Qsq->Fill(mm,Qsq);
-			h_mm_W->Fill(mm,W);
-			h_mm_theta_gk_cm->Fill(mm,theta_gk_cm*180./PI);
-			h_mm_eps->Fill(mm,eps);
+			h_mm_Qsq->Fill(mm*1000.,Qsq);
+			h_mm_W->Fill(mm*1000.,W);
+			h_mm_theta_gk_cm->Fill(mm*1000.,theta_gk_cm*180./PI);
+			h_mm_eps->Fill(mm*1000.,eps);
 			h_Qsq_eps->Fill(Qsq,eps);
 			h_W_eps->Fill(W,eps);
 			h_theta_gk_cm_eps->Fill(theta_gk_cm*180./PI,eps);
@@ -938,6 +939,10 @@ cout<<"Entries: "<<ENum<<endl;
 
 //	c3->Print("./pdf/mm_tight.pdf");
 //	c4->Print("./pdf/mm_wobg_tight.pdf");
+	c5->Print("./pdf/mm_Qsq.pdf");
+	c6->Print("./pdf/mm_W.pdf");
+	c7->Print("./pdf/mm_theta.pdf");
+	c8->Print("./pdf/mm_eps.pdf");
 
 cout << "Well done!" << endl;
 }//fit

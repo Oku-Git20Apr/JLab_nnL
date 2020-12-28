@@ -930,6 +930,31 @@ cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 		//hcoin_strict->Fit("gausn","","",-10.,-6.);
 		//hcoin_strict->Fit("gausn","","",-1.,1.);
 		//hcoin_strict->Fit("gausn","","",2.,4.);
+		TCanvas *c88 = new TCanvas("c88", "c88", 800, 800);
+		TH1 *frame_88 = c88->DrawFrame(0.,0.,1.25,1.);
+		TH1F* h_den  = new TH1F("h_den","denominator",25,0.,1.25);
+		TH1F* h_num  = new TH1F("h_num","numerator",25,0.,1.25);
+		double den, num;
+		h_den->SetBinContent(1,0.);
+		h_num->SetBinContent(1,0.);
+		for(int i=1;i<25;i++){
+		//den = fcoin_k_strict->Integral(-1.25,1.25)/0.056;
+		den = fcoin_k_strict->Integral(-20.,20.)/0.056;
+		num = fcoin_k_strict->Integral((double)i*(-0.05),(double)i*0.05)/0.056;
+		h_den->SetBinContent(i+1,den);
+		h_num->SetBinContent(i+1,num);
+		cout<<"ct="<<(double)i*0.05<<" ns, SR="<<num*100./den<<" %"<<endl;
+		}
+		cout << "TEfficiency! (Gas SR)" << endl;
+		TEfficiency *pEff1;
+		if(TEfficiency::CheckConsistency(*h_num,*h_den,"w")){
+		pEff1 = new TEfficiency(*h_num,*h_den);
+		}
+		frame_88->GetXaxis()->SetTitle("X [ns]");
+		frame_88->GetYaxis()->SetTitle("K^{+} Survival Ratio");
+		frame_88->GetYaxis()->SetDecimals();
+		frame_88->Draw("");
+		pEff1->Draw("same");
 		
 		c4->Print("./pdf/hcoin_fit_V_fix.pdf");
 

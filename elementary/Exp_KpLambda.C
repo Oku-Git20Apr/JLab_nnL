@@ -937,29 +937,29 @@ double ye8[4] = {//LEPS W=2.163 GeV
 	double x2_result[2], y2_result[2], xe2_result[2], ye2_result[2];
 	double x3_result[3], y3_result[3], xe3_result[3], ye3_result[3];
 	x_result[0]=8.;//deg
-	y_result[0]=0.29291;//ub/sr
+	y_result[0]=0.3195;//ub/sr
 	xe_result[0]=8.;
-	ye_result[0]=0.0085;
+	ye_result[0]=0.016;
 	x2_result[0]=4.;//deg
-	y2_result[0]=0.28427;//ub/sr
+	y2_result[0]=0.3094;//ub/sr
 	xe2_result[0]=4.;
-	ye2_result[0]=0.019;
+	ye2_result[0]=0.017;
 	x2_result[1]=12.;//deg
-	y2_result[1]=0.33296;//ub/sr
+	y2_result[1]=0.3575;//ub/sr
 	xe2_result[1]=4.;
-	ye2_result[1]=0.019;
+	ye2_result[1]=0.023;
 	x3_result[0]=3.;//deg
-	y3_result[0]=0.25615;//ub/sr
+	y3_result[0]=0.2762;//ub/sr
 	xe3_result[0]=3.;
-	ye3_result[0]=0.025;
+	ye3_result[0]=0.017;
 	x3_result[1]=8.;//deg
-	y3_result[1]=0.34318;//ub/sr
+	y3_result[1]=0.3734;//ub/sr
 	xe3_result[1]=2.;
-	ye3_result[1]=0.025;
+	ye3_result[1]=0.023;
 	x3_result[2]=13.;//deg
-	y3_result[2]=0.32668;//ub/sr
+	y3_result[2]=0.3510;//ub/sr
 	xe3_result[2]=3.;
-	ye3_result[2]=0.025;
+	ye3_result[2]=0.023;
   TGraphErrors *gr_result = new TGraphErrors(1, x_result, y_result, xe_result, ye_result);
   gr_result->SetMarkerSize(1.5);
   gr_result->SetMarkerStyle(21);
@@ -990,49 +990,54 @@ double ye8[4] = {//LEPS W=2.163 GeV
   gr3->Draw("Psame");
   gr1->Draw("Psame");//CLAS2010
   gr8->Draw("Psame");//LEPS
-  gr_result->Draw("P2same");
-  gr2_result->Draw("P2same");
-  gr3_result->Draw("P2same");
   gr4->Draw("Lsame");
   gr5->Draw("Lsame");
   gr6->Draw("Lsame");
   gr7->Draw("Lsame");
-TBox *b = new TBox(0.,0.28441,16.,0.30141); 
+TBox *b = new TBox(x_result[0]-xe_result[0],y_result[0]-ye_result[0],x_result[0]+xe_result[0],y_result[0]+ye_result[0]); 
 	b->SetFillColor(2); 
 	b->SetFillStyle(0);
 	b->SetLineColor(2);
 	b->SetLineWidth(1);
-TBox *b2_1 = new TBox(0.,0.26527,8.,0.30327); 
+TBox *b2_1 = new TBox(x2_result[0]-xe2_result[0],y2_result[0]-ye2_result[0],x2_result[0]+xe2_result[0],y2_result[0]+ye2_result[0]); 
+//TBox *b2_1 = new TBox(0.,0.26527,8.,0.30327); 
 	b2_1->SetFillColor(3); 
 	b2_1->SetFillStyle(0);
 	b2_1->SetLineColor(3);
 	b2_1->SetLineWidth(1);
-TBox *b2_2 = new TBox(8.,0.31396,16.,0.35196); 
+//TBox *b2_2 = new TBox(8.,0.31396,16.,0.35196); 
+TBox *b2_2 = new TBox(x2_result[1]-xe2_result[1],y2_result[1]-ye2_result[1],x2_result[1]+xe2_result[1],y2_result[1]+ye2_result[1]); 
 	b2_2->SetFillColor(3); 
 	b2_2->SetFillStyle(0);
 	b2_2->SetLineColor(3);
 	b2_2->SetLineWidth(1);
-TBox *b3_1 = new TBox(0.,0.23115,6.,0.28115); 
+//TBox *b3_1 = new TBox(0.,0.23115,6.,0.28115); 
+TBox *b3_1 = new TBox(x3_result[0]-xe3_result[0],y3_result[0]-ye3_result[0],x3_result[0]+xe3_result[0],y3_result[0]+ye3_result[0]); 
 	b3_1->SetFillColor(4); 
 	b3_1->SetFillStyle(0);
 	b3_1->SetLineColor(4);
 	b3_1->SetLineWidth(1);
-TBox *b3_2 = new TBox(6.,0.31818,10.,0.36818); 
+//TBox *b3_2 = new TBox(6.,0.31818,10.,0.36818); 
+TBox *b3_2 = new TBox(x3_result[1]-xe3_result[1],y3_result[1]-ye3_result[1],x3_result[1]+xe3_result[1],y3_result[1]+ye3_result[1]); 
 	b3_2->SetFillColor(4); 
 	b3_2->SetFillStyle(0);
 	b3_2->SetLineColor(4);
 	b3_2->SetLineWidth(1);
-TBox *b3_3 = new TBox(10.,0.30168,16.,0.35168); 
+//TBox *b3_3 = new TBox(10.,0.30168,16.,0.35168); 
+TBox *b3_3 = new TBox(x3_result[2]-xe3_result[2],y3_result[2]-ye3_result[2],x3_result[2]+xe3_result[2],y3_result[2]+ye3_result[2]); 
 	b3_3->SetFillColor(4); 
 	b3_3->SetFillStyle(0);
 	b3_3->SetLineColor(4);
 	b3_3->SetLineWidth(1);
-  b->Draw();
-  b2_1->Draw();
-  b2_2->Draw();
+  gr3_result->Draw("P2same");
+  gr2_result->Draw("P2same");
+  gr_result->Draw("P2same");
   b3_1->Draw();
   b3_2->Draw();
   b3_3->Draw();
+  b2_1->Draw();
+  b2_2->Draw();
+  b->Draw();
   ax->Draw();
   ay->Draw();
   leg->Draw();
@@ -1053,5 +1058,6 @@ TBox *b3_3 = new TBox(10.,0.30168,16.,0.35168);
 //dataset3->SetSelection(i);
 //cout<<i<<": "<<dataset3->GetKinematics()->GetW()<<endl;
 //}
-c1->Print("Elementary_gpKL.pdf");
+//c1->Print("Elementary_gpKL.pdf");
+c1->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/mthesis_Fig/pdf/CS_thetadepL.pdf");
 }
