@@ -512,8 +512,18 @@ cout << "Param file : " << AcceptanceR_table_z9.c_str() << endl;
  //const double fit_max_mm=0.085;
  const double fit_min_mm=-0.005;
  const double fit_max_mm=0.085;
- const double fmin_mm=-1.;
- const double fmax_mm=2.;
+//%%%%%%%%%%//
+//FULL RANGE//
+//%%%%%%%%%%//
+// const double fmin_mm=-1;
+// const double fmax_mm=2.;
+//%%%%%%%%%%%%%%%%%//
+//within acceptance//
+//%%%%%%%%%%%%%%%%%//
+ const double fmin_mm=-0.1;
+ const double fmax_mm=0.1;
+
+
  //const double fmin_mm=-0.01;
  //const double fmax_mm=0.12;
  //const double fmax_mm=10.;

@@ -5,6 +5,7 @@
 //K. Okuyama (Sep. 23, 2020)
 //K. Okuyama (Nov. 19, 2020) CS factor
 //K. Okuyama (Dec. 14, 2020) Mom cut 
+//K. Okuyama (Jan.  3, 2021) VP Flux Syst. 
 //
 //taken over from mea_lcr.C
 //using {left, right, center} bunch
@@ -440,6 +441,38 @@ cout << "Param file : " << AcceptanceR_table_z9.c_str() << endl;
   TH1F* hmm_mixacc_result_nocut_forAl  = new TH1F("hmm_mixacc_result_nocut_forAl","ACC (Al (best))",xbin,xmin,xmax);
   TH1F* hmm_mixacc_result_nocut_new_forAl  = new TH1F("hmm_mixacc_result_nocut_new_forAl","ACC (Al (strict))",xbin,xmin,xmax);
   TH1F* hmm_mixacc_result_momcut  = new TH1F("hmm_mixacc_result_momcut","MEA result (Mom. cut)",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_momL1  = new TH1F("hmm_mixacc_result_momL1","MEA result (Mom. cut)",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_momL2  = new TH1F("hmm_mixacc_result_momL2","MEA result (Mom. cut)",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_momL3  = new TH1F("hmm_mixacc_result_momL3","MEA result (Mom. cut)",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_momL4  = new TH1F("hmm_mixacc_result_momL4","MEA result (Mom. cut)",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_momL5  = new TH1F("hmm_mixacc_result_momL5","MEA result (Mom. cut)",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_momL6  = new TH1F("hmm_mixacc_result_momL6","MEA result (Mom. cut)",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_momL8  = new TH1F("hmm_mixacc_result_momL8","MEA result (Mom. cut)",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_momL9  = new TH1F("hmm_mixacc_result_momL9","MEA result (Mom. cut)",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_momS1  = new TH1F("hmm_mixacc_result_momS1","MEA result (Mom. cut)",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_momS2  = new TH1F("hmm_mixacc_result_momS2","MEA result (Mom. cut)",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_momS3  = new TH1F("hmm_mixacc_result_momS3","MEA result (Mom. cut)",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_momS4  = new TH1F("hmm_mixacc_result_momS4","MEA result (Mom. cut)",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_momS5  = new TH1F("hmm_mixacc_result_momS5","MEA result (Mom. cut)",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_momS6  = new TH1F("hmm_mixacc_result_momS6","MEA result (Mom. cut)",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_momS8  = new TH1F("hmm_mixacc_result_momS8","MEA result (Mom. cut)",xbin,xmin,xmax);
+  TH1F* hmm_mixacc_result_momS9  = new TH1F("hmm_mixacc_result_momS9","MEA result (Mom. cut)",xbin,xmin,xmax);
+  TH1F* hcs_mixacc_result_momL1  = new TH1F("hcs_mixacc_result_momL1","MEA result (Mom. cut)",xbin,xmin,xmax);
+  TH1F* hcs_mixacc_result_momL2  = new TH1F("hcs_mixacc_result_momL2","MEA result (Mom. cut)",xbin,xmin,xmax);
+  TH1F* hcs_mixacc_result_momL3  = new TH1F("hcs_mixacc_result_momL3","MEA result (Mom. cut)",xbin,xmin,xmax);
+  TH1F* hcs_mixacc_result_momL4  = new TH1F("hcs_mixacc_result_momL4","MEA result (Mom. cut)",xbin,xmin,xmax);
+  TH1F* hcs_mixacc_result_momL5  = new TH1F("hcs_mixacc_result_momL5","MEA result (Mom. cut)",xbin,xmin,xmax);
+  TH1F* hcs_mixacc_result_momL6  = new TH1F("hcs_mixacc_result_momL6","MEA result (Mom. cut)",xbin,xmin,xmax);
+  TH1F* hcs_mixacc_result_momL8  = new TH1F("hcs_mixacc_result_momL8","MEA result (Mom. cut)",xbin,xmin,xmax);
+  TH1F* hcs_mixacc_result_momL9  = new TH1F("hcs_mixacc_result_momL9","MEA result (Mom. cut)",xbin,xmin,xmax);
+  TH1F* hcs_mixacc_result_momS1  = new TH1F("hcs_mixacc_result_momS1","MEA result (Mom. cut)",xbin,xmin,xmax);
+  TH1F* hcs_mixacc_result_momS2  = new TH1F("hcs_mixacc_result_momS2","MEA result (Mom. cut)",xbin,xmin,xmax);
+  TH1F* hcs_mixacc_result_momS3  = new TH1F("hcs_mixacc_result_momS3","MEA result (Mom. cut)",xbin,xmin,xmax);
+  TH1F* hcs_mixacc_result_momS4  = new TH1F("hcs_mixacc_result_momS4","MEA result (Mom. cut)",xbin,xmin,xmax);
+  TH1F* hcs_mixacc_result_momS5  = new TH1F("hcs_mixacc_result_momS5","MEA result (Mom. cut)",xbin,xmin,xmax);
+  TH1F* hcs_mixacc_result_momS6  = new TH1F("hcs_mixacc_result_momS6","MEA result (Mom. cut)",xbin,xmin,xmax);
+  TH1F* hcs_mixacc_result_momS8  = new TH1F("hcs_mixacc_result_momS8","MEA result (Mom. cut)",xbin,xmin,xmax);
+  TH1F* hcs_mixacc_result_momS9  = new TH1F("hcs_mixacc_result_momS9","MEA result (Mom. cut)",xbin,xmin,xmax);
 // (NY/DAQ_Eff./RHRS)
   TH1F* hcs_mixacc_result_new  = new TH1F("hcs_mixacc_result_new","MEA result (new AC best)",xbin,xmin,xmax);
 /*-------------------*/
@@ -516,6 +549,22 @@ cout << "Param file : " << AcceptanceR_table_z9.c_str() << endl;
   bool event_selection_nocut = false;
   bool event_selection_nocut_new = false;
   bool event_selection_momcut = false;
+  bool event_selection_momL1 = false;//VP Flux Syst.
+  bool event_selection_momL2 = false;//VP Flux Syst.
+  bool event_selection_momL3 = false;//VP Flux Syst.
+  bool event_selection_momL4 = false;//VP Flux Syst.
+  bool event_selection_momL5 = false;//VP Flux Syst.
+  bool event_selection_momL6 = false;//VP Flux Syst.
+  bool event_selection_momL8 = false;//VP Flux Syst.
+  bool event_selection_momL9 = false;//VP Flux Syst.
+  bool event_selection_momS1 = false;//VP Flux Syst.
+  bool event_selection_momS2 = false;//VP Flux Syst.
+  bool event_selection_momS3 = false;//VP Flux Syst.
+  bool event_selection_momS4 = false;//VP Flux Syst.
+  bool event_selection_momS5 = false;//VP Flux Syst.
+  bool event_selection_momS6 = false;//VP Flux Syst.
+  bool event_selection_momS8 = false;//VP Flux Syst.
+  bool event_selection_momS9 = false;//VP Flux Syst.
   bool cm2_angle1_cut=false;
   bool cm2_angle2_cut=false;
   bool cm3_angle1_cut=false;
@@ -547,7 +596,7 @@ cout << "Param file : " << AcceptanceR_table_z9.c_str() << endl;
 
   int ENum=0;
  // tree->Draw(">>elist", "abs(ct_orig+7*2.0)<1.0||abs(ct_orig+2*2.0)<1.0||abs(ct_orig+1.0*2.0)<1.0||abs(ct_orig-4.0*2.0)<1.0||abs(ct_orig-5.0*2.0)<1.0||abs(ct_orig-6.0*2.0)<1.0");
-  tree->Draw(">>elist", "abs(ct_orig+9.0*2.012)<1.006||abs(ct_orig+8.0*2.012)<1.006||abs(ct_orig+2.0*2.012)<1.006||abs(ct_orig+1.0*2.012)<1.006||abs(ct_orig-6.0*2.012)<1.006||abs(ct_orig-7.0*2.012)<1.006&&Rp_c>1760.&&Rp_c<1900.&&2010.<Lp_c&&Lp_c<2160.");
+  tree->Draw(">>elist", "abs(ct_orig+9.0*2.012)<1.006||abs(ct_orig+8.0*2.012)<1.006||abs(ct_orig+2.0*2.012)<1.006||abs(ct_orig+1.0*2.012)<1.006||abs(ct_orig-6.0*2.012)<1.006||abs(ct_orig-7.0*2.012)<1.006&&Rp_c>1.760&&Rp_c<1.900&&2.010<Lp_c&&Lp_c<2.160");
   TEventList *elist = (TEventList*)gROOT->FindObject("elist");
   ENum = elist->GetN(); 
   //ENum = tree->GetEntries();
@@ -635,7 +684,7 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
 		else event_selection_nocut_new=false;
 		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection_new=true;
 		else event_selection_new=false;
-		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&L_tr_p>2.12&&L_tr_p<2.18&&R_tr_p>1.81&&R_tr_p<1.88)event_selection_momcut=true;
+		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&L_mom>2.12&&L_mom<2.18&&R_mom>1.81&&R_mom<1.88)event_selection_momcut=true;
 		else event_selection_momcut=false;
 		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection_woac=true;
 		else event_selection_woac=false;
@@ -741,7 +790,40 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
 		else event_selection_nocut_new=false;
 		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection_new=true;
 		else event_selection_new=false;
-		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&L_tr_p>2.12&&L_tr_p<2.18&&R_tr_p>1.81&&R_tr_p<1.88)event_selection_momcut=true;
+		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&R_mom<1.89)event_selection_momL1=true;
+		else event_selection_momL1=false;
+		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&R_mom<1.88)event_selection_momL2=true;
+		else event_selection_momL2=false;
+		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&R_mom<1.87)event_selection_momL3=true;
+		else event_selection_momL3=false;
+		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&R_mom<1.86)event_selection_momL4=true;
+		else event_selection_momL4=false;
+		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&R_mom<1.85)event_selection_momL5=true;
+		else event_selection_momL5=false;
+		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&R_mom<1.84)event_selection_momL6=true;
+		else event_selection_momL6=false;
+		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&R_mom<1.91)event_selection_momL8=true;
+		else event_selection_momL8=false;
+		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&R_mom<1.92)event_selection_momL9=true;
+		else event_selection_momL9=false;
+		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&R_mom>1.77)event_selection_momS1=true;
+		else event_selection_momS1=false;
+		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&R_mom>1.78)event_selection_momS2=true;
+		else event_selection_momS2=false;
+		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&R_mom>1.79)event_selection_momS3=true;
+		else event_selection_momS3=false;
+		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&R_mom>1.80)event_selection_momS4=true;
+		else event_selection_momS4=false;
+		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&R_mom>1.81)event_selection_momS5=true;
+		else event_selection_momS5=false;
+		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&R_mom>1.82)event_selection_momS6=true;
+		else event_selection_momS6=false;
+		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&R_mom>1.75)event_selection_momS8=true;
+		else event_selection_momS8=false;
+		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&R_mom>1.74)event_selection_momS9=true;
+		else event_selection_momS9=false;
+
+		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&L_mom>2.12&&L_mom<2.18&&R_mom>1.81&&R_mom<1.88)event_selection_momcut=true;
 		else event_selection_momcut=false;
 		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection_woac=true;
 		else event_selection_woac=false;
@@ -868,6 +950,38 @@ cout<<"MIXED! EVENT! ANALYSIS!"<<endl;
 			if(event_selection_new)hmm_mixacc_result_newCT->Fill(mm_mixed);
 			if(event_selection_new)hcs_mixacc_result_new->Fill(mm_mixed,cs);
 			if(event_selection_momcut)hmm_mixacc_result_momcut->Fill(mm_mixed);
+			if(event_selection_momL1)hmm_mixacc_result_momL1->Fill(mm_mixed);
+			if(event_selection_momL2)hmm_mixacc_result_momL2->Fill(mm_mixed);
+			if(event_selection_momL3)hmm_mixacc_result_momL3->Fill(mm_mixed);
+			if(event_selection_momL4)hmm_mixacc_result_momL4->Fill(mm_mixed);
+			if(event_selection_momL5)hmm_mixacc_result_momL5->Fill(mm_mixed);
+			if(event_selection_momL6)hmm_mixacc_result_momL6->Fill(mm_mixed);
+			if(event_selection_momL8)hmm_mixacc_result_momL8->Fill(mm_mixed);
+			if(event_selection_momL9)hmm_mixacc_result_momL9->Fill(mm_mixed);
+			if(event_selection_momS1)hmm_mixacc_result_momS1->Fill(mm_mixed);
+			if(event_selection_momS2)hmm_mixacc_result_momS2->Fill(mm_mixed);
+			if(event_selection_momS3)hmm_mixacc_result_momS3->Fill(mm_mixed);
+			if(event_selection_momS4)hmm_mixacc_result_momS4->Fill(mm_mixed);
+			if(event_selection_momS5)hmm_mixacc_result_momS5->Fill(mm_mixed);
+			if(event_selection_momS6)hmm_mixacc_result_momS6->Fill(mm_mixed);
+			if(event_selection_momS8)hmm_mixacc_result_momS8->Fill(mm_mixed);
+			if(event_selection_momS9)hmm_mixacc_result_momS9->Fill(mm_mixed);
+			if(event_selection_momL1)hcs_mixacc_result_momL1->Fill(mm_mixed,cs);
+			if(event_selection_momL2)hcs_mixacc_result_momL2->Fill(mm_mixed,cs);
+			if(event_selection_momL3)hcs_mixacc_result_momL3->Fill(mm_mixed,cs);
+			if(event_selection_momL4)hcs_mixacc_result_momL4->Fill(mm_mixed,cs);
+			if(event_selection_momL5)hcs_mixacc_result_momL5->Fill(mm_mixed,cs);
+			if(event_selection_momL6)hcs_mixacc_result_momL6->Fill(mm_mixed,cs);
+			if(event_selection_momL8)hcs_mixacc_result_momL8->Fill(mm_mixed,cs);
+			if(event_selection_momL9)hcs_mixacc_result_momL9->Fill(mm_mixed,cs);
+			if(event_selection_momS1)hcs_mixacc_result_momS1->Fill(mm_mixed,cs);
+			if(event_selection_momS2)hcs_mixacc_result_momS2->Fill(mm_mixed,cs);
+			if(event_selection_momS3)hcs_mixacc_result_momS3->Fill(mm_mixed,cs);
+			if(event_selection_momS4)hcs_mixacc_result_momS4->Fill(mm_mixed,cs);
+			if(event_selection_momS5)hcs_mixacc_result_momS5->Fill(mm_mixed,cs);
+			if(event_selection_momS6)hcs_mixacc_result_momS6->Fill(mm_mixed,cs);
+			if(event_selection_momS8)hcs_mixacc_result_momS8->Fill(mm_mixed,cs);
+			if(event_selection_momS9)hcs_mixacc_result_momS9->Fill(mm_mixed,cs);
 			if(event_selection_woac)hmm_mixacc_result_woac->Fill(mm_mixed);
 			if(event_selection_zdiff)hmm_mixacc_result_zdiff->Fill(mm_mixed);
 			if(ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP&&(fabs(R_tr_vz-L_tr_vz)<0.025)&&(fabs(fabs(R_tr_vz+L_tr_vz)/2.-0.12)<0.01||fabs(fabs(R_tr_vz+L_tr_vz)/2.+0.12)<0.01))hmm_mixacc_result_nocut_forAl->Fill(mm_mixed);//Al selection

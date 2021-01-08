@@ -253,9 +253,15 @@ void radiative2(){
   //TFile *file_G4 = new TFile("/data/41a/ELS/okuyama/Suzuki_20201208/G4_temp/data/H2_500um_woInRad.root","read");//w/o internal radiation 2020/12/08
   TFile *file_G4 = new TFile("/data/41a/ELS/okuyama/Suzuki_20201208/G4_temp/data/tree_H2_500um_wInRad.root","read");//w/ internal radiation 2020/12/08
   //TFile *file_simc = new TFile("/data/41a/ELS/okuyama/SIMC_jlab/SIMC/rootfiles/BOTH_LS_Rad3.root","read");
-  TFile *file_simc = new TFile("/data/41a/ELS/okuyama/SIMC_jlab/SIMC/rootfiles/BOTH_LS.root","read");
+  //TFile *file_simc = new TFile("/data/41a/ELS/okuyama/SIMC_jlab/SIMC/rootfiles/BOTH_LS.root","read");
   TFile *file_simcL = new TFile("/data/41a/ELS/okuyama/SIMC_jlab/SIMC/rootfiles/BOTH_L_Rad3.root","read");
   TFile *file_simcS = new TFile("/data/41a/ELS/okuyama/SIMC_jlab/SIMC/rootfiles/BOTH_S_Rad3.root","read");
+  TFile *file_simc = new TFile("/data/41a/ELS/okuyama/SIMC_jlab/SIMC/rootfiles/BOTH_LS_datafit.root","read");
+  //TFile *file_simcL = new TFile("/data/41a/ELS/okuyama/SIMC_jlab/SIMC/rootfiles/NONE_L.root","read");
+  //TFile *file_simcS = new TFile("/data/41a/ELS/okuyama/SIMC_jlab/SIMC/rootfiles/NONE_S.root","read");
+  //TFile *file_simc = new TFile("/data/41a/ELS/okuyama/SIMC_jlab/SIMC/rootfiles/NONE_LS.root","read");
+  //TFile *file_simcL = new TFile("/data/41a/ELS/okuyama/SIMC_jlab/SIMC/rootfiles/BOTH_L_datafit.root","read");
+  //TFile *file_simcS = new TFile("/data/41a/ELS/okuyama/SIMC_jlab/SIMC/rootfiles/BOTH_S_datafit.root","read");
   TTree *tree = (TTree*)file->Get("tree_out");
   TTree *SNT = (TTree*)file_simc->Get("SNT");
   TTree *SNTL = (TTree*)file_simcL->Get("SNT");
@@ -461,10 +467,16 @@ void radiative2(){
   TH1F* hmm_simcS  = new TH1F("hmm_simcS","hmm_simcS",xbin,xmin,xmax);
   TH1F* hmm_simc  = new TH1F("hmm_simc","hmm_simc",xbin,xmin,xmax);
 	float mm_simcL, mm_simcS;
+	float L_momL, L_momR;
+	float S_momL, S_momR;
 	SNTL->SetBranchStatus("*",0);
 	SNTL->SetBranchStatus("missmass",1);SNTL->SetBranchAddress("missmass",&mm_simcL);
+	SNTL->SetBranchStatus("Lp_rec",1);SNTL->SetBranchAddress("Lp_rec",&L_momL);
+	SNTL->SetBranchStatus("Rp_rec",1);SNTL->SetBranchAddress("Rp_rec",&L_momR);
 	SNTS->SetBranchStatus("*",0);
 	SNTS->SetBranchStatus("missmass",1);SNTS->SetBranchAddress("missmass",&mm_simcS);
+	SNTS->SetBranchStatus("Lp_rec",1);SNTS->SetBranchAddress("Lp_rec",&S_momL);
+	SNTS->SetBranchStatus("Rp_rec",1);SNTS->SetBranchAddress("Rp_rec",&S_momR);
   int ENum_simcL = SNTL->GetEntries(); 
   int ENum_simcS = SNTS->GetEntries(); 
 cout<<"Entries(SIMC Lambda): "<<ENum_simcL<<endl;
@@ -472,14 +484,14 @@ cout<<"Entries(SIMC Lambda): "<<ENum_simcL<<endl;
   for(int i=0;i<ENum_simcL;i++){
 	SNTL->GetEntry(i);
 	double ran = ranL_simc.Gaus((mm_simcL-ML-0.0015),0.001);
-	hmm_simcL->Fill(ran*1000.);
+	if(L_momR>1760.&&L_momR<1900.&&L_momL>2092.&&L_momL<2160.)hmm_simcL->Fill(ran*1000.);
 	}
 cout<<"Entries(SIMC Sigma0): "<<ENum_simcS<<endl;
   TRandom3 ranS_simc;
   for(int i=0;i<ENum_simcS;i++){
 	SNTS->GetEntry(i);
 	double ran = ranS_simc.Gaus((mm_simcS-ML-0.0015),0.001);
-	hmm_simcS->Fill(ran*1000.);
+	if(S_momR>1760.&&S_momR<1900.&&S_momL>2010.&&S_momL<2108.)hmm_simcS->Fill(ran*1000.);
 	}
 //  TH1F* hmm_simc  = new TH1F("hmm_simc","hmm_simc",xbin,xmin,xmax);
 //    //char condi[1000];
@@ -711,7 +723,7 @@ cout<<"Entries: "<<ENum<<endl;
 		if(fabs(ct)<1.006)ct_cut=true;
 		else ct_cut=false;
 		//if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
-		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
+		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&R_mom>1.760&&R_mom<1.900&&L_mom>2.010&&L_mom<2.160)event_selection=true;
 		else event_selection=false;
 
 		event_selection_nocut=false;
@@ -912,8 +924,8 @@ cout<<"hmm_L(data): "<<hmm_wobg_fom_best->Integral(hmm_wobg_fom_best->FindBin(de
 	//hmm_simcS->Scale(258./190355.);
 	//hmm_simcL->Scale(809./487082.);
 	//hmm_simcS->Scale(258./209782.);
-	hmm_simcL->Scale(1140.53/698789.);
-	hmm_simcS->Scale(349.678/260753.);
+	//hmm_simcL->Scale(1140.53/698789.);//2020Nov.
+	//hmm_simcS->Scale(349.678/260753.);//2020Nov.
 	hmm_simc->Add(hmm_simcL,hmm_simcS,1.0,1.0);
 	//hmm_simc->SetFillColor(kAzure);
 	//hmm_simc->SetFillStyle(3004);

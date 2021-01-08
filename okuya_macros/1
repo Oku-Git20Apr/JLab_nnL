@@ -512,8 +512,8 @@ cout << "Param file : " << AcceptanceR_table_z9.c_str() << endl;
  //const double fit_max_mm=0.085;
  const double fit_min_mm=-0.005;
  const double fit_max_mm=0.085;
- const double fmin_mm=-0.05;
- const double fmax_mm=2.20;
+ const double fmin_mm=-1.;
+ const double fmax_mm=2.;
  //const double fmin_mm=-0.01;
  //const double fmax_mm=0.12;
  //const double fmax_mm=10.;
@@ -982,12 +982,9 @@ cout<<"Entries: "<<ENum<<endl;
 	    mm=mass - mh;//shift by ML
 		
 		if(event_selection&&ct_cut)hmm_L_fom_best->Fill(mm);
-		if(event_selection_new&&ct_cut)hmm_L_fom_strict->Fill(mm);
+		//if(event_selection_new&&ct_cut)hmm_L_fom_strict->Fill(mm);
 		//change
-		//if(event_selection_momS6&&ct_cut)hmm_L_fom_strict->Fill(mm);
-
-
-
+		if(event_selection_momS1&&ct_cut)hmm_L_fom_strict->Fill(mm);
 		if(event_selection_nocut&&ct_cut)hmm_L_fom_nocut->Fill(mm);
 		double theta_ee = L_4vec.Theta();
 		//test double theta_ek = acos((phi_R*sin(phi0)+cos(phi0))/(sqrt(1+theta*theta+phi*phi)));//original frame
@@ -1111,8 +1108,8 @@ cout<<"Entries: "<<ENum<<endl;
 
 
 		//change
-		if(event_selection_new&&ct_cut)hcs_L_fom_strict->Fill(mm,cs);
-		//if(event_selection_momS6&&ct_cut)hcs_L_fom_strict->Fill(mm,cs);
+		//if(event_selection_new&&ct_cut)hcs_L_fom_strict->Fill(mm,cs);
+		if(event_selection_momS1&&ct_cut)hcs_L_fom_strict->Fill(mm,cs);
 		//
 		//
 		//if(event_selection&&ct_cut)hcs_L_fom_best->Fill(mm,cs);
@@ -1195,11 +1192,11 @@ cout<<"Entries: "<<ENum<<endl;
 	//TH1F* hmm_pi_fom_nocut=(TH1F*)file->Get("hmm_pi_fom_noZ");
 	//TH1F* hmm_pi_fom_best=(TH1F*)file->Get("hmm_pi_fom_best");
 	TH1F* hmm_bg_fom_best=(TH1F*)file_mea->Get("hmm_mixacc_result_best");
-	TH1F* hmm_bg_fom_strict=(TH1F*)file_mea->Get("hmm_mixacc_result_new");
-	TH1F* hcs_bg_fom_strict=(TH1F*)file_mea->Get("hcs_mixacc_result_new");
+	//TH1F* hmm_bg_fom_strict=(TH1F*)file_mea->Get("hmm_mixacc_result_new");
+	//TH1F* hcs_bg_fom_strict=(TH1F*)file_mea->Get("hcs_mixacc_result_new");
 	//change
-	//TH1F* hmm_bg_fom_strict=(TH1F*)file_mea->Get("hmm_mixacc_result_momS6");
-	//TH1F* hcs_bg_fom_strict=(TH1F*)file_mea->Get("hcs_mixacc_result_momS6");
+	TH1F* hmm_bg_fom_strict=(TH1F*)file_mea->Get("hmm_mixacc_result_momS1");
+	TH1F* hcs_bg_fom_strict=(TH1F*)file_mea->Get("hcs_mixacc_result_momS1");
 	//change
 	
 	TH1F* hcs_bg_cm2_1=(TH1F*)file_mea->Get("hcs_mixacc_result_cm2_1");
@@ -1319,7 +1316,7 @@ cout<<"Entries: "<<ENum<<endl;
 //===CHANGE===//
 	//hmm_wo_bg_fom_best->Add(hcs_L_fom_strict,hmm_bg_fom_strict,1.0,-1.0);//All
 	//hmm_wo_bg_fom_best->Add(hcs_L_fom_strict,hcs_bg_fom_strict,1.0,-1.0);//All by hcs
-	//hmm_wo_bg_fom_best->Add(hmm_L_fom_strict,hmm_bg_fom_strict,1.0,-1.0);//All by hmm
+	hmm_wo_bg_fom_best->Add(hmm_L_fom_strict,hmm_bg_fom_strict,1.0,-1.0);//All by hmm
 	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm2_1,hcs_bg_new_cm2_1,1.0,-1.0);//2 div.
 	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm2_2,hcs_bg_new_cm2_2,1.0,-1.0);//2 div.
 	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm3_1,hcs_bg_new_cm3_1,1.0,-1.0);//3 div.
@@ -1342,7 +1339,7 @@ cout<<"Entries: "<<ENum<<endl;
 	//hmm_wo_bg_fom_best->Add(hmm_L_new_cm3_2,hmm_bg_new_cm3_2,1.0,-1.0);//3 div.
 	//hmm_wo_bg_fom_best->Add(hmm_L_new_cm3_3,hmm_bg_new_cm3_3,1.0,-1.0);//3 div.
 	//hmm_wo_bg_fom_best->Add(hmm_L_new_Qsq2_1,hmm_bg_new_Qsq2_1,1.0,-1.0);//2 div.
-	hmm_wo_bg_fom_best->Add(hmm_L_new_Qsq2_2,hmm_bg_new_Qsq2_2,1.0,-1.0);//2 div.
+	//hmm_wo_bg_fom_best->Add(hmm_L_new_Qsq2_2,hmm_bg_new_Qsq2_2,1.0,-1.0);//2 div.
 	//hmm_wo_bg_fom_best->Add(hmm_L_new_Qsq3_1,hmm_bg_new_Qsq3_1,1.0,-1.0);//3 div.
 	//hmm_wo_bg_fom_best->Add(hmm_L_new_Qsq3_2,hmm_bg_new_Qsq3_2,1.0,-1.0);//3 div.
 	//hmm_wo_bg_fom_best->Add(hmm_L_new_Qsq3_3,hmm_bg_new_Qsq3_3,1.0,-1.0);//3 div.
@@ -1532,9 +1529,7 @@ cout<<"BEST CUT START"<<endl;
 	 fmm_best_4Poly->FixParameter(13,1.49999);
 	 //fmm_best_4Poly->SetParLimits(13,0.645,0.655);
 
-	//change
 	 hmm_wo_bg_fom_best->Fit("fmm_best_4Poly","LL","",fit_min_mm,fit_max_mm);//Total fitting w/ 4Poly BG
-	 //hmm_wo_bg_fom_best->Fit("fmm_best_4Poly","","",fit_min_mm,fit_max_mm);//Total fitting w/ 4Poly BG
 	 double chisq = fmm_best_4Poly->GetChisquare();
 	 double dof  = fmm_best_4Poly->GetNDF();
 	 cout<<"chisq="<<chisq<<endl;
@@ -1578,21 +1573,17 @@ cout<<"BEST CUT START"<<endl;
 	 fmm_Sigma_only->SetParError(6,fmm_best_4Poly->GetParError(13));
 
 	double nofL = fmm_Lambda_only->Integral(fmin_mm,fmax_mm);
-	double nofL2 = fmm_Lambda_only->Integral(-0.05,0.15);
 	double nofL_old = fmm_Lambda_only->Integral(-0.006,0.006);
 	nofL = nofL/fit_bin_width;
 	nofL_old = nofL_old/fit_bin_width;
 	cout<<"Number of Lambda (TF1 Integral) = "<<nofL<<endl;
-	cout<<"Number of Lambda within (TF1 Integral) = "<<nofL2/fit_bin_width<<endl;
 	cout<<"Number of Lambda w/o radiative tail (TF1 Integral) = "<<nofL_old<<endl;
 	cout<<"Number of Lambda w/o radiative tail (TH1F Integral) = "<<hmm_wo_bg_fom_best->Integral(hmm_wo_bg_fom_best->FindBin(-0.006),hmm_wo_bg_fom_best->FindBin(0.006))<<endl;
 
 	//double nofS = fmm_Sigma_only->Integral(-0.05,0.085);
 	double nofS = fmm_Sigma_only->Integral(fmin_mm,fmax_mm);
-	double nofS2 = fmm_Sigma_only->Integral(-0.05,0.15);
 	nofS = nofS/fit_bin_width;
 	cout<<"Number of Sigma (TF1 Integral) = "<<nofS<<endl;
-	cout<<"Number of Sigma within (TF1 Integral) = "<<nofS2/fit_bin_width<<endl;
 
 	 hmm_wo_bg_fom_best->Draw();
 	 fmm_best_4Poly->SetLineColor(kRed);
