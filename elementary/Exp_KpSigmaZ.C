@@ -790,9 +790,9 @@ void draw_KpSigmaZ(){
 
   for(int i=0;i<37;i++){  y6[i] /= 1000.; }
   TGraphErrors *gr6 = new TGraphErrors(37,x6,y6,0,0);
-  SetGr(gr6,"","","",2,2,1,1.0);//Red
+  SetGr(gr6,"","","",51,51,1,1.0);//Purple
   gr6->SetLineWidth(2);
-  gr6->SetLineStyle(1);
+  gr6->SetLineStyle(2);
 
 
 double x7[4] = {//LEPS W=2.163 GeV
@@ -834,7 +834,7 @@ double ye7[4] = {//LEPS W=2.163 GeV
   ax->SetLabelOffset(0.01);
   ax->SetTitleSize(0.06);  ax->SetTitleOffset(0.80);
   ax->SetMaxDigits(3);
-  ax->SetTitle("#theta_{#gammaK}^{CM} [deg]");
+  ax->SetTitle("#theta_{#gammaK}^{CM} [degree]");
 
   //TGaxis *ay = new TGaxis(-1,0, -1,0.5, 0,0.5, 505 );
   TGaxis *ay = new TGaxis(0,0, 0,0.5, 0,0.5, 505 );
@@ -851,68 +851,176 @@ double ye7[4] = {//LEPS W=2.163 GeV
   leg->SetTextSize(0.050);
   leg->SetMargin(0.15);
   leg->SetNColumns(1);
-  leg->AddEntry(gr1     ,Form("SAPHIR #scale[0.6]{EPJA19(2004) 251.}  #scale[0.5]{(#sqrt{s}=%.3lf GeV)}"
+  leg->AddEntry(gr1     ,Form("SAPHIR #scale[0.6]{EPJA19(2004) 251.}  #scale[0.5]{(W=%.3lf GeV)}"
                         ,dataset1->GetKinematics()->GetW()/1000.),"pl");
-  leg->AddEntry(gr2     ,Form("CLAS #scale[0.6]{PRC69(2004) 042201R.}  #scale[0.5]{(#sqrt{s}=%.3lf GeV)}"
+  leg->AddEntry(gr2     ,Form("CLAS #scale[0.6]{PRC69(2004) 042201R.}  #scale[0.5]{(W=%.3lf GeV)}"
                         ,dataset2->GetKinematics()->GetW()/1000.),"pl");
-  leg->AddEntry(gr3     ,Form("CLAS #scale[0.6]{PRC73(2006) 035202.}   #scale[0.5]{(#sqrt{s}=%.3lf GeV)}"
+  leg->AddEntry(gr3     ,Form("CLAS #scale[0.6]{PRC73(2006) 035202.}   #scale[0.5]{(W=%.3lf GeV)}"
                         ,dataset3->GetKinematics()->GetW()/1000.),"pl");
-  leg->AddEntry(gr4     ,Form("CLAS #scale[0.6]{PRC82(2010) 025202.}   #scale[0.5]{(#sqrt{s}=%.3lf GeV)}"
+  leg->AddEntry(gr4     ,Form("CLAS #scale[0.6]{PRC82(2010) 025202.}   #scale[0.5]{(W=%.3lf GeV)}"
                         ,dataset4->GetKinematics()->GetW()/1000.),"pl");
-  leg->AddEntry(gr7     ,"LEPS #scale[0.6]{PRC73(2006) 035214}    #scale[0.5]{(#sqrt{s}=2.163 GeV)}","pl");
-  leg->AddEntry(gr5     ,"MAID #scale[0.6]{PRC61(1999) 012201.}   #scale[0.5]{(#sqrt{s}=2.110 GeV)}","pl");
-  leg->AddEntry(gr6     ,"SLA #scale[0.6]{PRC58(1998) 75.}          #scale[0.5]{(#sqrt{s}=2.110 GeV)}","pl");
+  leg->AddEntry(gr7     ,"LEPS #scale[0.6]{PRC73(2006) 035214}    #scale[0.5]{(W=2.163 GeV)}","pl");
+  leg->AddEntry(gr5     ,"KM #scale[0.6]{PRC61(1999) 012201.}       #scale[0.5]{(W=2.110 GeV)}","pl");
+  leg->AddEntry(gr6     ,"SLA #scale[0.6]{PRC58(1998) 75.}          #scale[0.5]{(W=2.110 GeV)}","pl");
 
 
-	double x_result[1], y_result[1], xe_result[1], ye_result[1];
-	double x2_result[2], y2_result[2], xe2_result[2], ye2_result[2];
-	double x3_result[3], y3_result[3], xe3_result[3], ye3_result[3];
+	double x_result[1], y_result[1], xel_result[1], xeh_result[1], yel_result[1], yeh_result[1], xe_result[1], ye_result[1];
+	double x2_result[2], y2_result[2], xel2_result[2], xeh2_result[2], yel2_result[2], yeh2_result[2], xe2_result[2], ye2_result[2];
+	double x3_result[3], y3_result[3], xe3_result[3], yel3_result[3], yeh3_result[3];
+//	string result_in = "./result_input.dat";//D.C.S. Result
+//	string buf;
+//	int npoint = 0;
+//	int npoint2 = 0;
+//	int npoint3 = 0;
+//	int flag_LS = -1;//Lambda(1) or Sigma0(2)
+//	int flag_dep = -1;//Angle(1) or Q2(2)
+//	int flag_div = -1;//1-Div.(1) or 2-Div.(2) or 3-Div.(3)
+//	double xval, xerr, yval, yerr;
+//	ifstream ifp(result_in.c_str(),ios::in);
+//	if (ifp.fail()){ cout << "Failed" << endl; exit(1);}
+//cout << "Param file : " << result_in.c_str() << endl;
+//	while(1){
+//		getline(ifp,buf);
+//		if(buf[0]=='#'){continue;}
+//		if(ifp.eof())break;
+//		stringstream sbuf(buf);
+//		sbuf >> flag_LS >> flag_dep >> flag_div >> xval >> yval >> xerr >> yerr;
+//		cout << flag_LS << ", " << flag_dep << ", " << flag_div << ", " << xval << ", " << yval << ", " << xerr << ", " << yerr <<endl;
+//		
+//		if(flag_LS==2&&flag_dep==1&&flag_div==1){//1-Div.
+//			x_result[npoint] = xval; 
+//			y_result[npoint] = yval;
+//			xe_result[npoint]= xerr; 
+//			ye_result[npoint]= yerr; 
+//			npoint++;
+//		}
+//		if(flag_LS==2&&flag_dep==1&&flag_div==2){//2-Div.
+//			x2_result[npoint2] = xval; 
+//			y2_result[npoint2] = yval;
+//			xe2_result[npoint2]= xerr; 
+//			ye2_result[npoint2]= yerr; 
+//			npoint2++;
+//		}
+//		if(flag_LS==2&&flag_dep==1&&flag_div==3){//3-Div.
+//			x3_result[npoint3] = xval; 
+//			y3_result[npoint3] = yval;
+//			xe3_result[npoint3]= xerr; 
+//			ye3_result[npoint3]= yerr; 
+//			npoint3++;
+//		}
+//	}
+//
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%//
+//%%2021. 1. 11. ver., M-thesis		%//
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%//
 	x_result[0]=8.;//deg
-	y_result[0]=0.1032;//ub/sr
+	y_result[0]=0.0635;//ub/sr
 	xe_result[0]=8.;
-	ye_result[0]=0.0084;
-	x2_result[0]=4.;//deg
-	y2_result[0]=0.08727;//ub/sr
-	xe2_result[0]=4.;
-	ye2_result[0]=0.008;
-	x2_result[1]=12.;//deg
-	y2_result[1]=0.1196;//ub/sr
-	xe2_result[1]=4.;
-	ye2_result[1]=0.0105;
-	x3_result[0]=3.;//deg
-	y3_result[0]=0.0687;//ub/sr
-	xe3_result[0]=3.;
-	ye3_result[0]=0.008;
-	x3_result[1]=8.;//deg
-	y3_result[1]=0.1169;//ub/sr
-	xe3_result[1]=2.;
-	ye3_result[1]=0.011;
-	x3_result[2]=13.;//deg
-	y3_result[2]=0.1205;//ub/sr
-	xe3_result[2]=3.;
-	ye3_result[2]=0.011;
+	xel_result[0]=8.;
+	xeh_result[0]=8.;
+	ye_result[0]=0.009;
+	yel_result[0]=0.0183;
+	yeh_result[0]=0.0626;
 
-  TGraphErrors *gr_result = new TGraphErrors(1, x_result, y_result, xe_result, ye_result);
+	x2_result[0]=4.;//deg
+	y2_result[0]=0.0525;//ub/sr
+	xe2_result[0]=4.;
+	xel2_result[0]=4.;
+	xeh2_result[0]=4.;
+	ye2_result[0]=0.010;//Stat.
+	yel2_result[0]=0.0177;//Stat. & Syst.
+	yeh2_result[0]=0.0562;//Stat. & Syst.
+
+	x2_result[1]=12.;//deg
+	y2_result[1]=0.0743;//ub/sr
+	xe2_result[1]=4.;
+	xel2_result[1]=4.;
+	xeh2_result[1]=4.;
+	ye2_result[1]=0.0123;
+	yel2_result[1]=0.0239;
+	yeh2_result[1]=0.0774;
+//
+//
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%//
+//%%2021. 1. 8. ver., VP Flux was wrong%//
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%//
+//	x_result[0]=8.;//deg
+//	y_result[0]=0.0676;//ub/sr
+//	xe_result[0]=8.;
+//	xel_result[0]=8.;
+//	xeh_result[0]=8.;
+//	ye_result[0]=0.010;
+//	yel_result[0]=0.0195;
+//	yeh_result[0]=0.0666;
+//
+//	x2_result[0]=4.;//deg
+//	y2_result[0]=0.0546;//ub/sr
+//	ye2_result[0]=0.00998;
+//	xe2_result[0]=4.;
+//	xel2_result[0]=4.;
+//	xeh2_result[0]=4.;
+//	yel2_result[0]=0.0184;
+//	yeh2_result[0]=0.0585;
+//
+//	x2_result[1]=12.;//deg
+//	y2_result[1]=0.0805;//ub/sr
+//	xe2_result[1]=4.;
+//	xel2_result[1]=4.;
+//	xeh2_result[1]=4.;
+//	ye2_result[1]=0.0133;
+//	yel2_result[1]=0.0259;
+//	yeh2_result[1]=0.0838;
+//	x3_result[0]=3.;//deg
+//	y3_result[0]=0.0687;//ub/sr
+//	xe3_result[0]=3.;
+//	ye3_result[0]=0.008;
+//	x3_result[1]=8.;//deg
+//	y3_result[1]=0.1169;//ub/sr
+//	xe3_result[1]=2.;
+//	ye3_result[1]=0.011;
+//	x3_result[2]=13.;//deg
+//	y3_result[2]=0.1205;//ub/sr
+//	xe3_result[2]=3.;
+//	ye3_result[2]=0.011;
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%//
+
+  //TGraphErrors *gr_result = new TGraphErrors(1, x_result, y_result, xe_result, ye_result);
+  //gr_result->SetMarkerSize(1.5);
+  //gr_result->SetMarkerStyle(21);
+  //gr_result->SetFillStyle(3004);
+  ////gr_result->SetLineColor(2);
+  ////gr_result->SetFillColor(2);
+  //gr_result->SetMarkerColor(2);
+  //TGraphErrors *gr2_result = new TGraphErrors(2, x2_result, y2_result, xe2_result, ye2_result);
+  //gr2_result->SetMarkerSize(1.5);
+  //gr2_result->SetMarkerStyle(21);
+  //gr2_result->SetFillStyle(3005);
+  ////gr2_result->SetLineColor(kViolet);
+  ////gr2_result->SetFillColor(103);
+  //gr2_result->SetMarkerColor(3);
+  TGraphAsymmErrors *gr_result = new TGraphAsymmErrors(1, x_result, y_result, xel_result, xeh_result, yel_result, yeh_result);
+  //TGraphErrors *gr_result = new TGraphErrors(1, x_result, y_result, xe_result, ye_result);
   gr_result->SetMarkerSize(1.5);
   gr_result->SetMarkerStyle(21);
   gr_result->SetFillStyle(3004);
   //gr_result->SetLineColor(2);
   //gr_result->SetFillColor(2);
   gr_result->SetMarkerColor(2);
-  TGraphErrors *gr2_result = new TGraphErrors(2, x2_result, y2_result, xe2_result, ye2_result);
+  TGraphAsymmErrors *gr2_result = new TGraphAsymmErrors(2, x2_result, y2_result, xel2_result, xeh2_result, yel2_result, yeh2_result);
+  //TGraphErrors *gr2_result = new TGraphErrors(2, x2_result, y2_result, xe2_result, ye2_result);
   gr2_result->SetMarkerSize(1.5);
   gr2_result->SetMarkerStyle(21);
   gr2_result->SetFillStyle(3005);
   //gr2_result->SetLineColor(kViolet);
   //gr2_result->SetFillColor(103);
-  gr2_result->SetMarkerColor(3);
-  TGraphErrors *gr3_result = new TGraphErrors(3, x3_result, y3_result, xe3_result, ye3_result);
-  gr3_result->SetMarkerSize(1.5);
-  gr3_result->SetMarkerStyle(21);
-  gr3_result->SetFillStyle(3004);
-  //gr3_result->SetLineColor(kOrange);
-  //gr3_result->SetFillColor(102);
-  gr3_result->SetMarkerColor(4);
+  gr2_result->SetMarkerColor(4);
+//  TGraphErrors *gr3_result = new TGraphErrors(3, x3_result, y3_result, xe3_result, ye3_result);
+//  gr3_result->SetMarkerSize(1.5);
+//  gr3_result->SetMarkerStyle(21);
+//  gr3_result->SetFillStyle(3004);
+//  //gr3_result->SetLineColor(kOrange);
+//  //gr3_result->SetFillColor(102);
+//  gr3_result->SetMarkerColor(4);
 
   TCanvas *c1 = new TCanvas("c1","c1",1100,800);
   c1->Divide(1,1,0.0001,0.0001);
@@ -925,50 +1033,89 @@ double ye7[4] = {//LEPS W=2.163 GeV
   gr7->Draw("Psame");//LEPS
   gr5->Draw("Lsame");
   gr6->Draw("Lsame");
-TBox *b = new TBox(x_result[0]-xe_result[0],y_result[0]-ye_result[0],x_result[0]+xe_result[0],y_result[0]+ye_result[0]); 
+//TBox *b = new TBox(x_result[0]-xe_result[0],y_result[0]-ye_result[0],x_result[0]+xe_result[0],y_result[0]+ye_result[0]); 
+//	b->SetFillColor(2); 
+//	b->SetFillStyle(0);
+//	b->SetLineColor(2);
+//	b->SetLineWidth(1);
+//TBox *b2_1 = new TBox(x2_result[0]-xe2_result[0],y2_result[0]-ye2_result[0],x2_result[0]+xe2_result[0],y2_result[0]+ye2_result[0]); 
+////TBox *b2_1 = new TBox(0.,0.26527,8.,0.30327); 
+//	b2_1->SetFillColor(3); 
+//	b2_1->SetFillStyle(0);
+//	b2_1->SetLineColor(3);
+//	b2_1->SetLineWidth(1);
+////TBox *b2_2 = new TBox(8.,0.31396,16.,0.35196); 
+//TBox *b2_2 = new TBox(x2_result[1]-xe2_result[1],y2_result[1]-ye2_result[1],x2_result[1]+xe2_result[1],y2_result[1]+ye2_result[1]); 
+//	b2_2->SetFillColor(3); 
+//	b2_2->SetFillStyle(0);
+//	b2_2->SetLineColor(3);
+//	b2_2->SetLineWidth(1);
+TBox *b = new TBox(x_result[0]-xel_result[0],y_result[0]-yel_result[0],x_result[0]+xeh_result[0],y_result[0]+yeh_result[0]); 
 	b->SetFillColor(2); 
 	b->SetFillStyle(0);
 	b->SetLineColor(2);
-	b->SetLineWidth(1);
-TBox *b2_1 = new TBox(x2_result[0]-xe2_result[0],y2_result[0]-ye2_result[0],x2_result[0]+xe2_result[0],y2_result[0]+ye2_result[0]); 
+	b->SetLineWidth(3);
+	b->SetLineStyle(2);
+TBox *b_stat = new TBox(x_result[0]-xe_result[0],y_result[0]-ye_result[0],x_result[0]+xe_result[0],y_result[0]+ye_result[0]); 
+	b_stat->SetFillColor(2); 
+	b_stat->SetFillStyle(0);
+	b_stat->SetLineColor(2);
+	b_stat->SetLineWidth(3);
+TBox *b2_1 = new TBox(x2_result[0]-xel2_result[0],y2_result[0]-yel2_result[0],x2_result[0]+xeh2_result[0],y2_result[0]+yeh2_result[0]); 
 //TBox *b2_1 = new TBox(0.,0.26527,8.,0.30327); 
-	b2_1->SetFillColor(3); 
+	b2_1->SetFillColor(4); 
 	b2_1->SetFillStyle(0);
-	b2_1->SetLineColor(3);
-	b2_1->SetLineWidth(1);
+	b2_1->SetLineColor(4);
+	b2_1->SetLineWidth(3);
+	b2_1->SetLineStyle(2);
+TBox *b2_stat1 = new TBox(x2_result[0]-xe2_result[0],y2_result[0]-ye2_result[0],x2_result[0]+xe2_result[0],y2_result[0]+ye2_result[0]); 
+//TBox *b2_1 = new TBox(0.,0.26527,8.,0.30327); 
+	b2_stat1->SetFillColor(4); 
+	b2_stat1->SetFillStyle(0);
+	b2_stat1->SetLineColor(4);
+	b2_stat1->SetLineWidth(3);
 //TBox *b2_2 = new TBox(8.,0.31396,16.,0.35196); 
-TBox *b2_2 = new TBox(x2_result[1]-xe2_result[1],y2_result[1]-ye2_result[1],x2_result[1]+xe2_result[1],y2_result[1]+ye2_result[1]); 
-	b2_2->SetFillColor(3); 
+TBox *b2_2 = new TBox(x2_result[1]-xel2_result[1],y2_result[1]-yel2_result[1],x2_result[1]+xeh2_result[1],y2_result[1]+yeh2_result[1]); 
+	b2_2->SetFillColor(4); 
 	b2_2->SetFillStyle(0);
-	b2_2->SetLineColor(3);
-	b2_2->SetLineWidth(1);
+	b2_2->SetLineColor(4);
+	b2_2->SetLineWidth(3);
+	b2_2->SetLineStyle(2);
+TBox *b2_stat2 = new TBox(x2_result[1]-xe2_result[1],y2_result[1]-ye2_result[1],x2_result[1]+xe2_result[1],y2_result[1]+ye2_result[1]); 
+	b2_stat2->SetFillColor(4); 
+	b2_stat2->SetFillStyle(0);
+	b2_stat2->SetLineColor(4);
+	b2_stat2->SetLineWidth(3);
 //TBox *b3_1 = new TBox(0.,0.23115,6.,0.28115); 
-TBox *b3_1 = new TBox(x3_result[0]-xe3_result[0],y3_result[0]-ye3_result[0],x3_result[0]+xe3_result[0],y3_result[0]+ye3_result[0]); 
-	b3_1->SetFillColor(4); 
-	b3_1->SetFillStyle(0);
-	b3_1->SetLineColor(4);
-	b3_1->SetLineWidth(1);
-//TBox *b3_2 = new TBox(6.,0.31818,10.,0.36818); 
-TBox *b3_2 = new TBox(x3_result[1]-xe3_result[1],y3_result[1]-ye3_result[1],x3_result[1]+xe3_result[1],y3_result[1]+ye3_result[1]); 
-	b3_2->SetFillColor(4); 
-	b3_2->SetFillStyle(0);
-	b3_2->SetLineColor(4);
-	b3_2->SetLineWidth(1);
-//TBox *b3_3 = new TBox(10.,0.30168,16.,0.35168); 
-TBox *b3_3 = new TBox(x3_result[2]-xe3_result[2],y3_result[2]-ye3_result[2],x3_result[2]+xe3_result[2],y3_result[2]+ye3_result[2]); 
-	b3_3->SetFillColor(4); 
-	b3_3->SetFillStyle(0);
-	b3_3->SetLineColor(4);
-	b3_3->SetLineWidth(1);
-  gr3_result->Draw("P2same");
+//TBox *b3_1 = new TBox(x3_result[0]-xe3_result[0],y3_result[0]-ye3_result[0],x3_result[0]+xe3_result[0],y3_result[0]+ye3_result[0]); 
+//	b3_1->SetFillColor(4); 
+//	b3_1->SetFillStyle(0);
+//	b3_1->SetLineColor(4);
+//	b3_1->SetLineWidth(1);
+////TBox *b3_2 = new TBox(6.,0.31818,10.,0.36818); 
+//TBox *b3_2 = new TBox(x3_result[1]-xe3_result[1],y3_result[1]-ye3_result[1],x3_result[1]+xe3_result[1],y3_result[1]+ye3_result[1]); 
+//	b3_2->SetFillColor(4); 
+//	b3_2->SetFillStyle(0);
+//	b3_2->SetLineColor(4);
+//	b3_2->SetLineWidth(1);
+////TBox *b3_3 = new TBox(10.,0.30168,16.,0.35168); 
+//TBox *b3_3 = new TBox(x3_result[2]-xe3_result[2],y3_result[2]-ye3_result[2],x3_result[2]+xe3_result[2],y3_result[2]+ye3_result[2]); 
+//	b3_3->SetFillColor(4); 
+//	b3_3->SetFillStyle(0);
+//	b3_3->SetLineColor(4);
+//	b3_3->SetLineWidth(1);
+//  gr3_result->Draw("P2same");
   gr2_result->Draw("P2same");
-  gr_result->Draw("P2same");
-  b3_1->Draw();
-  b3_2->Draw();
-  b3_3->Draw();
+  //gr_result->Draw("P2same");
+//  b3_1->Draw();
+//  b3_2->Draw();
+//  b3_3->Draw();
   b2_1->Draw();
   b2_2->Draw();
-  b->Draw();
+  b2_stat1->Draw();
+  b2_stat2->Draw();
+  //b->Draw();
+  //b_stat->Draw();
   ax->Draw();
   ay->Draw();
   leg->Draw();
@@ -983,5 +1130,5 @@ TBox *b3_3 = new TBox(x3_result[2]-xe3_result[2],y3_result[2]-ye3_result[2],x3_r
 //cout<<i<<": "<<dataset4->GetKinematics()->GetW()<<endl;
 //}
 //c1->Print("Elementary_gpKS.pdf");
-c1->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/mthesis_Fig/pdf/CS_thetadepS.pdf");
+//c1->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/mthesis_Fig/pdf/CS_thetadepS2.pdf");
 }

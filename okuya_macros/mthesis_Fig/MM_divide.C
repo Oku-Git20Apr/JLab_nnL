@@ -299,8 +299,8 @@ cout << "Param file : " << AcceptanceR_table.c_str() << endl;
 
 
     
-	gStyle->SetOptStat(1);
-	gStyle->SetOptFit(1);
+	gStyle->SetOptStat(0);
+	gStyle->SetOptFit(0);
 
 
 
@@ -514,7 +514,9 @@ cout << "Param file : " << AcceptanceR_table.c_str() << endl;
   hmm_wobg_fom_best->SetLineColor(kBlack);
   TH2F* h_mm_Qsq = new TH2F("h_mm_Qsq","",100,-100.,200.,50,0.2,0.8);
   h_mm_Qsq->GetYaxis()->SetTitle("Q^{2} [(GeV/c)^{2}]");
+  h_mm_Qsq->GetYaxis()->SetLabelSize(1.2);
   h_mm_Qsq->GetXaxis()->SetTitle("Missing Mass - M_{#Lambda} [MeV/c^{2}]");
+  h_mm_Qsq->GetXaxis()->SetLabelSize(0.8);
   TH2F* h_mm_W = new TH2F("h_mm_W","",100,-100.,200.,50,2.05,2.25);
   h_mm_W->GetYaxis()->SetTitle("W [GeV]");
   h_mm_W->GetXaxis()->SetTitle("Missing Mass - M_{#Lambda} [MeV/c^{2}]");
@@ -572,6 +574,8 @@ cout << "Param file : " << AcceptanceR_table.c_str() << endl;
   TH2F* cos_eklab_gkcm = new TH2F("cos_eklab_gkcm","#theta_{gk}^{CM} vs #theta_{ek}^{lab}",100,0.95,1.0,100,0.95,1.0);
   TH2F* cos_ekcm_gkcm = new TH2F("cos_ekcm_gkcm","#theta_{gk}^{CM} vs #theta_{ek}^{CM}",100,0.9,1.0,100,0.9,1.0);
 
+  TH2D* h_theta_eeek = new TH2D("h_theta_eeek", "",20,0.2,0.26,20,0.2,0.26);
+  TH2D* h_theta_epek = new TH2D("h_theta_epek", "",50,0.15,0.3,50,0.35,0.65);
   TH1D* h_theta_ee = new TH1D("h_theta_ee", "theta_ee",1000,0.1,0.35);
   TH1D* h_phi_ee = new TH1D("h_phi_ee", "phi_ee",1000,0.,PI);
   TH1D* h_theta_ek = new TH1D("h_theta_ek", "theta_ek",1000,0.1,0.35);
@@ -802,6 +806,7 @@ cout<<"Entries: "<<ENum<<endl;
 		double phi_g = G_4vec.Phi()+2*PI;
 		double theta_g = G_4vec.Theta();
 		double theta_gk_lab = G_4vec.Angle(R_4vec.Vect());
+		double theta_epk = L_4vec.Angle(R_4vec.Vect());
 		double omega=G_4vec.E();
 		double beta=mom_g/(omega+Mp);
 	
@@ -899,6 +904,9 @@ cout<<"Entries: "<<ENum<<endl;
 			gklab_gkcm->Fill(theta_gk_lab,theta_gk_cm);
 			gklab_eklab->Fill(theta_gk_lab,theta_ek);
 			eelab_eklab->Fill(theta_ee,theta_ek);
+			h_theta_eeek->Fill(theta_ee,theta_ek);
+			h_theta_epek->Fill(theta_ee,theta_epk);
+			h_theta_ee->Fill(theta_ee);
 			eklab_gkcm->Fill(theta_gk_cm,theta_ek);
 			ekcm_gkcm->Fill(theta_gk_cm,theta_ek_cm);
 			cos_gklab_gkcm->Fill(cos(theta_gk_lab),cos(theta_gk_cm));
@@ -942,17 +950,17 @@ cout<<"Entries: "<<ENum<<endl;
 	//hmm_wobg_strict->Add(hmm_L_strict,hmm_bg_strict,1.,-1.);
 	//hmm_wobg_strict->Draw("");
 
-//	TCanvas* c5 = new TCanvas("c5","c5");
-//	h_mm_Qsq->Draw("colz");
-//	
-//	TCanvas* c6 = new TCanvas("c6","c6");
-//	h_mm_W->Draw("colz");
-//
-//	TCanvas* c7 = new TCanvas("c7","c7");
-//	h_mm_theta_gk_cm->Draw("colz");
-//
-//	TCanvas* c8 = new TCanvas("c8","c8");
-//	h_mm_eps->Draw("colz");
+	TCanvas* c5 = new TCanvas("c5","c5");
+	h_mm_Qsq->Draw("colz");
+	
+	TCanvas* c6 = new TCanvas("c6","c6");
+	h_mm_W->Draw("colz");
+
+	TCanvas* c7 = new TCanvas("c7","c7");
+	h_mm_theta_gk_cm->Draw("colz");
+
+	TCanvas* c8 = new TCanvas("c8","c8");
+	h_mm_eps->Draw("colz");
 //
 //	TCanvas* c9 = new TCanvas("c9","c9");
 //	h_Qsq_eps->Draw("colz");
@@ -987,14 +995,19 @@ cout<<"Entries: "<<ENum<<endl;
 	TCanvas* c19 = new TCanvas("c19","c19");
 	//h_eps->Draw("");
 	h_eps2->Draw("same");
+	TCanvas* c20 = new TCanvas("c20","c20");
+	//h_theta_eeek->Draw("colz");
+	h_theta_epek->Draw("colz");
+	TCanvas* c21 = new TCanvas("c21","c21");
+	h_theta_ee->Draw("");
 
 
 //	c3->Print("./pdf/mm_tight.pdf");
 //	c4->Print("./pdf/mm_wobg_tight.pdf");
-//	c5->Print("./pdf/mm_Qsq.pdf");
-//	c6->Print("./pdf/mm_W.pdf");
-//	c7->Print("./pdf/mm_theta.pdf");
-//	c8->Print("./pdf/mm_eps.pdf");
+	c5->Print("./pdf/mm_Qsq.pdf");
+	c6->Print("./pdf/mm_W.pdf");
+	c7->Print("./pdf/mm_theta.pdf");
+	c8->Print("./pdf/mm_eps.pdf");
 
 cout << "Well done!" << endl;
 }//fit

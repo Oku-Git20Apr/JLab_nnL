@@ -155,6 +155,7 @@ const double PI=3.14159265359;
   TH1F* hmm_mixacc  = new TH1F("hmm_mixacc","ACC (mixed)",xbin,xmin,xmax);
   TH1F* hm4   = (TH1F*)hm1->Clone("hm4");
 
+  TH2D* h_theta_eeek = new TH2D("h_theta_eeek", "theta_eeek",1000,0.1,0.35);
   TH1D* h_theta_ee = new TH1D("h_theta_ee", "theta_ee",1000,0.1,0.35);
   h_theta_ee->SetLineColor(kAzure);
   TH1D* h_phi_ee = new TH1D("h_phi_ee", "phi_ee",1000,0.,PI);

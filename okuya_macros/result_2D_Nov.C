@@ -1610,7 +1610,10 @@ cout<<"BEST CUT START"<<endl;
 	fmm_Lambda_only->Draw("");
 	fmm_Sigma_only ->Draw("same");
 	hmm_wo_bg_fom_best->Draw("same");
-	//Acceptance_map->Draw("lego2z");
+	
+	TCanvas* c800 = new TCanvas("c800","c800");
+	Acceptance_map->Draw("colz");
+
 	
 	TCanvas* c20 = new TCanvas("c20","c20");
 	c20->Divide(2,2);

@@ -623,7 +623,8 @@ cout << "Param file : " << AcceptanceR_table.c_str() << endl;
   h_zL->GetXaxis()->SetTitleOffset(0.6);
   h_zL->GetYaxis()->SetTitle("Counts");
   h_zL->GetYaxis()->SetTitleSize(0.07);
-  h_zL->GetYaxis()->SetTitleOffset(0.3);
+  //h_zL->GetYaxis()->SetTitleOffset(0.3);//Log
+  h_zL->GetYaxis()->SetTitleOffset(0.5);//Linear
   h_zL->SetLineColor(kAzure);
   TH1F* h_zR  = new TH1F("h_zR","",1000.,-15.,15.);
   h_zR->GetXaxis()->SetTitle("Z-vertex (HRS-R) [cm]");
@@ -632,7 +633,8 @@ cout << "Param file : " << AcceptanceR_table.c_str() << endl;
   h_zR->GetXaxis()->SetTitleOffset(0.6);
   h_zR->GetYaxis()->SetTitle("Counts");
   h_zR->GetYaxis()->SetTitleSize(0.07);
-  h_zR->GetYaxis()->SetTitleOffset(0.3);
+  //h_zR->GetYaxis()->SetTitleOffset(0.3);//Log
+  h_zR->GetYaxis()->SetTitleOffset(0.5);//Linear
   h_zR->SetLineColor(kAzure);
 
   TH1F* h_zave  = new TH1F("h_zave","Z-vertex (Ave.)",1000,-0.25,0.25);
@@ -1035,9 +1037,9 @@ cout<<"Entries: "<<ENum<<endl;
 	TCanvas* c4 = new TCanvas("c4","c4");
 	c4->SetLogy(1);
 	c4->Divide(1,2,1E-4,1E-4);
-	c4->cd(1)->SetLogy(1);
+	c4->cd(1)->SetLogy(0);
 	h_zL->Draw("");
-	c4->cd(2)->SetLogy(1);
+	c4->cd(2)->SetLogy(0);
 	h_zR->Draw("");
 	TCanvas* c5 = new TCanvas("c5","c5");
 	c5->Divide(1,1,1E-4,1E-4);
