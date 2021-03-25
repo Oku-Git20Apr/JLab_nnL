@@ -430,9 +430,15 @@ cout << "Param file : " << AcceptanceR_table_z9.c_str() << endl;
 	cout<<"HRS-R Acceptance (z9 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
 
   TH2F* Acceptance_map = new TH2F("Acceptance_map","#Delta#Omega_{K}^{lab}(p_{K},Z)",150,1.6,2.0,10,-10.,10.);
+  TH2F* Acceptance_map2 = new TH2F("Acceptance_map2","#Delta#Omega_{K}^{lab}(p_{K},Z)",50,1.6,2.0,10,-10.,10.);
 	for(int i=0;i<150;i++){
 		for(int j=0;j<10;j++){
 			Acceptance_map->SetBinContent(i+1,j+1,RHRS_table[i][j]*1000.);
+		}
+	}
+	for(int i=0;i<50;i++){
+		for(int j=0;j<10;j++){
+			Acceptance_map2->SetBinContent(i+1,j+1,RHRS_table[i*3][j]*1000.);
 		}
 	}
 
@@ -1612,7 +1618,8 @@ cout<<"BEST CUT START"<<endl;
 	hmm_wo_bg_fom_best->Draw("same");
 	
 	TCanvas* c800 = new TCanvas("c800","c800");
-	Acceptance_map->Draw("colz");
+	//Acceptance_map->Draw("colz");
+	Acceptance_map2->Draw("colz");
 
 	
 	TCanvas* c20 = new TCanvas("c20","c20");

@@ -1137,6 +1137,8 @@ if(dataflag==1){//H2-1
  ctime=-ctime;
  ctime_before=-ctime_before;
 tr.ct_orig=ctime;
+    L_tr_vz[lhit]  = L_tr_vz[lhit]*Ztr +Ztm;     // scaled
+    R_tr_vz[rhit]  = R_tr_vz[rhit]*Ztr +Ztm;     // scaled
 
  return ctime;
 

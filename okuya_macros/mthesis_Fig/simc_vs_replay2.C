@@ -1,10 +1,40 @@
-//--  Data vs SIMC   --//
+//--  Data vs SIMC (FP)  --//
 //
-//K. Okuyama (Dec. 10, 2020)
+//K. Okuyama (Feb. 21, 2021)
 //
-//This is taken over from MM.C
+//This is taken over from data_vs_simc.C
 //No array branch mode 
 //
+double FP_cut1(double *x, double *par){
+	const double PI=4.*atan(1.);
+	double x0 = x[0];
+	double flag = par[0];//L or R
+	return 0.17*x0/100.+0.025;
+}
+
+double FP_cut2(double *x, double *par){
+	const double PI=4.*atan(1.);
+	double x0 = x[0];
+	double flag = par[0];//L or R
+	return 0.17*x0/100.-0.035;
+}
+
+double FP_cut3(double *x, double *par){
+	const double PI=4.*atan(1.);
+	double x0 = x[0];
+	double flag = par[0];//L or R
+	return 0.40*x0/100.+0.130;
+}
+double FP_cut4(double *x, double *par){
+	const double PI=4.*atan(1.);
+	double x0 = x[0];
+	double flag = par[0];//L or R
+	return 0.40*x0/100.-0.130;
+}
+
+
+
+
 double F_Voigt( double *x, double *par )
   {
     // par[0] : area
@@ -190,12 +220,15 @@ double FMM_Res( double *x, double *par ){
 
 }
 
-void data_vs_simc(){
+void simc_vs_replay2(){
 	string pdfname = "fitting.pdf";
 cout << "Output pdf file name is " << pdfname << endl;
   
-  TFile *file = new TFile("../h2all_2020Nov.root","read");//input file of all H2 run(default: h2all4.root)
-  TFile *file_simc = new TFile("/data/41a/ELS/okuyama/SIMC_jlab/SIMC/rootfiles/BOTH_LS.root","read");// L:S0=3:1 (0.9M vs 0.3M) 2020/12/10
+  //TFile *file = new TFile("../h2all_2020Nov.root","read");//input file of all H2 run
+  TFile *file = new TFile("../h2all_noCalib.root","read");//input file of all H2 run(w/o Itabashi matrix, w/ SIMC initial matrix)
+  TFile *file_simc = new TFile("/data/41a/ELS/okuyama/SIMC_jlab/SIMC/rootfiles/BOTH_LS_20cm.root","read");// L:S0=3:1 (0.9M vs 0.3M) 2020/12/10
+  //TFile *file_simc = new TFile("/data/41a/ELS/okuyama/SIMC_jlab/SIMC/rootfiles/BOTH_LS_cell_x10.root","read");// L:S0=3:1 (0.9M vs 0.3M) 2020/12/10
+  //TFile *file_simc = new TFile("/data/41a/ELS/okuyama/SIMC_jlab/SIMC/rootfiles/RHRS_grnd.root","read");// L:S0=3:1 (0.9M vs 0.3M) 2020/12/10
   //TFile *file_simc = new TFile("/data/41a/ELS/okuyama/SIMC_jlab/SIMC/rootfiles/BOTH_LS_datafit.root","read");// L:S0=3:1 (0.9M vs 0.3M), pe'=2102.5MeV/c, pK=1825MeV/c,  2020/12/29
   //TFile *file_simc = new TFile("/data/41a/ELS/okuyama/SIMC_jlab/SIMC/rootfiles/NONE_LS.root","read");// L:S0=3:1 (0.9M vs 0.3M)  2020/1/5
   //TFile *file_simc = new TFile("/data/41a/ELS/okuyama/SIMC_jlab/SIMC/rootfiles/BOTH_LS_momminus20.root","read");// L:S0=3:1 (0.9M vs 0.3M), pe'=2080MeV/c, pK=1800MeV/c,  2020/12/29
@@ -565,12 +598,349 @@ cout << "Param file : " << AcceptanceR_table.c_str() << endl;
   TH2D* h_pepk_simc = new TH2D("h_pepk_simc", "p_{K} vs p_{e'}" ,50,1720.,1940.,50,1980.,2220.);
   h_pepk_simc->SetNdivisions(505);
   //h_pepk_simc->GetZaxis()->SetLabelOffset(-0.005);
+ 
+  
+//Focal Plane (Feb. 21, 2021)
+  TH1D* h_R_y_data       = new TH1D("h_R_y_data"      ,"h_R_y_data [cm]"      ,80,   -6.,  6.);
+  h_R_y_data->GetXaxis()->SetTitle("Y(FP) [cm]");
+  h_R_y_data->GetYaxis()->SetTitle("Counts");
+  h_R_y_data->SetLineColor(kAzure);
+  TH1D* h_R_y_simc       = new TH1D("h_R_y_simc"      ,"h_R_y_simc [cm]"      ,80,   -6.,  6.);
+  h_R_y_simc->GetXaxis()->SetTitle("Y(FP) [cm]");
+  h_R_y_simc->GetYaxis()->SetTitle("Counts");
+  h_R_y_simc->SetLineColor(kAzure);
+  tree_simc->Project("h_R_y_simc","h_yfp+0.516","");
+  TH1D* h_R_x_data       = new TH1D("h_R_x_data"      ,"h_R_x_data [cm]"      ,80,   -80.,  80.);
+  h_R_x_data->GetXaxis()->SetTitle("X(FP) [cm]");
+  h_R_x_data->GetYaxis()->SetTitle("Counts");
+  h_R_x_data->SetLineColor(kAzure);
+  TH1D* h_R_x_simc       = new TH1D("h_R_x_simc"      ,"h_R_x_simc [cm]"      ,80,   -80.,  80.);
+  h_R_x_simc->GetXaxis()->SetTitle("X(FP) [cm]");
+  h_R_x_simc->GetYaxis()->SetTitle("Counts");
+  h_R_x_simc->SetLineColor(kAzure);
+  tree_simc->Project("h_R_x_simc","h_xfp","");
+  TH1D* h_R_th_data       = new TH1D("h_R_th_data"      ,"h_R_th_data"      ,80,   -0.2,  0.2);
+  h_R_th_data->GetXaxis()->SetTitle("#theta(FP)");
+  h_R_th_data->GetYaxis()->SetTitle("Counts");
+  h_R_th_data->SetLineColor(kAzure);
+  TH1D* h_R_th_simc       = new TH1D("h_R_th_simc"      ,"h_R_th_simc"      ,80,   -0.2,  0.2);
+  h_R_th_simc->GetXaxis()->SetTitle("#theta(FP)");
+  h_R_th_simc->GetYaxis()->SetTitle("Counts");
+  h_R_th_simc->SetLineColor(kAzure);
+  tree_simc->Project("h_R_th_simc","h_xpfp","");
+  TH1D* h_R_ph_data       = new TH1D("h_R_ph_data"      ,"h_R_ph_data"      ,80,   -0.05,  0.05);
+  h_R_ph_data->GetXaxis()->SetTitle("#phi(FP)");
+  h_R_ph_data->GetYaxis()->SetTitle("Counts");
+  h_R_ph_data->SetLineColor(kAzure);
+  TH1D* h_R_ph_simc       = new TH1D("h_R_ph_simc"      ,"h_R_ph_simc"      ,80,   -0.05,  0.05);
+  h_R_ph_simc->GetXaxis()->SetTitle("#phi(FP)");
+  h_R_ph_simc->GetYaxis()->SetTitle("Counts");
+  h_R_ph_simc->SetLineColor(kAzure);
+  tree_simc->Project("h_R_ph_simc","h_ypfp","");
+  TH1D* h_R_tg_th_data       = new TH1D("h_R_tg_th_data"      ,"h_R_tg_th_data"      ,80,   -0.1,  0.1);
+  h_R_tg_th_data->GetXaxis()->SetTitle("#theta(tar)");
+  h_R_tg_th_data->GetYaxis()->SetTitle("Counts");
+  h_R_tg_th_data->SetLineColor(kAzure);
+  TH1D* h_R_tg_th_simc       = new TH1D("h_R_tg_th_simc"      ,"h_R_tg_th_simc"      ,80,   -0.1,  0.1);
+  h_R_tg_th_simc->GetXaxis()->SetTitle("#theta(tar)");
+  h_R_tg_th_simc->GetYaxis()->SetTitle("Counts");
+  h_R_tg_th_simc->SetLineColor(kAzure);
+  tree_simc->Project("h_R_tg_th_simc","h_xptar","");
+  TH1D* h_R_tg_ph_data       = new TH1D("h_R_tg_ph_data"      ,"h_R_tg_ph_data"      ,80,   -0.05,  0.05);
+  h_R_tg_ph_data->GetXaxis()->SetTitle("#phi(tar)");
+  h_R_tg_ph_data->GetYaxis()->SetTitle("Counts");
+  h_R_tg_ph_data->SetLineColor(kAzure);
+  TH1D* h_R_tg_ph_simc       = new TH1D("h_R_tg_ph_simc"      ,"h_R_tg_ph_simc"      ,80,   -0.05,  0.05);
+  h_R_tg_ph_simc->GetXaxis()->SetTitle("#phi(tar)");
+  h_R_tg_ph_simc->GetYaxis()->SetTitle("Counts");
+  h_R_tg_ph_simc->SetLineColor(kAzure);
+  tree_simc->Project("h_R_tg_ph_simc","h_yptar","");
+
+  TH1D* h_L_y_data       = new TH1D("h_L_y_data"      ,"h_L_y_data [cm]"      ,80,   -6.,  6.);
+  TH1D* h_L_y_simc       = new TH1D("h_L_y_simc"      ,"h_L_y_simc [cm]"      ,80,   -6.,  6.);
+  tree_simc->Project("h_L_y_simc","e_yfp+0.807","");
+  TH1D* h_L_x_data       = new TH1D("h_L_x_data"      ,"h_L_x_data [cm]"      ,80,   -80.,  80.);
+  TH1D* h_L_x_simc       = new TH1D("h_L_x_simc"      ,"h_L_x_simc [cm]"      ,80,   -80.,  80.);
+  tree_simc->Project("h_L_x_simc","e_xfp","");
+  TH1D* h_L_th_data       = new TH1D("h_L_th_data"      ,"h_L_th_data"      ,80,   -0.2,  0.2);
+  TH1D* h_L_th_simc       = new TH1D("h_L_th_simc"      ,"h_L_th_simc"      ,80,   -0.2,  0.2);
+  tree_simc->Project("h_L_th_simc","e_xpfp","");
+  TH1D* h_L_ph_data       = new TH1D("h_L_ph_data"      ,"h_L_ph_data"      ,80,   -0.05,  0.05);
+  TH1D* h_L_ph_simc       = new TH1D("h_L_ph_simc"      ,"h_L_ph_simc"      ,80,   -0.05,  0.05);
+  tree_simc->Project("h_L_ph_simc","e_ypfp","");
+  TH1D* h_L_tg_th_data       = new TH1D("h_L_tg_th_data"      ,"h_L_tg_th_data"      ,80,   -0.1,  0.1);
+  TH1D* h_L_tg_th_simc       = new TH1D("h_L_tg_th_simc"      ,"h_L_tg_th_simc"      ,80,   -0.1,  0.1);
+  tree_simc->Project("h_L_tg_th_simc","e_xptar","");
+  TH1D* h_L_tg_ph_data       = new TH1D("h_L_tg_ph_data"      ,"h_L_tg_ph_data"      ,80,   -0.05,  0.05);
+  TH1D* h_L_tg_ph_simc       = new TH1D("h_L_tg_ph_simc"      ,"h_L_tg_ph_simc"      ,80,   -0.05,  0.05);
+  tree_simc->Project("h_L_tg_ph_simc","e_yptar","");
+
+//== FP x FP ==//
+//X-Y, X-theta, Y-phi, theta-phi 
+//
+//X-Y
+  TH2D* h_L_x_y_data       = new TH2D("h_L_x_y_data"      ,"h_L_x_y_data"   ,80,  -6., 6.   ,80,   -80.,  80.);
+  h_L_x_y_data->GetYaxis()->SetTitle("X(FP) [cm]");
+  h_L_x_y_data->GetXaxis()->SetTitle("Y(FP) [cm]");
+  TH2D* h_L_x_y_simc       = new TH2D("h_L_x_y_simc"      ,"h_L_x_y_simc"   ,80,  -6., 6.   ,80,   -80.,  80.);
+  h_L_x_y_simc->GetYaxis()->SetTitle("X(FP) [cm]");
+  h_L_x_y_simc->GetXaxis()->SetTitle("Y(FP) [cm]");
+  tree_simc->Project("h_L_x_y_simc","e_xfp:e_yfp+0.807","");
+  TH2D* h_R_x_y_data       = new TH2D("h_R_x_y_data"      ,"h_R_x_y_data"   ,80,  -6., 6.   ,80,   -80.,  80.);
+  h_R_x_y_data->GetYaxis()->SetTitle("X(FP) [cm]");
+  h_R_x_y_data->GetXaxis()->SetTitle("Y(FP) [cm]");
+  TH2D* h_R_x_y_simc       = new TH2D("h_R_x_y_simc"      ,"h_R_x_y_simc"   ,80,  -6., 6.   ,80,   -80.,  80.);
+  h_R_x_y_simc->GetYaxis()->SetTitle("X(FP) [cm]");
+  h_R_x_y_simc->GetXaxis()->SetTitle("Y(FP) [cm]");
+  tree_simc->Project("h_R_x_y_simc","h_xfp:h_yfp+0.516","");
+//X-theta
+  TH2D* h_L_th_x_data       = new TH2D("h_L_th_x_data"      ,"h_L_th_x_data"   ,80,  -80., 80.   ,80,   -0.12,  0.12);
+  h_L_th_x_data->GetYaxis()->SetTitle("#theta(FP)");
+  h_L_th_x_data->GetXaxis()->SetTitle("X(FP) [cm]");
+  TH2D* h_L_th_x_simc       = new TH2D("h_L_th_x_simc"      ,"h_L_th_x_simc"   ,80,  -80., 80.   ,80,   -0.12,  0.12);
+  h_L_th_x_simc->GetYaxis()->SetTitle("#theta(FP)");
+  h_L_th_x_simc->GetXaxis()->SetTitle("X(FP) [cm]");
+  tree_simc->Project("h_L_th_x_simc","e_xpfp:e_xfp","");
+  //tree_simc->Project("h_L_th_x_simc","e_xpfp:e_xfp","e_xpfp<0.17*e_xfp/100.+0.025&&e_xpfp>0.17*e_xfp/100.-0.035&&e_xpfp<0.40*e_xfp/100.+0.130");
+  TH2D* h_R_th_x_data       = new TH2D("h_R_th_x_data"      ,"h_R_th_x_data"   ,80,  -80., 80.   ,80,   -0.12,  0.12);
+  h_R_th_x_data->GetYaxis()->SetTitle("#theta(FP)");
+  h_R_th_x_data->GetXaxis()->SetTitle("X(FP) [cm]");
+  TH2D* h_R_th_x_simc       = new TH2D("h_R_th_x_simc"      ,"h_R_th_x_simc"   ,80,  -80., 80.   ,80,   -0.12,  0.12);
+  h_R_th_x_simc->GetYaxis()->SetTitle("#theta(FP)");
+  h_R_th_x_simc->GetXaxis()->SetTitle("X(FP) [cm]");
+  tree_simc->Project("h_R_th_x_simc","h_xpfp:h_xfp","");
+  //tree_simc->Project("h_R_th_x_simc","h_xpfp:h_xfp","h_xpfp<0.17*h_xfp/100.+0.025&&h_xpfp>0.17*h_xfp/100.-0.035&&h_xpfp<0.40*h_xfp/100.+0.130");
+//Y-phi
+  TH2D* h_L_ph_y_data       = new TH2D("h_L_ph_y_data"      ,"h_L_ph_y_data"   ,80,  -6., 6.   ,80,   -0.05,  0.05);
+  h_L_ph_y_data->GetYaxis()->SetTitle("#phi(FP)");
+  h_L_ph_y_data->GetXaxis()->SetTitle("Y(FP) [cm]");
+  TH2D* h_L_ph_y_simc       = new TH2D("h_L_ph_y_simc"      ,"h_L_ph_y_simc"   ,80,  -6., 6.   ,80,   -0.05,  0.05);
+  h_L_ph_y_simc->GetYaxis()->SetTitle("#phi(FP)");
+  h_L_ph_y_simc->GetXaxis()->SetTitle("Y(FP) [cm]");
+  tree_simc->Project("h_L_ph_y_simc","e_ypfp:e_yfp+0.807","");
+  TH2D* h_R_ph_y_data       = new TH2D("h_R_ph_y_data"      ,"h_R_ph_y_data"   ,80,  -6., 6.   ,80,   -0.05,  0.05);
+  h_R_ph_y_data->GetYaxis()->SetTitle("#phi(FP)");
+  h_R_ph_y_data->GetXaxis()->SetTitle("Y(FP) [cm]");
+  TH2D* h_R_ph_y_simc       = new TH2D("h_R_ph_y_simc"      ,"h_R_ph_y_simc"   ,80,  -6., 6.   ,80,   -0.05,  0.05);
+  h_R_ph_y_simc->GetYaxis()->SetTitle("#phi(FP)");
+  h_R_ph_y_simc->GetXaxis()->SetTitle("Y(FP) [cm]");
+  tree_simc->Project("h_R_ph_y_simc","h_ypfp:h_yfp+0.516","");
+//theta-phi
+  TH2D* h_L_ph_th_data       = new TH2D("h_L_ph_th_data"      ,"h_L_ph_th_data"   ,80,    -0.12,  0.12   ,80,   -0.05,  0.05);
+  h_L_ph_th_data->GetYaxis()->SetTitle("#phi(FP)");
+  h_L_ph_th_data->GetXaxis()->SetTitle("#theta(FP)");
+  TH2D* h_L_ph_th_simc       = new TH2D("h_L_ph_th_simc"      ,"h_L_ph_th_simc"   ,80,    -0.12,  0.12   ,80,   -0.05,  0.05);
+  h_L_ph_th_simc->GetYaxis()->SetTitle("#phi(FP)");
+  h_L_ph_th_simc->GetXaxis()->SetTitle("#theta(FP)");
+  tree_simc->Project("h_L_ph_th_simc","e_ypfp:e_xpfp","");
+  TH2D* h_R_ph_th_data       = new TH2D("h_R_ph_th_data"      ,"h_R_ph_th_data"   ,80,    -0.12,  0.12   ,80,   -0.05,  0.05);
+  h_R_ph_th_data->GetYaxis()->SetTitle("#phi(FP)");
+  h_R_ph_th_data->GetXaxis()->SetTitle("#theta(FP)");
+  TH2D* h_R_ph_th_simc       = new TH2D("h_R_ph_th_simc"      ,"h_R_ph_th_simc"   ,80,    -0.12,  0.12   ,80,   -0.05,  0.05);
+  h_R_ph_th_simc->GetYaxis()->SetTitle("#phi(FP)");
+  h_R_ph_th_simc->GetXaxis()->SetTitle("#theta(FP)");
+  tree_simc->Project("h_R_ph_th_simc","h_ypfp:h_xpfp","");
+
+//== tar x tar ==//
+//theta-phi, phi-Z
+//
+//theta-phi
+  TH2D* h_L_tg_ph_tg_th_data       = new TH2D("h_L_tg_ph_tg_th_data"      ,"h_L_tg_ph_tg_th_data"   ,80,    -0.12,  0.12   ,80,   -0.05,  0.05);
+  h_L_tg_ph_tg_th_data->GetYaxis()->SetTitle("#phi(tar)");
+  h_L_tg_ph_tg_th_data->GetXaxis()->SetTitle("#theta(tar)");
+  TH2D* h_L_tg_ph_tg_th_simc       = new TH2D("h_L_tg_ph_tg_th_simc"      ,"h_L_tg_ph_tg_th_simc"   ,80,    -0.12,  0.12   ,80,   -0.05,  0.05);
+  h_L_tg_ph_tg_th_simc->GetYaxis()->SetTitle("#phi(tar)");
+  h_L_tg_ph_tg_th_simc->GetXaxis()->SetTitle("#theta(tar)");
+  tree_simc->Project("h_L_tg_ph_tg_th_simc","e_yptar:e_xptar","");
+  TH2D* h_R_tg_ph_tg_th_data       = new TH2D("h_R_tg_ph_tg_th_data"      ,"h_R_tg_ph_tg_th_data"   ,80,    -0.12,  0.12   ,80,   -0.05,  0.05);
+  h_R_tg_ph_tg_th_data->GetYaxis()->SetTitle("#phi(tar)");
+  h_R_tg_ph_tg_th_data->GetXaxis()->SetTitle("#theta(tar)");
+  TH2D* h_R_tg_ph_tg_th_simc       = new TH2D("h_R_tg_ph_tg_th_simc"      ,"h_R_tg_ph_tg_th_simc"   ,80,    -0.12,  0.12   ,80,   -0.05,  0.05);
+  h_R_tg_ph_tg_th_simc->GetYaxis()->SetTitle("#phi(tar)");
+  h_R_tg_ph_tg_th_simc->GetXaxis()->SetTitle("#theta(tar)");
+  tree_simc->Project("h_R_tg_ph_tg_th_simc","h_yptar:h_xptar","");
+//phi-Z
+  TH2D* h_L_z_tg_ph_data       = new TH2D("h_L_z_tg_ph_data"      ,"h_L_z_tg_ph_data"   ,80,   -0.05,  0.05   ,80,   -15., 15.  );
+  h_L_z_tg_ph_data->GetYaxis()->SetTitle("Z [cm]");
+  h_L_z_tg_ph_data->GetXaxis()->SetTitle("#phi(tar)");
+  TH2D* h_L_z_tg_ph_simc       = new TH2D("h_L_z_tg_ph_simc"      ,"h_L_z_tg_ph_simc"   ,80,   -0.05,  0.05   ,80,   -15., 15.  );
+  h_L_z_tg_ph_simc->GetYaxis()->SetTitle("Z [cm]");
+  h_L_z_tg_ph_simc->GetXaxis()->SetTitle("#phi(tar)");
+  tree_simc->Project("h_L_z_tg_ph_simc","zposi:e_yptar","");                                                              
+  TH2D* h_R_z_tg_ph_data       = new TH2D("h_R_z_tg_ph_data"      ,"h_R_z_tg_ph_data"   ,80,   -0.05,  0.05   ,80,   -15., 15.  );
+  h_R_z_tg_ph_data->GetYaxis()->SetTitle("Z [cm]");
+  h_R_z_tg_ph_data->GetXaxis()->SetTitle("#phi(tar)");
+  TH2D* h_R_z_tg_ph_simc       = new TH2D("h_R_z_tg_ph_simc"      ,"h_R_z_tg_ph_simc"   ,80,   -0.05,  0.05   ,80,   -15., 15.  );
+  h_R_z_tg_ph_simc->GetYaxis()->SetTitle("Z [cm]");
+  h_R_z_tg_ph_simc->GetXaxis()->SetTitle("#phi(tar)");
+  tree_simc->Project("h_R_z_tg_ph_simc","zposi:h_yptar","");
+
+//== FP x tar ==//
+//X-theta, Y-phi, theta-theta, phi-phi, Y-Z, phi-Z
+//X-theta
+  TH2D* h_L_tg_th_x_data       = new TH2D("h_L_tg_th_x_data"      ,"h_L_tg_th_x_data"   ,80,  -80., 80.   ,80,   -0.12,  0.12);
+  h_L_tg_th_x_data->GetYaxis()->SetTitle("#theta(tar)");
+  h_L_tg_th_x_data->GetXaxis()->SetTitle("X(FP) [cm]");
+  TH2D* h_L_tg_th_x_simc       = new TH2D("h_L_tg_th_x_simc"      ,"h_L_tg_th_x_simc"   ,80,  -80., 80.   ,80,   -0.12,  0.12);
+  h_L_tg_th_x_simc->GetYaxis()->SetTitle("#theta(tar)");
+  h_L_tg_th_x_simc->GetXaxis()->SetTitle("X(FP) [cm]");
+  tree_simc->Project("h_L_tg_th_x_simc","e_xptar:e_xfp","");
+  //tree_simc->Project("h_L_tg_th_x_simc","e_xpfp:e_xfp","e_xpfp<0.17*e_xfp/100.+0.025&&e_xpfp>0.17*e_xfp/100.-0.035&&e_xpfp<0.40*e_xfp/100.+0.130");
+  TH2D* h_R_tg_th_x_data       = new TH2D("h_R_tg_th_x_data"      ,"h_R_tg_th_x_data"   ,80,  -80., 80.   ,80,   -0.12,  0.12);
+  h_R_tg_th_x_data->GetYaxis()->SetTitle("#theta(tar)");
+  h_R_tg_th_x_data->GetXaxis()->SetTitle("X(FP) [cm]");
+  TH2D* h_R_tg_th_x_simc       = new TH2D("h_R_tg_th_x_simc"      ,"h_R_tg_th_x_simc"   ,80,  -80., 80.   ,80,   -0.12,  0.12);
+  h_R_tg_th_x_simc->GetYaxis()->SetTitle("#theta(tar)");
+  h_R_tg_th_x_simc->GetXaxis()->SetTitle("X(FP) [cm]");
+  tree_simc->Project("h_R_tg_th_x_simc","h_xptar:h_xfp","");
+  //tree_simc->Project("h_R_th_x_simc","h_xpfp:h_xfp","h_xpfp<0.17*h_xfp/100.+0.025&&h_xpfp>0.17*h_xfp/100.-0.035&&h_xpfp<0.40*h_xfp/100.+0.130");
+//Y-phi
+  TH2D* h_L_tg_ph_y_data       = new TH2D("h_L_tg_ph_y_data"      ,"h_L_tg_ph_y_data"   ,80,  -6., 6.   ,80,   -0.05,  0.05);
+  h_L_tg_ph_y_data->GetYaxis()->SetTitle("#phi(tar)");
+  h_L_tg_ph_y_data->GetXaxis()->SetTitle("Y(FP) [cm]");
+  TH2D* h_L_tg_ph_y_simc       = new TH2D("h_L_tg_ph_y_simc"      ,"h_L_tg_ph_y_simc"   ,80,  -6., 6.   ,80,   -0.05,  0.05);
+  h_L_tg_ph_y_simc->GetYaxis()->SetTitle("#phi(tar)");
+  h_L_tg_ph_y_simc->GetXaxis()->SetTitle("Y(FP) [cm]");
+  tree_simc->Project("h_L_tg_ph_y_simc","e_yptar:e_yfp+0.807","");
+  TH2D* h_R_tg_ph_y_data       = new TH2D("h_R_tg_ph_y_data"      ,"h_R_tg_ph_y_data"   ,80,  -6., 6.   ,80,   -0.05,  0.05);
+  h_R_tg_ph_y_data->GetYaxis()->SetTitle("#phi(tar)");
+  h_R_tg_ph_y_data->GetXaxis()->SetTitle("Y(FP) [cm]");
+  TH2D* h_R_tg_ph_y_simc       = new TH2D("h_R_tg_ph_y_simc"      ,"h_R_tg_ph_y_simc"   ,80,  -6., 6.   ,80,   -0.05,  0.05);
+  h_R_tg_ph_y_simc->GetYaxis()->SetTitle("#phi(tar)");
+  h_R_tg_ph_y_simc->GetXaxis()->SetTitle("Y(FP) [cm]");
+  tree_simc->Project("h_R_tg_ph_y_simc","h_yptar:h_yfp+0.516","");
+//theta-theta
+  TH2D* h_L_tg_th_th_data       = new TH2D("h_L_tg_th_th_data"      ,"h_L_tg_th_th_data"   ,80,  -0.12,  0.12  ,80,   -0.12,  0.12);
+  h_L_tg_th_th_data->GetYaxis()->SetTitle("#theta(tar)");
+  h_L_tg_th_th_data->GetXaxis()->SetTitle("#theta(FP)");
+  TH2D* h_L_tg_th_th_simc       = new TH2D("h_L_tg_th_th_simc"      ,"h_L_tg_th_th_simc"   ,80,  -0.12,  0.12  ,80,   -0.12,  0.12);
+  h_L_tg_th_th_simc->GetYaxis()->SetTitle("#theta(tar)");
+  h_L_tg_th_th_simc->GetXaxis()->SetTitle("#theta(FP)");
+  tree_simc->Project("h_L_tg_th_th_simc","e_xptar:e_xpfp","");
+  //tree_simc->Project("h_L_tg_th_th_simc","e_thpfp:e_thfp","e_thpfp<0.17*e_thfp/100.+0.025&&e_thpfp>0.17*e_thfp/100.-0.035&&e_thpfp<0.40*e_thfp/100.+0.130");
+  TH2D* h_R_tg_th_th_data       = new TH2D("h_R_tg_th_th_data"      ,"h_R_tg_th_th_data"   ,80,  -0.12,  0.12  ,80,   -0.12,  0.12);
+  h_R_tg_th_th_data->GetYaxis()->SetTitle("#theta(tar)");
+  h_R_tg_th_th_data->GetXaxis()->SetTitle("#theta(FP)");
+  TH2D* h_R_tg_th_th_simc       = new TH2D("h_R_tg_th_th_simc"      ,"h_R_tg_th_th_simc"   ,80,  -0.12,  0.12  ,80,   -0.12,  0.12);
+  tree_simc->Project("h_R_tg_th_th_simc","h_xptar:h_xpfp","");
+  h_R_tg_th_th_simc->GetYaxis()->SetTitle("#theta(tar)");
+  h_R_tg_th_th_simc->GetXaxis()->SetTitle("#theta(FP)");
+  //tree_simc->Project("h_R_th_x_simc","h_xpfp:h_xfp","h_xpfp<0.17*h_xfp/100.+0.025&&h_xpfp>0.17*h_xfp/100.-0.035&&h_xpfp<0.40*h_xfp/100.+0.130");
+//phi-phi
+  TH2D* h_L_tg_ph_ph_data       = new TH2D("h_L_tg_ph_ph_data"      ,"h_L_tg_ph_ph_data"   ,80,   -0.05,  0.05  ,80,   -0.05,  0.05);
+  h_L_tg_ph_ph_data->GetYaxis()->SetTitle("#phi(tar)");
+  h_L_tg_ph_ph_data->GetXaxis()->SetTitle("#phi(FP)");
+  TH2D* h_L_tg_ph_ph_simc       = new TH2D("h_L_tg_ph_ph_simc"      ,"h_L_tg_ph_ph_simc"   ,80,   -0.05,  0.05  ,80,   -0.05,  0.05);
+  h_L_tg_ph_ph_simc->GetYaxis()->SetTitle("#phi(tar)");
+  h_L_tg_ph_ph_simc->GetXaxis()->SetTitle("#phi(FP)");
+  tree_simc->Project("h_L_tg_ph_ph_simc","e_yptar:e_ypfp","");                                               
+  TH2D* h_R_tg_ph_ph_data       = new TH2D("h_R_tg_ph_ph_data"      ,"h_R_tg_ph_ph_data"   ,80,   -0.05,  0.05  ,80,   -0.05,  0.05);
+  h_R_tg_ph_ph_data->GetYaxis()->SetTitle("#phi(tar)");
+  h_R_tg_ph_ph_data->GetXaxis()->SetTitle("#phi(FP)");
+  TH2D* h_R_tg_ph_ph_simc       = new TH2D("h_R_tg_ph_ph_simc"      ,"h_R_tg_ph_ph_simc"   ,80,   -0.05,  0.05  ,80,   -0.05,  0.05);
+  h_R_tg_ph_ph_simc->GetYaxis()->SetTitle("#phi(tar)");
+  h_R_tg_ph_ph_simc->GetXaxis()->SetTitle("#phi(FP)");
+  tree_simc->Project("h_R_tg_ph_ph_simc","h_yptar:h_ypfp","");
+//Y-Z
+  TH2D* h_L_z_y_data       = new TH2D("h_L_z_y_data"      ,"h_L_z_y_data"   ,80,    -6., 6.   ,80,   -15., 15.  );
+  h_L_z_y_data->GetYaxis()->SetTitle("Z [cm]");
+  h_L_z_y_data->GetXaxis()->SetTitle("Y(FP) [cm]");
+  TH2D* h_L_z_y_simc       = new TH2D("h_L_z_y_simc"      ,"h_L_z_y_simc"   ,80,    -6., 6.   ,80,   -15., 15.  );
+  h_L_z_y_simc->GetYaxis()->SetTitle("Z [cm]");
+  h_L_z_y_simc->GetXaxis()->SetTitle("Y(FP) [cm]");
+  tree_simc->Project("h_L_z_y_simc","zposi:e_yfp+0.807","");                                                          
+  TH2D* h_R_z_y_data       = new TH2D("h_R_z_y_data"      ,"h_R_z_y_data"   ,80,    -6., 6.   ,80,   -15., 15.  );
+  h_R_z_y_data->GetYaxis()->SetTitle("Z [cm]");
+  h_R_z_y_data->GetXaxis()->SetTitle("Y(FP) [cm]");
+  TH2D* h_R_z_y_simc       = new TH2D("h_R_z_y_simc"      ,"h_R_z_y_simc"   ,80,    -6., 6.   ,80,   -15., 15.  );
+  h_R_z_y_simc->GetYaxis()->SetTitle("Z [cm]");
+  h_R_z_y_simc->GetXaxis()->SetTitle("Y(FP) [cm]");
+  tree_simc->Project("h_R_z_y_simc","zposi:h_yfp+0.516","");
+//phi-Z
+  TH2D* h_L_z_ph_data       = new TH2D("h_L_z_ph_data"      ,"h_L_z_ph_data"   ,80,   -0.05,  0.05   ,80,   -15., 15.  );
+  h_L_z_ph_data->GetYaxis()->SetTitle("Z [cm]");
+  h_L_z_ph_data->GetXaxis()->SetTitle("#phi(FP)");
+  TH2D* h_L_z_ph_simc       = new TH2D("h_L_z_ph_simc"      ,"h_L_z_ph_simc"   ,80,   -0.05,  0.05   ,80,   -15., 15.  );
+  h_L_z_ph_simc->GetYaxis()->SetTitle("Z [cm]");
+  h_L_z_ph_simc->GetXaxis()->SetTitle("#phi(FP)");
+  tree_simc->Project("h_L_z_ph_simc","zposi:e_ypfp","");                                                              
+  TH2D* h_R_z_ph_data       = new TH2D("h_R_z_ph_data"      ,"h_R_z_ph_data"   ,80,   -0.05,  0.05   ,80,   -15., 15.  );
+  h_R_z_ph_data->GetYaxis()->SetTitle("Z [cm]");
+  h_R_z_ph_data->GetXaxis()->SetTitle("#phi(FP)");
+  TH2D* h_R_z_ph_simc       = new TH2D("h_R_z_ph_simc"      ,"h_R_z_ph_simc"   ,80,   -0.05,  0.05   ,80,   -15., 15.  );
+  h_R_z_ph_simc->GetYaxis()->SetTitle("Z [cm]");
+  h_R_z_ph_simc->GetXaxis()->SetTitle("#phi(FP)");
+  tree_simc->Project("h_R_z_ph_simc","zposi:h_ypfp","");
+
+
+//  TH2D* h_L_tg_ph_y_data       = new TH2D("h_L_tg_ph_y_data"      ,"h_L_tg_ph_y_data"   ,80,  -6., 6.   ,80,   -0.05,  0.05);
+//  TH2D* h_L_tg_ph_y_simc       = new TH2D("h_L_tg_ph_y_simc"      ,"h_L_tg_ph_y_simc"   ,80,  -6., 6.   ,80,   -0.05,  0.05);
+//  tree_simc->Project("h_L_tg_ph_y_simc","e_yptar:-1.*e_yfp-0.807","");
+//  TH2D* h_R_tg_ph_y_data       = new TH2D("h_R_tg_ph_y_data"      ,"h_R_tg_ph_y_data"   ,80,  -6., 6.   ,80,   -0.05,  0.05);
+//  TH2D* h_R_tg_ph_y_simc       = new TH2D("h_R_tg_ph_y_simc"      ,"h_R_tg_ph_y_simc"   ,80,  -6., 6.   ,80,   -0.05,  0.05);
+//  tree_simc->Project("h_R_tg_ph_y_simc","h_yptar:-1.*h_yfp-0.516","");
+//  TH2D* h_L_tg_th_x_data       = new TH2D("h_L_tg_th_x_data"      ,"h_L_tg_th_x_data"   ,80,  -80., 80.   ,80,   -0.12,  0.12);
+//  TH2D* h_L_tg_th_x_simc       = new TH2D("h_L_tg_th_x_simc"      ,"h_L_tg_th_x_simc"   ,80,  -80., 80.   ,80,   -0.12,  0.12);
+//  tree_simc->Project("h_L_tg_th_x_simc","e_xptar:e_xfp","");
+//  //tree_simc->Project("h_L_tg_th_x_simc","e_xpfp:e_xfp","e_xpfp<0.17*e_xfp/100.+0.025&&e_xpfp>0.17*e_xfp/100.-0.035&&e_xpfp<0.40*e_xfp/100.+0.130");
+//  TH2D* h_R_tg_th_x_data       = new TH2D("h_R_tg_th_x_data"      ,"h_R_tg_th_x_data"   ,80,  -80., 80.   ,80,   -0.12,  0.12);
+//  TH2D* h_R_tg_th_x_simc       = new TH2D("h_R_tg_th_x_simc"      ,"h_R_tg_th_x_simc"   ,80,  -80., 80.   ,80,   -0.12,  0.12);
+//  tree_simc->Project("h_R_tg_th_x_simc","h_xptar:h_xfp","");
+//  //tree_simc->Project("h_R_tg_th_x_simc","h_xpfp:h_xfp","h_xpfp<0.17*h_xfp/100.+0.025&&h_xpfp>0.17*h_xfp/100.-0.035&&h_xpfp<0.40*h_xfp/100.+0.130");
+//
+//
+///////////////////
+//  TH2D* h_R_y_vz_data       = new TH2D("h_R_y_vz_data"      ,"h_R_y_vz_data"   ,80,   -6.,  6.,80,  -15., 15.   );
+//  TH2D* h_R_y_vz_simc       = new TH2D("h_R_y_vz_simc"      ,"h_R_y_vz_simc"   ,80,   -6.,  6.,80,  -15., 15.   );
+//  tree_simc->Project("h_R_y_vz_simc","zposi:h_yfp","");                                                         
+//  TH2D* h_L_y_vz_data       = new TH2D("h_L_y_vz_data"      ,"h_L_y_vz_data"   ,80,   -6.,  6.,80,  -15., 15.   );
+//  TH2D* h_L_y_vz_simc       = new TH2D("h_L_y_vz_simc"      ,"h_L_y_vz_simc"   ,80,   -6.,  6.,80,  -15., 15.   );
+//  tree_simc->Project("h_L_y_vz_simc","zposi:e_yfp","");
+//  TH2D* h_R_ph_vz_data       = new TH2D("h_R_ph_vz_data"      ,"h_R_ph_vz_data"   ,80,   -0.05,  0.05,80,  -15., 15.   );
+//  TH2D* h_R_ph_vz_simc       = new TH2D("h_R_ph_vz_simc"      ,"h_R_ph_vz_simc"   ,80,   -0.05,  0.05,80,  -15., 15.   );
+//  tree_simc->Project("h_R_ph_vz_simc","zposi:h_ypfp","");                                                         
+//  TH2D* h_L_ph_vz_data       = new TH2D("h_L_ph_vz_data"      ,"h_L_ph_vz_data"   ,80,   -0.05,  0.05,80,  -15., 15.   );
+//  TH2D* h_L_ph_vz_simc       = new TH2D("h_L_ph_vz_simc"      ,"h_L_ph_vz_simc"   ,80,   -0.05,  0.05,80,  -15., 15.   );
+//  tree_simc->Project("h_L_ph_vz_simc","zposi:e_ypfp","");
+  TH2D* h_R_p_x_data       = new TH2D("h_R_p_x_data"      ,"h_R_p_x_data"   ,80,   1700.,  1950.,80,  -80., 80.  );
+  h_R_p_x_data->GetYaxis()->SetTitle("X(FP) [cm]");
+  h_R_p_x_data->GetXaxis()->SetTitle("Momentum [MeV/c]");
+  TH2D* h_R_p_x_simc       = new TH2D("h_R_p_x_simc"      ,"h_R_p_x_simc"   ,80,   1700.,  1950.,80,  -80., 80.  );
+  h_R_p_x_simc->GetYaxis()->SetTitle("X(FP) [cm]");
+  h_R_p_x_simc->GetXaxis()->SetTitle("Momentum [MeV/c]");
+  tree_simc->Project("h_R_p_x_simc","h_xfp:Rp_rec","");
+  TH2D* h_L_p_x_data       = new TH2D("h_L_p_x_data"      ,"h_L_p_x_data"   ,80,   1950.,  2250.,80,  -80., 80.  );
+  h_L_p_x_data->GetYaxis()->SetTitle("X(FP) [cm]");
+  h_L_p_x_data->GetXaxis()->SetTitle("Momentum [MeV/c]");
+  TH2D* h_L_p_x_simc       = new TH2D("h_L_p_x_simc"      ,"h_L_p_x_simc"   ,80,   1950.,  2250.,80,  -80., 80.  );
+  h_L_p_x_simc->GetYaxis()->SetTitle("X(FP) [cm]");
+  h_L_p_x_simc->GetXaxis()->SetTitle("Momentum [MeV/c]");
+  tree_simc->Project("h_L_p_x_simc","e_xfp:Lp_rec","");
+
+  h_R_y_data->SetLineColor(kRed);
+  h_R_x_data->SetLineColor(kRed);
+  h_R_th_data->SetLineColor(kRed);
+  h_R_ph_data->SetLineColor(kRed);
+  h_R_tg_th_data->SetLineColor(kRed);
+  h_R_tg_ph_data->SetLineColor(kRed);
+  h_L_y_data->SetLineColor(kRed);
+  h_L_x_data->SetLineColor(kRed);
+  h_L_th_data->SetLineColor(kRed);
+  h_L_ph_data->SetLineColor(kRed);
+  h_L_tg_th_data->SetLineColor(kRed);
+  h_L_tg_ph_data->SetLineColor(kRed);
+
   tree_simc->Project("h_pepk_simc","Lp_rec:Rp_rec","");
   TH1D* h_pe_simc = new TH1D("h_pe_simc", "p_{e'}" ,200,1980.,2220.);
   tree_simc->Project("h_pe_simc","Lp_rec","");
   TH1D* h_pk_simc = new TH1D("h_pk_simc", "p_{K}" ,200,1720.,1940.);
   tree_simc->Project("h_pk_simc","Rp_rec","");
   TH2F* h_zz_dummy  = new TH2F("h_zz_dummy","h_zz_dummy",100,-0.15,0.15,100,-0.15,0.15);
+
+  TH1D* h_pe_simc_FPcut = new TH1D("h_pe_simc_FPcut", "p_{e'} (FP cut)" ,200,1980.,2220.);
+  tree_simc->Project("h_pe_simc_FPcut","Lp_rec","e_xpfp<0.17*e_xfp/100.+0.025&&e_xpfp>0.17*e_xfp/100.-0.035&&e_xpfp<0.40*e_xfp/100.+0.130&&e_xpfp>0.40*e_xfp/100.-0.130&&h_xpfp<0.17*h_xfp/100.+0.025&&h_xpfp>0.17*h_xfp/100.-0.035&&h_xpfp<0.40*h_xfp/100.+0.130&&h_xpfp>0.40*h_xfp/100.-0.130");
+  TH1D* h_pk_simc_FPcut = new TH1D("h_pk_simc_FPcut", "p_{K} (FP cut)" ,200,1720.,1940.);
+  tree_simc->Project("h_pk_simc_FPcut","Rp_rec","e_xpfp<0.17*e_xfp/100.+0.025&&e_xpfp>0.17*e_xfp/100.-0.035&&e_xpfp<0.40*e_xfp/100.+0.130&&e_xpfp>0.40*e_xfp/100.-0.130&&h_xpfp<0.17*h_xfp/100.+0.025&&h_xpfp>0.17*h_xfp/100.-0.035&&h_xpfp<0.40*h_xfp/100.+0.130&&h_xpfp>0.40*h_xfp/100.-0.130");
 
   TH1F* h_zave  = new TH1F("h_zave","Z-vertex (Ave.)",1000,-0.25,0.25);
   TH1F* h_zave_dummy  = new TH1F("h_zave_dummy","Z-vertex (Ave.)",1000,-0.15,0.15);
@@ -766,7 +1136,7 @@ cout<<"Entries: "<<ENum<<endl;
 		if(event_selection_ctout3)hmm_ctout3->Fill(mm);
 		if(event_selection_ctout4)hmm_ctout4->Fill(mm);
 		if(event_selection&&ct_cut)hmm_L_fom_best->Fill(mm);
-		if(event_selection&&ct_cut)hmm_L_strict->Fill(mm*1000.);
+		if(event_selection&&ct_cut&&abs(L_tr_tg_ph)>0.03)hmm_L_strict->Fill(mm*1000.);
 		if(event_selection_nocut&&ct_cut)hmm_L_fom_nocut->Fill(mm);
 		double theta_ee = L_4vec.Theta();
 		//test double theta_ek = acos((phi_R*sin(phi0)+cos(phi0))/(sqrt(1+theta*theta+phi*phi)));//original frame
@@ -839,7 +1209,8 @@ cout<<"Entries: "<<ENum<<endl;
 		if(event_selection&&ct_cut&&theta_gk_cm*180./PI>8.)hcs_L_fom_best->Fill(mm,cs);
 //		//if(event_selection_nocut&&ct_cut)hcs_L_fom_nocut->SetBinContent(hmm_L_fom_best->FindBin(mm),cs);
 
-		if(event_selection&&ct_cut){
+		//if(event_selection&&ct_cut)
+		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2){
 			gklab_gkcm->Fill(theta_gk_lab,theta_gk_cm);
 			gklab_eklab->Fill(theta_gk_lab,theta_ek);
 			eelab_eklab->Fill(theta_ee,theta_ek);
@@ -853,6 +1224,61 @@ cout<<"Entries: "<<ENum<<endl;
 			h_pepk->Fill(R_mom*1000.,L_mom*1000.);
 			h_pe->Fill(L_mom*1000.);
 			h_pk->Fill(R_mom*1000.);
+			h_R_x_data->Fill(R_tr_x*100.);
+			h_R_y_data->Fill(R_tr_y*100.);
+			h_R_th_data->Fill(R_tr_th);
+			h_R_ph_data->Fill(R_tr_ph);
+			h_R_tg_th_data->Fill(R_tr_tg_th);
+			h_R_tg_ph_data->Fill(R_tr_ph);
+			h_L_x_data->Fill(L_tr_x*100.);
+			h_L_y_data->Fill(L_tr_y*100.);
+//== FP x FP ==//
+//X-Y, X-theta, Y-phi, theta-phi 
+			h_L_x_y_data->Fill(L_tr_y*100.,L_tr_x*100.);
+			h_R_x_y_data->Fill(R_tr_y*100.,R_tr_x*100.);
+			h_L_th_x_data->Fill(L_tr_x*100.,L_tr_th);
+			h_R_th_x_data->Fill(R_tr_x*100.,R_tr_th);
+			h_L_ph_y_data->Fill(L_tr_y*100.,L_tr_ph);
+			h_R_ph_y_data->Fill(R_tr_y*100.,R_tr_ph);
+			h_L_ph_th_data->Fill(L_tr_th,L_tr_ph);
+			h_R_ph_th_data->Fill(R_tr_th,R_tr_ph);
+
+//== tar x tar ==//
+//theta-phi, phi-Z
+			h_L_tg_ph_tg_th_data->Fill(L_tr_tg_th,L_tr_tg_ph);
+			h_R_tg_ph_tg_th_data->Fill(R_tr_tg_th,R_tr_tg_ph);
+			h_L_z_tg_ph_data->Fill(L_tr_tg_ph,L_tr_vz*100.);
+			h_R_z_tg_ph_data->Fill(R_tr_tg_ph,R_tr_vz*100.);
+
+//== FP x tar ==//
+//X-theta, Y-phi, theta-theta, phi-phi, Y-Z, phi-Z
+			h_L_tg_th_x_data->Fill(L_tr_x*100.,L_tr_tg_th);
+			h_R_tg_th_x_data->Fill(R_tr_x*100.,R_tr_tg_th);
+			h_L_tg_th_th_data->Fill(L_tr_th,L_tr_tg_th);
+			h_R_tg_th_th_data->Fill(R_tr_th,R_tr_tg_th);
+			h_L_tg_ph_y_data->Fill(L_tr_y*100.,L_tr_tg_ph);
+			h_R_tg_ph_y_data->Fill(R_tr_y*100.,R_tr_tg_ph);
+			h_L_tg_ph_ph_data->Fill(L_tr_ph,L_tr_tg_ph);
+			h_R_tg_ph_ph_data->Fill(R_tr_ph,R_tr_tg_ph);
+			h_L_z_y_data->Fill(L_tr_y*100.,L_tr_vz*100.);
+			h_R_z_y_data->Fill(R_tr_y*100.,R_tr_vz*100.);
+			h_L_z_ph_data->Fill(L_tr_ph,L_tr_vz*100.);
+			h_R_z_ph_data->Fill(R_tr_ph,R_tr_vz*100.);
+
+			//h_L_y_vz_data->Fill(L_tr_y*100.,L_tr_vz*100.);
+			//h_R_y_vz_data->Fill(R_tr_y*100.,R_tr_vz*100.);
+			//h_L_ph_vz_data->Fill(L_tr_ph,L_tr_vz*100.);
+			//h_R_ph_vz_data->Fill(R_tr_ph,R_tr_vz*100.);
+			h_L_p_x_data->Fill(L_mom*1000.,L_tr_x*100.);
+			h_R_p_x_data->Fill(R_mom*1000.,R_tr_x*100.);
+			h_L_th_data->Fill(L_tr_th);
+			h_L_ph_data->Fill(L_tr_ph);
+			h_L_tg_th_data->Fill(L_tr_tg_th);
+			h_L_tg_ph_data->Fill(L_tr_ph);
+			//h_L_tg_ph_y_data->Fill(-1.*L_tr_y*100.,L_tr_tg_ph);
+			//h_R_tg_ph_y_data->Fill(-1.*R_tr_y*100.,R_tr_tg_ph);
+			//h_L_tg_th_x_data->Fill(L_tr_x*100.,L_tr_th);
+			//h_R_tg_th_x_data->Fill(R_tr_x*100.,R_tr_th);
 			//if(R_mom>1.76&&R_mom<1.90&&L_mom>2.01&&L_mom<2.16)h_pe->Fill(L_mom*1000.);
 			//if(R_mom>1.76&&R_mom<1.90&&L_mom>2.01&&L_mom<2.16)h_pk->Fill(R_mom*1000.);
 		}
@@ -947,9 +1373,15 @@ cout<<"h_pk_simc="<<h_pk_simc->GetEntries()<<endl;
 	c30->cd(3);
 	h_pe->Draw("e");
 	h_pe_simc->Draw("same");
+	h_pe_simc_FPcut->Scale(2081./923474.);//rec
+	h_pe_simc_FPcut->SetLineColor(kGreen);
+	h_pe_simc_FPcut->Draw("same");
 	c30->cd(4);
 	h_pk->Draw("e");
 	h_pk_simc->Draw("same");
+	h_pk_simc_FPcut->Scale(2226./1041430.);//rec
+	h_pk_simc_FPcut->SetLineColor(kGreen);
+	h_pk_simc_FPcut->Draw("same");
 	
 	TCanvas* c40 = new TCanvas("c40","c40",900.,900.);
     TH1D* h_pe_chisq = new TH1D("h_pe_chisq", "#chi_{e'}^{2}" ,200,1980.,2220.);
@@ -994,6 +1426,371 @@ cout<<"h_pk_simc="<<h_pk_simc->GetEntries()<<endl;
 	cout<<"k bin = "<<k_bin<<endl;
 //	c3->Print("./pdf/mm_tight.pdf");
 //	c4->Print("./pdf/mm_wobg_tight.pdf");
+
+cout << "h_R_y_simc = "<<h_R_y_simc->Integral()<<endl;
+cout << "h_R_y_data = "<<h_R_y_data->Integral()<<endl;
+cout << "h_R_x_simc = "<<h_R_x_simc->Integral()<<endl;
+cout << "h_R_x_data = "<<h_R_x_data->Integral()<<endl;
+cout << "h_R_th_simc = "<<h_R_th_simc->Integral()<<endl;
+cout << "h_R_ph_data = "<<h_R_ph_data->Integral()<<endl;
+cout << "h_R_tg_th_simc = "<<h_R_tg_th_simc->Integral()<<endl;
+cout << "h_R_tg_ph_data = "<<h_R_tg_ph_data->Integral()<<endl;
+cout << "h_L_y_simc = "<<h_L_y_simc->Integral()<<endl;
+cout << "h_L_y_data = "<<h_L_y_data->Integral()<<endl;
+cout << "h_L_x_simc = "<<h_L_x_simc->Integral()<<endl;
+cout << "h_L_x_data = "<<h_L_x_data->Integral()<<endl;
+cout << "h_L_th_simc = "<<h_L_th_simc->Integral()<<endl;
+cout << "h_L_ph_data = "<<h_L_ph_data->Integral()<<endl;
+cout << "h_L_tg_th_simc = "<<h_L_tg_th_simc->Integral()<<endl;
+cout << "h_L_tg_ph_data = "<<h_L_tg_ph_data->Integral()<<endl;
+
+	TCanvas* c50 = new TCanvas("c50","c50",900.,900.);
+	double dtemp, stemp;
+	c50->Divide(3,2);
+	c50->cd(1);
+	stemp=h_R_y_simc->Integral();
+	dtemp=h_R_y_data->Integral();
+	h_R_y_simc->Scale(dtemp/stemp);
+	h_R_y_data->Draw("e");
+	h_R_y_data->Fit("gausn");
+	h_R_y_simc->Draw("histsame");
+	h_R_y_simc->Fit("gausn");
+	c50->cd(2);
+	stemp=h_R_x_simc->Integral();
+	dtemp=h_R_x_data->Integral();
+	h_R_x_simc->Scale(dtemp/stemp);
+	h_R_x_data->Draw("e");
+	h_R_x_simc->Draw("histsame");
+	c50->cd(3);
+	stemp=h_R_th_simc->Integral();
+	dtemp=h_R_th_data->Integral();
+	h_R_th_simc->Scale(dtemp/stemp);
+	h_R_th_data->Draw("e");
+	h_R_th_simc->Draw("histsame");
+	c50->cd(4);
+	stemp=h_R_ph_simc->Integral();
+	dtemp=h_R_ph_data->Integral();
+	h_R_ph_simc->Scale(dtemp/stemp);
+	h_R_ph_data->Draw("e");
+	h_R_ph_simc->Draw("histsame");
+	c50->cd(5);
+	stemp=h_R_tg_th_simc->Integral();
+	dtemp=h_R_tg_th_data->Integral();
+	h_R_tg_th_simc->Scale(dtemp/stemp);
+	h_R_tg_th_data->Draw("e");
+	h_R_tg_th_simc->Draw("histsame");
+	c50->cd(6);
+	stemp=h_R_tg_ph_simc->Integral();
+	dtemp=h_R_tg_ph_data->Integral();
+	h_R_tg_ph_simc->Scale(dtemp/stemp);
+	h_R_tg_ph_data->Draw("e");
+	h_R_tg_ph_simc->Draw("histsame");
+	
+	TCanvas* c51 = new TCanvas("c51","c51",900.,900.);
+	c51->Divide(3,2);
+	c51->cd(1);
+	stemp=h_L_y_simc->Integral();
+	dtemp=h_L_y_data->Integral();
+	h_L_y_simc->Scale(dtemp/stemp);
+	h_L_y_data->Draw("e");
+	h_L_y_data->Fit("gausn");
+	h_L_y_simc->Draw("histsame");
+	h_L_y_simc->Fit("gausn");
+	c51->cd(2);
+	stemp=h_L_x_simc->Integral();
+	dtemp=h_L_x_data->Integral();
+	h_L_x_simc->Scale(dtemp/stemp);
+	h_L_x_data->Draw("e");
+	h_L_x_simc->Draw("histsame");
+	c51->cd(3);
+	stemp=h_L_th_simc->Integral();
+	dtemp=h_L_th_data->Integral();
+	h_L_th_simc->Scale(dtemp/stemp);
+	h_L_th_data->Draw("e");
+	h_L_th_simc->Draw("histsame");
+	c51->cd(4);
+	stemp=h_L_ph_simc->Integral();
+	dtemp=h_L_ph_data->Integral();
+	h_L_ph_simc->Scale(dtemp/stemp);
+	h_L_ph_data->Draw("e");
+	h_L_ph_simc->Draw("histsame");
+	c51->cd(5);
+	stemp=h_L_tg_th_simc->Integral();
+	dtemp=h_L_tg_th_data->Integral();
+	h_L_tg_th_simc->Scale(dtemp/stemp);
+	h_L_tg_th_data->Draw("e");
+	h_L_tg_th_simc->Draw("histsame");
+	c51->cd(6);
+	stemp=h_L_tg_ph_simc->Integral();
+	dtemp=h_L_tg_ph_data->Integral();
+	h_L_tg_ph_simc->Scale(dtemp/stemp);
+	h_L_tg_ph_data->Draw("e");
+	h_L_tg_ph_simc->Draw("histsame");
+
+//cout << "h_R_y_simc = "<<h_R_y_simc->Integral()<<endl;
+//cout << "h_R_y_data = "<<h_R_y_data->Integral()<<endl;
+//cout << "h_R_x_simc = "<<h_R_x_simc->Integral()<<endl;
+//cout << "h_R_x_data = "<<h_R_x_data->Integral()<<endl;
+//cout << "h_R_th_simc = "<<h_R_th_simc->Integral()<<endl;
+//cout << "h_R_ph_data = "<<h_R_ph_data->Integral()<<endl;
+//cout << "h_R_tg_th_simc = "<<h_R_tg_th_simc->Integral()<<endl;
+//cout << "h_R_tg_ph_data = "<<h_R_tg_ph_data->Integral()<<endl;
+//cout << "h_L_y_simc = "<<h_L_y_simc->Integral()<<endl;
+//cout << "h_L_y_data = "<<h_L_y_data->Integral()<<endl;
+//cout << "h_L_x_simc = "<<h_L_x_simc->Integral()<<endl;
+//cout << "h_L_x_data = "<<h_L_x_data->Integral()<<endl;
+//cout << "h_L_th_simc = "<<h_L_th_simc->Integral()<<endl;
+//cout << "h_L_ph_data = "<<h_L_ph_data->Integral()<<endl;
+//cout << "h_L_tg_th_simc = "<<h_L_tg_th_simc->Integral()<<endl;
+//cout << "h_L_tg_ph_data = "<<h_L_tg_ph_data->Integral()<<endl;
+//
+	TCanvas* c60 = new TCanvas("c60","c60",900.,900.);
+	c60->Divide(2,2);
+	c60->cd(1);
+	h_L_tg_ph_y_simc->Draw("colz");
+	c60->cd(2);
+	h_L_tg_ph_y_data->Draw("colz");
+	c60->cd(3);
+	h_L_tg_th_x_simc->Draw("colz");
+	c60->cd(4);
+	h_L_tg_th_x_data->Draw("colz");
+	TCanvas* c61 = new TCanvas("c61","c61",900.,900.);
+	c61->Divide(2,2);
+	c61->cd(1);
+	h_R_tg_ph_y_simc->Draw("colz");
+	c61->cd(2);
+	h_R_tg_ph_y_data->Draw("colz");
+	c61->cd(3);
+	h_R_tg_th_x_simc->Draw("colz");
+	c61->cd(4);
+	h_R_tg_th_x_data->Draw("colz");
+//	
+//	TCanvas* c62 = new TCanvas("c62","c62",900.,900.);
+//	c62->Divide(2,2);
+//	c62->cd(1);
+//  	h_R_y_vz_simc->Draw("colz");    
+//	c62->cd(2);
+//	h_R_y_vz_data->Draw("colz");    
+//	c62->cd(3);
+//  	h_L_y_vz_simc->Draw("colz");
+//	c62->cd(4);
+//  	h_L_y_vz_data->Draw("colz");
+//
+//	TCanvas* c63 = new TCanvas("c63","c63",900.,900.);
+//	c63->Divide(2,2);
+//	c63->cd(1);
+//  	h_R_ph_vz_simc->Draw("colz");    
+//	c63->cd(2);
+//	h_R_ph_vz_data->Draw("colz");    
+//	c63->cd(3);
+//  	h_L_ph_vz_simc->Draw("colz");
+//	c63->cd(4);
+//  	h_L_ph_vz_data->Draw("colz");
+
+
+
+
+//Each Pad Size are changed.
+	gStyle->SetPadLeftMargin(0.15);
+	gStyle->SetPadRightMargin(0.15);
+	gStyle->SetPadTopMargin(0.15);
+	gStyle->SetPadBottomMargin(0.15);
+	TCanvas* c64 = new TCanvas("c64","c64",900.,900.);
+	c64->Divide(2,2);
+	c64->cd(1);
+  	h_R_p_x_simc->Draw("colz");    
+	c64->cd(2);
+  	h_R_p_x_data->Draw("colz");    
+	c64->cd(3);
+  	h_L_p_x_simc->Draw("colz");    
+	c64->cd(4);
+  	h_L_p_x_data->Draw("colz");    
+
+	TCanvas* c70 = new TCanvas("c70","c70 (FP)",900.,900.);
+	c70->Divide(2,2);
+	c70->cd(1);
+  	h_R_x_y_simc->Draw("colz");    
+	c70->cd(2);
+  	h_R_x_y_data->Draw("colz");    
+	c70->cd(3);
+  	h_L_x_y_simc->Draw("colz");    
+	c70->cd(4);
+  	h_L_x_y_data->Draw("colz");    
+
+	TCanvas* c71 = new TCanvas("c71","c71 (FP)",900.,900.);
+	c71->Divide(2,2);
+	TF1* func_fp1 = new TF1("func_fp1",FP_cut1,-80.,80.,1);
+	func_fp1->SetNpx(600);
+	func_fp1->SetParameter(1,0);
+	func_fp1->SetLineColor(kRed);
+	func_fp1->SetLineWidth(4);
+	TF1* func_fp2 = new TF1("func_fp2",FP_cut2,-80.,80.,1);
+	func_fp2->SetNpx(600);
+	func_fp2->SetParameter(1,0);
+	func_fp2->SetLineColor(kRed);
+	func_fp2->SetLineWidth(4);
+	TF1* func_fp3 = new TF1("func_fp3",FP_cut3,-80.,80.,1);
+	func_fp3->SetNpx(600);
+	func_fp3->SetParameter(1,0);
+	func_fp3->SetLineColor(kRed);
+	func_fp3->SetLineWidth(4);
+	TF1* func_fp4 = new TF1("func_fp4",FP_cut4,-80.,80.,1);
+	func_fp4->SetNpx(600);
+	func_fp4->SetParameter(1,0);
+	func_fp4->SetLineColor(kViolet);
+	func_fp4->SetLineWidth(4);
+	c71->cd(1);
+  	h_R_th_x_simc->Draw("colz");    
+	func_fp1->Draw("same");
+	func_fp2->Draw("same");
+	func_fp3->Draw("same");
+	func_fp4->Draw("same");
+	c71->cd(2);
+  	h_R_th_x_data->Draw("colz");    
+	func_fp1->Draw("same");
+	func_fp2->Draw("same");
+	func_fp3->Draw("same");
+	func_fp4->Draw("same");
+	c71->cd(3);
+  	h_L_th_x_simc->Draw("colz");    
+	func_fp1->Draw("same");
+	func_fp2->Draw("same");
+	func_fp3->Draw("same");
+	func_fp4->Draw("same");
+	c71->cd(4);
+  	h_L_th_x_data->Draw("colz");    
+	func_fp1->Draw("same");
+	func_fp2->Draw("same");
+	func_fp3->Draw("same");
+	func_fp4->Draw("same");
+
+	TCanvas* c72 = new TCanvas("c72","c72 (FP)",900.,900.);
+	c72->Divide(2,2);
+	c72->cd(1);
+  	h_R_ph_y_simc->Draw("colz");    
+	c72->cd(2);
+  	h_R_ph_y_data->Draw("colz");    
+	c72->cd(3);
+  	h_L_ph_y_simc->Draw("colz");    
+	c72->cd(4);
+  	h_L_ph_y_data->Draw("colz");    
+
+	TCanvas* c73 = new TCanvas("c73","c73 (FP)",900.,900.);
+	c73->Divide(2,2);
+	c73->cd(1);
+  	h_R_ph_th_simc->Draw("colz");    
+	c73->cd(2);
+  	h_R_ph_th_data->Draw("colz");    
+	c73->cd(3);
+  	h_L_ph_th_simc->Draw("colz");    
+	c73->cd(4);
+  	h_L_ph_th_data->Draw("colz");    
+
+	TCanvas* c80 = new TCanvas("c80","c80 (tar)",900.,900.);
+	c80->Divide(2,2);
+	c80->cd(1);
+  	h_R_tg_ph_tg_th_simc->Draw("colz");    
+	c80->cd(2);
+  	h_R_tg_ph_tg_th_data->Draw("colz");    
+	c80->cd(3);
+  	h_L_tg_ph_tg_th_simc->Draw("colz");    
+	c80->cd(4);
+  	h_L_tg_ph_tg_th_data->Draw("colz");    
+
+	TCanvas* c81 = new TCanvas("c81","c81 (tar)",900.,900.);
+	c81->Divide(2,2);
+	c81->cd(1);
+  	h_R_z_tg_ph_simc->Draw("colz");    
+	c81->cd(2);
+  	h_R_z_tg_ph_data->Draw("colz");    
+	c81->cd(3);
+  	h_L_z_tg_ph_simc->Draw("colz");    
+	c81->cd(4);
+  	h_L_z_tg_ph_data->Draw("colz");    
+
+	TCanvas* c90 = new TCanvas("c90","c90 (FP x tar)",900.,900.);
+	c90->Divide(2,2);
+	c90->cd(1);
+	h_R_tg_th_x_simc->Draw("colz");
+	c90->cd(2);
+	h_R_tg_th_x_data->Draw("colz");
+	c90->cd(3);
+	h_L_tg_th_x_simc->Draw("colz");
+	c90->cd(4);
+	h_L_tg_th_x_data->Draw("colz");
+
+	TCanvas* c91 = new TCanvas("c91","c91 (FP x tar)",900.,900.);
+	c91->Divide(2,2);
+	c91->cd(1);
+	h_R_tg_th_th_simc->Draw("colz");
+	c91->cd(2);
+	h_R_tg_th_th_data->Draw("colz");
+	c91->cd(3);
+	h_L_tg_th_th_simc->Draw("colz");
+	c91->cd(4);
+	h_L_tg_th_th_data->Draw("colz");
+
+	TCanvas* c92 = new TCanvas("c92","c92 (FP x tar)",900.,900.);
+	c92->Divide(2,2);
+	c92->cd(1);
+	h_R_tg_ph_y_simc->Draw("colz");
+	c92->cd(2);
+	h_R_tg_ph_y_data->Draw("colz");
+	c92->cd(3);
+	h_L_tg_ph_y_simc->Draw("colz");
+	c92->cd(4);
+	h_L_tg_ph_y_data->Draw("colz");
+
+	TCanvas* c93 = new TCanvas("c93","c93 (FP x tar)",900.,900.);
+	c93->Divide(2,2);
+	c93->cd(1);
+	h_R_tg_ph_ph_simc->Draw("colz");
+	c93->cd(2);
+	h_R_tg_ph_ph_data->Draw("colz");
+	c93->cd(3);
+	h_L_tg_ph_ph_simc->Draw("colz");
+	c93->cd(4);
+	h_L_tg_ph_ph_data->Draw("colz");
+
+	TCanvas* c94 = new TCanvas("c94","c94 (tar)",900.,900.);
+	c94->Divide(2,2);
+	c94->cd(1);
+  	h_R_z_y_simc->Draw("colz");    
+	c94->cd(2);
+  	h_R_z_y_data->Draw("colz");    
+	c94->cd(3);
+  	h_L_z_y_simc->Draw("colz");    
+	c94->cd(4);
+  	h_L_z_y_data->Draw("colz");    
+
+	TCanvas* c95 = new TCanvas("c95","c95 (tar)",900.,900.);
+	c95->Divide(2,2);
+	c95->cd(1);
+  	h_R_z_ph_simc->Draw("colz");    
+	c95->cd(2);
+  	h_R_z_ph_data->Draw("colz");    
+	c95->cd(3);
+  	h_L_z_ph_simc->Draw("colz");    
+	c95->cd(4);
+  	h_L_z_ph_data->Draw("colz");    
+
+/*--- Print ---*/
+cout << "Print is starting" << endl;
+	c64->Print("SIMC_vs_replay.pdf[");
+	c64->Print("SIMC_vs_replay.pdf");
+	c70->Print("SIMC_vs_replay.pdf");
+	c71->Print("SIMC_vs_replay.pdf");
+	c72->Print("SIMC_vs_replay.pdf");
+	c73->Print("SIMC_vs_replay.pdf");
+	c80->Print("SIMC_vs_replay.pdf");
+	c81->Print("SIMC_vs_replay.pdf");
+	c90->Print("SIMC_vs_replay.pdf");
+	c91->Print("SIMC_vs_replay.pdf");
+	c92->Print("SIMC_vs_replay.pdf");
+	c93->Print("SIMC_vs_replay.pdf");
+	c94->Print("SIMC_vs_replay.pdf");
+	c95->Print("SIMC_vs_replay.pdf");
+	c95->Print("SIMC_vs_replay.pdf]");
 
 cout << "Well done!" << endl;
 }//fit

@@ -1137,6 +1137,8 @@ if(dataflag==1){//H2-1
  ctime=-ctime;
  ctime_before=-ctime_before;
 tr.ct_orig=ctime;
+    L_tr_vz[lhit]  = L_tr_vz[lhit]*Ztr +Ztm;     // scaled
+    R_tr_vz[rhit]  = R_tr_vz[rhit]*Ztr +Ztm;     // scaled
 
  return ctime;
 
@@ -2162,6 +2164,7 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 	}
       
       for(int lt=0;lt<NLtr;lt++){
+		L_tr_vz[lt] = -0.121126;
         L_Tr = L_FP = false;
         // FP and chi2 cuts
         if( L_tr_chi2[lt]<0.01 ) L_Tr = true;

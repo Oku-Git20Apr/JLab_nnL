@@ -777,7 +777,7 @@ cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 		h_num->SetBinContent(1,0.);
 		for(int i=1;i<25;i++){
 		//den = fcoin_k_strict->Integral(-1.25,1.25)/0.056;
-		den = fcoin_k_strict->Integral(-20.,20.)/0.056;
+		den = fcoin_k_strict->Integral(-2.,2.)/0.056;
 		num = fcoin_k_strict->Integral((double)i*(-0.05),(double)i*0.05)/0.056;
 		h_den->SetBinContent(i+1,den);
 		h_num->SetBinContent(i+1,num);

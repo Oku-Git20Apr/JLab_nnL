@@ -1,9 +1,8 @@
-//--  Al Contamination   --//
+//--  Data vs SIMC (FP)  --//
 //
-//K. Okuyama (Oct. 25, 2020)
-//K. Okuyama (Dec. 12, 2020)
+//K. Okuyama (Feb. 21, 2021)
 //
-//This is taken over from result.C
+//This is taken over from data_vs_simc.C
 //No array branch mode 
 //
 double F_Voigt( double *x, double *par )
@@ -125,84 +124,6 @@ double F_VZ( double *x, double *par )
   return pol2gaus(x,par)+par[5]*TMath::Gaus(x[0],par[6],par[7],1)+par[8]*TMath::Gaus(x[0],par[9],par[10],1)+par[11]*TMath::Gaus(x[0],par[12],par[13],1)+par[14]*TMath::Gaus(x[0],par[15],par[16],1);
 }
 
-double F_VZ_cell( double *x, double *par)
-{
-double a1, a2;
-double b1, b2;
-a1=par[0]*exp(-0.5*pow((x[0]-par[1])/par[2],2.));
-a2=par[0]*par[3]*exp(-0.5*pow((x[0]-par[1]+par[4])/par[5],2.));
-b1=par[6]*exp(-0.5*pow((x[0]-par[7])/par[2],2.));
-b2=par[6]*par[3]*exp(-0.5*pow((x[0]-par[7]+par[4])/par[5],2.));
-double a = a1+a2;
-double b = b1+b2;
-return a+b;
-}
-double F_gas( double *x, double *par)
-{
-//par[0]: Al Gauss sigma
-//par[1]: Al second gauss strength
-//par[2]: Al(front) second gauss pos. 
-//par[3]: Al second gauss sigma 
-//par[4]: pol2 coeff.1
-//par[5]: pol2 coeff.2
-//par[6]: total scale 
-
-double gas = 0.;
-int np = 2000;
-for(int i=0;i<np;i++){
- double pol2 = par[4]*pow((x[0]-par[5]),2.)+1.;
- double step = -100.+(double)i/10.;
- if(step<-0.125*100.) pol2 = 0.;
- if(step> 0.125*100.) pol2 = 0.;
-
- double fland;
- fland = exp(-0.5*pow((x[0]-step)/par[0],2.))+par[1]*exp(-0.5*pow((x[0]+par[2]-step)/par[3],2.));
- gas += pol2 * fland;
-}
-gas = par[6]*gas;
-return gas;
-}
-
-double F_VZ2( double *x, double *par)
-{
-//par[0]: Al front scale
-//par[1]: Al front pos.
-//par[2]: Al Gauss sigma
-//par[3]: Al second gauss strength
-//par[4]: Al(front) second gauss pos. 
-//par[5]: Al second gauss sigma 
-//par[6]: Al rear scale
-//par[7]: Al(rear) second gauss pos. 
-//par[8]: pol2 coeff.1
-//par[9]: pol2 coeff.2
-//par[10]: total scale 
-
-double g_f1, g_f2;//front Gauss
-double g_r1, g_r2;//rear Gauss
-g_f1=par[0]*exp(-0.5*pow((x[0]-par[1])/par[2],2.));
-g_f2=par[0]*par[3]*exp(-0.5*pow((x[0]-par[1]+par[4])/par[5],2.));
-g_r1=par[6]*exp(-0.5*pow((x[0]-par[7])/par[2],2.));
-g_r2=par[6]*par[3]*exp(-0.5*pow((x[0]-par[7]+par[4])/par[5],2.));
-double g_front = g_f1 + g_f2;
-double g_rear  = g_r1 + g_r2;
-
-double gas = 0.;
-int np = 2000;
-for(int i=0;i<np;i++){
- double pol2 = par[8]*pow((x[0]-par[9]),2.)+1.;
- double step = -100.+(double)i/10.;
- if(step<-0.125*100.) pol2 = 0.;
- if(step> 0.125*100.) pol2 = 0.;
-
- double fland;
- fland = exp(-0.5*pow((x[0]-step)/par[2],2.))+par[3]*exp(-0.5*pow((x[0]+par[4]-step)/par[5],2.));
- gas += pol2 * fland;
-}
-gas = par[10]*gas;
-double val =  g_front + g_rear + gas;
-return val;
-}
-
 double FMM_Response( double *x, double *par ){
 
    //par[0]=Width (scale) parameter of Landau density
@@ -269,39 +190,28 @@ double FMM_Res( double *x, double *par ){
 
 }
 
-void vertex_fit3(){
+void simc_fp_momcut(){
 	string pdfname = "fitting.pdf";
 cout << "Output pdf file name is " << pdfname << endl;
   
-  //TFile *file = new TFile("../h2all_Lsingle.root","read");//input file of all H2 run(default: h2all4.root)
   TFile *file = new TFile("../h2all_2020Nov.root","read");//input file of all H2 run(default: h2all4.root)
-  TFile *file_dummy = new TFile("../dummy_Tkin/tritium_111325.root","read");//input file of all H2 run(default: h2all4.root)
-  TFile *file_true = new TFile("../dummy_Tkin/tritium_111157.root","read");//input file of all H2 run(default: h2all4.root)
+  TFile *file_simc = new TFile("/data/41a/ELS/okuyama/SIMC_jlab/SIMC/rootfiles/BOTH_LS.root","read");// L:S0=3:1 (0.9M vs 0.3M) 2020/12/10
+  //TFile *file_simc = new TFile("/data/41a/ELS/okuyama/SIMC_jlab/SIMC/rootfiles/BOTH_LS_datafit.root","read");// L:S0=3:1 (0.9M vs 0.3M), pe'=2102.5MeV/c, pK=1825MeV/c,  2020/12/29
+  //TFile *file_simc = new TFile("/data/41a/ELS/okuyama/SIMC_jlab/SIMC/rootfiles/NONE_LS.root","read");// L:S0=3:1 (0.9M vs 0.3M)  2020/1/5
+  //TFile *file_simc = new TFile("/data/41a/ELS/okuyama/SIMC_jlab/SIMC/rootfiles/BOTH_LS_momminus20.root","read");// L:S0=3:1 (0.9M vs 0.3M), pe'=2080MeV/c, pK=1800MeV/c,  2020/12/29
+  //TFile *file_simc = new TFile("/data/41a/ELS/okuyama/SIMC_jlab/SIMC/rootfiles/BOTH_LS_500um.root","read");// L:S0=3:1 (0.9M vs 0.3M), Al thickiness = 500 um, 2020/12/29
+  //TFile *file_simc = new TFile("/data/41a/ELS/okuyama/SIMC_jlab/SIMC/rootfiles/BOTH_LS_ElossCor.root","read");// L:S0=3:1 (0.9M vs 0.3M), w/ Eloss Correction, 2020/12/10
+  //TFile *file_simc = new TFile("/data/41a/ELS/okuyama/SIMC_jlab/SIMC/rootfiles/BOTH_LS_Rad3.root","read");// L:S0=3:1 (0.9M vs 0.3M), w/ extrad_flag = 3(Friedrich approximation), 2020/12/10
+  TTree *tree_simc = (TTree*)file_simc->Get("SNT");
 	//ACCBGの引き算はmea_hist.ccから
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea6.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
-  //TFile *file_mea = new TFile("../MixedEventAnalysis/bgmea_llccrr_Lsingle.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
-  TFile *file_mea = new TFile("../MixedEventAnalysis/bgmea_csbase.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
-  double nbunch = 6000.;//effetive bunches (6 bunches x 1000 mixtures)
+  TFile *file_mea = new TFile("../MixedEventAnalysis/bgmea_2020Nov.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
+  TFile *file_mea_mthesis = new TFile("../MixedEventAnalysis/bgmea_mthesis_2020Nov.root","read");//MeV
+  double nbunch = 6000.;//effetive bunches (6 bunches x 5 mixtures)
  // TTree *tree_old = (TTree*)file->Get("tree_out");
 //cout<<"Please wait a moment. CloneTree() is working..."<<endl;
   //TTree *tree = tree_old->CloneTree();
   TTree *tree = (TTree*)file->Get("tree_out");
-  TChain *chain_dummy = new TChain("T");
-	//chain_dummy = (TChain*)file_dummy->Get("T");
-  TChain *chain_true = new TChain("T");// = (TChain*)file_true->Get("T");
-  //TChain *chain_dummy = new TChain("tree_dummy","");
-  //TChain *chain_true = new TChain("tree_true","");
-	chain_dummy->Add("../dummy_Tkin/tritium_111325.root");
-	chain_dummy->Add("../dummy_Tkin/tritium_111325_1.root");
-	chain_dummy->Add("../dummy_Tkin/tritium_111323.root");
-	chain_dummy->Add("../dummy_Tkin/tritium_111324.root");
-	chain_dummy->Add("../dummy_Tkin/tritium_111324_1.root");
-	chain_true->Add("~/data_okuyama/rootfiles/nnL_temp/tritium_111157_1.root");
-	chain_true->Add("~/data_okuyama/rootfiles/nnL_temp/tritium_111157_2.root");
-	chain_true->Add("~/data_okuyama/rootfiles/nnL_temp/tritium_111157_3.root");
-	chain_true->Add("~/data_okuyama/rootfiles/nnL_temp/tritium_111157_4.root");
-	chain_true->Add("~/data_okuyama/rootfiles/nnL_temp/tritium_111157_5.root");
-//	tree->Write();
 
 
 //---  DAQ Efficiency ---//
@@ -595,6 +505,27 @@ cout << "Param file : " << AcceptanceR_table.c_str() << endl;
   TH1F* hmm_pi_wobg_fom_nocut  = new TH1F("hmm_pi_wobg_fom_nocut","hmm_pi_wobg_fom_nocut",xbin,xmin,xmax);
   TH1F* hm2   = (TH1F*)hmm_L_fom_best->Clone("hm2");
   TH1F* hm4   = (TH1F*)hmm_L_fom_best->Clone("hm4");
+  TH1F* hmm_L_strict  = new TH1F("hmm_L_strict","",xbin,xmin*1000.,xmax*1000.);
+  hmm_L_strict->GetXaxis()->SetTitle("Missing Mass - M_{#Lambda} [MeV/c^{2}]");
+  hmm_L_strict->GetYaxis()->SetTitle("Counts/(MeV/c^{2})");
+  hmm_L_strict->SetLineColor(kBlack);
+  TH1F* hmm_wobg_strict  = new TH1F("hmm_wobg_strict","",xbin,xmin*1000.,xmax*1000.);
+  hmm_wobg_strict->GetXaxis()->SetTitle("Missing Mass - M_{#Lambda} [MeV/c^{2}]");
+  hmm_wobg_strict->GetYaxis()->SetTitle("Counts/(MeV/c^{2})");
+  hmm_wobg_strict->SetLineColor(kBlack);
+  TH1F* hmm_wobg_fom_best  = new TH1F("hmm_wobg_fom_best","",xbin,xmin,xmax);
+  hmm_wobg_fom_best->GetXaxis()->SetTitle("Missing Mass - M_{#Lambda} [GeV/c^{2}]");
+  hmm_wobg_fom_best->GetYaxis()->SetTitle("Counts/(GeV/c^{2})");
+  hmm_wobg_fom_best->SetLineColor(kBlack);
+  TH1F* h_ct  = new TH1F("h_ct","h_ct",1000/0.056,-5000,5000.);
+  TH1F* h_ct2  = new TH1F("h_ct2","h_ct2",1000/0.056,-5000,5000.);
+  TH1F* hmm_ctout_only  = new TH1F("hmm_ctout_only","hmm_ctout_only",300,-0.1,0.2);
+  TH1F* hmm_ctout  = new TH1F("hmm_ctout","hmm_ctout",300,-0.1,0.2);
+  TH1F* hmm_ctout2  = new TH1F("hmm_ctout2","hmm_ctout2",300,-0.1,0.2);
+  TH1F* hmm_ctout3  = new TH1F("hmm_ctout3","hmm_ctout3",300,-0.1,0.2);
+  TH1F* hmm_ctout4  = new TH1F("hmm_ctout4","hmm_ctout4",300,-0.1,0.2);
+  TH2F* h_ctmm = new TH2F("h_ctmm","Cointime vs MM",100/0.056,-20.,20.,100,-0.1,0.2);
+  TH2F* h_ctmm2 = new TH2F("h_ctmm2","Cointime vs MM (strict)",100/0.056,-20.,20.,100,-0.1,0.2);
   TH2F* gklab_gkcm = new TH2F("gklab_gkcm","#theta_{gk}^{lab} vs #theta_{gk}^{CM}",100,0.,0.15,100,0.,0.4);
   TH2F* gklab_eklab = new TH2F("gklab_eklab","#theta_{gk}^{lab} vs #theta_{ek}^{lab}",100,0.,0.15,100,0.15,0.3);
   TH2F* eelab_eklab = new TH2F("eelab_eklab","#theta_{ee}^{lab} vs #theta_{ek}^{lab}",100,0.15,0.3,100,0.15,0.3);
@@ -625,10 +556,77 @@ cout << "Param file : " << AcceptanceR_table.c_str() << endl;
   
   TH1F* h_nltrack  = new TH1F("h_nltrack","NLtr",10,-2,8);
   TH1F* h_nrtrack  = new TH1F("h_nrtrack","NRtr",10,-2,8);
-  TH2F* h_pepk  = new TH2F("h_pepk","h_pepk (tight)",40,1.73,1.93,40,1.95,2.25);
+  //TH2F* h_pepk  = new TH2F("h_pepk","h_pepk (tight)",40,1.73,1.93,40,1.95,2.25);
+  TH2D* h_pepk = new TH2D("h_pepk", "p_{K} vs p_{e'}" ,50,1720.,1940.,50,1980.,2220.);
+  h_pepk->SetNdivisions(505);
+  h_pepk->GetZaxis()->SetLabelOffset(-0.005);
+  TH1D* h_pe = new TH1D("h_pe", "p_{e'}" ,200,1980.,2220.);
+  TH1D* h_pk = new TH1D("h_pk", "p_{K}" ,200,1720.,1940.);
+  TH2D* h_pepk_simc = new TH2D("h_pepk_simc", "p_{K} vs p_{e'}" ,50,1720.,1940.,50,1980.,2220.);
+  h_pepk_simc->SetNdivisions(505);
+  //h_pepk_simc->GetZaxis()->SetLabelOffset(-0.005);
+ 
+  
+//Focal Plane (Feb. 21, 2021)
+  TH1D* h_R_y_data       = new TH1D("h_R_y_data"      ,"h_R_y_data [cm]"      ,80,   -10.,  10.);
+  TH1D* h_R_y_simc       = new TH1D("h_R_y_simc"      ,"h_R_y_simc [cm]"      ,80,   -10.,  10.);
+  tree_simc->Project("h_R_y_simc","h_yfp","Rp_orig>1760.&&Rp_orig<1900&&Lp_orig>2010&&Lp_orig<2160");
+  TH1D* h_R_x_data       = new TH1D("h_R_x_data"      ,"h_R_x_data [cm]"      ,80,   -80.,  80.);
+  TH1D* h_R_x_simc       = new TH1D("h_R_x_simc"      ,"h_R_x_simc [cm]"      ,80,   -80.,  80.);
+  tree_simc->Project("h_R_x_simc","h_xfp","Rp_orig>1760.&&Rp_orig<1900&&Lp_orig>2010&&Lp_orig<2160");
+  TH1D* h_R_th_data       = new TH1D("h_R_th_data"      ,"h_R_th_data"      ,80,   -0.2,  0.2);
+  TH1D* h_R_th_simc       = new TH1D("h_R_th_simc"      ,"h_R_th_simc"      ,80,   -0.2,  0.2);
+  tree_simc->Project("h_R_th_simc","h_xpfp","Rp_orig>1760.&&Rp_orig<1900&&Lp_orig>2010&&Lp_orig<2160");
+  TH1D* h_R_ph_data       = new TH1D("h_R_ph_data"      ,"h_R_ph_data"      ,80,   -0.05,  0.05);
+  TH1D* h_R_ph_simc       = new TH1D("h_R_ph_simc"      ,"h_R_ph_simc"      ,80,   -0.05,  0.05);
+  tree_simc->Project("h_R_ph_simc","h_ypfp","Rp_orig>1760.&&Rp_orig<1900&&Lp_orig>2010&&Lp_orig<2160");
+  TH1D* h_R_tg_th_data       = new TH1D("h_R_tg_th_data"      ,"h_R_tg_th_data"      ,80,   -0.1,  0.1);
+  TH1D* h_R_tg_th_simc       = new TH1D("h_R_tg_th_simc"      ,"h_R_tg_th_simc"      ,80,   -0.1,  0.1);
+  tree_simc->Project("h_R_tg_th_simc","h_xptar","Rp_orig>1760.&&Rp_orig<1900&&Lp_orig>2010&&Lp_orig<2160");
+  TH1D* h_R_tg_ph_data       = new TH1D("h_R_tg_ph_data"      ,"h_R_tg_ph_data"      ,80,   -0.05,  0.05);
+  TH1D* h_R_tg_ph_simc       = new TH1D("h_R_tg_ph_simc"      ,"h_R_tg_ph_simc"      ,80,   -0.05,  0.05);
+  tree_simc->Project("h_R_tg_ph_simc","h_yptar","Rp_orig>1760.&&Rp_orig<1900&&Lp_orig>2010&&Lp_orig<2160");
+
+  TH1D* h_L_y_data       = new TH1D("h_L_y_data"      ,"h_L_y_data [cm]"      ,80,   -10.,  10.);
+  TH1D* h_L_y_simc       = new TH1D("h_L_y_simc"      ,"h_L_y_simc [cm]"      ,80,   -10.,  10.);
+  tree_simc->Project("h_L_y_simc","h_yfp","Rp_orig>1760.&&Rp_orig<1900&&Lp_orig>2010&&Lp_orig<2160");
+  TH1D* h_L_x_data       = new TH1D("h_L_x_data"      ,"h_L_x_data [cm]"      ,80,   -80.,  80.);
+  TH1D* h_L_x_simc       = new TH1D("h_L_x_simc"      ,"h_L_x_simc [cm]"      ,80,   -80.,  80.);
+  tree_simc->Project("h_L_x_simc","h_xfp","Rp_orig>1760.&&Rp_orig<1900&&Lp_orig>2010&&Lp_orig<2160");
+  TH1D* h_L_th_data       = new TH1D("h_L_th_data"      ,"h_L_th_data"      ,80,   -0.2,  0.2);
+  TH1D* h_L_th_simc       = new TH1D("h_L_th_simc"      ,"h_L_th_simc"      ,80,   -0.2,  0.2);
+  tree_simc->Project("h_L_th_simc","h_xpfp","Rp_orig>1760.&&Rp_orig<1900&&Lp_orig>2010&&Lp_orig<2160");
+  TH1D* h_L_ph_data       = new TH1D("h_L_ph_data"      ,"h_L_ph_data"      ,80,   -0.05,  0.05);
+  TH1D* h_L_ph_simc       = new TH1D("h_L_ph_simc"      ,"h_L_ph_simc"      ,80,   -0.05,  0.05);
+  tree_simc->Project("h_L_ph_simc","h_ypfp","Rp_orig>1760.&&Rp_orig<1900&&Lp_orig>2010&&Lp_orig<2160");
+  TH1D* h_L_tg_th_data       = new TH1D("h_L_tg_th_data"      ,"h_L_tg_th_data"      ,80,   -0.1,  0.1);
+  TH1D* h_L_tg_th_simc       = new TH1D("h_L_tg_th_simc"      ,"h_L_tg_th_simc"      ,80,   -0.1,  0.1);
+  tree_simc->Project("h_L_tg_th_simc","h_xptar","Rp_orig>1760.&&Rp_orig<1900&&Lp_orig>2010&&Lp_orig<2160");
+  TH1D* h_L_tg_ph_data       = new TH1D("h_L_tg_ph_data"      ,"h_L_tg_ph_data"      ,80,   -0.05,  0.05);
+  TH1D* h_L_tg_ph_simc       = new TH1D("h_L_tg_ph_simc"      ,"h_L_tg_ph_simc"      ,80,   -0.05,  0.05);
+  tree_simc->Project("h_L_tg_ph_simc","h_yptar","Rp_orig>1760.&&Rp_orig<1900&&Lp_orig>2010&&Lp_orig<2160");
+
+  h_R_y_data->SetLineColor(kRed);
+  h_R_x_data->SetLineColor(kRed);
+  h_R_th_data->SetLineColor(kRed);
+  h_R_ph_data->SetLineColor(kRed);
+  h_R_tg_th_data->SetLineColor(kRed);
+  h_R_tg_ph_data->SetLineColor(kRed);
+  h_L_y_data->SetLineColor(kRed);
+  h_L_x_data->SetLineColor(kRed);
+  h_L_th_data->SetLineColor(kRed);
+  h_L_ph_data->SetLineColor(kRed);
+  h_L_tg_th_data->SetLineColor(kRed);
+  h_L_tg_ph_data->SetLineColor(kRed);
+
+  tree_simc->Project("h_pepk_simc","Lp_rec:Rp_rec","");
+  TH1D* h_pe_simc = new TH1D("h_pe_simc", "p_{e'}" ,200,1980.,2220.);
+  tree_simc->Project("h_pe_simc","Lp_rec","");
+  TH1D* h_pk_simc = new TH1D("h_pk_simc", "p_{K}" ,200,1720.,1940.);
+  tree_simc->Project("h_pk_simc","Rp_rec","");
   TH2F* h_zz_dummy  = new TH2F("h_zz_dummy","h_zz_dummy",100,-0.15,0.15,100,-0.15,0.15);
 
-  TH1F* h_zave  = new TH1F("h_zave","Z-vertex (Ave.)",1000,-25.,25.);
+  TH1F* h_zave  = new TH1F("h_zave","Z-vertex (Ave.)",1000,-0.25,0.25);
   TH1F* h_zave_dummy  = new TH1F("h_zave_dummy","Z-vertex (Ave.)",1000,-0.15,0.15);
   TH1F* h_zave_true  = new TH1F("h_zave_true","Z-vertex (Ave.)",1000,-0.15,0.15);
   h1 ->SetLineColor(2);
@@ -641,7 +639,12 @@ cout << "Param file : " << AcceptanceR_table.c_str() << endl;
   bool R_Tr = false;
   bool R_FP = false;
   bool ct_cut = false;
+  bool ct_cut_ctout = false;
   bool event_selection = false;
+  bool event_selection_ctout = false;
+  bool event_selection_ctout2 = false;
+  bool event_selection_ctout3 = false;
+  bool event_selection_ctout4 = false;
   bool event_selection_nocut = false;
   double z_par[100], ac_par[100], ct_par[100];
   double z2_par[100][100], ac2_par[100][100];
@@ -690,26 +693,11 @@ cout<<"cs="<<cs<<endl;
 
 
 
-  int ENum_dummy = chain_dummy->GetEntries();
-cout<<"Entries(dummy): "<<ENum_dummy<<endl;
- // for(int i=0;i<ENum_dummy;i++){
-//	chain_dummy->GetEntry(i);
-	//if(abs(R_tr_vz2-L_tr_vz2)<0.025)h_zave_dummy->Fill((R_tr_vz2+L_tr_vz2)/2.);
-	chain_dummy->Project("h_zave_dummy","(R.tr.vz+L.tr.vz)/2.","abs(R.tr.vz-L.tr.vz)<0.025","");
-	chain_dummy->Project("h_zz_dummy","R.tr.vz:L.tr.vz","","");
-//	}
-  int ENum_true = chain_true->GetEntries();
-cout<<"Entries(true): "<<ENum_true<<endl;
- // for(int i=0;i<ENum_true;i++){
-//	chain_true->GetEntry(i);
-	//if(abs(R_tr_vz3-L_tr_vz3)<0.025)h_zave_true->Fill((R_tr_vz3+L_tr_vz3)/2.);
-	chain_true->Project("h_zave_true","(R.tr.vz+L.tr.vz)/2.","abs(R.tr.vz-L.tr.vz)<0.025","");
-//	}
-
   //tree->Draw(">>elist" , "fabs(ct_orig[0][0])<1.0");
-  tree->Draw(">>elist" , "fabs(ct_orig)<1.006");//ctsum (does NOT dintinguish #track)
-  TEventList *elist = (TEventList*)gROOT->FindObject("elist");
-  int ENum = elist->GetN(); 
+  //tree->Draw(">>elist" , "fabs(ct_orig)<3.");//ctsum (does NOT dintinguish #track)
+  //TEventList *elist = (TEventList*)gROOT->FindObject("elist");
+  //int ENum = elist->GetN(); 
+  int ENum = tree->GetEntries(); 
 cout<<"Entries: "<<ENum<<endl;
   int time_div=ENum/25;
   if(ENum<100000)time_div=10000;
@@ -720,7 +708,8 @@ cout<<"Entries: "<<ENum<<endl;
 	time(&start);
 
   for(int i=0;i<ENum;i++){
-	tree->GetEntry(elist->GetEntry(i));
+	//tree->GetEntry(elist->GetEntry(i));
+	tree->GetEntry(i);
 
     if(i%time_div==0){
       end = time(NULL);
@@ -747,12 +736,26 @@ cout<<"Entries: "<<ENum<<endl;
 
 	
 
+		double pi_pos = 3.18;//ns
 
-		if(fabs(ct)<1.006)ct_cut=true;
+		if(fabs(ct)<1.006&&R_tr_p>1.76&&R_tr_p<1.9&&L_tr_p>2.01&&L_tr_p<2.16)ct_cut=true;
 		else ct_cut=false;
+		//if(fabs(ct+pi_pos+147.455)<1.006||fabs(ct+pi_pos+185.081)<1.006||fabs(ct+pi_pos+348.277)<1.006||fabs(ct+pi_pos+687.262)<1.006||fabs(ct+pi_pos+1151.74)<1.006||fabs(ct+pi_pos+2181.05)<1.006||fabs(ct+pi_pos+2017.86)<1.006||fabs(ct+pi_pos+2520.02)<1.006||fabs(ct+pi_pos+2984.54)<1.006||fabs(ct+pi_pos+3673.55)<1.006)ct_cut_ctout=true;
+		if(fabs(ct+pi_pos+3650.07)<10.)ct_cut_ctout=true;
+		else ct_cut_ctout=false;
 		//if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
-		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
+		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
 		else event_selection=false;
+		//if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum>3.&&ac2sum>5.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
+		//else event_selection=false;
+		if(ct<-80.)event_selection_ctout=true;
+		else event_selection_ctout=false;
+		if(ct<-80.&&fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection_ctout2=true;
+		else event_selection_ctout2=false;
+		if(ct>150.)event_selection_ctout3=true;
+		else event_selection_ctout3=false;
+		if(ct>150.&&fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection_ctout4=true;
+		else event_selection_ctout4=false;
 
 		event_selection_nocut=false;
 		if(zcut_flag){
@@ -807,7 +810,17 @@ cout<<"Entries: "<<ENum<<endl;
 		mass = Missing.M();
 	    mm=mass - mh;//shift by ML
 		
+		h_ctmm->Fill(ct,mm);
+		h_ct->Fill(ct);
+		if(event_selection)h_ctmm2->Fill(ct,mm);
+		if(event_selection)h_ct2->Fill(ct);
+		if(event_selection&&ct_cut_ctout)hmm_ctout_only->Fill(mm);
+		if(event_selection_ctout)hmm_ctout->Fill(mm);
+		if(event_selection_ctout2)hmm_ctout2->Fill(mm);
+		if(event_selection_ctout3)hmm_ctout3->Fill(mm);
+		if(event_selection_ctout4)hmm_ctout4->Fill(mm);
 		if(event_selection&&ct_cut)hmm_L_fom_best->Fill(mm);
+		if(event_selection&&ct_cut)hmm_L_strict->Fill(mm*1000.);
 		if(event_selection_nocut&&ct_cut)hmm_L_fom_nocut->Fill(mm);
 		double theta_ee = L_4vec.Theta();
 		//test double theta_ek = acos((phi_R*sin(phi0)+cos(phi0))/(sqrt(1+theta*theta+phi*phi)));//original frame
@@ -867,7 +880,7 @@ cout<<"Entries: "<<ENum<<endl;
 		if(kbin>=0 &&kbin<150){
 		RHRS = RHRS_table[kbin];//
 		effDAQ = daq_table[nrun-111000];
-		if(effDAQ==0.2)cout<<"Starange!!! DAQ Eff. of run"<<nrun<<" does not exist."<<endl;
+		if(effDAQ==0.2)cout<<"Strange!!! DAQ Eff. of run"<<nrun<<" does not exist."<<endl;
 		efficiency = effAC*effZ*effFP*effch2*effct*effDAQ*efftr*effK;
 		//if(RHRS!=0.)cs = pow(10.,33.)/(ntar_h2*efficiency*RHRS*Ng);//[nb/sr]
 		if(RHRS!=0.&&effDAQ!=0.)cs = 1./effDAQ/RHRS/100.;//[nb/sr]
@@ -891,483 +904,250 @@ cout<<"Entries: "<<ENum<<endl;
 			cos_eelab_eklab->Fill(cos(theta_ee),cos(theta_ek));
 			cos_eklab_gkcm->Fill(cos(theta_gk_cm),cos(theta_ek));
 			cos_ekcm_gkcm->Fill(cos(theta_gk_cm),cos(theta_ek_cm));
-			if(theta_gk_cm*180./PI>=8.)h_pepk->Fill(R_mom,L_mom);
+			h_pepk->Fill(R_mom*1000.,L_mom*1000.);
+			h_pe->Fill(L_mom*1000.);
+			h_pk->Fill(R_mom*1000.);
+			h_R_x_data->Fill(R_tr_x*100.);
+			h_R_y_data->Fill(R_tr_y*100.);
+			h_R_th_data->Fill(R_tr_th);
+			h_R_ph_data->Fill(R_tr_ph);
+			h_R_tg_th_data->Fill(R_tr_tg_th);
+			h_R_tg_ph_data->Fill(R_tr_tg_ph);
+			h_L_x_data->Fill(L_tr_x*100.);
+			h_L_y_data->Fill(L_tr_y*100.);
+			h_L_th_data->Fill(L_tr_th);
+			h_L_ph_data->Fill(L_tr_ph);
+			h_L_tg_th_data->Fill(L_tr_tg_th);
+			h_L_tg_ph_data->Fill(L_tr_tg_ph);
+			//if(R_mom>1.76&&R_mom<1.90&&L_mom>2.01&&L_mom<2.16)h_pe->Fill(L_mom*1000.);
+			//if(R_mom>1.76&&R_mom<1.90&&L_mom>2.01&&L_mom<2.16)h_pk->Fill(R_mom*1000.);
 		}
 
 		//if(abs(R_tr_vz-L_tr_vz)<0.025&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP)h_zave->Fill((R_tr_vz+L_tr_vz)/2.);
-		if(abs(R_tr_vz-L_tr_vz)<0.025)h_zave->Fill((R_tr_vz+L_tr_vz)*100./2.);
+		if(abs(R_tr_vz-L_tr_vz)<0.025)h_zave->Fill((R_tr_vz+L_tr_vz)/2.);
 		h_nltrack->Fill(NLtr);
 		h_nrtrack->Fill(NRtr);
 
 }//ENum
 //	cout<<"nbunch="<<nbunch<<endl;
-	TCanvas* c1 = new TCanvas("c1","c1");
-	hmm_L_fom_best->Draw("");
-//	hcs_L_fom_best->Draw("");
-//	TCanvas* c2 = new TCanvas("c2","c2");
-//	TH1F* hmm_pi_fom_nocut=(TH1F*)file->Get("hmm_pi_fom_noZ");
-//	TH1F* hmm_Al_fom_nocut=(TH1F*)file->Get("hmm_Al_fom_best");
-//	TH1F* hmm_pi_fom_best=(TH1F*)file->Get("hmm_pi_fom_best");
-//	//TH1F* hmm_pi_fom_nocut=(TH1F*)file->Get("hmm_pi_fom_noZ");
-//	//TH1F* hmm_pi_fom_best=(TH1F*)file->Get("hmm_pi_fom_best");
-	TH1F* hmm_bg_fom_best=(TH1F*)file_mea->Get("hmm_mixacc_result_best");
-//	hcs_L_fom_best->Rebin(2);
-//	TH1F* hmm_bg_fom_nocut=(TH1F*)file_mea->Get("hmm_mixacc_result_nocut");
-//	TH1F* hmm_Albg_fom_nocut=(TH1F*)file_mea->Get("hmm_mixacc_result_nocut_forAl");
-//	//TH1F* hmm_bg_fom_nocut=(TH1F*)file_mea->Get("hmm_mixacc_nocut_result");
-//    int fitmin = hmm_L_fom_best->FindBin(0.10);
-//    int fitmax = hmm_L_fom_best->FindBin(0.15);
-//    double num1 = hmm_L_fom_best->Integral(fitmin,fitmax);
-//    double num2 = hmm_bg_fom_best->Integral(fitmin,fitmax);
-//    double mixscale = num1/num2;
-//	cout<<"hmm_L integral ="<<num1<<endl;
-//	cout<<"hmm_bg integral ="<<num2<<endl;
-//	cout<<"mixscale(mixed/original)="<<1/mixscale<<endl;
-	hmm_bg_fom_best->Sumw2();
-//	hmm_bg_fom_nocut->Sumw2();
-//	hmm_Albg_fom_nocut->Sumw2();
-	hmm_bg_fom_best->Scale(1./nbunch);
-	hmm_bg_fom_best->SetLineColor(kGreen);
-	hmm_bg_fom_best->Draw("same");
-//	//cs	 = pow(10.,33.)/(ntar_h2*efficiency*RHRS*Ng);//[nb/sr]
-//	cs	 = 1./(effDAQ*RHRS*100.);//[nb/sr]
-//	hmm_bg_fom_best->Scale(cs);
-//	hmm_bg_fom_best->Rebin(2);
-//	hmm_bg_fom_nocut->Scale(1./nbunch);
-//	hmm_Albg_fom_nocut->Scale(1./nbunch);
-//	//TH1F* hmm_wo_bg_fom_best = (TH1F*)hmm_L_fom_best->Clone("hmm_wo_bg_fom_best");
-//	hmm_wo_bg_fom_best->Add(hcs_L_fom_best,hmm_bg_fom_best,1.0,-1.0);
-//	hmm_wo_bg_fom_nocut->Add(hmm_L_fom_nocut,hmm_bg_fom_nocut,1.0,-1.0);
-//	//hmm_pi_wobg_fom_best->Add(hmm_pi_fom_best,hmm_bg_fom_best,1.0,-1.0);
-//	//hmm_pi_wobg_fom_nocut->Add(hmm_pi_fom_nocut,hmm_bg_fom_nocut,1.0,-1.0);
-//	hmm_pi_wobg_fom_nocut->Add(hmm_Al_fom_nocut,hmm_Albg_fom_nocut,1.0,-1.0);
-//
-//
-//	 double constL=0.;
-//	 double meanL=0.;
-//	 double sigL=0.;
-//	 double constS=0.;
-//	 double meanS=0.;
-//	 double sigS=0.;
-//	 double par1 = 0.;
-//	 double par2 = 0.;
-//	 double par3 = 0.;
-//	 double par4 = 0.;
-//	 double par5 = 0.;
-//	 double par6 = 0.;
-//	 double integralL_nocut = 0.;
-//	 double integralS_nocut = 0.;
-//	 n_L_nocut=0.;
-//	 n_S_nocut=0.;
-//	 double fmin = -0.05;
-//	 double fmax =  0.15;
-///****************************************/
-///************BEST CUT********************/
-///****************************************/
-//cout<<"BEST CUT START"<<endl;
-//
-//	fmmbg_best=new TF1("fmmbg_best","pol4",min_mm,max_mm);
-//	fmmbg_best->SetNpx(2000);
-//	 fL_best=new TF1("fL_best","gaus(0)",min_mm,max_mm);
-//	 fL_best->SetNpx(2000);
-//	 fL_best->SetParameters(def_n_L,def_mean_L,def_sig_L);
-//	 fL_best->SetParLimits(0,0.,100000);
-//	 fL_best->SetParLimits(1,def_mean_L-def_sig_L,def_mean_L+def_sig_L);
-//	 fL_best->SetParLimits(2,0.,0.01);
-//	 fS_best=new TF1("fS_best","gaus(0)",min_mm,max_mm);
-//	 fS_best->SetNpx(2000);
-//	 fS_best->SetParameters(def_n_S,def_mean_S,def_sig_S);
-//	 fS_best->SetParLimits(0,0.,100000);
-//	 fS_best->SetParLimits(1,def_mean_S-def_sig_S,def_mean_S+def_sig_S);
-//	 fS_best->SetParLimits(2,0.,0.01);//sigma limit in order not to mix with bg
-//	 
-//	 fmm_best=new TF1("fmm_best","gaus(0)+gaus(3)+pol4(6)",min_mm,max_mm);
-//	 fmm_best->SetNpx(2000);
-//	 fmm_best->SetTitle("Missing Mass (best cut)");
-//	 fmm_best->SetParLimits(0,0.,1000000.);//positive
-//	 fmm_best->SetParLimits(3,0.,1000000.);//positive
-//		
-//	 hmm_wo_bg_fom_best->Fit("fL_best","N","",def_mean_L-def_sig_L,def_mean_L+def_sig_L);
-//	 const_L_best=fL_best->GetParameter(0);
-//	 mean_L_best=fL_best->GetParameter(1);
-//	 sig_L_best=fL_best->GetParameter(2);
-//	
-//	 hmm_wo_bg_fom_best->Fit("fS_best","N","",def_mean_S-def_sig_S,def_mean_S+def_sig_S);
-//	 const_S_best=fS_best->GetParameter(0);
-//	 mean_S_best=fS_best->GetParameter(1);
-//	 sig_S_best=fS_best->GetParameter(2);
-//
-//
-//	 constL=0.;
-//	 meanL=0.;
-//	 sigL=0.;
-//	 constS=0.;
-//	 meanS=0.;
-//	 sigS=0.;
-//	 par1 = 0.;
-//	 par2 = 0.;
-//	 par3 = 0.;
-//	 par4 = 0.;
-//	 par5 = 0.;
-//	 par6 = 0.;
-//	 double integralL_best = 0.;
-//	 double integralS_best = 0.;
-//	 n_L_best=0.;
-//	 n_S_best=0.;
-//
-///*%%%%%%%%%%%%%%%%%%%%%%%%*/
-///*%%    4th Polynomial	%%*/
-///*%%%%%%%%%%%%%%%%%%%%%%%%*/
-//	//--- w/ 4th Polynomial func.
-//	 cout<<"4Poly MODE START"<<endl;
-//	 fmm_best_4Poly=new TF1("fmm_best_4Poly",FMM_Res,fit_min_mm,fit_max_mm,14);
-//   //par[0]=Width (scale) parameter of Landau density
-//   //par[1]=Most Probable (MP, location) parameter of Landau density
-//   //par[2]=Total area (integral -inf to inf, normalization constant)
-//   //par[3]=Width (sigma) of convoluted Gaussian function
-//   //par[4]=tau of exp function
-//   //par[5]=Shift of Function Peak
-//   //par[6]=Relative Strength
-//   //
-//   //
-//   //
-//   //par[0]=Width (scale) parameter of Landau density
-//   //par[1]=Most Probable (MP, location) parameter of Landau density
-//   //par[2]=Total area (integral -inf to inf, normalization constant)
-//   //par[3]=Width (sigma) of convoluted Gaussian function
-//	 fmmbg_best_4Poly=new TF1("fmmbg_best_4Poly","pol4",fit_min_mm,fit_max_mm);
-//	 fmm_best_4Poly->SetNpx(20000);
-//	 fmm_best_4Poly->SetTitle("Missing Mass (best)");
-//	 fmm_best_4Poly->SetParLimits(2,0.,1000.);//positive
-//	 fmm_best_4Poly->SetParLimits(9,0.,300.);//positive
-//	 fmm_best_4Poly->SetParameter(0,0.0007);//Landau width
-//	 fmm_best_4Poly->SetParameter(1,mean_L_best);
-//	 fmm_best_4Poly->SetParLimits(1,def_mean_L-def_sig_L,def_mean_L+def_sig_L);
-//	 fmm_best_4Poly->SetParameter(2,1.5);//total scale
-//	 fmm_best_4Poly->SetParameter(3,0.001);//sigma
-//	 fmm_best_4Poly->SetParLimits(3,0.,0.01);
-//	 fmm_best_4Poly->SetParameter(4,0.05);//att.
-//	 fmm_best_4Poly->SetParLimits(4,0.005,0.08);
-//	 fmm_best_4Poly->SetParameter(5,-0.004);//peak pos.
-//	 fmm_best_4Poly->SetParLimits(5,-0.05,0.05);
-//	 fmm_best_4Poly->SetParameter(6,0.6);//relative strength
-//	 fmm_best_4Poly->SetParLimits(6,0.,1.5);//relative strength
-//
-//	 fmm_best_4Poly->SetParameter(7,0.0003);//Landau width
-//	 fmm_best_4Poly->SetParameter(8,mean_S_best);//MPV
-//	 fmm_best_4Poly->SetParLimits(8,def_mean_S-def_sig_S,def_mean_S+def_sig_S);
-//	 fmm_best_4Poly->SetParameter(9,0.4);//total scale
-//	 fmm_best_4Poly->SetParameter(10,0.0015);//sigma
-//	 fmm_best_4Poly->SetParLimits(10,0.,0.01);
-//	 fmm_best_4Poly->SetParameter(11,0.05);//att
-//	 fmm_best_4Poly->SetParLimits(11,0.03,0.12);
-//	 fmm_best_4Poly->SetParameter(12,0.080);//peak pos.
-//	 //fmm_best_4Poly->SetParLimits(15,-0.085,-0.055);
-//	 fmm_best_4Poly->SetParameter(13,0.6);
-//	 fmm_best_4Poly->SetParLimits(13,0.,1.5);//relative strength
-//
-//	 hmm_wo_bg_fom_best->Fit("fmm_best_4Poly","","",fit_min_mm,fit_max_mm);//Total fitting w/ 4Poly BG
-//	 double chisq = fmm_best_4Poly->GetChisquare();
-//	 double dof  = fmm_best_4Poly->GetNDF();
-//	 cout<<"chisq="<<chisq<<endl;
-//	 cout<<"dof="<<dof<<endl;
-//	 cout<<"Reduced chi-square = "<<chisq/dof<<endl;
-//
-//
-//	 TF1* fmm_Lambda_only = new TF1("fmm_Lambda_only",FMM_Response,fit_min_mm,fit_max_mm,7);
-//	 TF1* fmm_Sigma_only  = new TF1("fmm_Sigma_only" ,FMM_Response, fit_min_mm,fit_max_mm,7);
-////Lambda_only
-//	 fmm_Lambda_only->SetNpx(20000);
-//	 fmm_Lambda_only->SetParameter(0,fmm_best_4Poly->GetParameter(0));
-//	 fmm_Lambda_only->SetParameter(1,fmm_best_4Poly->GetParameter(1));
-//	 fmm_Lambda_only->SetParameter(2,fmm_best_4Poly->GetParameter(2));
-//	 fmm_Lambda_only->SetParameter(3,fmm_best_4Poly->GetParameter(3));
-//	 fmm_Lambda_only->SetParameter(4,fmm_best_4Poly->GetParameter(4));
-//	 fmm_Lambda_only->SetParameter(5,fmm_best_4Poly->GetParameter(5));
-//	 fmm_Lambda_only->SetParameter(6,fmm_best_4Poly->GetParameter(6));
-////Sigma_only
-//	 fmm_Sigma_only->SetNpx(20000);
-//	 fmm_Sigma_only->SetParameter(0,fmm_best_4Poly->GetParameter(7));
-//	 fmm_Sigma_only->SetParameter(1,fmm_best_4Poly->GetParameter(8));
-//	 fmm_Sigma_only->SetParameter(2,fmm_best_4Poly->GetParameter(9));
-//	 fmm_Sigma_only->SetParameter(3,fmm_best_4Poly->GetParameter(10));
-//	 fmm_Sigma_only->SetParameter(4,fmm_best_4Poly->GetParameter(11));
-//	 fmm_Sigma_only->SetParameter(5,fmm_best_4Poly->GetParameter(12));
-//	 fmm_Sigma_only->SetParameter(6,fmm_best_4Poly->GetParameter(13));
-//
-//	double nofL = fmm_Lambda_only->Integral(fit_min_mm,fit_max_mm);
-//	double nofL_old = fmm_Lambda_only->Integral(-0.006,0.006);
-//	nofL = nofL/fit_bin_width;
-//	nofL_old = nofL_old/fit_bin_width;
-//	cout<<"Number of Lambda (TF1 Integral) = "<<nofL<<endl;
-//	cout<<"Number of Lambda w/o radiative tail (TF1 Integral) = "<<nofL_old<<endl;
-//	cout<<"Number of Lambda w/o radiative tail (TH1F Integral) = "<<hmm_wo_bg_fom_best->Integral(hmm_wo_bg_fom_best->FindBin(-0.006),hmm_wo_bg_fom_best->FindBin(0.006))<<endl;
-//
-//	double nofS = fmm_Sigma_only->Integral(fit_min_mm,fit_max_mm);
-//	nofS = nofS/fit_bin_width;
-//	cout<<"Number of Sigma (TF1 Integral) = "<<nofS<<endl;
-//
-//	 hmm_wo_bg_fom_best->Draw();
-//	 fmm_best_4Poly->SetLineColor(kRed);
-//	 fmm_best_4Poly->Draw("same");
-//	 fmm_Lambda_only->SetLineColor(kAzure);
-//	 fmm_Sigma_only->SetLineColor(kCyan);
-//	 fmm_Lambda_only->Draw("same");
-//	 fmm_Sigma_only->Draw("same");
-//	 //fL_best->SetLineColor(kGreen);
-//	 //fS_best->SetLineColor(kGreen);
-//	 //fL_best->Draw("same");
-//	 //fS_best->Draw("same");
+	//TCanvas* c1 = new TCanvas("c1","c1");
+	//hmm_L_fom_best->Draw("");
+	//TH1F* hmm_bg_fom_best=(TH1F*)file_mea->Get("hmm_mixacc_result_best");
+	//hmm_bg_fom_best->Sumw2();
+	//hmm_bg_fom_best->Scale(1./nbunch);
+	//hmm_bg_fom_best->SetLineColor(kGreen);
+	//hmm_bg_fom_best->Draw("same");
 
-	TCanvas* c3 = new TCanvas("c3","c3");
-	c3->Divide(2,2);
-	c3->cd(1);
-	gklab_gkcm->Draw("colz");
-	c3->cd(2);
-	gklab_eklab->Draw("colz");
-	c3->cd(3);
-	eelab_eklab->Draw("colz");
-	c3->cd(4);
-	//eklab_gkcm->Draw("colz");
-	ekcm_gkcm->Draw("colz");
-	TCanvas* c4 = new TCanvas("c4","c4");
-	c4->Divide(2,2);
-	c4->cd(1);
-	cos_gklab_gkcm->Draw("colz");
-	c4->cd(2);
-	cos_gklab_eklab->Draw("colz");
-	c4->cd(3);
-	cos_eelab_eklab->Draw("colz");
-	c4->cd(4);
-	//cos_eklab_gkcm->Draw("colz");
-	cos_ekcm_gkcm->Draw("colz");
+	//TCanvas* c2 = new TCanvas("c2","c2");
+	//hmm_wobg_fom_best->Add(hmm_L_fom_best,hmm_bg_fom_best,1.,-1.);
+	//hmm_wobg_fom_best->Draw("");
+
+	//TCanvas* c3 = new TCanvas("c3","c3");
+	//hmm_L_strict->Draw("");
+	//TH1F* hmm_bg_strict=(TH1F*)file_mea_mthesis->Get("hmm_mixed");
+	//hmm_bg_strict->Sumw2();
+	//hmm_bg_strict->Scale(1./nbunch);
+	//hmm_bg_strict->SetLineColor(kGreen);
+	//hmm_bg_strict->SetFillColor(kGreen);
+	//hmm_bg_strict->SetMarkerColor(kGreen);
+	//hmm_bg_strict->Draw("same");
+
 	//TCanvas* c4 = new TCanvas("c4","c4");
-	//h_nltrack->Draw("");
-	//TCanvas* c5 = new TCanvas("c5","c5");
-	//h_nrtrack->Draw("");
-	TCanvas* c6 = new TCanvas("c6","c6");
+	//hmm_wobg_strict->Add(hmm_L_strict,hmm_bg_strict,1.,-1.);
+	//hmm_wobg_strict->Draw("");
+
+cout<<"Integral"<<endl;
+cout<<"h_pe(mom_cut)="<<h_pe->Integral(h_pe->FindBin(2010.),h_pe->FindBin(2160.))<<endl;
+cout<<"h_pe="<<h_pe->Integral()<<endl;
+cout<<"h_pk(mom_cut)="<<h_pk->Integral(h_pk->FindBin(1760.),h_pk->FindBin(1900.))<<endl;
+cout<<"h_pk="<<h_pk->Integral()<<endl;
+cout<<"h_pe_simc(mom_cut)="<<h_pe_simc->Integral(h_pe_simc->FindBin(2010.),h_pe_simc->FindBin(2160.))<<endl;
+cout<<"h_pe_simc="<<h_pe_simc->Integral()<<endl;
+cout<<"h_pk_simc(mom_cut)="<<h_pk_simc->Integral(h_pk_simc->FindBin(1760.),h_pk_simc->FindBin(1900.))<<endl;
+cout<<"h_pk_simc="<<h_pk_simc->Integral()<<endl;
+cout<<"GetEntries"<<endl;
+cout<<"h_pe="<<h_pe->GetEntries()<<endl;
+cout<<"h_pk="<<h_pk->GetEntries()<<endl;
+cout<<"h_pe_simc="<<h_pe_simc->GetEntries()<<endl;
+cout<<"h_pk_simc="<<h_pk_simc->GetEntries()<<endl;
+	TCanvas* c10 = new TCanvas("c10","c10",900.,900.);
+	c10->Divide(2,2);
+	c10->cd(1);
+	h_pe_simc->Draw("");
+	c10->cd(2);
+	h_pk_simc->Draw("");
+	c10->cd(3);
+	gPad->SetLeftMargin(0.15);
+	gPad->SetRightMargin(0.15);
+	gPad->SetTopMargin(0.15);
+	gPad->SetBottomMargin(0.15);
+	h_pepk_simc->Draw("colz");
+	TCanvas* c20 = new TCanvas("c20","c20",900.,900.);
+	c20->Divide(2,2);
+	c20->cd(1);
+	h_pe->Draw("");
+	c20->cd(2);
+	h_pk->Draw("");
+	c20->cd(3);
 	h_pepk->Draw("colz");
-	TCanvas* c7 = new TCanvas("c7","c7");
-	c7->SetLogy(1);
-	 TF1* fz_true_front = new TF1("fz_true_front","F_VZ",-0.15,0.15,13);
-	 TF1* fz_true_back  = new TF1("fz_true_back ","F_VZ",-0.15,0.15,13);
-	 TF1* fz_dummy_front = new TF1("fz_dummy_front","F_VZ",-0.15,0.15,13);
-	 TF1* fz_dummy_back  = new TF1("fz_dummy_back ","F_VZ",-0.15,0.15,13);
-	 TF1* fz_corr_front = new TF1("fz_corr_front","F_VZ",-0.15,0.15,13);
-	 TF1* fz_corr_back  = new TF1("fz_corr_back ","F_VZ",-0.15,0.15,13);
-	 //TF1* fz_corr  = new TF1("fz_corr","F_VZ",-0.15,0.15,17);
-	 TF1* fz_corr  = new TF1("fz_corr","F_VZ2",-16.,16.,11);//total
-	 TF1* fz_cell  = new TF1("fz_cell","F_VZ_cell",-16.,16.,8);//cell
-	 TF1* fz_gas  = new TF1("fz_gas","F_gas",-25.,25.,7);//gas
-//-------------------------------//
-//    NEW Z FUNCTION             //
-//-------------------------------//
-//par[0]: Al front scale
-//par[1]: Al front pos.
-//par[2]: Al Gauss sigma
-//par[3]: Al second gauss strength
-//par[4]: Al(front) second gauss pos. 
-//par[5]: Al second gauss sigma 
-//par[6]: Al rear scale
-//par[7]: Al rear pos. 
-//par[8]: pol2 coeff.1
-//par[9]: pol2 coeff.2
-//par[10]: total scale 
-    fz_corr->SetParameter(0,380.);
-    fz_corr->SetParameter(1,-0.125*100.);
-    fz_corr->SetParameter(2,0.005*100.);
-    fz_corr->SetParameter(3,0.4);
-    fz_corr->SetParameter(4,-0.002*100.);
-    fz_corr->SetParameter(5,0.006*100.);
-    fz_corr->SetParameter(6,337.);
-    fz_corr->SetParameter(7,0.125*100.);
-    fz_corr->SetParameter(8,-0.016/100.);
-    fz_corr->SetParameter(9,-1.6*100.);
-    fz_corr->SetParameter(10,0.9);
-
-	fz_corr->SetNpx(20000);
-
-//c7->DrawFrame(-0.25,0.1,0.25,100.);
-//fz_corr->Draw("same");
-	fz_cell->SetNpx(20000);
-//   //==pol2gaus
-//   //par[0]=x^2
-//   //par[1]=x^1
-//   //par[2]=x^0
-//   //par[3]=Norm
-//   //par[4]=Width (sigma) of convoluted Gaussian function
-//   //==F_Voigt
-//    // par[0] : area
-//    // par[1] : location
-//    // par[2] : gaussian sigma
-//    // par[3] : lorentz fwhm
-//	fz_corr->SetParameter(0,-200.);
-//	//fz_corr->SetParLimits(0,-0.1,0.1);
-//	fz_corr->SetParameter(1,-12.);
-//	fz_corr->SetParameter(2,15.);
-//	fz_corr->SetParameter(3,2.);
-//	fz_corr->SetParameter(4,0.004);
-////front
-//	fz_corr->SetParameter(5,2.2);
-//	fz_corr->SetParLimits(5,0.,10000.);
-//	fz_corr->SetParameter(6,-0.125);
-//	fz_corr->SetParameter(7,0.004);//sigma
-//	fz_corr->SetParLimits(7,0.,10000.);
-//	fz_corr->SetParameter(8,1.35);
-//	fz_corr->SetParLimits(8,0.,10000.);
-//	fz_corr->SetParameter(9,-0.125);
-//	fz_corr->SetParameter(10,0.008);//sigma
-//	fz_corr->SetParLimits(10,0.,10000.);
-////back
-//	fz_corr->SetParameter(11,1.);
-//	fz_corr->SetParLimits(11,0.,10000.);
-//	fz_corr->SetParameter(12,0.125);
-//	fz_corr->SetParameter(13,0.004);//sigma
-//	fz_corr->SetParLimits(13,0.,10000.);
-//	fz_corr->SetParameter(14,2.);
-//	fz_corr->SetParLimits(14,0.,10000.);
-//	fz_corr->SetParameter(15,0.125);
-//	fz_corr->SetParameter(16,0.008);//sigma
-//	fz_corr->SetParLimits(16,0.,10000.);
-	//h_zave->Draw("");
-	h_zave_true->SetLineColor(kAzure);
-	h_zave_true->Sumw2();
-	//h_zave_dummy->Sumw2();
-	h_zave_true->Scale(0.28*0.997442/40.6/0.946037);
-	//h_zave_dummy->Scale(100./0.28/0.997442);
-	h_zave_dummy->SetLineColor(kRed);
-	h_zave_dummy->Draw("");
-	h_zave_true->Draw("same");
-	//h_zave_true->Fit("fz_true_front","","",-0.145,-0.105);
-	//h_zave_true->Fit("fz_true_back ","","",0.105,0.145);
-//	double Al_contami_true = fz_true_front->Integral(-0.1,0.1);
-//	Al_contami_true+=fz_true_back->Integral(-0.1,0.1);
-//	Al_contami_true/=0.0003;
-//	double Al_contami_dummy = fz_dummy_front->Integral(-0.1,0.1);
-//	Al_contami_dummy+=fz_dummy_back->Integral(-0.1,0.1);
-//	Al_contami_dummy/=0.0003;
-	//h_zave_dummy->Fit("fz_dummy_front","","",-0.145,-0.105);
-	//h_zave_dummy->Fit("fz_dummy_back ","","",0.105,0.145);
-	TCanvas* c8 = new TCanvas("c8","c8");
-	c8->SetLogy(1);
-	//h_zave->Fit("fz_corr_front","","",-0.145,-0.105);
-	//h_zave->Fit("fz_corr_back ","","",0.105,0.145);
-	TCanvas* c9 = new TCanvas("c9","c9");
-	//h_zave_dummy->Draw("");
-	h_zave->Fit("fz_corr","","",-15.,15.);
-//	fz_front->SetParameter(0,fz_corr->GetParameter(5));
-//	fz_front->SetParameter(1,fz_corr->GetParameter(6));
-//	fz_front->SetParameter(2,fz_corr->GetParameter(7));
-//	fz_front->SetParameter(3,fz_corr->GetParameter(8));
-//	fz_front->SetParameter(4,fz_corr->GetParameter(9));
-//	fz_front->SetParameter(5,fz_corr->GetParameter(10));
-//	fz_back->SetParameter(0,fz_corr->GetParameter(11));
-//	fz_back->SetParameter(1,fz_corr->GetParameter(12));
-//	fz_back->SetParameter(2,fz_corr->GetParameter(13));
-//	fz_back->SetParameter(3,fz_corr->GetParameter(14));
-//	fz_back->SetParameter(4,fz_corr->GetParameter(15));
-//	fz_back->SetParameter(5,fz_corr->GetParameter(16));
-//	fz_front->SetLineColor(kViolet);
-//	fz_back->SetLineColor(kViolet);
-//	fz_front->SetLineStyle(2);
-//	fz_back->SetLineStyle(2);
-//	fz_front->Draw("same");
-//	fz_back->Draw("same");
-	fz_cell->SetParameter(0,fz_corr->GetParameter(0));
-	fz_cell->SetParameter(1,fz_corr->GetParameter(1));
-	fz_cell->SetParameter(2,fz_corr->GetParameter(2));
-	fz_cell->SetParameter(3,fz_corr->GetParameter(3));
-	fz_cell->SetParameter(4,fz_corr->GetParameter(4));
-	fz_cell->SetParameter(5,fz_corr->GetParameter(5));
-	fz_cell->SetParameter(6,fz_corr->GetParameter(6));
-	fz_cell->SetParameter(7,fz_corr->GetParameter(7));
-	fz_cell->SetLineColor(kViolet);
-	fz_cell->SetLineStyle(2);
-	fz_gas->SetLineColor(kCyan);
-	fz_gas->SetLineStyle(2);
-
-	fz_gas->SetParameter(0,fz_corr->GetParameter(2));
-	fz_gas->SetParameter(1,fz_corr->GetParameter(3));
-	fz_gas->SetParameter(2,fz_corr->GetParameter(4));
-	fz_gas->SetParameter(3,fz_corr->GetParameter(5));
-	fz_gas->SetParameter(4,fz_corr->GetParameter(8));
-	fz_gas->SetParameter(5,fz_corr->GetParameter(9));
-	fz_gas->SetParameter(6,fz_corr->GetParameter(10));
+	TCanvas* c30 = new TCanvas("c30","c30",900.,900.);
+	h_pe->SetLineColor(kAzure);
+	h_pk->SetLineColor(kAzure);
+	h_pe_simc->SetLineColor(kRed);
+	h_pk_simc->SetLineColor(kRed);
+	c30->Divide(2,2);
+	c30->cd(1);
+	h_pe->Draw("");
+	//h_pe_simc->Scale(1863./922483.);//orig
+	//h_pe_simc->Scale(2421./1.2e+6);
+	h_pe_simc->Scale(2081./923474.);//rec
+	h_pe_simc->Draw("same");
+	c30->cd(2);
+	h_pk->SetNdivisions(505);
+	h_pk->Draw("");
+	h_pk_simc->Scale(2226./1041430.);//rec
+	//h_pk_simc->Scale(2286./1040300.);//orig
+	//h_pk_simc->Scale(1863./1040300.);
+	//h_pk_simc->Scale(2421./1.2e+6);
+	h_pk_simc->Draw("same");
+	c30->cd(3);
+	h_pe->Draw("e");
+	h_pe_simc->Draw("same");
+	c30->cd(4);
+	h_pk->Draw("e");
+	h_pk_simc->Draw("same");
 	
-	fz_cell->Draw("same");
-	fz_gas->Draw("same");
-	fz_corr->Draw("same");
-	//fz_corr->Draw("");
-	 double chisq = fz_corr->GetChisquare();
-	 double dof  = fz_corr->GetNDF();
-	 cout<<"chisq="<<chisq<<endl;
-	 cout<<"dof="<<dof<<endl;
-	 cout<<"Reduced chi-square = "<<chisq/dof<<endl;
+	TCanvas* c40 = new TCanvas("c40","c40",900.,900.);
+    TH1D* h_pe_chisq = new TH1D("h_pe_chisq", "#chi_{e'}^{2}" ,200,1980.,2220.);
+    TH1D* h_pk_chisq = new TH1D("h_pk_chisq", "#chi_{K}^{2}" ,200,1720.,1940.);
+	double e_data, e_expt, e_temp, e_chisq=0.;
+	double k_data, k_expt, k_temp, k_chisq=0.;
+	int e_bin=0, k_bin=0;
+	for(int i=0;i<200;i++){
+		e_data = h_pe->GetBinContent(i+1);
+		e_expt = h_pe_simc->GetBinContent(i+1);
+		if(e_expt==0.)e_temp=0.01;
+		else e_temp = (e_data - e_expt)*(e_data - e_expt)/e_expt;
+		//e_temp = (e_data - e_expt)*(e_data - e_expt)/e_expt;
+		if(h_pe->GetBinCenter(i+1)>2010.&&h_pe->GetBinCenter(i+1)<2160.){e_chisq += e_temp;e_bin++;}
+		//e_chisq += e_temp;e_bin++;
+		h_pe_chisq->SetBinContent(i+1,e_temp);
+		k_data = h_pk->GetBinContent(i+1);
+		k_expt = h_pk_simc->GetBinContent(i+1);
+		if(k_expt==0.)k_temp=0.01;
+		else k_temp = (k_data - k_expt)*(k_data - k_expt)/k_expt;
+		//k_temp = (k_data - k_expt)*(k_data - k_expt)/k_expt;
+		if(h_pk->GetBinCenter(i+1)>1760.&&h_pk->GetBinCenter(i+1)<1900.){k_chisq += k_temp;k_bin++;}
+		//k_chisq += k_temp;k_bin++;
+		h_pk_chisq->SetBinContent(i+1,k_temp);
+	}
+	c40->Divide(2,2);
+	c40->cd(1);
+	h_pe->Draw("e");
+	h_pe_simc->Draw("same");
+	c40->cd(2);
+	h_pk->Draw("e");
+	h_pk_simc->Draw("same");
+	c40->cd(3);
+	h_pe_chisq->Draw("");
+	c40->cd(4);
+	h_pk_chisq->SetNdivisions(505);
+	h_pk_chisq->Draw("");
+	
+	cout<<"e chi-square = "<<e_chisq<<endl;
+	cout<<"e bin = "<<e_bin<<endl;
+	cout<<"k chi-square = "<<k_chisq<<endl;
+	cout<<"k bin = "<<k_bin<<endl;
+//	c3->Print("./pdf/mm_tight.pdf");
+//	c4->Print("./pdf/mm_wobg_tight.pdf");
 
-	double Al_contami_corr = fz_corr->Integral(-10.,10.);
-	Al_contami_corr+=fz_corr->Integral(-10.,10.);
-	Al_contami_corr/=0.05;
-	cout<<"Al (gas)  = "<<Al_contami_corr<<endl;
-	double Al_contami_cell = fz_cell->Integral(-10.,10.);
-	Al_contami_cell+=fz_cell->Integral(-10.,10.);
-	Al_contami_cell/=0.05;
-	cout<<"Al (cell) = "<<Al_contami_cell<<endl;
-	cout<<"Al Contamination = "<<Al_contami_cell*100./(Al_contami_cell+Al_contami_corr)<<endl;
-	double Al_res1 = fz_corr->Integral(-16.,-14.5);
-	double Al_res2 = fz_corr->Integral(14.5,16.);
-	double Al_res_hist1 = h_zave->Integral(h_zave->FindBin(-16.),h_zave->FindBin(-14.5));
-	double Al_res_hist2 = h_zave->Integral(h_zave->FindBin(14.5),h_zave->FindBin(16.));
-	cout<<"Al (res from func.) = "<<(Al_res1+Al_res2)/0.05<<endl;
-	cout<<"Al (res from hist.) = "<<(Al_res_hist1+Al_res_hist2)<<endl;
-	cout<<"Al Contamination Systematice Error [%] = "<<((Al_res_hist1+Al_res_hist2)-((Al_res1+Al_res2)/0.05))*100./(Al_contami_cell+Al_contami_corr)<<endl;
+cout << "h_R_y_simc = "<<h_R_y_simc->Integral()<<endl;
+cout << "h_R_y_data = "<<h_R_y_data->Integral()<<endl;
+cout << "h_R_x_simc = "<<h_R_x_simc->Integral()<<endl;
+cout << "h_R_x_data = "<<h_R_x_data->Integral()<<endl;
+cout << "h_R_th_simc = "<<h_R_th_simc->Integral()<<endl;
+cout << "h_R_ph_data = "<<h_R_ph_data->Integral()<<endl;
+cout << "h_R_tg_th_simc = "<<h_R_tg_th_simc->Integral()<<endl;
+cout << "h_R_tg_ph_data = "<<h_R_tg_ph_data->Integral()<<endl;
+cout << "h_L_y_simc = "<<h_L_y_simc->Integral()<<endl;
+cout << "h_L_y_data = "<<h_L_y_data->Integral()<<endl;
+cout << "h_L_x_simc = "<<h_L_x_simc->Integral()<<endl;
+cout << "h_L_x_data = "<<h_L_x_data->Integral()<<endl;
+cout << "h_L_th_simc = "<<h_L_th_simc->Integral()<<endl;
+cout << "h_L_ph_data = "<<h_L_ph_data->Integral()<<endl;
+cout << "h_L_tg_th_simc = "<<h_L_tg_th_simc->Integral()<<endl;
+cout << "h_L_tg_ph_data = "<<h_L_tg_ph_data->Integral()<<endl;
 
-	TH1F* h_den  = new TH1F("h_den","denominator",25,0.,25.);
-	TH1F* h_num  = new TH1F("h_num","numerator",25,0.,25.);
-	double den, num;
-	h_den->SetBinContent(1,0.);
-	h_num->SetBinContent(1,0.);
-	for(int i=1;i<25;i++){
-	//den = h_zave->Integral(h_zave->FindBin((double)i*(-0.01)),h_zave->FindBin((double)i*(0.01)));
-	//den = h_zave->Integral(h_zave->FindBin(-25.),h_zave->FindBin(0.25));
-	den = fz_gas->Integral(-25.,25.)/0.05;
-	num = fz_gas->Integral((double)i*(-1.),(double)i)/0.05;
-	h_den->SetBinContent(i+1,den);
-	h_num->SetBinContent(i+1,num);
-	}
+	TCanvas* c50 = new TCanvas("c50","c50",900.,900.);
+	c50->Divide(3,2);
+	c50->cd(1);
+	h_R_y_simc->Scale(2421./1200000.);
+	h_R_y_simc->Draw("hist");
+	h_R_y_data->Draw("esame");
+	c50->cd(2);
+	h_R_x_simc->Scale(2421./1200000.);
+	h_R_x_simc->Draw("hist");
+	h_R_x_data->Draw("esame");
+	c50->cd(3);
+	h_R_th_simc->Scale(2421./1200000.);
+	h_R_th_simc->Draw("hist");
+	h_R_th_data->Draw("esame");
+	c50->cd(4);
+	h_R_ph_simc->Scale(2421./1200000.);
+	h_R_ph_simc->Draw("hist");
+	h_R_ph_data->Draw("esame");
+	c50->cd(5);
+	h_R_tg_th_simc->Scale(2421./1200000.);
+	h_R_tg_th_simc->Draw("hist");
+	h_R_tg_th_data->Draw("esame");
+	c50->cd(6);
+	h_R_tg_ph_simc->Scale(2421./1200000.);
+	h_R_tg_ph_simc->Draw("hist");
+	h_R_tg_ph_data->Draw("esame");
+	
+	TCanvas* c51 = new TCanvas("c51","c51",900.,900.);
+	c51->Divide(3,2);
+	c51->cd(1);
+	h_L_y_simc->Scale(2421./1200000.);
+	h_L_y_simc->Draw("hist");
+	h_L_y_data->Draw("esame");
+	c51->cd(2);
+	h_L_x_simc->Scale(2421./1200000.);
+	h_L_x_simc->Draw("hist");
+	h_L_x_data->Draw("esame");
+	c51->cd(3);
+	h_L_th_simc->Scale(2421./1200000.);
+	h_L_th_simc->Draw("hist");
+	h_L_th_data->Draw("esame");
+	c51->cd(4);
+	h_L_ph_simc->Scale(2421./1200000.);
+	h_L_ph_simc->Draw("hist");
+	h_L_ph_data->Draw("esame");
+	c51->cd(5);
+	h_L_tg_th_simc->Scale(2421./1200000.);
+	h_L_tg_th_simc->Draw("hist");
+	h_L_tg_th_data->Draw("esame");
+	c51->cd(6);
+	h_L_tg_ph_simc->Scale(2421./1200000.);
+	h_L_tg_ph_simc->Draw("hist");
+	h_L_tg_ph_data->Draw("esame");
 
-	TH1F* h_den2  = new TH1F("h_den2","denominator",25,0.,25.);
-	TH1F* h_num2  = new TH1F("h_num2","numerator",25,0.,25.);
-	double den2, num2;
-	h_den2->SetBinContent(1,0.);
-	h_num2->SetBinContent(1,0.);
-	for(int i=1;i<25;i++){
-	//den = h_zave->Integral(h_zave->FindBin((double)i*(-0.01)),h_zave->FindBin((double)i*(0.01)));
-	//den = h_zave->Integral(h_zave->FindBin(-25.),h_zave->FindBin(0.25));
-	den2 = fz_corr->Integral((double)i*(-1.),(double)i)/0.05;
-	num2 = fz_cell->Integral((double)i*(-1.),(double)i)/0.05;
-	h_den2->SetBinContent(i+1,den2);
-	h_num2->SetBinContent(i+1,num2);
-	}
-	cout << "TEfficiency! (Gas SR)" << endl;
-	TEfficiency *pEff1;
-	if(TEfficiency::CheckConsistency(*h_num,*h_den,"w")){
-	pEff1 = new TEfficiency(*h_num,*h_den);
-	}
-	cout << "TEfficiency2! (Al Contamination)" << endl;
-	TEfficiency *pEff2;
-	if(TEfficiency::CheckConsistency(*h_num2,*h_den2,"w")){
-	pEff2 = new TEfficiency(*h_num2,*h_den2);
-	}
-	TCanvas* c10 = new TCanvas("c10","c10");
-	pEff1->Draw("");
-	for(int i=1;i<25;i++){
-cout<<"SR_"<<i<<": "<<pEff1->GetEfficiency(i)<<endl;
-	}
-	TCanvas* c11 = new TCanvas("c11","c11");
-	pEff1->Draw("");
-	pEff2->SetLineColor(kRed);
-	pEff2->Draw("same");
-//	h_zz_dummy->Draw("colz");
+cout << "h_R_y_simc = "<<h_R_y_simc->Integral()<<endl;
+cout << "h_R_y_data = "<<h_R_y_data->Integral()<<endl;
+cout << "h_R_x_simc = "<<h_R_x_simc->Integral()<<endl;
+cout << "h_R_x_data = "<<h_R_x_data->Integral()<<endl;
+cout << "h_R_th_simc = "<<h_R_th_simc->Integral()<<endl;
+cout << "h_R_ph_data = "<<h_R_ph_data->Integral()<<endl;
+cout << "h_R_tg_th_simc = "<<h_R_tg_th_simc->Integral()<<endl;
+cout << "h_R_tg_ph_data = "<<h_R_tg_ph_data->Integral()<<endl;
+cout << "h_L_y_simc = "<<h_L_y_simc->Integral()<<endl;
+cout << "h_L_y_data = "<<h_L_y_data->Integral()<<endl;
+cout << "h_L_x_simc = "<<h_L_x_simc->Integral()<<endl;
+cout << "h_L_x_data = "<<h_L_x_data->Integral()<<endl;
+cout << "h_L_th_simc = "<<h_L_th_simc->Integral()<<endl;
+cout << "h_L_ph_data = "<<h_L_ph_data->Integral()<<endl;
+cout << "h_L_tg_th_simc = "<<h_L_tg_th_simc->Integral()<<endl;
+cout << "h_L_tg_ph_data = "<<h_L_tg_ph_data->Integral()<<endl;
 
 cout << "Well done!" << endl;
 }//fit

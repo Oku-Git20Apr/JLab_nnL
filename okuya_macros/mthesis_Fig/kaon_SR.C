@@ -142,6 +142,12 @@ void kaon_SR(){
   TH1F* hL2_T2S2  = new TH1F("hL2_T2S2","hL2_T2S2",1000,20.,30.);
   TH1F* hR2_T2FP  = new TH1F("hR2_T2FP","hR2_T2FP",1000,20.,30.);
   TH1F* hL2_T2FP  = new TH1F("hL2_T2FP","hL2_T2FP",1000,20.,30.);
+  TH1F* hR_mom  = new TH1F("hR_mom","hR_mom",1000,1.7,2.0);
+  TH1F* hR2_mom  = new TH1F("hR2_mom","hR2_mom",1000,1.7,2.0);
+  TH2F* hR_T2S2_mom  = new TH2F("hR_T2S2_mom","hR_T2S2_mom",100,25.,27.,100,1.7,2.);
+  TH2F* hL_T2S2_mom  = new TH2F("hL_T2S2_mom","hL_T2S2_mom",100,25.,27.,100,1.9,2.2);
+  TH2F* hR2_T2S2_mom  = new TH2F("hR2_T2S2_mom","hR2_T2S2_mom",100,25.,27.,100,1.76,1.9);
+  TH2F* hL2_T2S2_mom  = new TH2F("hL2_T2S2_mom","hL2_T2S2_mom",100,25.,27.,100,1.9,2.2);
 
 
   bool L_Tr = false;
@@ -207,16 +213,22 @@ cout<<"Entries: "<<ENum<<endl;
 		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
 		else event_selection=false;
 		//if(ct_cut){
+			hR_mom->Fill(R_tr_p);
 			hR_T2S2->Fill(R_tr_pathl);
 			hL_T2S2->Fill(L_tr_pathl);
 			hR_T2FP->Fill(R_tr_pathl-R_s2_trpath);
 			hL_T2FP->Fill(L_tr_pathl-L_s2_trpath);
+			hL_T2S2_mom->Fill(L_tr_pathl,L_tr_p);
+			hR_T2S2_mom->Fill(R_tr_pathl,R_tr_p);
 	//	}
 		if(ct_cut&&event_selection){
+			hR2_mom->Fill(R_tr_p);
 			hR2_T2S2->Fill(R_tr_pathl);
 			hL2_T2S2->Fill(L_tr_pathl);
 			hR2_T2FP->Fill(R_tr_pathl-R_s2_trpath);
 			hL2_T2FP->Fill(L_tr_pathl-L_s2_trpath);
+			hL2_T2S2_mom->Fill(L_tr_pathl,L_tr_p);
+			hR2_T2S2_mom->Fill(R_tr_pathl,R_tr_p);
 		}
 
 
@@ -236,6 +248,24 @@ cout<<"Entries: "<<ENum<<endl;
 	c1->cd(4);
 			hL_T2FP->Draw("");
 			cout<<"hL_T2FP="<<hL_T2FP->Integral()<<endl;
+
+//Momentum vs. Path Length
+	TCanvas* c2 = new TCanvas("c2","c2");
+	c2->Divide(2,2);
+	c2->cd(1);
+	hL_T2S2_mom->Draw("colz");
+	c2->cd(2);
+	hR_T2S2_mom->Draw("colz");
+	c2->cd(3);
+	hL2_T2S2_mom->Draw("colz");
+	c2->cd(4);
+	hR2_T2S2_mom->Draw("colz");
+
+	TCanvas* c3 = new TCanvas("c3","c3");
+	hR_mom->Draw("");
+	TCanvas* c4 = new TCanvas("c4","c4");
+	hR2_mom->Draw("");
+
 
 cout << "Well done!" << endl;
 }//fit
