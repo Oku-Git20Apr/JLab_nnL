@@ -940,10 +940,10 @@ double tuning::CoinCalc_gogami(int RS2_seg, int LS2_seg,int rhit, int lhit){
 //okuyama (2020/11/19)
   int dataflag = 1;//H_1
   //int dataflag = 2;//H_2
-  double kcenter = 3.122;
+  double kcenter = 3.122;//3.122;
 
 //beta
-  double beta_R  = R_tr_p[rhit]/sqrt(R_tr_p[rhit]*R_tr_p[rhit]+Mpi*Mpi);
+  double beta_R  = R_tr_p[rhit]/sqrt(R_tr_p[rhit]*R_tr_p[rhit]+Mp*Mp);
   //double beta_R  = R_tr_p[rhit]/sqrt(R_tr_p[rhit]*R_tr_p[rhit]+MK*MK);
   double beta_L  = L_tr_p[lhit]/sqrt(L_tr_p[lhit]*L_tr_p[lhit]+Me*Me);  
 
@@ -1134,8 +1134,8 @@ if(dataflag==1){//H2-1
 //	      }
 //	    }
 //
- ctime=-ctime;
- ctime_before=-ctime_before;
+ ctime=-ctime-1.2;
+ ctime_before=-ctime_before-1.2;
 tr.ct_orig=ctime;
     L_tr_vz[lhit]  = L_tr_vz[lhit]*Ztr +Ztm;     // scaled
     R_tr_vz[rhit]  = R_tr_vz[rhit]*Ztr +Ztm;     // scaled

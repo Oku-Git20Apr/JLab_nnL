@@ -66,6 +66,10 @@ TARGET22= h2all_2
 OBJS22=   h2all_2.o Setting.o Tree.o ParamMan.o
 TARGET23= h2Tkin 
 OBJS23=   h2Tkin.o Setting.o Tree.o ParamMan.o
+TARGET24= h2all_1_etap
+OBJS24=   h2all_1_etap.o Setting.o Tree.o ParamMan.o
+TARGET25= h2all_2_etap
+OBJS25=   h2all_2_etap.o Setting.o Tree.o ParamMan.o
 #TARGET14= okuyana 
 #OBJS14=   okuyana.o Setting.o Tree.o ParamMan.o
 
@@ -75,7 +79,9 @@ all:$(TARGET13)\
      $(TARGET20)\
      $(TARGET21)\
      $(TARGET22)\
-     $(TARGET23)
+     $(TARGET23)\
+     $(TARGET24)\
+     $(TARGET25)\
 #     $(TARGET11)
 #$(TARGET1)\
 #     $(TARGET2)\
@@ -139,6 +145,10 @@ $(TARGET21): $(patsubst %,$(LIBDIR)/%,$(OBJS21))
 $(TARGET22): $(patsubst %,$(LIBDIR)/%,$(OBJS22))
 	$(CXX) $(CFLAGS) -o $(BINDIR)/$@ $^ $(CXXLIBS) $(CXXFLAGS)
 $(TARGET23): $(patsubst %,$(LIBDIR)/%,$(OBJS23))
+	$(CXX) $(CFLAGS) -o $(BINDIR)/$@ $^ $(CXXLIBS) $(CXXFLAGS)
+$(TARGET24): $(patsubst %,$(LIBDIR)/%,$(OBJS24))
+	$(CXX) $(CFLAGS) -o $(BINDIR)/$@ $^ $(CXXLIBS) $(CXXFLAGS)
+$(TARGET25): $(patsubst %,$(LIBDIR)/%,$(OBJS25))
 	$(CXX) $(CFLAGS) -o $(BINDIR)/$@ $^ $(CXXLIBS) $(CXXFLAGS)
 .PHONY: clean
 clean:

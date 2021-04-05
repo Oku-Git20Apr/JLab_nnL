@@ -938,12 +938,12 @@ void tuning::CoinCalc(int RS2_seg, int LS2_seg, int rhit, int lhit){
 double tuning::CoinCalc_gogami(int RS2_seg, int LS2_seg,int rhit, int lhit){
 
 //okuyama (2020/11/19)
-  int dataflag = 1;//H_1
-  //int dataflag = 2;//H_2
+  //int dataflag = 1;//H_1
+  int dataflag = 2;//H_2
   double kcenter = 3.122;
 
 //beta
-  double beta_R  = R_tr_p[rhit]/sqrt(R_tr_p[rhit]*R_tr_p[rhit]+Mpi*Mpi);
+  double beta_R  = R_tr_p[rhit]/sqrt(R_tr_p[rhit]*R_tr_p[rhit]+Mp*Mp);
   //double beta_R  = R_tr_p[rhit]/sqrt(R_tr_p[rhit]*R_tr_p[rhit]+MK*MK);
   double beta_L  = L_tr_p[lhit]/sqrt(L_tr_p[lhit]*L_tr_p[lhit]+Me*Me);  
 
@@ -1032,10 +1032,10 @@ double tuning::CoinCalc_gogami(int RS2_seg, int LS2_seg,int rhit, int lhit){
 
 
 
- //double ctime = - meantime_R + ctimecorL + ctimecorR;
+// double ctime = - meantime_R + ctimecorL + ctimecorR;
  double ctime = - meantime_R;//okuyama (2020/11/19)
  double ctime_before = - meantime_R;
-
+ 
 
  tr.ctimecorR=ctimecorR;
  tr.ctimecorL=ctimecorL;
@@ -1134,8 +1134,8 @@ if(dataflag==1){//H2-1
 //	      }
 //	    }
 //
- ctime=-ctime;
- ctime_before=-ctime_before;
+ ctime=-ctime-1.2;
+ ctime_before=-ctime_before-1.2;
 tr.ct_orig=ctime;
     L_tr_vz[lhit]  = L_tr_vz[lhit]*Ztr +Ztm;     // scaled
     R_tr_vz[rhit]  = R_tr_vz[rhit]*Ztr +Ztm;     // scaled
@@ -1366,8 +1366,8 @@ cout<<"bin coin"<<bin_coin_c<<endl;
 
 void tuning::MakeHist(){
   cout<<"Make Hist "<<endl;
-	file_out = new TFile("h2all_1_temp.root","recreate");
-	//file_out = new TFile("h2all_1_2020Nov.root","recreate");
+	file_out = new TFile("h2all_2_temp.root","recreate");
+	//file_out = new TFile("h2all_2_2020Nov.root","recreate");
 	tree_out = new TTree("tree_out","tree_out");
 	//`tree_out ->Branch("branch name",variable ,"branch name/type");
 	
@@ -2649,7 +2649,7 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
     	tr.Qsq= Qsq;
     	tr.W= W;
     	tr.eps= eps;
-
+		
 
 		double A=Me*Me*omega*omega/(4*Einc*Einc*Escat*Escat);
 		double sinterm=sin(theta_ee/2)*sin(theta_ee/2);
@@ -4759,11 +4759,11 @@ cout<<"after file_out"<<endl;
 int main(int argc, char** argv){
 
 	cout<<"nth = "<<nth<<endl;
-  string ifname = "../small_1.list";//Run111157~111220
-  //string ifname = "../small2.list";//Run111157~111220 & Run111480~111542
+//  string ifname = "../small.list";//Run111157~111220
+  string ifname = "../small_2.list";//Run111157~111220 & Run111480~111542
 //    string ifname = "../test.list";//for debug
     string pname = "./Lambda_H1.param";//Run111157~111220
-    //string pname = "./Lambda_H2.param";//Run111480~111542
+   // string pname = "./Lambda_H2.param";//Run111480~111542
     string mtparam = "../matrix/matrix_new.list";
     string print_name = "./test_print.pdf";
     bool print_flag = false;//.pdf
@@ -4797,8 +4797,8 @@ cout << "AC->ACtune() is done" << endl;
     if(root_flag)AC->Write();
   
 cout<<"=========== Output files ============="<<endl;
-cout<<"h2all_1_temp.root was created!"<<endl;
-cout<<"If you want to confirm, please rename it to h2all_1_Nov.root"<<endl;
+cout<<"h2all_2_temp.root was created!"<<endl;
+cout<<"If you want to confirm, please rename it to h2all_2_Nov.root"<<endl;
   
   
 	
