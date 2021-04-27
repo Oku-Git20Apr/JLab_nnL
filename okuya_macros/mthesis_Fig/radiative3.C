@@ -7,6 +7,7 @@
 //K. Okuyama (Dec. 11, 2020)
 //K. Okuyama (Dec. 14, 2020)//G4 tree
 //K. Okuyama (Jan. 06, 2021)//Mom cut
+//K. Okuyama (Apr. 27, 2021)//clean my description
 //
 //taken over from tail_ana.C
 //
@@ -269,10 +270,10 @@ void radiative3(){
   //TFile *file_simcL = new TFile("/data/41a/ELS/okuyama/SIMC_jlab/SIMC/rootfiles/BOTH_L_datafit.root","read");
   //TFile *file_simcS = new TFile("/data/41a/ELS/okuyama/SIMC_jlab/SIMC/rootfiles/BOTH_S_datafit.root","read");
   //TFile *file_simc = new TFile("/data/41a/ELS/okuyama/SIMC_jlab/SIMC/rootfiles/BOTH_LS_datafit.root","read");
-  TTree *tree = (TTree*)file->Get("tree_out");
-  TTree *SNT = (TTree*)file_simc->Get("SNT");
-  TTree *SNTL = (TTree*)file_simcL->Get("SNT");
-  TTree *SNTS = (TTree*)file_simcS->Get("SNT");
+  TTree *tree = (TTree*)file->Get("tree_out");//input
+  TTree *SNT = (TTree*)file_simc->Get("SNT");//SIMC all
+  TTree *SNTL = (TTree*)file_simcL->Get("SNT");//SIMC Lambda
+  TTree *SNTS = (TTree*)file_simcS->Get("SNT");//SIMC Sigma0
   TTree *tree_G4L = (TTree*)file_G4->Get("tree0_12_0");//Lambda
   TTree *tree_G4S = (TTree*)file_G4->Get("tree0_12_1");//Sigma0
 
@@ -397,8 +398,8 @@ void radiative3(){
 //               Branch                  //
 //---------------------------------------//
 
- int nrun, NLtr, NRtr, Ls2_pad[100], Rs2_pad[100];
- double ct, ct_eff;
+	int nrun, NLtr, NRtr, Ls2_pad[100], Rs2_pad[100];
+	double ct, ct_eff;
 
 	double L_tr_chi2;
 	double L_tr_x, L_tr_y, L_tr_th, L_tr_ph;
@@ -451,6 +452,7 @@ void radiative3(){
 
 
 
+//-- DATA --//
   TH1F* h1  = new TH1F("h1","",400,-20.,20.0);
   h1->GetXaxis()->SetTitle("coin time (ns)");
   h1->GetYaxis()->SetTitle("Counts / 100 ps");
@@ -506,19 +508,24 @@ void radiative3(){
 	SNTS->SetBranchStatus("Rp_orig",1);SNTS->SetBranchAddress("Rp_orig",&S_momR);
 	SNTS->SetBranchStatus("Rth_gen",1);SNTS->SetBranchAddress("Rth_gen",&S_thR);
     SNTS->SetBranchStatus("Rph_gen"    ,1);SNTS->SetBranchAddress("Rph_gen"    ,&S_phR     );
+
+
+//SIMC Event Loop//
   int ENum_simcL = SNTL->GetEntries(); 
   int ENum_simcS = SNTS->GetEntries(); 
+
 cout<<"Entries(SIMC Lambda): "<<ENum_simcL<<endl;
   TRandom3 ranL_simc;
   for(int i=0;i<ENum_simcL;i++){
 	SNTL->GetEntry(i);
 	double ran = ranL_simc.Gaus((mm_simcL-ML),0.001);
-//KINEMATICS
-  L_momL/=1000.;
-  L_momR/=1000.;
-  double L_momB=4.318;
-  double mh = ML;//hypernuclei
-  double mt = Mp;//target mass
+
+//KINEMATICS CALCULATION
+		L_momL/=1000.;//MeV-->GeV
+  		L_momR/=1000.;//MeV-->GeV
+  		double L_momB=4.318;//GeV
+  		double mh = ML;//hypernuclei
+  		double mt = Mp;//target mass
 	    double R_pz = L_momR/sqrt(1.0*1.0 + pow(L_thR, 2.0) + pow( L_phR,2.0));
 	    double R_px = R_pz * ( L_thR );
 	    double R_py = R_pz * ( L_phR );
@@ -603,8 +610,14 @@ cout<<"Entries(SIMC Lambda): "<<ENum_simcL<<endl;
 		L_4vec.Boost(-boost);
 		B_4vec.Boost(-boost);
 		double theta_gk_cm = G_4vec.Angle(R_4vec.Vect());
+
+
+
+//FILL into histograms//
+
 	//if(L_momR>1760.&&L_momR<1900.&&L_momL>2092.&&L_momL<2160.)hmm_simcL->Fill(ran*1000.);
-	if(L_momR>1.760&&L_momR<1.900&&L_momL>2.010&&L_momL<2.160&&ran<0.15)hmm_simcL->Fill(ran*1000.);
+	if(L_momR>1.760&&L_momR<1.900&&L_momL>2.010&&L_momL<2.160&&ran<0.15)hmm_simcL->Fill(ran*1000.);//with mom cut
+
 	//cout<<"theta_gk_cm="<<theta_gk_cm*180./PI<<endl;
 	//change
 	//if(theta_gk_cm*180./PI>=8.&&L_momR>1.760&&L_momR<1.900&&L_momL>2.010&&L_momL<2.160)hmm_simcL->Fill(ran*1000.);
@@ -618,12 +631,13 @@ cout<<"Entries(SIMC Sigma0): "<<ENum_simcS<<endl;
   for(int i=0;i<ENum_simcS;i++){
 	SNTS->GetEntry(i);
 	double ran = ranS_simc.Gaus((mm_simcS-ML-0.001),0.001);
-//KINEMATICS
-  S_momL/=1000.;
-  S_momR/=1000.;
-  double S_momB=4.318;
-  double mh = ML;//hypernuclei
-  double mt = Mp;//target mass
+
+//KINEMATICS CALCULATION
+		S_momL/=1000.;//MeV-->GeV
+  		S_momR/=1000.;//MeV-->GeV
+  		double S_momB=4.318;//GeV
+  		double mh = ML;//hypernuclei
+  		double mt = Mp;//target mass
 	    double R_pz = S_momR/sqrt(1.0*1.0 + pow(S_thR, 2.0) + pow( S_phR,2.0));
 	    double R_px = R_pz * ( S_thR );
 	    double R_py = R_pz * ( S_phR );
@@ -708,12 +722,19 @@ cout<<"Entries(SIMC Sigma0): "<<ENum_simcS<<endl;
 		L_4vec.Boost(-boost);
 		B_4vec.Boost(-boost);
 		double theta_gk_cm = G_4vec.Angle(R_4vec.Vect());
+
+
+//FILL into histograms//
+
 	//if(S_momR>1760.&&S_momR<1900.&&S_momL>2010.&&S_momL<2108.)hmm_simcS->Fill(ran*1000.);
-	if(S_momR>1.760&&S_momR<1.900&&S_momL>2.010&&S_momL<2.160&&ran<0.15)hmm_simcS->Fill(ran*1000.);
+	if(S_momR>1.760&&S_momR<1.900&&S_momL>2.010&&S_momL<2.160&&ran<0.15)hmm_simcS->Fill(ran*1000.);//with mom cut
+
+
 	//change
 	//if(theta_gk_cm*180./PI>=8.&&S_momR>1.760&&S_momR<1.900&&S_momL>2.010&&S_momL<2.160)hmm_simcS->Fill(ran*1000.);
 	//if(Qsq>=0.5&&S_momR>1.760&&S_momR<1.900&&S_momL>2.010&&S_momL<2.160)hmm_simcS->Fill(ran*1000.);
 	}
+
 //  TH1F* hmm_simc  = new TH1F("hmm_simc","hmm_simc",xbin,xmin,xmax);
 //    //char condi[1000];
 //	//SNT->Project("hmm_simc", "missmass*1000.");
@@ -1084,6 +1105,9 @@ cout<<"Entries: "<<ENum<<endl;
 		h_nrtrack->Fill(NRtr);
 
 }//ENum
+
+
+
 	//THStack *hs = (THStack*)file_G4->Get("new_mm1stack0_12");
 	TH1F* hmm_bg_temp = (TH1F*)file_mea->Get("hmm_mixacc_result_new");
 	//change
