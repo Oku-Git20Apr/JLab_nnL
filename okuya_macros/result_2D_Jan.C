@@ -5,6 +5,7 @@
 //
 //K. Okuyama (Nov. 21, 2020)
 //K. Okuyama (Dec. 14, 2020)//Mom cut
+//K. Okuyama (May. 11, 2021)//Fitting w/ pion, Al
 //
 //This is taken over from result_2D.C
 //Use 2D Acceptance Map (Z, pK)

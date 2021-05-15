@@ -1,6 +1,7 @@
 //--  Kaon's survival ratio   --//
 //
 //K. Okuyama (Nov. 21, 2020)
+//K. Okuyama (May. 14, 2020)//Kaon SR event by event re-try
 //
 //This is taken over from MM.C
 //No array branch mode 
@@ -10,17 +11,17 @@
 void kaon_SR(){
 
   //TFile *file = new TFile("../h2all_2020Nov.root","read");//input file of all H2 run
-  TFile *file = new TFile("../h2all_1_temp.root","read");//TEST
+  TFile *file = new TFile("/data/41a/ELS/JLab/E12-17-003/root/tritium_111175_1.root","read");//TEST
 	//ACCBGの引き算はmea_hist.ccから
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea6.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
   TFile *file_mea = new TFile("../MixedEventAnalysis/bgmea_2020Nov.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
   double nbunch = 6000.;//effetive bunches (6 bunches x 5 mixtures)
-  TTree *tree = (TTree*)file->Get("tree_out");
+  TTree *tree = (TTree*)file->Get("T");
 
 
     
-	//gStyle->SetOptStat(0);
-	//gStyle->SetOptFit(0);
+	gStyle->SetOptStat(0);
+	gStyle->SetOptFit(0);
 
 
 
@@ -149,6 +150,17 @@ void kaon_SR(){
   TH2F* hR2_T2S2_mom  = new TH2F("hR2_T2S2_mom","hR2_T2S2_mom",100,25.,27.,100,1.76,1.9);
   TH2F* hL2_T2S2_mom  = new TH2F("hL2_T2S2_mom","hL2_T2S2_mom",100,25.,27.,100,1.9,2.2);
 
+  TH2F* h2_kSR  = new TH2F("h2_kSR","h2_kSR",100,25.,27.,100,1.7,2.);
+  int srbin = 100;
+  TH1D* h_kSR  = new TH1D("h_kSR","h_kSR",srbin,1.7,2.);
+  double kaonsr[srbin];
+  int counts[srbin];
+  for(int i=0;i<srbin;i++){//Initialization
+	kaonsr[i]=0.;
+	counts[i]=0;
+  }
+	
+
 
   bool L_Tr = false;
   bool L_FP = false;
@@ -220,6 +232,16 @@ cout<<"Entries: "<<ENum<<endl;
 			hL_T2FP->Fill(L_tr_pathl-L_s2_trpath);
 			hL_T2S2_mom->Fill(L_tr_pathl,L_tr_p);
 			hR_T2S2_mom->Fill(R_tr_pathl,R_tr_p);
+			double ksr = exp(-1.*R_tr_pathl*MK/R_tr_p/3.7);
+//cout<<"survival ratio = "<<ksr<<endl;
+//cout<<"R_tr_pathl = "<<R_tr_pathl<<endl;
+//cout<<"R_tr_p = "<<R_tr_p<<endl;
+			if(R_tr_p>1.7&&R_tr_p<2.0&&R_tr_pathl>25.&&R_tr_pathl<27.){	
+			kaonsr[(int)((R_tr_p-1.7)*srbin/0.3)] += ksr;
+			counts[(int)((R_tr_p-1.7)*srbin/0.3)] ++;
+			}
+			h2_kSR->SetBinContent(h2_kSR->GetXaxis()->FindBin(R_tr_pathl),h2_kSR->GetYaxis()->FindBin(R_tr_p),ksr);
+//cout<<"SR= "<<ksr<<endl;
 	//	}
 		if(ct_cut&&event_selection){
 			hR2_mom->Fill(R_tr_p);
@@ -233,6 +255,19 @@ cout<<"Entries: "<<ENum<<endl;
 
 
 }//ENum
+
+double tmp;
+  for(int i=0;i<srbin;i++){
+	if(counts[i]!=0) tmp = kaonsr[i]/counts[i];//average
+	else tmp = 0.;
+//cout<<"survival ratio is "<<tmp<<endl;
+//cout<<"kaonsr["<<i<<"] = "<<kaonsr[i]<<endl;
+//cout<<"counts["<<i<<"] = "<<counts[i]<<endl;
+	h_kSR->SetBinContent(i+1,tmp);
+  }
+
+
+
 //	cout<<"nbunch="<<nbunch<<endl;
 	TCanvas* c1 = new TCanvas("c1","c1");
 	c1->Divide(2,2);
@@ -266,6 +301,11 @@ cout<<"Entries: "<<ENum<<endl;
 	TCanvas* c4 = new TCanvas("c4","c4");
 	hR2_mom->Draw("");
 
+	TCanvas* c5 = new TCanvas("c5","c5");
+	h2_kSR->Draw("colz");
+
+	TCanvas* c6 = new TCanvas("c6","c6");
+	h_kSR->Draw("");
 
 cout << "Well done!" << endl;
 }//fit

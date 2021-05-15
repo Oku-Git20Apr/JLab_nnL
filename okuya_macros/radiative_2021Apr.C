@@ -261,8 +261,8 @@ void radiative_2021Apr(){
   TFile *file_G4 = new TFile("/data/41a/ELS/okuyama/Suzuki_20201208/G4_temp/data/tree_H2_500um_wInRad.root","read");//w/ internal radiation 2020/12/08
 
 //SIMC//
-  TFile *file_simcL = new TFile("/data/41a/ELS/okuyama/SIMC_jlab/SIMC/rootfiles/radL_Alupdate.root","read");
-  TFile *file_simcS = new TFile("/data/41a/ELS/okuyama/SIMC_jlab/SIMC/rootfiles/radS_Alupdate.root","read");
+  TFile *file_simcL = new TFile("/data/41a/ELS/okuyama/SIMC_jlab/SIMC/rootfiles/radL_Alupdate_double.root","read");
+  TFile *file_simcS = new TFile("/data/41a/ELS/okuyama/SIMC_jlab/SIMC/rootfiles/radS_Alupdate_double.root","read");
   TFile *file_simc = new TFile("/data/41a/ELS/okuyama/SIMC_jlab/SIMC/rootfiles/rad_Alupdate.root","read");
   TTree *tree = (TTree*)file->Get("tree_out");//input
   TTree *SNT = (TTree*)file_simc->Get("SNT");//SIMC all
@@ -1161,8 +1161,13 @@ cout<<"hmm_L(data): "<<hmm_wobg_fom_best->Integral(hmm_wobg_fom_best->FindBin(de
 			//c2->Print("./pdf/cointime_strict.pdf");
 	TCanvas* c5 = new TCanvas("c5","c5",800,800);
 
-	hmm_simcL->Scale(833.828*833.828/357870./833.851);//2021Apr.//Full
-	hmm_simcS->Scale(283.282*283.282/205538./294.881);//2021Apr.//Full
+	//hmm_simcL->Scale(833.828*833.828/357870./833.851);//2021Apr.//Full
+	//hmm_simcS->Scale(283.282*283.282/205538./294.881);//2021Apr.//Full
+	//hmm_simcL->Scale(833.828/351142.);//2021Apr.//MAX
+	//hmm_simcS->Scale(283.282*283.282/204959./295.921);//2021Apr.//MAX
+	hmm_simcL->Scale(833.828/330870.);//2021Apr.//MAX
+	hmm_simcS->Scale(283.282*283.282/202332./299.470);//2021Apr.//MAX
+
 	hmm_simc->Add(hmm_simcL,hmm_simcS,1.0,1.0);
 	hmm_simc->SetLineColor(kRed);
 
