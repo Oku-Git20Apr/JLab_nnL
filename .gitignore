@@ -34,3 +34,5 @@
 # Okuyama
 *.root
 bin/
+*.env
+*.env.swp

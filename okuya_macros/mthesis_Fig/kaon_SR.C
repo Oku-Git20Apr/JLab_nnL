@@ -11,17 +11,21 @@
 void kaon_SR(){
 
   //TFile *file = new TFile("../h2all_2020Nov.root","read");//input file of all H2 run
+  //TTree *tree = (TTree*)file->Get("tree_out");
   TFile *file = new TFile("/data/41a/ELS/JLab/E12-17-003/root/tritium_111175_1.root","read");//TEST
+  TTree *tree = (TTree*)file->Get("T");
+
+
 	//ACCBGの引き算はmea_hist.ccから
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea6.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
   TFile *file_mea = new TFile("../MixedEventAnalysis/bgmea_2020Nov.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
   double nbunch = 6000.;//effetive bunches (6 bunches x 5 mixtures)
-  TTree *tree = (TTree*)file->Get("T");
 
 
     
 	gStyle->SetOptStat(0);
 	gStyle->SetOptFit(0);
+
 
 
 
@@ -151,14 +155,56 @@ void kaon_SR(){
   TH2F* hL2_T2S2_mom  = new TH2F("hL2_T2S2_mom","hL2_T2S2_mom",100,25.,27.,100,1.9,2.2);
 
   TH2F* h2_kSR  = new TH2F("h2_kSR","h2_kSR",100,25.,27.,100,1.7,2.);
-  int srbin = 100;
-  TH1D* h_kSR  = new TH1D("h_kSR","h_kSR",srbin,1.7,2.);
+  int srbin = 80;
+  TH1D* h_kSR  = new TH1D("h_kSR","h_kSR",srbin,1.65,2.);
   double kaonsr[srbin];
+  double ave[srbin];//Ensemble average: \bar{X} 
+  double dif[srbin];// (X_i - \bar{X})^2
+  //double sigma[srbin];//sigma of ave. \sigma = \sqrt{\frac{\sum_i^n (X_i-\bar{X})^2}{n(n-1)}}
   int counts[srbin];
   for(int i=0;i<srbin;i++){//Initialization
 	kaonsr[i]=0.;
+	ave[i]=0.;
 	counts[i]=0;
+	dif[i]=0.;
   }
+
+//---  Loading... ---//average of ksr
+	string daq_file = "../information/ksr_tmp.dat";//input file
+	int binnum;//running bin
+	int nbin;//total # of bin
+	double ave_tmp;
+	double sig_tmp;
+	for(int i=0;i<srbin;i++){
+		ave[i]=0.;
+	}
+
+	string buf;
+	ifstream ifp(daq_file.c_str(),ios::in);
+	if (ifp.fail()){ cout << "Failed" << endl; exit(1);}
+cout << "Param file : " << daq_file.c_str() << endl;
+	while(1){
+		getline(ifp,buf);
+		if(buf[0]=='#'){continue;}
+		if(buf=="Number of Bin"){
+			getline(ifp,buf);
+			stringstream sbinbuf(buf);
+			sbinbuf >> nbin;
+			//cout << nbin <<endl;
+			if(nbin==srbin)continue;
+			else{
+				cout<<"Number of Bins is different!"<<endl;
+				cout<<"srbin should be set "<<nbin<<endl;
+				break;
+			}
+		}
+		if(ifp.eof())break;
+		stringstream sbuf(buf);
+		sbuf >> binnum >> ave_tmp;
+		ave[binnum] = ave_tmp;
+		cout << binnum<< ", " << ave[binnum] <<endl;
+	}
+	cout<<"Average of SR was successfully loaded from external file."<<endl;
 	
 
 
@@ -232,13 +278,15 @@ cout<<"Entries: "<<ENum<<endl;
 			hL_T2FP->Fill(L_tr_pathl-L_s2_trpath);
 			hL_T2S2_mom->Fill(L_tr_pathl,L_tr_p);
 			hR_T2S2_mom->Fill(R_tr_pathl,R_tr_p);
-			double ksr = exp(-1.*R_tr_pathl*MK/R_tr_p/3.7);
+			double ksr = exp(-1.*R_tr_pathl*MK/R_tr_p/3.713);
 //cout<<"survival ratio = "<<ksr<<endl;
 //cout<<"R_tr_pathl = "<<R_tr_pathl<<endl;
 //cout<<"R_tr_p = "<<R_tr_p<<endl;
 			if(R_tr_p>1.7&&R_tr_p<2.0&&R_tr_pathl>25.&&R_tr_pathl<27.){	
-			kaonsr[(int)((R_tr_p-1.7)*srbin/0.3)] += ksr;
-			counts[(int)((R_tr_p-1.7)*srbin/0.3)] ++;
+			kaonsr[(int)((R_tr_p-1.65)*srbin/0.35)] += ksr;
+			counts[(int)((R_tr_p-1.65)*srbin/0.35)] ++;
+			double ksrave = ave[(int)((R_tr_p-1.65)*srbin/0.35)];
+			dif[(int)((R_tr_p-1.65)*srbin/0.35)] += (ksr - ksrave)*(ksr - ksrave);
 			}
 			h2_kSR->SetBinContent(h2_kSR->GetXaxis()->FindBin(R_tr_pathl),h2_kSR->GetYaxis()->FindBin(R_tr_p),ksr);
 //cout<<"SR= "<<ksr<<endl;
@@ -256,14 +304,21 @@ cout<<"Entries: "<<ENum<<endl;
 
 }//ENum
 
-double tmp;
+double tmp,tmp2;
+double ave_new[srbin];
   for(int i=0;i<srbin;i++){
-	if(counts[i]!=0) tmp = kaonsr[i]/counts[i];//average
+	if(counts[i]!=0){
+		tmp = kaonsr[i]/counts[i];//average
+		ave_new[i] = tmp;
+	}
 	else tmp = 0.;
+	if(counts[i]!=0&&counts[i]!=1) tmp2 = sqrt(dif[i]/counts[i]/(counts[i]-1));//sigma of ave.
+	else tmp2 = 0.;
 //cout<<"survival ratio is "<<tmp<<endl;
 //cout<<"kaonsr["<<i<<"] = "<<kaonsr[i]<<endl;
 //cout<<"counts["<<i<<"] = "<<counts[i]<<endl;
 	h_kSR->SetBinContent(i+1,tmp);
+	h_kSR->SetBinError(i+1,tmp2);
   }
 
 
@@ -305,7 +360,24 @@ double tmp;
 	h2_kSR->Draw("colz");
 
 	TCanvas* c6 = new TCanvas("c6","c6");
-	h_kSR->Draw("");
+	TH1F *frame = c6->DrawFrame(1.65,0.,2.,0.20);
+	h_kSR->SetLineColor(kRed);
+	h_kSR->SetLineWidth(2);
+	h_kSR->Draw("esame");
+
+	ofstream fout("../information/ksr_tmp.dat");
+		fout<<"#from mthesis_Fig/kaon_SR.C"<<endl;
+		fout<<"Number of Bin"<<endl;
+		fout<<srbin<<endl;
+		fout<<"#"<<endl;
+		fout<<"#"<<endl;
+		fout<<"#"<<endl;
+		double vpflux_temp;
+		double vpflux_total=0.;
+	for(int i=0; i<srbin; i++){
+		fout<<i<<" "<<ave_new[i]<<endl;
+	}
+	cout<<"Average of each bin was successfully written in ../information/ksr_tmp.dat."<<endl;
 
 cout << "Well done!" << endl;
 }//fit
