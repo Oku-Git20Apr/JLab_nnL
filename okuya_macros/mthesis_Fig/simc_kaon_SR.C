@@ -66,12 +66,16 @@ void simc_kaon_SR(){
 
 	float R_mom; 
 	float R_tr_pathl;
+	float R_x;//h_xfp
+	float R_y;//h_yfp
 	float R_dx;//h_xpfp
 	float R_dy;//h_ypfp
 	float R_ksr;
 
 	tree->SetBranchStatus("*",0);
   	tree->SetBranchStatus("Rp_rec",1);  tree->SetBranchAddress("Rp_rec", &R_mom);
+    tree->SetBranchStatus("h_xfp",1);  tree->SetBranchAddress("h_xfp", &R_x);
+    tree->SetBranchStatus("h_yfp",1);  tree->SetBranchAddress("h_yfp", &R_y);
     tree->SetBranchStatus("h_xpfp",1);  tree->SetBranchAddress("h_xpfp", &R_dx);
     tree->SetBranchStatus("h_ypfp",1);  tree->SetBranchAddress("h_ypfp", &R_dy);
     tree->SetBranchStatus("PathLength",1);  tree->SetBranchAddress("PathLength", &R_tr_pathl);
@@ -91,6 +95,19 @@ void simc_kaon_SR(){
   TH1F* hR_T2S2  = new TH1F("hR_T2S2","hR_T2S2",1000,26.,29.);
   TH2F* hR_T2S2_mom  = new TH2F("hR_T2S2_mom","hR_T2S2_mom",100,25.,27.,100,1.7,2.);
   TH2F* hR2_T2S2_mom  = new TH2F("hR2_T2S2_mom","hR2_T2S2_mom",100,25.,27.,100,1.76,1.9);
+
+  gStyle->SetTitleSize(0.04,"X");
+  gStyle->SetTitleSize(0.04,"Y");
+  TH2F* hR_mom_x  = new TH2F("hR_mom_x","hR_mom_x;Momentum [GeV/c];X(FP) [m]",100,1.76,1.9,100,-1.0,1.0);
+  TH2F* hR_mom_th  = new TH2F("hR_mom_th","hR_mom_th;Momentum [GeV/c];X'(FP) [rad]",100,1.76,1.9,100,-0.15,0.15);
+  TH2F* hR_len_x  = new TH2F("hR_len_x","hR_len_x;Path Length (T to S2) [m];X(FP) [m]",100,25.,27.,100,-1.0,1.0);
+  TH2F* hR_len_th  = new TH2F("hR_len_th","hR_len_th;Path Length (T to S2) [m];X'(FP) [rad]",100,25.,27.,100,-0.15,0.15);
+  TH2F* hR_lenfp_x  = new TH2F("hR_lenfp_x","hR_lenfp_x;Path Length (T to FP) [m];X(FP) [m]",100,21.,25.,100,-1.0,1.0);
+  TH2F* hR_lenfp_th  = new TH2F("hR_lenfp_th","hR_lenfp_th;Path Length (T to FP) [m];X'(FP) [rad]",100,21.,25.,100,-0.15,0.15);
+  TH2F* hR_mom_y  = new TH2F("hR_mom_y","hR_mom_y;Momentum [GeV/c];Y(FP) [m]",100,1.76,1.9,100,-0.1,0.1);
+  TH2F* hR_mom_ph  = new TH2F("hR_mom_ph","hR_mom_ph;Momentum [GeV/c];Y'(FP) [rad]",100,1.76,1.9,100,-0.25,0.25);
+  TH2F* hR_len_y  = new TH2F("hR_len_y","hR_len_y;Path Length (T to S2) [m];Y(FP) [m]",100,25.,27.,100,-0.1,0.1);
+  TH2F* hR_len_ph  = new TH2F("hR_len_ph","hR_len_ph;Path Length (T to S2) [m];Y'(FP) [rad]",100,25.,27.,100,-0.25,0.25);
 
   TH2F* h2_kSR  = new TH2F("h2_kSR","h2_kSR",100,25.,27.,100,1.7,2.);
   int srbin = 80;
@@ -176,6 +193,16 @@ cout<<"Entries: "<<ENum<<endl;
 			hR_mom->Fill(R_mom);
 			hR_T2S2->Fill(R_tr_pathl);
 			hR_T2S2_mom->Fill(R_tr_pathl,R_mom);
+
+			hR_mom_x->Fill(R_mom,R_x*0.01);
+			hR_mom_th->Fill(R_mom,R_dx);
+			hR_len_x->Fill(R_tr_pathl,R_x*0.01);
+			hR_len_th->Fill(R_tr_pathl,R_dx);
+			hR_mom_y->Fill(R_mom,R_y*0.01);
+			hR_mom_ph->Fill(R_mom,R_dy);
+			hR_len_y->Fill(R_tr_pathl,R_y*0.01);
+			hR_len_ph->Fill(R_tr_pathl,R_dy);
+
 			double ksr = exp(-1.*R_tr_pathl*MK/R_mom/3.713);
 //cout<<"survival ratio = "<<ksr<<endl;
 //cout<<"R_tr_pathl = "<<R_tr_pathl<<endl;
@@ -242,6 +269,32 @@ double ave_new[srbin];
 	h_kSR2->SetLineColor(kRed);
 	h_kSR2->SetLineWidth(2);
 	h_kSR2->Draw("esame");
+
+	TCanvas* c8 = new TCanvas("c8","c8");
+	c8->Divide(2,3);
+	c8->cd(1);
+	hR_mom_x->Draw("colz");
+	c8->cd(2);
+	hR_mom_th->Draw("colz");
+	c8->cd(3);
+	hR_len_x->Draw("colz");
+	c8->cd(4);
+	hR_len_th->Draw("colz");
+	c8->cd(5);
+	hR_lenfp_x->Draw("colz");
+	c8->cd(6);
+	hR_lenfp_th->Draw("colz");
+
+	TCanvas* c9 = new TCanvas("c9","c9");
+	c9->Divide(2,3);
+	c9->cd(1);
+	hR_mom_y->Draw("colz");
+	c9->cd(2);
+	hR_mom_ph->Draw("colz");
+	c9->cd(3);
+	hR_len_y->Draw("colz");
+	c9->cd(4);
+	hR_len_ph->Draw("colz");
 
 	ofstream fout("../information/simc_ksr_tmp.dat");
 		fout<<"#from mthesis_Fig/simc_kaon_SR.C"<<endl;

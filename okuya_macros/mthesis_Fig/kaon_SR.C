@@ -154,6 +154,20 @@ void kaon_SR(){
   TH2F* hR2_T2S2_mom  = new TH2F("hR2_T2S2_mom","hR2_T2S2_mom",100,25.,27.,100,1.76,1.9);
   TH2F* hL2_T2S2_mom  = new TH2F("hL2_T2S2_mom","hL2_T2S2_mom",100,25.,27.,100,1.9,2.2);
 
+  gStyle->SetTitleSize(0.04,"X");
+  gStyle->SetTitleSize(0.04,"Y");
+  TH2F* hR_mom_x  = new TH2F("hR_mom_x","hR_mom_x;Momentum [GeV/c];X(FP) [m]",100,1.76,1.9,100,-1.0,1.0);
+  TH2F* hR_mom_th  = new TH2F("hR_mom_th","hR_mom_th;Momentum [GeV/c];X'(FP) [rad]",100,1.76,1.9,100,-0.15,0.15);
+  TH2F* hR_len_x  = new TH2F("hR_len_x","hR_len_x;Path Length (T to S2) [m];X(FP) [m]",100,25.,27.,100,-1.0,1.0);
+  TH2F* hR_len_th  = new TH2F("hR_len_th","hR_len_th;Path Length (T to S2) [m];X'(FP) [rad]",100,25.,27.,100,-0.15,0.15);
+  TH2F* hR_lenfp_x  = new TH2F("hR_lenfp_x","hR_lenfp_x;Path Length (T to FP) [m];X(FP) [m]",100,21.,25.,100,-1.0,1.0);
+  TH2F* hR_lenfp_th  = new TH2F("hR_lenfp_th","hR_lenfp_th;Path Length (T to FP) [m];X'(FP) [rad]",100,21.,25.,100,-0.15,0.15);
+
+  TH2F* hR_mom_y  = new TH2F("hR_mom_y","hR_mom_y;Momentum [GeV/c];Y(FP) [m]",100,1.76,1.9,100,-0.1,0.1);
+  TH2F* hR_mom_ph  = new TH2F("hR_mom_ph","hR_mom_ph;Momentum [GeV/c];Y'(FP) [rad]",100,1.76,1.9,100,-0.15,0.15);
+  TH2F* hR_len_y  = new TH2F("hR_len_y","hR_len_y;Path Length (T to S2) [m];Y(FP) [m]",100,25.,27.,100,-0.1,0.1);
+  TH2F* hR_len_ph  = new TH2F("hR_len_ph","hR_len_ph;Path Length (T to S2) [m];Y'(FP) [rad]",100,25.,27.,100,-0.15,0.15);
+
   TH2F* h2_kSR  = new TH2F("h2_kSR","h2_kSR",100,25.,27.,100,1.7,2.);
   int srbin = 80;
   TH1D* h_kSR  = new TH1D("h_kSR","h_kSR",srbin,1.65,2.);
@@ -278,6 +292,17 @@ cout<<"Entries: "<<ENum<<endl;
 			hL_T2FP->Fill(L_tr_pathl-L_s2_trpath);
 			hL_T2S2_mom->Fill(L_tr_pathl,L_tr_p);
 			hR_T2S2_mom->Fill(R_tr_pathl,R_tr_p);
+			hR_mom_x->Fill(R_tr_p,R_tr_x);
+			hR_mom_th->Fill(R_tr_p,R_tr_th);
+			hR_len_x->Fill(R_tr_pathl,R_tr_x);
+			hR_len_th->Fill(R_tr_pathl,R_tr_th);
+			hR_lenfp_x->Fill(R_tr_pathl-R_s2_trpath,R_tr_x);
+			hR_lenfp_th->Fill(R_tr_pathl-R_s2_trpath,R_tr_th);
+
+			hR_mom_y->Fill(R_tr_p,R_tr_y);
+			hR_mom_ph->Fill(R_tr_p,R_tr_ph);
+			hR_len_y->Fill(R_tr_pathl,R_tr_y);
+			hR_len_ph->Fill(R_tr_pathl,R_tr_ph);
 			double ksr = exp(-1.*R_tr_pathl*MK/R_tr_p/3.713);
 //cout<<"survival ratio = "<<ksr<<endl;
 //cout<<"R_tr_pathl = "<<R_tr_pathl<<endl;
@@ -365,6 +390,37 @@ double ave_new[srbin];
 	h_kSR->SetLineWidth(2);
 	h_kSR->Draw("esame");
 
+	TCanvas* c7 = new TCanvas("c7","c7");
+	c7->Divide(2,3);
+	c7->cd(1);
+	hR_mom_x->Draw("colz");
+	c7->cd(2);
+	hR_mom_th->Draw("colz");
+	c7->cd(3);
+	hR_len_x->Draw("colz");
+	c7->cd(4);
+	hR_len_th->Draw("colz");
+	c7->cd(5);
+	hR_lenfp_x->Draw("colz");
+	c7->cd(6);
+	hR_lenfp_th->Draw("colz");
+
+	TCanvas* c8 = new TCanvas("c8","c8");
+	c8->Divide(2,3);
+	c8->cd(1);
+	hR_mom_y->Draw("colz");
+	c8->cd(2);
+	hR_mom_ph->Draw("colz");
+	c8->cd(3);
+	hR_len_y->Draw("colz");
+	c8->cd(4);
+	hR_len_ph->Draw("colz");
+
+			hR_mom_th->Fill(R_tr_p,R_tr_th);
+			hR_len_x->Fill(R_tr_pathl,R_tr_x);
+			hR_len_th->Fill(R_tr_pathl,R_tr_th);
+			hR_len_x->Fill(R_tr_pathl-R_s2_trpath,R_tr_x);
+			hR_len_th->Fill(R_tr_pathl-R_s2_trpath,R_tr_th);
 	ofstream fout("../information/ksr_tmp.dat");
 		fout<<"#from mthesis_Fig/kaon_SR.C"<<endl;
 		fout<<"Number of Bin"<<endl;
