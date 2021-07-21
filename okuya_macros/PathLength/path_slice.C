@@ -3,7 +3,8 @@
 //--	from Cointime        --//
 //-----------------------------//
 
-//K. Okuyama (Jun. 22, 2021)
+//K. Okuyama (Jul. 18, 2021)
+//-- Path Length (from Cointime) vs. Momentum
 
 double PI=4.*atan(1.);
 
@@ -57,7 +58,7 @@ double fcoin_acc( double *x, double *par)
 //
 //}
 
-void path_from_ct(){
+void path_slice(){
 //ROOT::Math::IntegratorOneDimOptions::SetDefaultRelTolerance(1.E-6);
 	string pdfname = "temp.pdf";
 cout << "Output pdf file name is " << pdfname << endl;
@@ -174,9 +175,25 @@ cout << "Output pdf file name is " << pdfname << endl;
   	tree->SetBranchStatus("R.tr.vz",1);  tree->SetBranchAddress("R.tr.vz", &R_tr_vz);
 
 
+  const int slice=12;
+  double Nbin_pos[slice+1];
+	Nbin_pos[0] = 1730.;
+	Nbin_pos[slice] = 1930.;
+  for(int i=1;i<slice;i++){
+	Nbin_pos[i] = 1730.+200.*(double)(i+1)/(slice+2);
+  }
+  TH1F* h_path_mom  = new TH1F("h_path_mom;Momentum [MeV/c];Path Length [m]","",slice,Nbin_pos);
+  TH1F* h_tdiff_mom  = new TH1F("h_tdiff_mom;Momentum [MeV/c];t_{#pi}-t_{p} [m]","",slice,Nbin_pos);
+  TH1F* h_pionpos_mom  = new TH1F("h_pionpos_mom;Momentum [MeV/c];Pion Pos. [ns]","",slice,Nbin_pos);
+  TH1F* h_protonpos_mom  = new TH1F("h_protonpos_mom;Momentum [MeV/c];Proton Pos. [ns]","",slice,Nbin_pos);
+  TH2F* h_coin_mom  = new TH2F("h_coin_mom;Cointime [ns];Momentum [MeV/c]","",2000,-20.,20.,1000,1730.,1930.);
   //TH1F* hcoin  = new TH1F("hcoin","",40000/56,-20.,20.);
-  TH1F* hcoin  = new TH1F("hcoin","",130000/56,-30.,100.);
-  TH1F* h_pk  = new TH1F("h_pk","",1000,1730.,1930.);
+  //TH1F* hcoin  = new TH1F("hcoin","",130000/56,-30.,100.);
+  TH1F* hcoin[slice];
+	for(int i=0;i<slice;i++){
+		//hcoin[i] = new TH1F(Form("hcoin[%d]",i),"",130000/56,-30.,100.);
+		hcoin[i] = new TH1F(Form("hcoin[%d]",i),"",40000/56,-20.,20.);
+	}
   
 
   TH1F* h_test  = new TH1F("h_test","",1000,1.8,2.4);
@@ -243,37 +260,61 @@ cout<<"Entries: "<<ENum<<endl;
 		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
 		else event_selection=false;
 		
-		//hcoin->Fill(ct);
-		//h_pk->Fill(R_mom*1000.);
-		//if(R_mom<1.85)hcoin->Fill(ct);
-		//if(R_mom<1.85)h_pk->Fill(R_mom*1000.);
-		if(R_mom>1.80)hcoin->Fill(ct);
-		if(R_mom>1.80)h_pk->Fill(R_mom*1000.);
+		//if(abs(R_mom-1.90)<0.02)hcoin->Fill(ct);
+		for(int i=0;i<slice;i++){
+			//if(abs(R_mom-1.76-0.2*i/(slice+2))<0.1/(slice+2))hcoin[i]->Fill(ct);
+			if(abs(R_mom-1.73-0.2*(i+1.5)/(slice+2))<0.1/(slice+2))hcoin[i]->Fill(ct);
+			if(i==0&&abs(R_mom-1.73-0.1/(slice+2))<0.1/(slice+2))hcoin[i]->Fill(ct);
+			if(i==slice-1&&abs(R_mom-1.93+0.1/(slice+2))<0.1/(slice+2))hcoin[i]->Fill(ct);
+		}
+		h_coin_mom->Fill(ct,R_mom*1000.);
 
 }//ENum
 
 	double chisq = 0.;
 	double dof = 0.;
-
+	double pion_par0[slice] = {0}; 
+	double pion_par1[slice] = {0};
+	double pion_par2[slice] = {0};
+	double proton_par0[slice] = {0}; 
+	double proton_par1[slice] = {0};
+	double proton_par2[slice] = {0};
+	double pion_parerr0[slice] = {0}; 
+	double pion_parerr1[slice] = {0};
+	double pion_parerr2[slice] = {0};
+	double proton_parerr0[slice] = {0}; 
+	double proton_parerr1[slice] = {0};
+	double proton_parerr2[slice] = {0};
+	double t_diff[slice] = {0};
+	double pathlen[slice] = {0};
+	double t_diff_sig[slice] = {0};
+	double pathlen_sig[slice] = {0};
 
 		TCanvas *c4 = new TCanvas("c4", "c4", 800, 800);
 //Pion Fitting
 cout<<"Pion Fitting is performed as a first step"<<endl;
 cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
-	 TF1 *fcoin_pion= new TF1("fcoin_pion","gausn",1.,5.);
-	 fcoin_pion->SetNpx(20000);
-	 fcoin_pion->SetParameter(0,30000.);
-	 fcoin_pion->SetParameter(1,3.18);
-	 fcoin_pion->SetParameter(2,0.4);
-	 hcoin->Fit("fcoin_pion","","",2.,4.);
-	 double pion_par0 = fcoin_pion->GetParameter(0);
-	 double pion_par1 = fcoin_pion->GetParameter(1);
-	 double pion_par2 = fcoin_pion->GetParameter(2);
+//	 TF1 *fcoin_pion= new TF1("fcoin_pion","gausn",1.,5.);
+  TF1* fcoin_pion[slice]; 
+  TF1 *fcoin_proton[slice];
+	for(int i=0;i<slice;i++){
+		fcoin_pion[i] = new TF1(Form("fcoin_pion[%d]",i),"gausn",1.,5.);
+	 fcoin_pion[i]->SetNpx(20000);
+	 fcoin_pion[i]->SetParameter(0,100000./slice);
+	 fcoin_pion[i]->SetParameter(1,3.15);
+	 fcoin_pion[i]->SetParameter(2,0.4);
+	 hcoin[i]->Fit(Form("fcoin_pion[%d]",i),"","",2.,4.);
+	 pion_par0[i] = fcoin_pion[i]->GetParameter(0);
+	 pion_par1[i] = fcoin_pion[i]->GetParameter(1);
+	 pion_par2[i] = fcoin_pion[i]->GetParameter(2);
+	 pion_parerr0[i] = fcoin_pion[i]->GetParError(0);
+	 pion_parerr1[i] = fcoin_pion[i]->GetParError(1);
+	 pion_parerr2[i] = fcoin_pion[i]->GetParError(2);
 	 cout<<"%%%%%Information%%%%%"<<endl;
 	 //cout<<"Pion Fitting after BG subtraction (fcoin_pion) "<<endl;
 	 cout<<"Pion Fitting w/o BG subtraction (fcoin_pion) "<<endl;
-	 chisq = fcoin_pion->GetChisquare();
-	 dof  = fcoin_pion->GetNDF();
+	 chisq = fcoin_pion[i]->GetChisquare();
+	 dof  = fcoin_pion[i]->GetNDF();
 	 cout<<"chisq="<<chisq<<endl;
 	 cout<<"dof="<<dof<<endl;
 	 cout<<"Reduced chi-square = "<<chisq/dof<<endl;
@@ -281,60 +322,136 @@ cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 //Proton Fitting
 cout<<"Proton Fitting is performed as a next step"<<endl;
 cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
-	 TF1 *fcoin_proton= new TF1("fcoin_proton","gausn",-9,-6.);
-	 fcoin_proton->SetNpx(20000);
-	 fcoin_proton->SetParameter(0,5000.);
-	 fcoin_proton->SetParameter(1,-8.0);
-	 fcoin_proton->SetParameter(2,0.4);
-	 hcoin->Fit("fcoin_proton","","",-9.,-6.);
-	 double proton_par0 = fcoin_proton->GetParameter(0);
-	 double proton_par1 = fcoin_proton->GetParameter(1);
-	 double proton_par2 = fcoin_proton->GetParameter(2);
+	 fcoin_proton[i]= new TF1(Form("fcoin_proton[%d]",i),"gausn",-10,-5.);
+	 fcoin_proton[i]->SetNpx(20000);
+	 fcoin_proton[i]->SetParameter(0,2000.);
+	 if(i<slice/4){
+		fcoin_proton[i]->SetParameter(1,-8.5);
+	 }else if(i<slice*2/4){
+		fcoin_proton[i]->SetParameter(1,-8.0);
+	 }else if(i<slice*3/4){
+		fcoin_proton[i]->SetParameter(1,-7.5);
+	 }else{
+		fcoin_proton[i]->SetParameter(1,-7.0);
+	 }
+	 fcoin_proton[i]->SetParameter(2,0.4);
+	 if(i<slice/8){
+		hcoin[i]->Fit(Form("fcoin_proton[%d]",i),"","",-10.,-8.);
+	 }else if(i<slice*2/4){
+		hcoin[i]->Fit(Form("fcoin_proton[%d]",i),"","",-9.,-7.);
+	 }else if(i<slice*3/4){
+		hcoin[i]->Fit(Form("fcoin_proton[%d]",i),"","",-8.5,-6.5);
+	 }else{
+		hcoin[i]->Fit(Form("fcoin_proton[%d]",i),"","",-8.,-6.);
+	 }
+	 proton_par0[i] = fcoin_proton[i]->GetParameter(0);
+	 proton_par1[i] = fcoin_proton[i]->GetParameter(1);
+	 proton_par2[i] = fcoin_proton[i]->GetParameter(2);
+	 proton_parerr0[i] = fcoin_proton[i]->GetParError(0);
+	 proton_parerr1[i] = fcoin_proton[i]->GetParError(1);
+	 proton_parerr2[i] = fcoin_proton[i]->GetParError(2);
 	 cout<<"%%%%%Information%%%%%"<<endl;
 	 //cout<<"Proton Fitting after BG subtraction (fcoin_proton) "<<endl;
 	 cout<<"Proton Fitting w/o BG subtraction (fcoin_proton) "<<endl;
-	 chisq = fcoin_proton->GetChisquare();
-	 dof  = fcoin_proton->GetNDF();
+	 chisq = fcoin_proton[i]->GetChisquare();
+	 dof  = fcoin_proton[i]->GetNDF();
 	 cout<<"chisq="<<chisq<<endl;
 	 cout<<"dof="<<dof<<endl;
 	 cout<<"Reduced chi-square = "<<chisq/dof<<endl;
+	}//i loop for fitting
 
 
 	TCanvas *c5 = new TCanvas("c5", "c5", 800, 800);
-	c5->DrawFrame(-20.,0.,20.,40000.);
-	hcoin->SetLineColor(kAzure);
-	hcoin->Draw("same");
-	fcoin_pion->SetLineColor(kOrange);
-	fcoin_pion->Draw("same");
-	fcoin_proton->SetLineColor(kRed);
-	fcoin_proton->Draw("same");
+	c5->Divide(slice/2,2);
+	for(int i=0;i<slice;i++){
+		//c5->cd(i+1)->DrawFrame(-20.,0.,20.,8000.);
+		c5->cd(i+1);
+		hcoin[i]->SetLineColor(kAzure);
+		hcoin[i]->Draw("same");
+		fcoin_pion[i]->SetLineColor(kOrange);
+		fcoin_pion[i]->Draw("same");
+		fcoin_proton[i]->SetLineColor(kRed);
+		fcoin_proton[i]->Draw("same");
+	}
 
-	//double mom = 1.82;//GeV/c
-	//double mom = 1.80;//GeV/c
-	double mom = 1.85;//GeV/c
+	double mom = -1.82;//GeV/c
 	double betapi = mom/sqrt(Mpi*Mpi+mom*mom);
 	double betap  = mom/sqrt(Mp*Mp+mom*mom);
-	double betapi_sig = 0.2/pow(sqrt(Mpi*Mpi+mom*mom),3.);
-	double betap_sig  = 0.2/pow(sqrt(Mp*Mp+mom*mom),3.);
-	double t_diff = proton_par1-pion_par1;
-	double pathlen = betapi*betap*LightVelocity*t_diff/(betap-betapi);
-
-	double t_diff_sig = sqrt(proton_par2*proton_par2+pion_par2*pion_par2);
-	double t_diff_sig2 = sqrt(proton_par2*proton_par2/proton_par0*0.056+pion_par2*pion_par2/pion_par0*0.056);
-	double pathlen_sig = betapi*betap*LightVelocity*t_diff_sig/(betap-betapi);
-	double pathlen_sig2 = betapi*betap*LightVelocity*t_diff_sig2/(betap-betapi);
-	double pathlen_sig3 = sqrt(betapi*betap*LightVelocity/(betap-betapi)*betapi*betap*LightVelocity/(betap-betapi)*t_diff_sig2*t_diff_sig2+pow(betap,4.)*LightVelocity*LightVelocity/(std::pow(betapi-betap,4))*(betapi_sig*betapi_sig)+pow(betapi,4.)*LightVelocity*LightVelocity/(std::pow(betapi-betap,4))*(betap_sig*betap_sig));
-	cout<<"Npi="<<pion_par0/0.056<<endl;
-	cout<<"Np="<<proton_par0/0.056<<endl;
-	cout<<"betapi="<<betapi<<endl;
-	cout<<"betap="<<betap<<endl;
-	cout<<"t_diff="<<abs(t_diff)<<" [ns]"<<endl;
-	cout<<"pathlen="<<pathlen<<"+/-"<<abs(pathlen_sig)<<" [m]"<<endl;
-	cout<<"pathlen2="<<pathlen<<"+/-"<<abs(pathlen_sig2)<<" [m]"<<endl;
-	cout<<"pathlen3="<<pathlen<<"+/-"<<abs(pathlen_sig3)<<" [m]"<<endl;
+	double betapi_sig = 0.02/sqrt(Mpi*Mpi+mom*mom);
+	double betap_sig  = 0.02/sqrt(Mp*Mp+mom*mom);
+	for(int i=0;i<slice;i++){
+		if(i==0){
+		mom = 1.73+0.2/(slice+2);
+		}else if(i==slice-1){
+		mom = 1.93-0.2/(slice+2);;
+		}else{
+		mom = 1.73+0.2*(i+1.5)/(slice+2);//GeV/c
+		}
+		cout<<"mom="<<mom<<endl;
+		betapi = mom/sqrt(Mpi*Mpi+mom*mom);
+		betap  = mom/sqrt(Mp*Mp+mom*mom);
+		if(i==0||i==slice-1){
+		betapi_sig = 0.4/(slice+2)/pow(sqrt(Mpi*Mpi+mom*mom),3.);
+		betap_sig  = 0.4/(slice+2)/pow(sqrt(Mp*Mp+mom*mom),3.);
+		}else{
+		betapi_sig = 0.2/(slice+2)/pow(sqrt(Mpi*Mpi+mom*mom),3.);
+		betap_sig  = 0.2/(slice+2)/pow(sqrt(Mp*Mp+mom*mom),3.);
+		}
+		cout<<"betapi="<<betapi<<endl;
+		cout<<"betap="<<betap<<endl;
+		//cout<<"betapi_sig="<<betapi_sig<<endl;
+		//cout<<"betap_sig="<<betap_sig<<endl;
+		t_diff[i] = proton_par1[i]-pion_par1[i];
+		pathlen[i] = betapi*betap*LightVelocity*t_diff[i]/(betap-betapi);
+		//t_diff_sig[i] = sqrt(proton_par2[i]*proton_par2[i]+pion_par2[i]*pion_par2[i]);
+		//t_diff_sig[i] = sqrt(proton_par2[i]*proton_par2[i]/proton_par0[i]*0.056+pion_par2[i]*pion_par2[i]/pion_par0[i]*0.056);
+		t_diff_sig[i] = sqrt(pion_parerr1[i]*pion_parerr1[i]+proton_parerr1[i]*proton_parerr1[i]);
+		//pathlen_sig[i] = betapi*betap*LightVelocity*t_diff_sig[i]/(betap-betapi);
+		pathlen_sig[i] = sqrt(betapi*betap*LightVelocity/(betap-betapi)*betapi*betap*LightVelocity/(betap-betapi)*t_diff_sig[i]*t_diff_sig[i]+pow(betap,4.)*LightVelocity*LightVelocity/(std::pow(betapi-betap,4))*(betapi_sig*betapi_sig)+pow(betapi,4.)*LightVelocity*LightVelocity/(std::pow(betapi-betap,4))*(betap_sig*betap_sig));
+	cout<<"t_diff["<<i<<"]="<<t_diff[i]<<"+/-"<<abs(t_diff_sig[i])<<" [ns]"<<endl;
+	cout<<"pathlen["<<i<<"]="<<pathlen[i]<<"+/-"<<abs(pathlen_sig[i])<<" [m]"<<endl;
+	//cout<<"t_diff_clac="<<t_diff[i]<<"+/-"<<sqrt(pion_parerr1[i]*pion_parerr1[i]+proton_parerr1[i]*proton_parerr1[i])<<endl;
+		h_path_mom->SetBinContent(i+1,pathlen[i]);
+		h_path_mom->SetBinError(i+1,pathlen_sig[i]);
+		h_tdiff_mom->SetBinContent(i+1,abs(t_diff[i]));
+		h_tdiff_mom->SetBinError(i+1,t_diff_sig[i]);
+		h_pionpos_mom->SetBinContent(i+1,pion_par1[i]);
+		h_pionpos_mom->SetBinError(i+1,pion_parerr1[i]);
+		h_protonpos_mom->SetBinContent(i+1,proton_par1[i]);
+		h_protonpos_mom->SetBinError(i+1,proton_parerr1[i]);
+	}
 
 	TCanvas *c6 = new TCanvas("c6", "c6", 800, 800);
-	h_pk->SetLineColor(kAzure);
-	h_pk->Draw("same");
+	//c6->DrawFrame(1730.,26.3,1930.,27.3);
+	h_path_mom->Draw("esame");
+	TCanvas *c7 = new TCanvas("c7", "c7", 800, 800);
+	//c7->DrawFrame(1730.,26.3,1930.,27.3);
+	h_tdiff_mom->Draw("esame");
+cout<<"pion positon;"<<endl;
+	for(int i=0;i<slice;i++){
+cout<<pion_par1[i]<<endl;
+	}
+cout<<"proton positon;"<<endl;
+	for(int i=0;i<slice;i++){
+cout<<proton_par1[i]<<endl;
+	}
+	TCanvas *c8 = new TCanvas("c8", "c8", 800, 800);
+	h_pionpos_mom->Draw("e");
+	TCanvas *c9 = new TCanvas("c9", "c9", 800, 800);
+	h_protonpos_mom->Draw("e");
+	TCanvas *c10 = new TCanvas("c10", "c10", 800, 800);
+	h_coin_mom->Draw("colz");
+
+	//double t_diff_sig = sqrt(proton_par2*proton_par2+pion_par2*pion_par2);
+	//double t_diff_sig2 = sqrt(proton_par2*proton_par2/proton_par0*0.056+pion_par2*pion_par2/pion_par0*0.056);
+	//double pathlen_sig = betapi*betap*LightVelocity*t_diff_sig/(betap-betapi);
+	//double pathlen_sig2 = betapi*betap*LightVelocity*t_diff_sig2/(betap-betapi);
+	//cout<<"Npi="<<pion_par0/0.056<<endl;
+	//cout<<"Np="<<proton_par0/0.056<<endl;
+	//cout<<"betapi="<<betapi<<endl;
+	//cout<<"betap="<<betap<<endl;
+	//cout<<"t_diff="<<abs(t_diff)<<" [ns]"<<endl;
+	//cout<<"pathlen="<<pathlen<<"+/-"<<abs(pathlen_sig)<<" [m]"<<endl;
+	//cout<<"pathlen2="<<pathlen<<"+/-"<<abs(pathlen_sig2)<<" [m]"<<endl;
 
 }//path_from_ct

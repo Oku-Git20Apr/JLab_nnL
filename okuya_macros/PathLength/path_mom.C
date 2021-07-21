@@ -3,7 +3,9 @@
 //--	from Cointime        --//
 //-----------------------------//
 
-//K. Okuyama (Jun. 22, 2021)
+//K. Okuyama (Jul. 18, 2021)
+//-- Cointime vs. Momentum
+//-- Path Length (from Cointime) vs. Momentum
 
 double PI=4.*atan(1.);
 
@@ -57,7 +59,7 @@ double fcoin_acc( double *x, double *par)
 //
 //}
 
-void path_from_ct(){
+void path_mom(){
 //ROOT::Math::IntegratorOneDimOptions::SetDefaultRelTolerance(1.E-6);
 	string pdfname = "temp.pdf";
 cout << "Output pdf file name is " << pdfname << endl;
@@ -176,7 +178,6 @@ cout << "Output pdf file name is " << pdfname << endl;
 
   //TH1F* hcoin  = new TH1F("hcoin","",40000/56,-20.,20.);
   TH1F* hcoin  = new TH1F("hcoin","",130000/56,-30.,100.);
-  TH1F* h_pk  = new TH1F("h_pk","",1000,1730.,1930.);
   
 
   TH1F* h_test  = new TH1F("h_test","",1000,1.8,2.4);
@@ -243,12 +244,7 @@ cout<<"Entries: "<<ENum<<endl;
 		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
 		else event_selection=false;
 		
-		//hcoin->Fill(ct);
-		//h_pk->Fill(R_mom*1000.);
-		//if(R_mom<1.85)hcoin->Fill(ct);
-		//if(R_mom<1.85)h_pk->Fill(R_mom*1000.);
-		if(R_mom>1.80)hcoin->Fill(ct);
-		if(R_mom>1.80)h_pk->Fill(R_mom*1000.);
+		if(abs(R_mom-1.90)<0.02)hcoin->Fill(ct);
 
 }//ENum
 
@@ -281,12 +277,12 @@ cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 //Proton Fitting
 cout<<"Proton Fitting is performed as a next step"<<endl;
 cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
-	 TF1 *fcoin_proton= new TF1("fcoin_proton","gausn",-9,-6.);
+	 TF1 *fcoin_proton= new TF1("fcoin_proton","gausn",-9,-7.);
 	 fcoin_proton->SetNpx(20000);
 	 fcoin_proton->SetParameter(0,5000.);
 	 fcoin_proton->SetParameter(1,-8.0);
 	 fcoin_proton->SetParameter(2,0.4);
-	 hcoin->Fit("fcoin_proton","","",-9.,-6.);
+	 hcoin->Fit("fcoin_proton","","",-8.,-6.);
 	 double proton_par0 = fcoin_proton->GetParameter(0);
 	 double proton_par1 = fcoin_proton->GetParameter(1);
 	 double proton_par2 = fcoin_proton->GetParameter(2);
@@ -309,13 +305,9 @@ cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 	fcoin_proton->SetLineColor(kRed);
 	fcoin_proton->Draw("same");
 
-	//double mom = 1.82;//GeV/c
-	//double mom = 1.80;//GeV/c
-	double mom = 1.85;//GeV/c
+	double mom = 1.90;//GeV/c
 	double betapi = mom/sqrt(Mpi*Mpi+mom*mom);
 	double betap  = mom/sqrt(Mp*Mp+mom*mom);
-	double betapi_sig = 0.2/pow(sqrt(Mpi*Mpi+mom*mom),3.);
-	double betap_sig  = 0.2/pow(sqrt(Mp*Mp+mom*mom),3.);
 	double t_diff = proton_par1-pion_par1;
 	double pathlen = betapi*betap*LightVelocity*t_diff/(betap-betapi);
 
@@ -323,7 +315,6 @@ cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 	double t_diff_sig2 = sqrt(proton_par2*proton_par2/proton_par0*0.056+pion_par2*pion_par2/pion_par0*0.056);
 	double pathlen_sig = betapi*betap*LightVelocity*t_diff_sig/(betap-betapi);
 	double pathlen_sig2 = betapi*betap*LightVelocity*t_diff_sig2/(betap-betapi);
-	double pathlen_sig3 = sqrt(betapi*betap*LightVelocity/(betap-betapi)*betapi*betap*LightVelocity/(betap-betapi)*t_diff_sig2*t_diff_sig2+pow(betap,4.)*LightVelocity*LightVelocity/(std::pow(betapi-betap,4))*(betapi_sig*betapi_sig)+pow(betapi,4.)*LightVelocity*LightVelocity/(std::pow(betapi-betap,4))*(betap_sig*betap_sig));
 	cout<<"Npi="<<pion_par0/0.056<<endl;
 	cout<<"Np="<<proton_par0/0.056<<endl;
 	cout<<"betapi="<<betapi<<endl;
@@ -331,10 +322,5 @@ cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 	cout<<"t_diff="<<abs(t_diff)<<" [ns]"<<endl;
 	cout<<"pathlen="<<pathlen<<"+/-"<<abs(pathlen_sig)<<" [m]"<<endl;
 	cout<<"pathlen2="<<pathlen<<"+/-"<<abs(pathlen_sig2)<<" [m]"<<endl;
-	cout<<"pathlen3="<<pathlen<<"+/-"<<abs(pathlen_sig3)<<" [m]"<<endl;
-
-	TCanvas *c6 = new TCanvas("c6", "c6", 800, 800);
-	h_pk->SetLineColor(kAzure);
-	h_pk->Draw("same");
 
 }//path_from_ct
