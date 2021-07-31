@@ -3,8 +3,9 @@
 //--	from Cointime        --//
 //-----------------------------//
 
-//K. Okuyama (Jul. 18, 2021)
-//-- Path Length (from Cointime) vs. Momentum
+//- taken from path_slice_update.C
+//K. Okuyama (Jul. 24, 2021)
+//	suggested by Nue at ELS#142
 
 double PI=4.*atan(1.);
 
@@ -32,20 +33,6 @@ double F1_path(double *x, double *par){
 	double betap  = mom/sqrt(Mp*Mp+mom*mom);
 	double pathlen = betapi*betap*LightVelocity*tdiff/(betapi-betap);
 	return pathlen;//m
-}
-double F1_sr(double *x, double *par){
-	double Mpi = 0.13957018;         // charged pion mass (GeV/c2)
-	double Mp = 0.938272046;         // proton       mass (GeV/c2)
-	double MK = 0.493677;            // charged Kaon mass (GeV/c2)
-	double LightVelocity = 0.299792458;          // speed of light in vacuum (m/ns)
-	double mom = x[0]/1000.;//GeV/c
-	double b = par[0];//intercept
-	double a = par[1];//slope
-	double tdiff = a*mom*1000.+b;//pol1
-	double betapi = mom/sqrt(Mpi*Mpi+mom*mom);
-	double betap  = mom/sqrt(Mp*Mp+mom*mom);
-	double pathlen = betapi*betap*LightVelocity*tdiff/(betapi-betap);
-	return exp(-pathlen*MK/mom/3.71);//m
 }
 
 void func_shade(TCanvas *cc, TF1 *f1, TF1 *f2, TF1 *f3) {
@@ -145,13 +132,14 @@ double fcoin_acc( double *x, double *par)
 //
 //}
 
-void path_slice_update(){
+void mom_calib(){
 //ROOT::Math::IntegratorOneDimOptions::SetDefaultRelTolerance(1.E-6);
 	string pdfname = "temp.pdf";
 cout << "Output pdf file name is " << pdfname << endl;
   
   //TFile *file = new TFile("../h2all5.root","read");//input file of all H2 run(default: h2all4.root)
-  TFile *file = new TFile("../h2all_2020Nov.root","read");//input file of all H2 run(default: h2all4.root)
+  //TFile *file = new TFile("../h2all_2020Nov.root","read");//input file of all H2 run(default: h2all4.root)
+  TFile *file = new TFile("../h2all_wseg_formomcalib20210724.root","read");//input file of all H2 run(default: h2all4.root)
   TTree *tree = (TTree*)file->Get("tree_out");
 
     
@@ -214,6 +202,14 @@ cout << "Output pdf file name is " << pdfname << endl;
 
  int NLtr, NRtr, Ls2_pad[100], Rs2_pad[100];
  double ct, ct_eff;
+ double ct_wseg[16][16];
+for(int i=0;i<16;i++){
+	for(int j=0;j<16;j++){
+		ct_wseg[i][j]=-1000.;
+	}
+}
+ int LS2_seg;
+ int RS2_seg;
 
 	double L_tr_chi2;
 	double L_tr_x, L_tr_y, L_tr_th, L_tr_ph;
@@ -240,6 +236,9 @@ cout << "Output pdf file name is " << pdfname << endl;
   	tree->SetBranchStatus("Rp_c",1);  tree->SetBranchAddress("Rp_c", &R_mom);
   	tree->SetBranchStatus("Bp_c",1);  tree->SetBranchAddress("Bp_c", &B_mom);
   	tree->SetBranchStatus("ct_orig",1);  tree->SetBranchAddress("ct_orig", &ct);
+  	tree->SetBranchStatus("ct_seg",1);  tree->SetBranchAddress("ct_seg", ct_wseg);
+  	tree->SetBranchStatus("LS2seg",1);  tree->SetBranchAddress("LS2seg", &LS2_seg);
+  	tree->SetBranchStatus("RS2seg",1);  tree->SetBranchAddress("RS2seg", &RS2_seg);
 
   	tree->SetBranchStatus("L.tr.chi2",1);  tree->SetBranchAddress("L.tr.chi2", &L_tr_chi2);
   	tree->SetBranchStatus("L.tr.x",1);  tree->SetBranchAddress("L.tr.x", &L_tr_x);
@@ -262,21 +261,38 @@ cout << "Output pdf file name is " << pdfname << endl;
   	tree->SetBranchStatus("R.tr.vz",1);  tree->SetBranchAddress("R.tr.vz", &R_tr_vz);
 
 
-  const int slice=8;
+  const int slice=6;
   double Nbin_pos[slice+1];
 	Nbin_pos[0] = 1730.;
 	Nbin_pos[slice] = 1930.;
   for(int i=1;i<slice;i++){
 	Nbin_pos[i] = 1730.+200.*(double)(i+1)/(slice+2);
   }
-  TH1F* h_path_mom  = new TH1F("h_path_mom;Momentum [MeV/c];Path Length [m]","",slice,Nbin_pos);
-  TH1F* h_tdiff_mom  = new TH1F("h_tdiff_mom;Momentum [MeV/c];t_{#pi}-t_{p} [m]","",slice,Nbin_pos);
-  TH1F* h_pionpos_mom  = new TH1F("h_pionpos_mom;Momentum [MeV/c];Pion Pos. [ns]","",slice,Nbin_pos);
-  TH1F* h_protonpos_mom  = new TH1F("h_protonpos_mom;Momentum [MeV/c];Proton Pos. [ns]","",slice,Nbin_pos);
-  TH2F* h_coin_mom  = new TH2F("h_coin_mom;Cointime [ns];Momentum [MeV/c]","",2000,-20.,20.,1000,1730.,1930.);
-  TH2F* h_mom_coin  = new TH2F("h_mom_coin;Momentum [MeV/c];Cointime [ns]","",1000,1730.,1930.,2000,-20.,20.);
-  TH2F* h_mom_coin_pi  = new TH2F("h_mom_coin_pi;Momentum [MeV/c];Cointime [ns]","",1000,1730.,1930.,2000,-20.,20.);
-  TH2F* h_mom_coin_p  = new TH2F("h_mom_coin_p;Momentum [MeV/c];Cointime [ns]","",1000,1730.,1930.,2000,-20.,20.);
+  TH1F* h_path_mom  = new TH1F("h_path_mom;Momentum","h_path_mom;Momentum [MeV/c];Path Length [m]",slice,Nbin_pos);
+  TH1F* h_tdiff_mom  = new TH1F("h_tdiff_mom;Momentum","h_tdiff_mom;Momentum [MeV/c];t_{#pi}-t_{p} [m]",slice,Nbin_pos);
+  TH1F* h_mom_from_ct  = new TH1F("h_mom_from_ct","Mom_from_ct;Momentum [MeV/c];Momentum [MeV/c]",slice,Nbin_pos);
+  TH1F* h_mom_from_cte1  = new TH1F("h_mom_from_cte1","Mom_from_ct;Momentum [MeV/c];Momentum [MeV/c]",slice,Nbin_pos);
+  TH1F* h_mom_from_cte2  = new TH1F("h_mom_from_cte2","Mom_from_ct;Momentum [MeV/c];Momentum [MeV/c]",slice,Nbin_pos);
+  TH1F* h_mom_from_cte3  = new TH1F("h_mom_from_cte3","Mom_from_ct;Momentum [MeV/c];Momentum [MeV/c]",slice,Nbin_pos);
+  TH1F* h_mom_from_cte4  = new TH1F("h_mom_from_cte4","Mom_from_ct;Momentum [MeV/c];Momentum [MeV/c]",slice,Nbin_pos);
+  h_mom_from_cte1->SetLineColor(kRed);
+  h_mom_from_cte2->SetLineColor(kAzure);
+  h_mom_from_cte3->SetLineColor(kGreen);
+  h_mom_from_cte4->SetLineColor(kOrange);
+  TH1F* h_pionpos_mom  = new TH1F("h_pionpos_mom","h_pionpos_mom;Momentum [MeV/c];Pion Pos. [ns]",slice,Nbin_pos);
+  TH1F* h_protonpos_mom  = new TH1F("h_protonpos_mom","h_protonpos_mom;Momentum [MeV/c];Proton Pos. [ns]",slice,Nbin_pos);
+  TH2F* h_coin_mom  = new TH2F("h_coin_mom","h_coin_mom;Cointime [ns];Momentum [MeV/c]",2000,-20.,20.,1000,1730.,1930.);
+  TH2F* h_mom_coin  = new TH2F("h_mom_coin","h_mom_coin;Momentum [MeV/c];Cointime [ns]",1000,1730.,1930.,2000,-20.,20.);
+  TH2F* h_mom_coin_pi  = new TH2F("h_mom_coin_pi","h_mom_coin_pi;Momentum [MeV/c];Cointime [ns]",1000,1730.,1930.,2000,-20.,20.);
+  TH2F* h_mom_coin_p  = new TH2F("h_mom_coin_p","h_mom_coin_p;Momentum [MeV/c];Cointime [ns]",1000,1730.,1930.,2000,-20.,20.);
+  TH2F* h_coin_seg  = new TH2F("h_coin_seg","#LS2seg=5: fixed;Cointime [ns];#Segment",2000,-20.,20.,16,1.,17.);
+  TH2F* h_mom_seg  = new TH2F("h_mom_seg","Mom. vs #Seg;Momentum [GeV/c];#Segment",100,1730.,1930.,16,1.,17.);
+  //h_coin_seg->GetXaxis()->SetTitle("Cointime [ns]");
+  //h_coin_seg->GetYaxis()->SetTitle("#Segment");
+  TH2F* h_coin_seg2  = new TH2F("h_coin_seg2","#LS2seg=#RS2seg;Cointime [ns];#Segment",2000,-20.,20.,16,1.,17.);
+  //h_coin_seg2->GetXaxis()->SetTitle("Cointime [ns]");
+  //h_coin_seg2->GetYaxis()->SetTitle("#Segment");
+  TH1F* hcoin_test = new TH1F("hcoin_test","",40000/56,-20.,20.);
   //TH1F* hcoin  = new TH1F("hcoin","",40000/56,-20.,20.);
   //TH1F* hcoin  = new TH1F("hcoin","",130000/56,-30.,100.);
   TH1F* hcoin[slice];
@@ -353,7 +369,13 @@ cout<<"Entries: "<<ENum<<endl;
 
 		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP)event_selection=true;
 		else event_selection=false;
-		
+
+	bool seg_flag = false;
+	for(int k=0;k<16;k++){
+		if(abs(ct_wseg[k][8])<20.)seg_flag=true;
+	}
+	seg_flag=true;
+if(seg_flag){//&&fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.025){
 		//if(abs(R_mom-1.90)<0.02)hcoin->Fill(ct);
 		for(int i=0;i<slice;i++){
 			//if(abs(R_mom-1.76-0.2*i/(slice+2))<0.1/(slice+2))hcoin[i]->Fill(ct);
@@ -373,6 +395,16 @@ cout<<"Entries: "<<ENum<<endl;
 		h_mom_coin->Fill(R_mom*1000.,ct);
 		if(ac1sum>3.&&ac2sum>3.&&abs(ct-3.15)<1.)h_mom_coin_pi->Fill(R_mom*1000.,ct);
 		if(ac1sum<3.&&ac2sum<3.&&ct>10.*R_mom-27.3&&ct<10.*R_mom-25.3)h_mom_coin_p->Fill(R_mom*1000.,ct);
+		for(int j=0;j<16;j++){
+			//if(ct_wseg[j][j]>-30.)h_coin_seg->Fill(ct_wseg[j][j],h_coin_seg->GetYaxis()->GetBinCenter(j+1));
+			if(ct_wseg[j][j]>-30.)h_coin_seg->Fill(ct_wseg[j][j],h_coin_seg->GetYaxis()->GetBinCenter(j+1));
+			if(ct_wseg[8][j]>-30.)h_mom_seg->Fill(R_mom*1000.,h_mom_seg->GetYaxis()->GetBinCenter(j+1));
+			//if(ct_wseg[5][j]>-30.)h_coin_seg2->Fill(ct_wseg[5][j],h_coin_seg2->GetYaxis()->GetBinCenter(j+1));
+			
+			hcoin_test->Fill(ct_wseg[j][j]);
+		}
+		//	h_coin_seg2->Fill(ct_wseg[LS2_seg][RS2_seg],LS2_seg);
+	}//#LS2seg=#RS2seg=5
 
 }//ENum
 
@@ -394,6 +426,11 @@ cout<<"Entries: "<<ENum<<endl;
 	double pathlen[slice] = {0};
 	double t_diff_sig[slice] = {0};
 	double pathlen_sig[slice] = {0};
+	double mom_from_ct[slice] = {0};
+	double mom_from_cte1[slice] = {0};
+	double mom_from_cte2[slice] = {0};
+	double mom_from_cte3[slice] = {0};
+	double mom_from_cte4[slice] = {0};
 
 		TCanvas *c4 = new TCanvas("c4", "c4", 800, 800);
 //Pion Fitting
@@ -521,6 +558,42 @@ cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 	cout<<"t_diff["<<i<<"]="<<t_diff[i]<<"+/-"<<abs(t_diff_sig[i])<<" [ns]"<<endl;
 	cout<<"pathlen["<<i<<"]="<<pathlen[i]<<"+/-"<<abs(pathlen_sig[i])<<" [m]"<<endl;
 	//cout<<"t_diff_clac="<<t_diff[i]<<"+/-"<<sqrt(pion_parerr1[i]*pion_parerr1[i]+proton_parerr1[i]*proton_parerr1[i])<<endl;
+		double a = 27.3;//m; L
+		double b = LightVelocity*abs(t_diff[i]);//ct_diff
+		double c = Mpi;
+		double d = Mp;
+		double term1 = a*a*b*b*c*c/(4.*a*a*b*b-pow(b,4.));
+		double term2 = a*a*b*b*d*d/(4.*a*a*b*b-pow(b,4.));
+		double term3 = 2.*sqrt(pow(a,4.)*b*b*(a*a*pow(c,4.)-2.*pow(a*c*d,2.)+pow(a*d,2.)*d*d+2.*pow(b*c*d,2.)))/(4.*a*a*b*b-pow(b,4.)); 
+//		mom_from_ct[i]=sqrt(pow(a*c,4.)-2.*pow(a,4.)*c*c*d*d+pow(a*d,4.)-2.*pow(a*b*c,2.)-2.*pow(a*b*d,2.)+pow(b,4.))/2/a/b;
+		//mom_from_ct[i]=sqrt(-term1-term2-term3);
+		mom_from_ct[i]=sqrt(-term1-term2+term3);
+		double dpath = 0.025;
+		double ae1 = 27.3-dpath;//m; L
+		double ae2 = 27.3-dpath;//m; L
+		double ae3 = 27.3+dpath;//m; L
+		double ae4 = 27.3+dpath;//m; L
+		double be1 = LightVelocity*abs(t_diff[i]-t_diff_sig[i]);//ct_diff
+		double be2 = LightVelocity*abs(t_diff[i]+t_diff_sig[i]);//ct_diff
+		double be3 = LightVelocity*abs(t_diff[i]-t_diff_sig[i]);//ct_diff
+		double be4 = LightVelocity*abs(t_diff[i]+t_diff_sig[i]);//ct_diff
+		double term1e1 = ae1*ae1*be1*be1*c*c/(4.*ae1*ae1*be1*be1-pow(be1,4.));
+		double term1e2 = ae2*ae2*be2*be2*c*c/(4.*ae2*ae2*be2*be2-pow(be2,4.));
+		double term1e3 = ae3*ae3*be3*be3*c*c/(4.*ae3*ae3*be3*be3-pow(be3,4.));
+		double term1e4 = ae4*ae4*be4*be4*c*c/(4.*ae4*ae4*be4*be4-pow(be4,4.));
+		double term2e1 = ae1*ae1*be1*be1*d*d/(4.*ae1*ae1*be1*be1-pow(be1,4.));
+		double term2e2 = ae2*ae2*be2*be2*d*d/(4.*ae2*ae2*be2*be2-pow(be2,4.));
+		double term2e3 = ae3*ae3*be3*be3*d*d/(4.*ae3*ae3*be3*be3-pow(be3,4.));
+		double term2e4 = ae4*ae4*be4*be4*d*d/(4.*ae4*ae4*be4*be4-pow(be4,4.));
+		double term3e1 = 2.*sqrt(pow(ae1,4.)*be1*be1*(ae1*ae1*pow(c,4.)-2.*pow(ae1*c*d,2.)+pow(ae1*d,2.)*d*d+2.*pow(be1*c*d,2.)))/(4.*ae1*ae1*be1*be1-pow(be1,4.)); 
+		double term3e2 = 2.*sqrt(pow(ae2,4.)*be2*be2*(ae2*ae2*pow(c,4.)-2.*pow(ae2*c*d,2.)+pow(ae2*d,2.)*d*d+2.*pow(be2*c*d,2.)))/(4.*ae2*ae2*be2*be2-pow(be2,4.)); 
+		double term3e3 = 2.*sqrt(pow(ae3,4.)*be3*be3*(ae3*ae3*pow(c,4.)-2.*pow(ae3*c*d,2.)+pow(ae3*d,2.)*d*d+2.*pow(be3*c*d,2.)))/(4.*ae3*ae3*be3*be3-pow(be3,4.)); 
+		double term3e4 = 2.*sqrt(pow(ae4,4.)*be4*be4*(ae4*ae4*pow(c,4.)-2.*pow(ae4*c*d,2.)+pow(ae4*d,2.)*d*d+2.*pow(be4*c*d,2.)))/(4.*ae4*ae4*be4*be4-pow(be4,4.)); 
+		mom_from_cte1[i]=sqrt(-term1e1-term2e1+term3e1);
+		mom_from_cte2[i]=sqrt(-term1e2-term2e2+term3e2);
+		mom_from_cte3[i]=sqrt(-term1e3-term2e3+term3e3);
+		mom_from_cte4[i]=sqrt(-term1e4-term2e4+term3e4);
+	cout<<"mom_from_ct["<<i<<"]="<<mom_from_ct[i]<<" [GeV/c]"<<endl;
 		h_path_mom->SetBinContent(i+1,pathlen[i]);
 		h_path_mom->SetBinError(i+1,pathlen_sig[i]);
 		h_tdiff_mom->SetBinContent(i+1,abs(t_diff[i]));
@@ -529,6 +602,11 @@ cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 		h_pionpos_mom->SetBinError(i+1,pion_parerr1[i]);
 		h_protonpos_mom->SetBinContent(i+1,proton_par1[i]);
 		h_protonpos_mom->SetBinError(i+1,proton_parerr1[i]);
+		h_mom_from_ct->SetBinContent(i+1,mom_from_ct[i]*1000.);
+		h_mom_from_cte1->SetBinContent(i+1,mom_from_cte1[i]*1000.);
+		h_mom_from_cte2->SetBinContent(i+1,mom_from_cte2[i]*1000.);
+		h_mom_from_cte3->SetBinContent(i+1,mom_from_cte3[i]*1000.);
+		h_mom_from_cte4->SetBinContent(i+1,mom_from_cte4[i]*1000.);
 	}
 
 	TCanvas *c6 = new TCanvas("c6", "c6", 800, 800);
@@ -612,22 +690,18 @@ cout<<proton_par1[i]<<endl;
 	func_shade(c15,f1_path_derr,f1_path_uerr,f1_path);
 	h_path_mom->Draw("esame");
 
-//SURVIVAL RATIO
-	TCanvas *c19 = new TCanvas("c19", "c19", 800, 800);
-	TF1* f1_sr = new TF1("f1_sr", F1_sr, 1730.,1930.,2);
-	f1_sr->SetParameter(0,fpi_line->GetParameter(0)-fp_line->GetParameter(0));
-	f1_sr->SetParameter(1,fpi_line->GetParameter(1)-fp_line->GetParameter(1));
-	//f1_sr->Draw("");
-	//h_path_mom->Draw("esame");
-	TF1* f1_sr_uerr = new TF1("f1_sr_uerr", F1_sr, 1730.,1930.,2);
-	TF1* f1_sr_derr = new TF1("f1_sr_derr", F1_sr, 1730.,1930.,2);
-	f1_sr_derr->SetParameter(0,fpi_line->GetParameter(0)+fpi_line->GetParError(0)-fp_line->GetParameter(0)-fp_line->GetParError(0));
-	f1_sr_derr->SetParameter(1,fpi_line->GetParameter(1)+fpi_line->GetParError(1)-fp_line->GetParameter(1)-fp_line->GetParError(1));
-	f1_sr_uerr->SetParameter(0,fpi_line->GetParameter(0)-fpi_line->GetParError(0)-fp_line->GetParameter(0)+fp_line->GetParError(0));
-	f1_sr_uerr->SetParameter(1,fpi_line->GetParameter(1)-fpi_line->GetParError(1)-fp_line->GetParameter(1)+fp_line->GetParError(1));
-	f1_sr_derr->SetFillColor(kBlue);
-	f1_sr_derr->SetFillStyle(3001);
-	func_shade(c19,f1_sr_derr,f1_sr_uerr,f1_sr);
+	TCanvas *c16 = new TCanvas("c16", "c16", 800, 800);
+	h_coin_seg->Draw("colz");
+	TCanvas *c17 = new TCanvas("c17", "c17", 800, 800);
+//	hcoin_test->Draw("");
+	h_mom_seg->Draw("colz");
+	TCanvas *c18 = new TCanvas("c18", "c18", 800, 800);
+	h_mom_from_ct->Draw("");
+	h_mom_from_cte1->Draw("same");
+	h_mom_from_cte2->Draw("same");
+	h_mom_from_cte3->Draw("same");
+	h_mom_from_cte4->Draw("same");
+	//h_coin_seg2->Draw("colz");
 
 //
 //void fshade() {

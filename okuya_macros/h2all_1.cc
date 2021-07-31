@@ -1137,6 +1137,9 @@ if(dataflag==1){//H2-1
  ctime=-ctime;
  ctime_before=-ctime_before;
 tr.ct_orig=ctime;
+tr.ct_seg[LS2_seg][RS2_seg]=ctime;
+tr.LS2seg=LS2_seg;
+tr.RS2seg=RS2_seg;
     L_tr_vz[lhit]  = L_tr_vz[lhit]*Ztr +Ztm;     // scaled
     R_tr_vz[rhit]  = R_tr_vz[rhit]*Ztr +Ztm;     // scaled
 
@@ -1462,6 +1465,9 @@ void tuning::MakeHist(){
 	tree_out->Branch("dpe_"     ,tr.dpe_   ,"dpe_[10]/D"  );
 	tree_out->Branch("dpk"     ,tr.dpk   ,"dpk[10]/D"  );
 	tree_out->Branch("ct_orig"     ,&tr.ct_orig   ,"ct_orig/D"  );
+	tree_out->Branch("ct_seg"     ,tr.ct_seg   ,"ct_seg[16][16]/D"  );
+	tree_out->Branch("LS2seg"     ,tr.LS2seg   ,"LS2seg/I"  );
+	tree_out->Branch("RS2seg"     ,tr.RS2seg   ,"RS2seg/I"  );
 	tree_out->Branch("ct_itabashi"     ,&tr.ct_itabashi   ,"ct_itabashi/D"  );
 	tree_out->Branch("tr.ntrack_l"  ,&tr.ntrack_l   ,"tr.ntrack_l/I"  );
 	tree_out->Branch("tr.ntrack_r"  ,&tr.ntrack_r   ,"tr.ntrack_r/I"  );
@@ -2283,6 +2289,13 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
     	tr.eps= -1000.;
 		tr.ct_orig= -1000.;
 		tr.ct_itabashi = -1000.;
+		for(int segL=0;segL<16;segL++){
+			for(int segR=0;segR<16;segR++){
+				tr.ct_seg[segL][segR] = -1000.;
+			}
+		}
+		tr.LS2seg= -1000;
+		tr.RS2seg= -1000;
 
 	    tr.AC1_npe_sum=0.0;
 	    tr.AC2_npe_sum=0.0;

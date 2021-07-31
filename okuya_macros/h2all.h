@@ -35,6 +35,9 @@ struct TreeBranch{
   double ct_acc,ct_b,ct_c; 
   double ct_g,ct_gb;
   double ct_orig;
+  double ct_seg[16][16];//with segment info. //2021.7.24 added for PathLength calc. and Mom. calib.
+  int LS2seg;//with segment info. //2021.7.26 added for PathLength calc. and Mom. calib.
+  int RS2seg;//with segment info. //2021.7.26 added for PathLength calc. and Mom. calib.
   double ct_itabashi;
   double Rs0ra_p,Rs0la_p,Rs0a_p;
   double Rs2ra_p[16],Rs2la_p[16],Rs2a_p[16];
