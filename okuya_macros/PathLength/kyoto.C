@@ -555,7 +555,7 @@ cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 	cout<<"t_diff["<<i<<"]="<<t_diff[i]<<"+/-"<<abs(t_diff_sig[i])<<" [ns]"<<endl;
 	cout<<"pathlen["<<i<<"]="<<pathlen[i]<<"+/-"<<abs(pathlen_sig[i])<<" [m]"<<endl;
 	//cout<<"t_diff_clac="<<t_diff[i]<<"+/-"<<sqrt(pion_parerr1[i]*pion_parerr1[i]+proton_parerr1[i]*proton_parerr1[i])<<endl;
-		double a = 27.3;//m; L
+		double a = 26.8;//m; L
 		double b = LightVelocity*abs(t_diff[i]);//ct_diff
 		double c = Mpi;
 		double d = Mp;
@@ -565,11 +565,11 @@ cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 //		mom_from_ct[i]=sqrt(pow(a*c,4.)-2.*pow(a,4.)*c*c*d*d+pow(a*d,4.)-2.*pow(a*b*c,2.)-2.*pow(a*b*d,2.)+pow(b,4.))/2/a/b;
 		//mom_from_ct[i]=sqrt(-term1-term2-term3);
 		mom_from_ct[i]=sqrt(-term1-term2+term3);
-		double dpath = 0.025;
-		double ae1 = 27.3-dpath;//m; L
-		double ae2 = 27.3-dpath;//m; L
-		double ae3 = 27.3+dpath;//m; L
-		double ae4 = 27.3+dpath;//m; L
+		double dpath = 0.25;
+		double ae1 = a-dpath;//m; L
+		double ae2 = a-dpath;//m; L
+		double ae3 = a+dpath;//m; L
+		double ae4 = a+dpath;//m; L
 		double be1 = LightVelocity*abs(t_diff[i]-t_diff_sig[i]);//ct_diff
 		double be2 = LightVelocity*abs(t_diff[i]+t_diff_sig[i]);//ct_diff
 		double be3 = LightVelocity*abs(t_diff[i]-t_diff_sig[i]);//ct_diff

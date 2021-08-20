@@ -9,7 +9,8 @@
 
 void simc_kaon_SR(){
 
-  TFile *file = new TFile("/data/41a/ELS/okuyama/SIMC_jlab/SIMC/rootfiles/decay_L.root","read");//
+  //TFile *file = new TFile("/data/41a/ELS/okuyama/SIMC_jlab/SIMC/rootfiles/decay_L.root","read");//
+  TFile *file = new TFile("/data/41a/ELS/okuyama/SIMC_jlab/SIMC/rootfiles/test0811_1.root","read");//
   TTree *tree = (TTree*)file->Get("SNT");
 
     
@@ -189,7 +190,8 @@ cout<<"Entries: "<<ENum<<endl;
       cout<<i<<" / "<<ENum<<" ("<<i*100/ENum<<"%) : "<<Form("%.0lf sec passed,  %.0lf sec left",diff,esttime)<<endl;
     }
 
-			R_tr_pathl += -1.83*(1.+R_dx*R_dx+R_dy*R_dy);// 183cm (Z_aerogel)
+			//R_tr_pathl += -1.83*(1.+R_dx*R_dx+R_dy*R_dy);// 183cm (Z_aerogel)
+			//R_tr_pathl += -0.5845*(1.+R_dx*R_dx+R_dy*R_dy);// (Final -> S2)
 			hR_mom->Fill(R_mom);
 			hR_T2S2->Fill(R_tr_pathl);
 			hR_T2S2_mom->Fill(R_tr_pathl,R_mom);
@@ -260,7 +262,7 @@ double ave_new[srbin];
 
 	TCanvas* c6 = new TCanvas("c6","c6");
 	TH1F *frame = c6->DrawFrame(1.65,0.,2.,0.20);
-	h_kSR->SetLineColor(kAzure);
+	h_kSR->SetLineColor(kGreen);
 	h_kSR->SetLineWidth(2);
 	h_kSR->Draw("esame");
 

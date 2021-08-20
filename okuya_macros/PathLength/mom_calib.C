@@ -285,7 +285,7 @@ for(int i=0;i<16;i++){
   TH2F* h_mom_coin  = new TH2F("h_mom_coin","h_mom_coin;Momentum [MeV/c];Cointime [ns]",1000,1730.,1930.,2000,-20.,20.);
   TH2F* h_mom_coin_pi  = new TH2F("h_mom_coin_pi","h_mom_coin_pi;Momentum [MeV/c];Cointime [ns]",1000,1730.,1930.,2000,-20.,20.);
   TH2F* h_mom_coin_p  = new TH2F("h_mom_coin_p","h_mom_coin_p;Momentum [MeV/c];Cointime [ns]",1000,1730.,1930.,2000,-20.,20.);
-  TH2F* h_coin_seg  = new TH2F("h_coin_seg","#LS2seg=5: fixed;Cointime [ns];#Segment",2000,-20.,20.,16,1.,17.);
+  TH2F* h_coin_seg  = new TH2F("h_coin_seg","#RS2seg=8: fixed;Cointime [ns];#Segment",2000,-20.,20.,16,1.,17.);
   TH2F* h_mom_seg  = new TH2F("h_mom_seg","Mom. vs #Seg;Momentum [GeV/c];#Segment",100,1730.,1930.,16,1.,17.);
   //h_coin_seg->GetXaxis()->SetTitle("Cointime [ns]");
   //h_coin_seg->GetYaxis()->SetTitle("#Segment");
@@ -397,8 +397,8 @@ if(seg_flag){//&&fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.025){
 		if(ac1sum<3.&&ac2sum<3.&&ct>10.*R_mom-27.3&&ct<10.*R_mom-25.3)h_mom_coin_p->Fill(R_mom*1000.,ct);
 		for(int j=0;j<16;j++){
 			//if(ct_wseg[j][j]>-30.)h_coin_seg->Fill(ct_wseg[j][j],h_coin_seg->GetYaxis()->GetBinCenter(j+1));
-			if(ct_wseg[j][j]>-30.)h_coin_seg->Fill(ct_wseg[j][j],h_coin_seg->GetYaxis()->GetBinCenter(j+1));
-			if(ct_wseg[8][j]>-30.)h_mom_seg->Fill(R_mom*1000.,h_mom_seg->GetYaxis()->GetBinCenter(j+1));
+			if(ct_wseg[j][8]>-30.)h_coin_seg->Fill(ct_wseg[j][8],h_coin_seg->GetYaxis()->GetBinCenter(j+1));
+			if(ct_wseg[j][8]>-30.)h_mom_seg->Fill(R_mom*1000.,h_mom_seg->GetYaxis()->GetBinCenter(j+1));
 			//if(ct_wseg[5][j]>-30.)h_coin_seg2->Fill(ct_wseg[5][j],h_coin_seg2->GetYaxis()->GetBinCenter(j+1));
 			
 			hcoin_test->Fill(ct_wseg[j][j]);
@@ -558,7 +558,7 @@ cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 	cout<<"t_diff["<<i<<"]="<<t_diff[i]<<"+/-"<<abs(t_diff_sig[i])<<" [ns]"<<endl;
 	cout<<"pathlen["<<i<<"]="<<pathlen[i]<<"+/-"<<abs(pathlen_sig[i])<<" [m]"<<endl;
 	//cout<<"t_diff_clac="<<t_diff[i]<<"+/-"<<sqrt(pion_parerr1[i]*pion_parerr1[i]+proton_parerr1[i]*proton_parerr1[i])<<endl;
-		double a = 27.3;//m; L
+		double a = 26.8;//m; L
 		double b = LightVelocity*abs(t_diff[i]);//ct_diff
 		double c = Mpi;
 		double d = Mp;
@@ -568,11 +568,11 @@ cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 //		mom_from_ct[i]=sqrt(pow(a*c,4.)-2.*pow(a,4.)*c*c*d*d+pow(a*d,4.)-2.*pow(a*b*c,2.)-2.*pow(a*b*d,2.)+pow(b,4.))/2/a/b;
 		//mom_from_ct[i]=sqrt(-term1-term2-term3);
 		mom_from_ct[i]=sqrt(-term1-term2+term3);
-		double dpath = 0.025;
-		double ae1 = 27.3-dpath;//m; L
-		double ae2 = 27.3-dpath;//m; L
-		double ae3 = 27.3+dpath;//m; L
-		double ae4 = 27.3+dpath;//m; L
+		double dpath = 0.25;
+		double ae1 = a-dpath;//m; L
+		double ae2 = a-dpath;//m; L
+		double ae3 = a+dpath;//m; L
+		double ae4 = a+dpath;//m; L
 		double be1 = LightVelocity*abs(t_diff[i]-t_diff_sig[i]);//ct_diff
 		double be2 = LightVelocity*abs(t_diff[i]+t_diff_sig[i]);//ct_diff
 		double be3 = LightVelocity*abs(t_diff[i]-t_diff_sig[i]);//ct_diff
