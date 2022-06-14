@@ -533,7 +533,8 @@ cout << "Param file : " << AcceptanceR_table_z9.c_str() << endl;
  //const double fit_min_mm=-0.01;
  //const double fit_max_mm=0.085;
  const double fit_min_mm=-0.005;
- const double fit_max_mm=0.085;
+ //const double fit_max_mm=0.085;
+ const double fit_max_mm=0.100;
  const double fmin_mm=-0.05;
  const double fmax_mm=0.15;
  //const double fmin_mm=-0.01;
@@ -1365,7 +1366,7 @@ cout<<"Entries: "<<ENum<<endl;
 	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm3_1,hcs_bg_new_cm3_1,1.0,-1.0);//3 div.
 	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm3_2,hcs_bg_new_cm3_2,1.0,-1.0);//3 div.
 	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm3_3,hcs_bg_new_cm3_3,1.0,-1.0);//3 div.
-	//hmm_wo_bg_fom_best->Add(hcs_L_new_Qsq2_1,hcs_bg_new_Qsq2_1,1.0,-1.0);//2 div.
+	hmm_wo_bg_fom_best->Add(hcs_L_new_Qsq2_1,hcs_bg_new_Qsq2_1,1.0,-1.0);//2 div.
 	//hmm_wo_bg_fom_best->Add(hcs_L_new_Qsq2_2,hcs_bg_new_Qsq2_2,1.0,-1.0);//2 div.
 	//hmm_wo_bg_fom_best->Add(hcs_L_new_Qsq3_1,hcs_bg_new_Qsq3_1,1.0,-1.0);//3 div.
 	//hmm_wo_bg_fom_best->Add(hcs_L_new_Qsq3_2,hcs_bg_new_Qsq3_2,1.0,-1.0);//3 div.
@@ -1376,7 +1377,7 @@ cout<<"Entries: "<<ENum<<endl;
 	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm4_4,hcs_bg_new_cm4_4,1.0,-1.0);//4 div.
 //MM
 	//hmm_wo_bg_fom_best->Add(hmm_L_fom_strict,hmm_bg_fom_strict,1.0,-1.0);//All
-	hmm_wo_bg_fom_strict->Add(hmm_L_fom_strict,hmm_bg_fom_strict,1.0,-1.0);//All
+	//hmm_wo_bg_fom_strict->Add(hmm_L_fom_strict,hmm_bg_fom_strict,1.0,-1.0);//All
 	//hmm_wo_bg_fom_best->Add(hmm_L_new_cm2_1,hmm_bg_new_cm2_1,1.0,-1.0);//2 div.
 	//hmm_wo_bg_fom_best->Add(hmm_L_new_cm2_2,hmm_bg_new_cm2_2,1.0,-1.0);//2 div.
 	//hmm_wo_bg_fom_best->Add(hmm_L_new_cm3_1,hmm_bg_new_cm3_1,1.0,-1.0);//3 div.
@@ -1934,6 +1935,7 @@ cout<<"BEST CUT START"<<endl;
 	 //fS_best->SetLineColor(kGreen);
 	 //fL_best->Draw("same");
 	 //fS_best->Draw("same");
+	 c2->Print("LS_fitting_20220118.pdf");
 
 //	TCanvas* c3 = new TCanvas("c3","c3");
 //	c3->Divide(2,2);

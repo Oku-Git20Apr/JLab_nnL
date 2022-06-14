@@ -5,6 +5,9 @@
 //%Geant4
 //
 //K. Okuyama (April 27, 2021)
+//K. Okuyama (June 13, 2022)//updated for HYP2022
+//- copied from radiative_2021Apr.C
+//- basically they are the same. but MEA file and acceptance map are updated.
 //
 //taken over from radiative3.C
 //-- after Aluminum cell modeling (April 9, 2021)
@@ -246,7 +249,7 @@ double FMM_Res( double *x, double *par ){
 
 }
 
-void radiative_2021Apr(){
+void radiative_2022(){
 	//BOTH_LS.root === cell thickness ~ 400 um
 	//BOTH_LS_cell.root === cell / sin(13.2deg);
 	//BOTH_LS_cell_x10.root === cell * 10 / sin(13.2deg);
@@ -255,8 +258,8 @@ void radiative_2021Apr(){
 	//radL_Alupdate.root
 	//radS_Alupdate.root
   
-  TFile *file = new TFile("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/h2all_2020Nov.root","read");//w/o internal radiation 2020/12/08
-  TFile *file_mea = new TFile("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/MixedEventAnalysis/bgmea_2021Jan.root","read");
+  TFile *file = new TFile("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/h2all_2020Nov.root","read");
+  TFile *file_mea = new TFile("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/MixedEventAnalysis/bgmea_llccrr_new_2022effK.root","read");//2022/6/11
   //TFile *file_G4 = new TFile("/data/41a/ELS/okuyama/Suzuki_20201208/G4_temp/data/H2_500um_woInRad.root","read");//w/o internal radiation 2020/12/08
   TFile *file_G4 = new TFile("/data/41a/ELS/okuyama/Suzuki_20201208/G4_temp/data/tree_H2_500um_wInRad.root","read");//w/ internal radiation 2020/12/08
 
@@ -480,28 +483,35 @@ void radiative_2021Apr(){
 	float L_phL, L_phR;
 	float S_thL, S_thR;
 	float S_phL, S_phR;
+	float L_L_xfp, L_L_xpfp;
+	float L_R_xfp, L_R_xpfp;
+	float S_L_xfp, S_L_xpfp;
+	float S_R_xfp, S_R_xpfp;
+
 	SNTL->SetBranchStatus("*",0);
 	SNTL->SetBranchStatus("missmass",1);SNTL->SetBranchAddress("missmass",&mm_simcL);
-	//SNTL->SetBranchStatus("Lp_rec",1);SNTL->SetBranchAddress("Lp_rec",&L_momL);
-	//SNTL->SetBranchStatus("e_xptar",1);SNTL->SetBranchAddress("e_xptar",&L_thL);
-    //SNTL->SetBranchStatus("e_yptar"    ,1);SNTL->SetBranchAddress("e_yptar"    ,&L_phL     );
-	//SNTL->SetBranchStatus("Rp_rec",1);SNTL->SetBranchAddress("Rp_rec",&L_momR);
-	//SNTL->SetBranchStatus("h_xptar",1);SNTL->SetBranchAddress("h_xptar",&L_thR);
-    //SNTL->SetBranchStatus("h_yptar"    ,1);SNTL->SetBranchAddress("h_yptar"    ,&L_phR     );
 	SNTL->SetBranchStatus("Lp_orig",1);SNTL->SetBranchAddress("Lp_orig",&L_momL);
-	SNTL->SetBranchStatus("Lth_gen",1);SNTL->SetBranchAddress("Lth_gen",&L_thL);
-    SNTL->SetBranchStatus("Lph_gen"    ,1);SNTL->SetBranchAddress("Lph_gen"    ,&L_phL     );
+	SNTL->SetBranchStatus("Lth_orig",1);SNTL->SetBranchAddress("Lth_orig",&L_thL);
+    SNTL->SetBranchStatus("Lph_orig"    ,1);SNTL->SetBranchAddress("Lph_orig"    ,&L_phL     );
 	SNTL->SetBranchStatus("Rp_orig",1);SNTL->SetBranchAddress("Rp_orig",&L_momR);
-	SNTL->SetBranchStatus("Rth_gen",1);SNTL->SetBranchAddress("Rth_gen",&L_thR);
-    SNTL->SetBranchStatus("Rph_gen"    ,1);SNTL->SetBranchAddress("Rph_gen"    ,&L_phR     );
+	SNTL->SetBranchStatus("Rth_orig",1);SNTL->SetBranchAddress("Rth_orig",&L_thR);
+    SNTL->SetBranchStatus("Rph_orig"    ,1);SNTL->SetBranchAddress("Rph_orig"    ,&L_phR     );
+    SNTL->SetBranchStatus("h_xfp"  ,1);SNTL->SetBranchAddress("h_xfp"  ,&L_R_xfp );
+    SNTL->SetBranchStatus("h_xpfp" ,1);SNTL->SetBranchAddress("h_xpfp" ,&L_R_xpfp);
+    SNTL->SetBranchStatus("e_xfp"  ,1);SNTL->SetBranchAddress("e_xfp"  ,&L_L_xfp );
+    SNTL->SetBranchStatus("e_xpfp" ,1);SNTL->SetBranchAddress("e_xpfp" ,&L_L_xpfp);
 	SNTS->SetBranchStatus("*",0);
 	SNTS->SetBranchStatus("missmass",1);SNTS->SetBranchAddress("missmass",&mm_simcS);
 	SNTS->SetBranchStatus("Lp_orig",1);SNTS->SetBranchAddress("Lp_orig",&S_momL);
-	SNTS->SetBranchStatus("Lth_gen",1);SNTS->SetBranchAddress("Lth_gen",&S_thL);
-    SNTS->SetBranchStatus("Lph_gen"    ,1);SNTS->SetBranchAddress("Lph_gen"    ,&S_phL     );
+	SNTS->SetBranchStatus("Lth_orig",1);SNTS->SetBranchAddress("Lth_orig",&S_thL);
+    SNTS->SetBranchStatus("Lph_orig"    ,1);SNTS->SetBranchAddress("Lph_orig"    ,&S_phL     );
 	SNTS->SetBranchStatus("Rp_orig",1);SNTS->SetBranchAddress("Rp_orig",&S_momR);
-	SNTS->SetBranchStatus("Rth_gen",1);SNTS->SetBranchAddress("Rth_gen",&S_thR);
-    SNTS->SetBranchStatus("Rph_gen"    ,1);SNTS->SetBranchAddress("Rph_gen"    ,&S_phR     );
+	SNTS->SetBranchStatus("Rth_orig",1);SNTS->SetBranchAddress("Rth_orig",&S_thR);
+    SNTS->SetBranchStatus("Rph_orig"    ,1);SNTS->SetBranchAddress("Rph_orig"    ,&S_phR     );
+    SNTS->SetBranchStatus("h_xfp"  ,1);SNTS->SetBranchAddress("h_xfp"  ,&S_R_xfp );
+    SNTS->SetBranchStatus("h_xpfp" ,1);SNTS->SetBranchAddress("h_xpfp" ,&S_R_xpfp);
+    SNTS->SetBranchStatus("e_xfp"  ,1);SNTS->SetBranchAddress("e_xfp"  ,&S_L_xfp );
+    SNTS->SetBranchStatus("e_xpfp" ,1);SNTS->SetBranchAddress("e_xpfp" ,&S_L_xpfp);
 
 
 //SIMC Event Loop//
@@ -613,11 +623,13 @@ cout<<"Entries(SIMC Lambda): "<<ENum_simcL<<endl;
 	//if(L_momR>1.760&&L_momR<1.900&&L_momL>2.010&&L_momL<2.160&&ran<0.15)hmm_simcL->Fill(ran*1000.);//with mom cut
 
 	//cout<<"theta_gk_cm="<<theta_gk_cm*180./PI<<endl;
+	if(L_L_xpfp<0.17*L_L_xfp/100.+0.025&&L_L_xpfp>0.17*L_L_xfp/100.-0.035&&L_L_xpfp<0.40*L_L_xfp/100.+0.130&&L_L_xpfp>0.40*L_L_xfp/100.-0.130&&L_R_xpfp<0.17*L_R_xfp/100.+0.025&&L_R_xpfp>0.17*L_R_xfp/100.-0.035&&L_R_xpfp<0.40*L_R_xfp/100.+0.130&&L_R_xpfp>0.40*L_R_xfp/100.-0.130){
 	//change
-	//if(theta_gk_cm*180./PI>=8.&&L_momR>1.760&&L_momR<1.900&&L_momL>2.010&&L_momL<2.160)hmm_simcL->Fill(ran*1000.);
-	//if(Qsq>=0.5&&L_momR>1.760&&L_momR<1.900&&L_momL>2.010&&L_momL<2.160)hmm_simcL->Fill(ran*1000.);
-	if(L_momR>1.760&&L_momR<1.900&&L_momL>2.010&&L_momL<2.160)hmm_simcL->Fill(ran*1000.);
-	}
+		//if(L_momR>1.760&&L_momR<1.900&&L_momL>2.010&&L_momL<2.160)hmm_simcL->Fill(ran*1000.);
+		if(theta_gk_cm*180./PI>=8.&&L_momR>1.760&&L_momR<1.900&&L_momL>2.010&&L_momL<2.160)hmm_simcL->Fill(ran*1000.);
+		//if(Qsq>=0.5&&L_momR>1.760&&L_momR<1.900&&L_momL>2.010&&L_momL<2.160)hmm_simcL->Fill(ran*1000.);
+	}//FP cut
+}
 
 
 
@@ -723,11 +735,13 @@ cout<<"Entries(SIMC Sigma0): "<<ENum_simcS<<endl;
 	//if(S_momR>1760.&&S_momR<1900.&&S_momL>2010.&&S_momL<2108.)hmm_simcS->Fill(ran*1000.);
 	//if(S_momR>1.760&&S_momR<1.900&&S_momL>2.010&&S_momL<2.160&&ran<0.15)hmm_simcS->Fill(ran*1000.);//with mom cut
 
+	if(S_L_xpfp<0.17*S_L_xfp/100.+0.025&&S_L_xpfp>0.17*S_L_xfp/100.-0.035&&S_L_xpfp<0.40*S_L_xfp/100.+0.130&&S_L_xpfp>0.40*S_L_xfp/100.-0.130&&S_R_xpfp<0.17*S_R_xfp/100.+0.025&&S_R_xpfp>0.17*S_R_xfp/100.-0.035&&S_R_xpfp<0.40*S_R_xfp/100.+0.130&&S_R_xpfp>0.40*S_R_xfp/100.-0.130){
 	//change
-	//if(theta_gk_cm*180./PI>=8.&&S_momR>1.760&&S_momR<1.900&&S_momL>2.010&&S_momL<2.160)hmm_simcS->Fill(ran*1000.);
-	//if(Qsq>=0.5&&S_momR>1.760&&S_momR<1.900&&S_momL>2.010&&S_momL<2.160)hmm_simcS->Fill(ran*1000.);
-	if(S_momR>1.760&&S_momR<1.900&&S_momL>2.010&&S_momL<2.160)hmm_simcS->Fill(ran*1000.);
-	}
+		//if(S_momR>1.760&&S_momR<1.900&&S_momL>2.010&&S_momL<2.160)hmm_simcS->Fill(ran*1000.);
+		if(theta_gk_cm*180./PI>=8.&&S_momR>1.760&&S_momR<1.900&&S_momL>2.010&&S_momL<2.160)hmm_simcS->Fill(ran*1000.);
+		//if(Qsq>=0.5&&S_momR>1.760&&S_momR<1.900&&S_momL>2.010&&S_momL<2.160)hmm_simcS->Fill(ran*1000.);
+	}//FP cut
+}
 
 //  TH1F* hmm_simc  = new TH1F("hmm_simc","hmm_simc",xbin,xmin,xmax);
 //    //char condi[1000];
@@ -770,8 +784,9 @@ cout<<"Entries(G4 Sigma0): "<<ENum_G4S<<endl;
 	double ran = ranS_G4.Gaus((mm_G4S-ML-0.0015),0.001);
 	hmm_G4S->Fill(ran*1000.);
 	}
+//-- Geant4 --//
 
-
+//-- DATA --//
   TH1F* hmm_wo_bg_fom_nocut  = new TH1F("hmm_wo_bg_fom_nocut","hmm_wo_bg_fom_nocut",xbin,xmin,xmax);
   TH1F* hmm_pi_wobg_fom_best  = new TH1F("hmm_pi_wobg_fom_best","hmm_pi_wobg_fom_best",xbin,xmin,xmax);
   TH1F* hmm_pi_wobg_fom_nocut  = new TH1F("hmm_pi_wobg_fom_nocut","hmm_pi_wobg_fom_nocut",xbin,xmin,xmax);
@@ -1063,8 +1078,8 @@ cout<<"Entries: "<<ENum<<endl;
 		//if(tan_lab1!=tan_lab2)cout<<"tan1="<<atan(tan_lab1)<<", tan2="<<atan(tan_lab2)<<"theta_gk_lab="<<theta_gk_lab<<endl;
 
 		//change
-		if(event_selection&&ct_cut)hmm_L_fom_best->Fill(mm*1000.);
-		//if(event_selection&&ct_cut&&theta_gk_cm*180./PI>=8.)hmm_L_fom_best->Fill(mm*1000.);
+		//if(event_selection&&ct_cut)hmm_L_fom_best->Fill(mm*1000.);
+		if(event_selection&&ct_cut&&theta_gk_cm*180./PI>=8.)hmm_L_fom_best->Fill(mm*1000.);
 		//if(event_selection&&ct_cut&&Qsq>=0.5)hmm_L_fom_best->Fill(mm*1000.);
 		if(event_selection_nocut&&ct_cut)hmm_L_fom_nocut->Fill(mm);
 
@@ -1100,9 +1115,9 @@ cout<<"Entries: "<<ENum<<endl;
 
 }//ENum
 	//THStack *hs = (THStack*)file_G4->Get("new_mm1stack0_12");
-	TH1F* hmm_bg_temp = (TH1F*)file_mea->Get("hmm_mixacc_result_new");
 	//change
-	//TH1F* hmm_bg_temp = (TH1F*)file_mea->Get("hmm_mixacc_result_new_cm2_2");
+	//TH1F* hmm_bg_temp = (TH1F*)file_mea->Get("hmm_mixacc_result_new");
+	TH1F* hmm_bg_temp = (TH1F*)file_mea->Get("hmm_mixacc_result_new_cm2_2");
 	//TH1F* hmm_bg_temp = (TH1F*)file_mea->Get("hmm_mixacc_result_new_Qsq2_2");
 
 	for(int i=0;i<300;i++){
@@ -1173,8 +1188,8 @@ cout<<"hmm_L(data): "<<hmm_wobg_fom_best->Integral(hmm_wobg_fom_best->FindBin(de
 	 TGaxis* ay_strict = new TGaxis(-100,-20.,-100,180.,-20.,180.,510);
 
 //change
-	hmm_simcL->Scale(833.828*833.828/357870./833.851);//2021Apr.//Full
-	hmm_simcS->Scale(283.282*283.282/205538./294.881);//2021Apr.//Full
+	//hmm_simcL->Scale(833.828*833.828/357870./833.851);//2021Apr.//Full
+	//hmm_simcS->Scale(283.282*283.282/205538./294.881);//2021Apr.//Full
 	//hmm_simcL->Scale(516.215/171889.);//2021Apr.//Qsq2_1
 	//hmm_simcS->Scale(222.42*222.42/128832./231.118);//2021Apr.//Qsq2_1
 	//hmm_simcL->Scale(317.613/185991.);//2021Apr.//Qsq2_2
@@ -1184,6 +1199,19 @@ cout<<"hmm_L(data): "<<hmm_wobg_fom_best->Integral(hmm_wobg_fom_best->FindBin(de
 	//hmm_simcS->Scale(283.282*283.282/204959./295.921);//2021Apr.//MAX
 	//hmm_simcL->Scale(833.828/330870.);//2021Apr.//MAX
 	//hmm_simcS->Scale(283.282*283.282/202332./299.470);//2021Apr.//MAX
+	
+	//hmm_simcL->Scale(840.453/354084.);//2022//Full(gen)
+	//hmm_simcS->Scale(295.703*295.703/187535./314.213);//2022//Full(gen)
+	//hmm_simcL->Scale(836.453/357066.);//2022//Full
+	//hmm_simcS->Scale(285.696*285.696/199277./296.423);//2022//Full
+	//hmm_simcL->Scale(518./171561.);//2022//Qsq2_1
+	//hmm_simcS->Scale(223.993*223.993/124466./232.84);//2022//Qsq2_1
+	//hmm_simcL->Scale(318.454/185505.);//2022//Qsq2_2
+	//hmm_simcS->Scale(61.7035*61.7035/74811./65.7607);//2022//Qsq2_2
+	//hmm_simcL->Scale(440.84/205483.);//2022//cm2_1
+	//hmm_simcS->Scale(105.808*105.808/98027./111.881);//2022//cm2_1
+	hmm_simcL->Scale(395.613/151583.);//2022//cm2_1
+	hmm_simcS->Scale(179.888*179.888/102148./183.489);//2022//cm2_1
 
 	hmm_simc->Add(hmm_simcL,hmm_simcS,1.0,1.0);
 	hmm_simc->SetLineColor(kRed);
@@ -1193,18 +1221,18 @@ cout<<"hmm_L(data): "<<hmm_wobg_fom_best->Integral(hmm_wobg_fom_best->FindBin(de
 	 ay_strict->Draw("same");
 	hmm_simc->SetLineWidth(4);
 	hmm_simc->Draw("Psame");
-cout<<"Data vs SIMC (Lambda)"<<endl;
+cout<<"Step1: Data vs SIMC (Lambda)"<<endl;
 cout<<"hmm_simc: "<<hmm_simc->Integral(hmm_simc->FindBin(-6),hmm_simc->FindBin(6.))<<endl;
 cout<<"hmm_L(data): "<<hmm_wobg_fom_best->Integral(hmm_wobg_fom_best->FindBin(-6),hmm_wobg_fom_best->FindBin(6.))<<endl;
-cout<<"Data vs SIMC (Sigma0)"<<endl;
+cout<<"Step2: Data vs SIMC (Sigma0)"<<endl;
 cout<<"hmm_simc(L+S for scaling): "<<hmm_simc->Integral(hmm_simc->FindBin(def_mean_S*1000.-6),hmm_simc->FindBin(def_mean_S*1000.+6.))<<endl;
 cout<<"hmm_L(data) L+S for scaling: "<<hmm_wobg_fom_best->Integral(hmm_wobg_fom_best->FindBin(def_mean_S*1000.-6),hmm_wobg_fom_best->FindBin(def_mean_S*1000.+6.))<<endl;
 
 cout<<"Total"<<endl;
 cout<<"hmm_G4L: "<<hmm_G4L->Integral()<<endl;
 cout<<"hmm_G4S: "<<hmm_G4S->Integral()<<endl;
-cout<<"hmm_simcL: "<<hmm_simcL->Integral()<<endl;
-cout<<"hmm_simcS: "<<hmm_simcS->Integral()<<endl;
+cout<<"hmm_simcL(result): "<<hmm_simcL->Integral()<<endl;
+cout<<"hmm_simcS(result): "<<hmm_simcS->Integral()<<endl;
 cout<<"hmm_data: "<<hmm_wobg_fom_best->Integral()<<endl;
 cout<<"hmm_G4: "<<hmm_G4->Integral()<<endl;
 cout<<"hmm_simc: "<<hmm_simc->Integral()<<endl;

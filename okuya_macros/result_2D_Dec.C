@@ -512,10 +512,11 @@ cout << "Param file : " << AcceptanceR_table_z9.c_str() << endl;
  //const double fit_max_mm=0.085;
  const double fit_min_mm=-0.005;
  const double fit_max_mm=0.085;
-// const double fmin_mm=-0.05;
-// const double fmax_mm=2.20;
- const double fmin_mm=-0.05;
- const double fmax_mm=0.15;
+//change
+ //const double fmin_mm=-0.05;//out of range
+ //const double fmax_mm=2.20;//out of range
+ const double fmin_mm=-0.05;//Full (Mom cut)
+ const double fmax_mm=0.15;//Full (Mom cut)
  //const double fmin_mm=-0.01;
  //const double fmax_mm=0.12;
  //const double fmax_mm=10.;
@@ -1320,7 +1321,7 @@ cout<<"Entries: "<<ENum<<endl;
 //Choose one from the list below
 //===CHANGE===//
 	//hmm_wo_bg_fom_best->Add(hcs_L_fom_strict,hmm_bg_fom_strict,1.0,-1.0);//All
-	//hmm_wo_bg_fom_best->Add(hcs_L_fom_strict,hcs_bg_fom_strict,1.0,-1.0);//All by hcs
+	hmm_wo_bg_fom_best->Add(hcs_L_fom_strict,hcs_bg_fom_strict,1.0,-1.0);//All by hcs
 	//hmm_wo_bg_fom_best->Add(hmm_L_fom_strict,hmm_bg_fom_strict,1.0,-1.0);//All by hmm
 	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm2_1,hcs_bg_new_cm2_1,1.0,-1.0);//2 div.
 	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm2_2,hcs_bg_new_cm2_2,1.0,-1.0);//2 div.
@@ -1337,7 +1338,7 @@ cout<<"Entries: "<<ENum<<endl;
 	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm4_3,hcs_bg_new_cm4_3,1.0,-1.0);//4 div.
 	//hmm_wo_bg_fom_best->Add(hcs_L_new_cm4_4,hcs_bg_new_cm4_4,1.0,-1.0);//4 div.
 //MM
-	hmm_wo_bg_fom_best->Add(hmm_L_fom_strict,hmm_bg_fom_strict,1.0,-1.0);//All
+	//hmm_wo_bg_fom_best->Add(hmm_L_fom_strict,hmm_bg_fom_strict,1.0,-1.0);//All
 	//hmm_wo_bg_fom_best->Add(hmm_L_new_cm2_1,hmm_bg_new_cm2_1,1.0,-1.0);//2 div.
 	//hmm_wo_bg_fom_best->Add(hmm_L_new_cm2_2,hmm_bg_new_cm2_2,1.0,-1.0);//2 div.
 	//hmm_wo_bg_fom_best->Add(hmm_L_new_cm3_1,hmm_bg_new_cm3_1,1.0,-1.0);//3 div.
@@ -1535,8 +1536,8 @@ cout<<"BEST CUT START"<<endl;
 	 //fmm_best_4Poly->SetParLimits(13,0.645,0.655);
 
 	//change
-	 hmm_wo_bg_fom_best->Fit("fmm_best_4Poly","N","N",fit_min_mm,fit_max_mm);//Total fitting w/ 4Poly BG
-	 //hmm_wo_bg_fom_best->Fit("fmm_best_4Poly","","",fit_min_mm,fit_max_mm);//Total fitting w/ 4Poly BG
+	 //hmm_wo_bg_fom_best->Fit("fmm_best_4Poly","N","N",fit_min_mm,fit_max_mm);//Total fitting w/ 4Poly BG
+	 hmm_wo_bg_fom_best->Fit("fmm_best_4Poly","","",fit_min_mm,fit_max_mm);//Total fitting w/ 4Poly BG
 	 double chisq = fmm_best_4Poly->GetChisquare();
 	 double dof  = fmm_best_4Poly->GetNDF();
 	 cout<<"chisq="<<chisq<<endl;
