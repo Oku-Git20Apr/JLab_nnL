@@ -1,7 +1,12 @@
 //------------------//
-// VP Flux Integral //
+// Acceptance map   //
+//  for HRS-L       //
 //------------------//
-
+//K. Okuyama (2022.5.25)
+//K. Okuyama (2022.6.11) add SIMC FP cut 
+//  taken over from vpflux_mthesis.cc
+//  (corresponding to acceptanceR_mthesis.cc for HRS-R)
+//mom bin: 150=>100
 
 
 #include <iostream>
@@ -23,41 +28,12 @@
 #include "TLine.h"
 #include "TRandom.h"
 #include "TLorentzVector.h"
+
 using namespace std;
 void SetTitle( TH2D*, const char*, const char*, const char*);
 void SetTitle( TH1D*, const char*, const char*, const char*);
 
 static const double PI = 4.*atan(1.0);
-
-double vpflux_lab(double *par){
-	double Einc  = 4.3;//[GeV]
-	//double Escat = 2.1;//[GeV]
-	double Escat = par[0];//[GeV]
-	double theta = par[1];	
-
-	double Me=511.*pow(10.,-6.);//[GeV/c^2]
-	double Mp=0.9382720;//[GeV/c^2]
-	double Qsq=2*Einc*Escat*(1-cos(theta));
-	double omega = Einc - Escat;
-	double q2=Qsq+omega*omega;
-	double kg=omega-Qsq/(2*Mp);
-	double eps=1/(1+2*(q2/Qsq)*tan(theta/2)*tan(theta/2));
-//if(theta>0.230&&theta<0.231){
-//cout<<"Qsq="<<Qsq<<endl;
-//cout<<"q2="<<q2<<endl;
-//cout<<"kg="<<kg<<endl;
-//cout<<"eps="<<eps<<endl;
-//}
-
-	double vpflux=Escat*kg/(137*2*PI*PI*Einc*Qsq*(1-eps));
-	return vpflux;
-}
-//TF1* func3 = new TF1("func3",vpflux_lab, 0.001, 0.3,1);
-//func3->SetNpx(600);
-//func3->SetParameter(0,2.1);
-//func3->SetLineColor(kGreen);
-//func3->SetLineWidth(4);
-//func3->Draw("same");
 
 int main(int argc, char** argv){
 	//////////////////////
@@ -68,56 +44,38 @@ int main(int argc, char** argv){
 	//label
 	//string filename = "LHRS_new";//tehta_width=0.067 rad
 	//string filename = "LHRS_big";//thetawidth=0.1 rad
-	string filename = "LHRS_Lambda_grnd";//thetawidth=0.1 rad
-	//string filename = "LHRS_datafit";//thetawidth=0.1 rad
+	//string filename = "LHRS_Lambda_grnd";//thetawidth=0.1 rad
 	//string filename = "LHRS_SigmaZ_grnd";//thetawidth=0.1 rad
+	//string filename = "LHRS_grnd";//thetawidth=0.1 rad //new 2022/5/25
+	//string filename = "LHRS_grnd_test1M";//thetawidth=0.1 rad //new 2022/6/5
+	//string filename = "LHRS_grnd_test1M_2";//thetawidth=0.1 rad //new 2022/6/5
+	//string filename = "LHRS_grnd_test1M_3";//thetawidth=0.1 rad //new 2022/6/5
+	//string filename = "LHRS_grnd_test1M_4";//thetawidth=0.1 rad //new 2022/6/7
+	//string filename = "LHRS_grnd_test1M_5";//thetawidth=0.1 rad //new 2022/6/7
+	//string filename = "LHRS_grnd_test1M_6";//thetawidth=0.1 rad //new 2022/6/7
+	//string filename = "LHRS_grnd_test1M_7";//thetawidth=0.1 rad //new 2022/6/7
+	//string filename = "LHRS_grnd_test1M_8";//thetawidth=0.1 rad //new 2022/6/7
+	string filename = "LHRS_grnd_large";//thetawidth=0.1 rad //new 2022/6/2
 	//string filename = "BOTH";
 	//string filename = "RHRS";
 	bool BatchFlag = false;
-	bool PDFFlag = true;
-	while((option=getopt(argc, argv, "f:bp"))!=-1){
-		switch(option){
-			case 'f':
-				filename = optarg;
-				break;
-			case 'b':
-				cout << "batch mode" << endl;
-				BatchFlag = true;
-				break;
-			case 'p':
-				PDFFlag = true;
-				break;
-			case 'h':
-				cout<<"-f : input root filename"<<endl;
-				cout<<"-b : execute in batch mode"<<endl;
-				cout<<"-p : print pdf file"<<endl;
-				return 0;
-				break;
-			case '?':
-				cout << "unknown option: " << option << endl;
-				return 0;
-				break;
-			default:
-				cout<<"type -h to see help!!"<<endl;
-				return 0;
-				break;
-		}
-	}
+	bool PDFFlag = false;
+
   TApplication theApp("App", &argc, argv);
 	ostringstream RootFile;
 	ostringstream PDFFile;
 	RootFile << "../" << filename << ".root";	
-	PDFFile << "./vpflux.pdf";	
+	PDFFile  << "./"  << filename << ".pdf";	
 
 	///////////////////////
 	// General condition //
 	///////////////////////
-  gROOT->SetStyle("Plain");
-  gStyle->SetTitleFontSize(0.05);
-  gStyle->SetTitleSize(0.05, "X");
-  gStyle->SetTitleSize(0.05, "Y");
-  gStyle->SetTitleOffset(0.9, "X");
-  gStyle->SetTitleOffset(0.9, "Y");
+    gROOT->SetStyle("Plain");
+    gStyle->SetTitleFontSize(0.05);
+    gStyle->SetTitleSize(0.05, "X");
+    gStyle->SetTitleSize(0.05, "Y");
+    gStyle->SetTitleOffset(0.9, "X");
+    gStyle->SetTitleOffset(0.9, "Y");
 	gStyle->SetOptStat(0);
 	gStyle->SetPadGridX(0);
 	gStyle->SetPadGridY(0);
@@ -127,7 +85,6 @@ int main(int argc, char** argv){
     char str[SizeOfBuffer];
 	double centralmom, centraltheta, thetawidth;
 	double centralphi, phiwidth;
-
 
 	
 	centraltheta=13.2*PI/180.;
@@ -159,10 +116,10 @@ int main(int argc, char** argv){
 	cout<< "volume = " << volume <<endl;
 
 
-	int bin_mom = 150;
+	int bin_mom = 100;
 	double min_mom = 1.9;//nnL
 	double max_mom = 2.3;//nnL
-	int bin_th = 150;
+	int bin_th = 100;
 	//double min_th = 0.10;
 	//double max_th = 0.35;
 	double min_th = 0.95;//cos
@@ -178,25 +135,17 @@ int main(int argc, char** argv){
 	TH1D *h_sa_mom_result = new TH1D("h_sa_mom_result", "", bin_mom, min_mom, max_mom);
 	//t->Project("h_mom_result","Lp_orig");
 	
-	//TH1D *h_mom_gen_cm = new TH1D( "h_mom_gen_cm", "", bin_mom, min_mom_cm, max_mom_cm);
-	//TH1D *h_mom_result_cm = new TH1D( "h_mom_result_cm", "", bin_mom, min_mom_cm, max_mom_cm);
-	//TH1D *h_sa_mom_result_cm = new TH1D("h_sa_mom_result_cm", "", bin_mom, min_mom_cm, max_mom_cm);
-
 	TH1D *h_vp_mom = new TH1D( "h_vp_mom", "", bin_mom, min_mom, max_mom);
 	TH1D *h_vp_mom2 = new TH1D( "h_vp_mom2", "w/ HRS-R Acceptance", bin_mom, min_mom, max_mom);
 	TH1D *h_vp_mom_result = new TH1D("h_vp_mom_result", "", bin_mom, min_mom, max_mom);
-	TH1D *h_vp_mom_result2 = new TH1D("h_vp_mom_result2", "", bin_mom, min_mom, max_mom);//w/ RHRS Acceptance
-	TH1D *h_vp_mom_result3 = new TH1D("h_vp_mom_result3", "", bin_mom, min_mom*1000., max_mom*1000.);//w/ RHRS Acceptance
-	SetTitle(h_vp_mom_result3, "", "Momentum [MeV/c]", "Integrated VP Flux [#gamma#lower[-0.2]{#scale[0.5]{#bullet}}MeV^{-1}#lower[-0.2]{#scale[0.5]{#bullet}}electron^{-1}]");
-	//h_vp_mom_result3->GetXaxis()->SetNdivisions(505, kFALSE);
-	//h_vp_mom_result3->SetMarkerColor(kBlack);
-	h_vp_mom_result3->SetLineColor(kBlack);
-	h_vp_mom_result3->SetLineWidth(2);
+	TH1D *h_vp_mom_result2 = new TH1D("h_vp_mom_result2", "w/ HRS-R Acceptance", bin_mom, min_mom, max_mom);//w/ RHRS Acceptance
 	TH2D *h_th_mom = new TH2D( "h_th_mom", "", bin_2D_th, 0.,20.,bin_2D_mom, 1.95, 2.25);
 	TH2D *h_momL_momR = new TH2D( "h_momL_momR", "", 50, 1.73, 1.93 ,50., 1.95, 2.25);
 	TH1D *h_momL = new TH1D( "h_momL", "", 200,1.95,2.25);
 	TH1D *h_th_cm = new TH1D( "h_th_cm", "", 100.,0.,20.);
 	TH1D *h_th_cm2 = new TH1D( "h_th_cm2", "", 100.,0.,20.);
+	TH2D *h2_test1 = new TH2D( "h2_test1", "before FP cut", 100.,-0.6,0.6,100.,-0.1,0.1);
+	TH2D *h2_test2 = new TH2D( "h2_test2", "after FP cut", 100.,-0.6,0.6,100.,-0.1,0.1);
 
 	int n1, n2;
 	double val;
@@ -217,23 +166,41 @@ int main(int argc, char** argv){
 	float L_mom=0.;
 	float L_th=0.;
 	float L_ph=0.;
+	float vertex=0.;
+	float R_xfp=0.;
+	float R_xpfp=0.;
+	float R_yfp=0.;
+	float R_ypfp=0.;
+	float L_xfp=0.;
+	float L_xpfp=0.;
+	float L_yfp=0.;
+	float L_ypfp=0.;
 	tree->SetBranchStatus("*",0);
-	tree->SetBranchStatus("Rp_gen",1);tree->SetBranchAddress("Rp_gen",&R_mom);
-	tree->SetBranchStatus("Rth_gen",1);tree->SetBranchAddress("Rth_gen",&R_th);
-    tree->SetBranchStatus("Rph_gen"    ,1);tree->SetBranchAddress("Rph_gen"    ,&R_ph     );
-	tree->SetBranchStatus("Lp_gen",1);tree->SetBranchAddress("Lp_gen",&L_mom);
-	tree->SetBranchStatus("Lth_gen",1);tree->SetBranchAddress("Lth_gen",&L_th);
-    tree->SetBranchStatus("Lph_gen"    ,1);tree->SetBranchAddress("Lph_gen"    ,&L_ph     );
+	tree->SetBranchStatus("Rp_gen" ,1);tree->SetBranchAddress("Rp_gen" ,&R_mom );
+	tree->SetBranchStatus("Rth_gen",1);tree->SetBranchAddress("Rth_gen",&R_th  );
+    tree->SetBranchStatus("Rph_gen",1);tree->SetBranchAddress("Rph_gen",&R_ph  );
+	tree->SetBranchStatus("Lp_gen" ,1);tree->SetBranchAddress("Lp_gen" ,&L_mom );
+	tree->SetBranchStatus("Lth_gen",1);tree->SetBranchAddress("Lth_gen",&L_th  );
+    tree->SetBranchStatus("Lph_gen",1);tree->SetBranchAddress("Lph_gen",&L_ph  );
+    tree->SetBranchStatus("zposi"  ,1);tree->SetBranchAddress("zposi"  ,&vertex);
+    tree->SetBranchStatus("h_xfp"  ,1);tree->SetBranchAddress("h_xfp"  ,&R_xfp );
+    tree->SetBranchStatus("h_xpfp" ,1);tree->SetBranchAddress("h_xpfp" ,&R_xpfp);
+    tree->SetBranchStatus("h_yfp"  ,1);tree->SetBranchAddress("h_yfp"  ,&R_yfp );
+    tree->SetBranchStatus("h_ypfp" ,1);tree->SetBranchAddress("h_ypfp" ,&R_ypfp);
+    tree->SetBranchStatus("e_xfp"  ,1);tree->SetBranchAddress("e_xfp"  ,&L_xfp );
+    tree->SetBranchStatus("e_xpfp" ,1);tree->SetBranchAddress("e_xpfp" ,&L_xpfp);
+    tree->SetBranchStatus("e_yfp"  ,1);tree->SetBranchAddress("e_yfp"  ,&L_yfp );
+    tree->SetBranchStatus("e_ypfp" ,1);tree->SetBranchAddress("e_ypfp" ,&L_ypfp);
     ENum = tree->GetEntries();
   for(int i=0;i<ENum;i++){
     tree->GetEntry(i);
     if(i%100000==0)cout<<i<<" / "<<ENum<<endl;
+	h2_test1->Fill(L_xfp/100.,L_xpfp);//before FP cut
+	if(L_xpfp<0.17*L_xfp/100.+0.025&&L_xpfp>0.17*L_xfp/100.-0.035&&L_xpfp<0.40*L_xfp/100.+0.130&&L_xpfp>0.40*L_xfp/100.-0.130){}else{continue;}
+	h2_test2->Fill(L_xfp/100.,L_xpfp);//after FP cut
 	
 	L_mom /= 1000.;//MeV-->GeV
 	R_mom /= 1000.;//MeV-->GeV
-	//R_mom = 1.85;//GeV/c
-	//R_th=0.;
-	//R_ph=0.;
 	double Einc  = 4.318;//[GeV]
 	//double Escat = 2.1;//[GeV]
 	double Escat = L_mom;//[GeV]
@@ -253,14 +220,16 @@ int main(int argc, char** argv){
 		//h_mom_gen->SetBinContent(h_mom_gen->FindBin(mom),deltaE);
 		//h_mom_result->SetBinContent(h_mom_gen->FindBin(mom),mom);
 		for(int i=0;i<bin_mom;i++){
-		//h_mom_gen->SetBinContent(i,26147*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//first try
-		//h_mom_gen->SetBinContent(i,2583235*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//LHRS 1,000,000 (2020/10/4)
-		//h_mom_gen->SetBinContent(i,2582007*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//LHRS_new 1,000,000 (2020/10/17)// true density
-		//h_mom_gen->SetBinContent(i,5688035*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//LHRS_big 1,000,000 (2020/10/27)
-		h_mom_gen->SetBinContent(i,5695419*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//LHRS_Lambda_grnd 1,000,000 (2020/11/22)
-		//h_mom_gen->SetBinContent(i,5990331*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//LHRS_datafit 1,000,000 (2021/1/6)
-		//h_mom_gen->SetBinContent(i,5696881*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//LHRS_SigmaZ_grnd 1,000,000 (2020/11/22)
-		//h_mom_gen->SetBinContent(i,2549979*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//RHRS 1,000,000 (2020/10/4)
+		//h_mom_gen->SetBinContent(i,5695419*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//LHRS_grnd 1,000,000 (2022/5/27), z-partition factor 0.1
+		//h_mom_gen->SetBinContent(i,5626418*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//LHRS_grnd_test1M 1,000,000 (2022/6/5), z-partition factor 0.1
+		//h_mom_gen->SetBinContent(i,5626418*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//LHRS_grnd_test1M_2 1,000,000 (2022/6/5), z-partition factor 0.1
+		//h_mom_gen->SetBinContent(i,5608381*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//LHRS_grnd_test1M_3 1,000,000 (2022/6/5), z-partition factor 0.1
+		//h_mom_gen->SetBinContent(i,5608381*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//LHRS_grnd_test1M_4 1,000,000 (2022/6/5), z-partition factor 0.1
+		//h_mom_gen->SetBinContent(i,5608381*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//LHRS_grnd_test1M_5 1,000,000 (2022/6/5), z-partition factor 0.1
+		//h_mom_gen->SetBinContent(i,5610546*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//LHRS_grnd_test1M_6 1,000,000 (2022/6/5), z-partition factor 0.1
+		//h_mom_gen->SetBinContent(i,5610567*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//LHRS_grnd_test1M_7 1,000,000 (2022/6/5), z-partition factor 0.1
+		//h_mom_gen->SetBinContent(i,5583538*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//LHRS_grnd_test1M_8 1,000,000 (2022/6/5), z-partition factor 0.1
+		h_mom_gen->SetBinContent(i,56276976*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//LHRS_grnd_large 10,000,000 (2022/6/2), z-partition factor 0.1
 		}
 	double vpflux=Escat*kg/(137*2*PI*PI*Einc*Qsq*(1-eps));
 	double k = MAX*gRandom->Uniform();
@@ -269,8 +238,7 @@ int main(int argc, char** argv){
 //cout<<"q2="<<q2<<endl;
 //cout<<"kg="<<kg<<endl;
 //cout<<"eps="<<eps<<endl;
-
-	//cout<<"vpflux vs k = "<<vpflux<<" : "<<k<<endl;
+//cout<<"vpflux vs k = "<<vpflux<<" : "<<k<<endl;
 	
 	    //===== Right Hand Coordinate ====//
 	    //th and phi are originally meant tan(theta) and tan(phi),
@@ -381,7 +349,7 @@ int main(int argc, char** argv){
 //===Angle partition===//
 		//h_mom_result->Fill(L_mom);
 		//if(theta_gk_cm*180./PI>=6.&&theta_gk_cm*180./PI<10.)h_mom_result->Fill(L_mom);
-		h_mom_result->Fill(L_mom);
+		if(8.<=vertex&&vertex<10.)h_mom_result->Fill(L_mom);//zzz
 		//h_mom_result->Fill(L_mom);
 		h_th_mom->Fill(theta_gk_cm*180./PI,L_mom);
 		h_momL_momR->Fill(R_mom,L_mom);
@@ -390,22 +358,16 @@ int main(int argc, char** argv){
 		if(L_mom<2.12)h_th_cm2->Fill(theta_gk_cm*180./PI);
 	 if(vpflux>k){//Full
 		h_vp_mom->Fill(L_mom);
-		//if(L_mom>2.08&&theta_gk_cm*180./PI>=6.&&theta_gk_cm*180./PI<10.)
-		if(L_mom>2.04&&L_mom<2.17){
+		//if(L_mom>2.08&&theta_gk_cm*180./PI>=6.&&theta_gk_cm*180./PI<10.){
 		//if(L_mom<2.12&&theta_gk_cm*180./PI>=6.&&theta_gk_cm*180./PI<10.){//partition
 //Partition templete
 //L_mom>2.08&&Qsq<0.5 (Lambda, Qsq)
 //L_mom<2.12&&Qsq<0.5 (Sigma0, Qsq)
 //L_mom>2.08&&theta_gk_cm*180./PI<8 (Lambda, theta_gk_cm*180./PI)
 //L_mom<2.12&&theta_gk_cm*180./PI<8 (Sigma0, theta_gk_cm*180./PI)
-		//if(L_mom>2.010&&L_mom<2.160){//Full Mom. cut
-		//if(L_mom>2.092&&L_mom<2.160){//L_mom>2.08(Lambda), L_mom<2.12(Simga0)
-		//if(L_mom<2.108&&L_mom>2.010){//L_mom>2.08(Lambda), L_mom<2.12(Simga0)
 		//change
-		//if(L_mom<2.160&&L_mom>2.092&&theta_gk_cm*180./PI>=8.){//L_mom>2.082(Lambda), L_mom<2.108(Simga0)
-		//if(L_mom<2.160&&L_mom>2.092&&Qsq>=0.5){//L_mom>2.082(Lambda), L_mom<2.108(Simga0)
-		//if(L_mom<2.108&&L_mom>2.010&&theta_gk_cm*180./PI>=8.){//L_mom>2.082(Lambda), L_mom<2.108(Simga0)
-		//if(L_mom<2.108&&L_mom>2.010&&Qsq>=0.5){//L_mom>2.082(Lambda), L_mom<2.108(Simga0)
+		//if(L_mom>2.010&&L_mom<2.108&&theta_gk_cm*180./PI>=8.)//Sigma0
+		if(L_mom>2.092&&L_mom<2.160&&theta_gk_cm*180./PI>=8.){//Lambda
 		h_vp_mom2->Fill(L_mom);
 		//if(L_mom>2.1)h_vp_mom2->Fill(L_mom);
 		}
@@ -543,38 +505,32 @@ int main(int argc, char** argv){
 	h_momL->Draw("");
 
 	TCanvas *c4 = new TCanvas("c4", "c4");
-	h_sa_mom_result->Draw("e2");
+	SetTitle(h_sa_mom_result, "", "Momentum [GeV/c]", "Solid Angle [msr]");
+	h_sa_mom_result->SetMaximum(6.);
+	h_sa_mom_result->SetNdivisions(505);
+	h_sa_mom_result->Draw("e2 same");
 	h_sa_mom_result->Draw("p same");
 
 	TCanvas *c5 = new TCanvas("c5", "c5");
+	SetTitle(h_mom_gen, "", "Momentum [GeV/c]", "Events");
+	h_mom_gen->SetNdivisions(505);
 	h_mom_gen->Draw();
+	h_mom_result->SetNdivisions(505);
 	h_mom_result->SetLineColor(kAzure);
 	h_mom_result->Draw("same");
 
-	//label
-	ofstream fout("vpflux_SIMC.dat");//LHRS
-	//ofstream fout("vpflux_dummy.dat");//RHRS
-		fout<<"#VP Flux Calculation with SIMC Acceptance"<<endl;
-		fout<<"#1.8<pe[GeV/c]<2.4, 150 partition --> 1bin=4MeV/c"<<endl;
-		double vpflux_temp;
-		double vpflux_total=0.;
-	for(int i=0; i<bin_mom; i++){
-		vpflux_temp = h_vp_mom_result2->GetBinContent(i+1);
-		double vpflux_tempe = h_vp_mom_result2->GetBinError(i+1);
-		h_vp_mom_result3->SetBinContent(i+1,vpflux_temp*0.001);
-		h_vp_mom_result3->SetBinError(i+1,vpflux_tempe*0.001);
-		double vpflux_temp_ = vpflux_temp;// * 0.004/bin_mom;
-		fout<<i+1<<" "<<vpflux_temp_<<endl;
-		vpflux_total+=vpflux_temp_;
-	}
-	
-	cout<<"vpflux_total="<<vpflux_total<<endl;
 	TCanvas *c6 = new TCanvas("c6", "c6");
-	h_vp_mom_result3->Draw("E");
-c6->Print("vpflux_full_MeV.pdf");
+	SetTitle(h_vp_mom_result, "", "Momentum [GeV/c]", "Integrated VP Flux [#gamma#lower[-0.2]{#scale[0.5]{#bullet}}GeV^{-1}#lower[-0.2]{#scale[0.5]{#bullet}}electron^{-1}]");
+	h_vp_mom_result->SetNdivisions(505);
+	h_vp_mom_result->Draw("");
+	
+	TCanvas *c10 = new TCanvas("c10", "FP cut");
+	c10->Divide(2,1);
+	c10->cd(1);
+	h2_test1->Draw("colz");
+	c10->cd(2);
+	h2_test2->Draw("colz");
 
-//c4->Print("LHRS_acceptance.pdf");
-//c5->Print("LHRS_mc_gen.pdf");
 
 	if(!BatchFlag){
 		theApp.Run();
@@ -592,24 +548,55 @@ c6->Print("vpflux_full_MeV.pdf");
 //c2->Close();
 //c3->Close();
 	
+//	//label
+//	ofstream fout("vpflux_SIMC.dat");//LHRS
+//	//ofstream fout("vpflux_dummy.dat");//RHRS
+//		fout<<"#VP Flux Calculation with SIMC Acceptance"<<endl;
+//		fout<<"#1.8<pe[GeV/c]<2.4, 150 partition --> 1bin=4MeV/c"<<endl;
+//		double vpflux_temp;
+//		double vpflux_total=0.;
+//	for(int i=0; i<bin_mom; i++){
+//		vpflux_temp = h_vp_mom_result2->GetBinContent(i+1);
+//		vpflux_temp = vpflux_temp;// * 0.004/bin_mom;
+//		fout<<i+1<<" "<<vpflux_temp<<endl;
+//		vpflux_total+=vpflux_temp;
+//	}
+//	
+//	cout<<"vpflux_total="<<vpflux_total<<endl;
+//
+//	//label
+//	ofstream fout2("LHRS_SIMC.dat");//LHRS
+//	//ofstream fout2("RHRS_SIMC.dat");//RHRS
+//		fout2<<"#Acceptance by SIMC"<<endl;
+//		fout2<<"#1.8<pe[GeV/c]<2.4, 150 partition --> 1bin=4MeV/c"<<endl;
+//		double Acceptance_temp;
+//		double Acceptance_total=0.;
+//		int Acceptance_bin=0;
+//	for(int i=0; i<bin_mom; i++){
+//		Acceptance_temp = h_sa_mom_result->GetBinContent(i+1);
+//		Acceptance_temp = Acceptance_temp;
+//		fout2<<i+1<<" "<<Acceptance_temp<<endl;
+//		Acceptance_total+=Acceptance_temp;
+//		if(Acceptance_temp!=0)Acceptance_bin++;
+//	}
+//	cout<<"Acceptance (average)="<<Acceptance_total/(double)Acceptance_bin<<endl;
 
-	//label
-	ofstream fout2("LHRS_SIMC.dat");//LHRS
-	//ofstream fout2("RHRS_SIMC.dat");//RHRS
+	ofstream fout2("LHRS_SIMC100bin_10_z9.dat");//LHRS//zzz
+	//ofstream fout2("LHRS_SIMC10.dat");//LHRS//zzz
 		fout2<<"#Acceptance by SIMC"<<endl;
-		fout2<<"#1.8<pe[GeV/c]<2.4, 150 partition --> 1bin=4MeV/c"<<endl;
+		fout2<<"#1.9<pe[GeV/c]<2.3, 100 partition --> 1bin=4MeV/c"<<endl;
 		double Acceptance_temp;
 		double Acceptance_total=0.;
 		int Acceptance_bin=0;
 	for(int i=0; i<bin_mom; i++){
 		Acceptance_temp = h_sa_mom_result->GetBinContent(i+1);
-		Acceptance_temp = Acceptance_temp;
-		fout2<<i+1<<" "<<Acceptance_temp<<endl;
+		fout2<<i+1<<" "<<h_sa_mom_result->GetBinContent(i+1)<<" "<<h_sa_mom_result->GetBinError(i+1)<<endl;
 		Acceptance_total+=Acceptance_temp;
 		if(Acceptance_temp!=0)Acceptance_bin++;
 	}
+//	fout2<<"Acceptance (average)="<<Acceptance_total/(double)Acceptance_bin<<endl;
+	fout2.close();
 	cout<<"Acceptance (average)="<<Acceptance_total/(double)Acceptance_bin<<endl;
-
 
 	cout<< "Finish!" << endl;
 	return 0;

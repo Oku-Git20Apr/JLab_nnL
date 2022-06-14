@@ -1,7 +1,10 @@
-//------------------//
-// VP Flux Integral //
-//------------------//
-
+//------------------------------------//
+//------------------------------------//
+//---   HRS-R Acceptance           ---//
+//------------------------------------//
+//K. Okuyama (Oct. 13, 2020)
+//K. Okuyama (Dec. 17, 2020) M-thesis
+//bin_mom: 150=>100
 
 
 #include <iostream>
@@ -9,8 +12,7 @@
 #include <sstream>
 #include <math.h>
 #include <time.h>
-#include <string>
-
+#include <string> 
 #include "TStyle.h"
 #include "TROOT.h"
 #include "TApplication.h"
@@ -29,80 +31,20 @@ void SetTitle( TH1D*, const char*, const char*, const char*);
 
 static const double PI = 4.*atan(1.0);
 
-double vpflux_lab(double *par){
-	double Einc  = 4.3;//[GeV]
-	//double Escat = 2.1;//[GeV]
-	double Escat = par[0];//[GeV]
-	double theta = par[1];	
-
-	double Me=511.*pow(10.,-6.);//[GeV/c^2]
-	double Mp=0.9382720;//[GeV/c^2]
-	double Qsq=2*Einc*Escat*(1-cos(theta));
-	double omega = Einc - Escat;
-	double q2=Qsq+omega*omega;
-	double kg=omega-Qsq/(2*Mp);
-	double eps=1/(1+2*(q2/Qsq)*tan(theta/2)*tan(theta/2));
-//if(theta>0.230&&theta<0.231){
-//cout<<"Qsq="<<Qsq<<endl;
-//cout<<"q2="<<q2<<endl;
-//cout<<"kg="<<kg<<endl;
-//cout<<"eps="<<eps<<endl;
-//}
-
-	double vpflux=Escat*kg/(137*2*PI*PI*Einc*Qsq*(1-eps));
-	return vpflux;
-}
-//TF1* func3 = new TF1("func3",vpflux_lab, 0.001, 0.3,1);
-//func3->SetNpx(600);
-//func3->SetParameter(0,2.1);
-//func3->SetLineColor(kGreen);
-//func3->SetLineWidth(4);
-//func3->Draw("same");
-
 int main(int argc, char** argv){
 	//////////////////////
 	// command argument //
 	//////////////////////
 	int option;
 	//string filename = "1H_kaon";
-	//label
-	//string filename = "LHRS_new";//tehta_width=0.067 rad
-	//string filename = "LHRS_big";//thetawidth=0.1 rad
-	string filename = "LHRS_Lambda_grnd";//thetawidth=0.1 rad
-	//string filename = "LHRS_datafit";//thetawidth=0.1 rad
-	//string filename = "LHRS_SigmaZ_grnd";//thetawidth=0.1 rad
-	//string filename = "BOTH";
-	//string filename = "RHRS";
-	bool BatchFlag = false;
+	//string filename = "RHRS_new";//0<theta_max<0.067
+	//string filename = "RHRS_big";//0<theta_max<0.1
+	string filename = "RHRS_grnd";//0<theta_max<0.1
+	//string filename = "RHRS_cm";//0<theta_max<0.1
+	//string filename = "RHRS2";//0<theta_max<0.1
+	bool BatchFlag = true;
 	bool PDFFlag = true;
-	while((option=getopt(argc, argv, "f:bp"))!=-1){
-		switch(option){
-			case 'f':
-				filename = optarg;
-				break;
-			case 'b':
-				cout << "batch mode" << endl;
-				BatchFlag = true;
-				break;
-			case 'p':
-				PDFFlag = true;
-				break;
-			case 'h':
-				cout<<"-f : input root filename"<<endl;
-				cout<<"-b : execute in batch mode"<<endl;
-				cout<<"-p : print pdf file"<<endl;
-				return 0;
-				break;
-			case '?':
-				cout << "unknown option: " << option << endl;
-				return 0;
-				break;
-			default:
-				cout<<"type -h to see help!!"<<endl;
-				return 0;
-				break;
-		}
-	}
+
   TApplication theApp("App", &argc, argv);
 	ostringstream RootFile;
 	ostringstream PDFFile;
@@ -131,8 +73,9 @@ int main(int argc, char** argv){
 
 	
 	centraltheta=13.2*PI/180.;
-	//thetawidth=0.067;
-	thetawidth=0.1;
+	//thetawidth=0.067;//new
+	thetawidth=0.1;//big
+	//thetawidth=PI;//CM
 	centralphi=0.;
 	phiwidth=2*PI;
 	cout<< "central theta = " << centraltheta*180/PI << " [deg]" << endl;
@@ -149,7 +92,7 @@ int main(int argc, char** argv){
 	double phimax = 1.*(centralphi + phiwidth);
 	double Domega = 2.*PI* (1-cos(thetawidth))*1000.; // [msr]
 	double momwidth = 0.5;
-	double MAX = 0.01;
+	double MAX = 0.00001;
 	double volume = Domega*MAX/1000.; 
 	cout<< "thetamin = " << thetamin*180/PI << " [deg]" <<endl;
 	cout<< "thetamax = " << thetamax*180/PI << " [deg]" <<endl;
@@ -159,10 +102,12 @@ int main(int argc, char** argv){
 	cout<< "volume = " << volume <<endl;
 
 
-	int bin_mom = 150;
-	double min_mom = 1.9;//nnL
-	double max_mom = 2.3;//nnL
-	int bin_th = 150;
+	int bin_mom = 100;
+	double min_mom = 1.6;//nnL
+	double max_mom = 2.0;//nnL
+	double min_mom_cm = 0.45;//nnL
+	double max_mom_cm = 0.85;//nnL
+	int bin_th = 100;
 	//double min_th = 0.10;
 	//double max_th = 0.35;
 	double min_th = 0.95;//cos
@@ -176,28 +121,13 @@ int main(int argc, char** argv){
 	TH1D *h_mom_gen = new TH1D( "h_mom_gen", "", bin_mom, min_mom, max_mom);
 	TH1D *h_mom_result = new TH1D( "h_mom_result", "", bin_mom, min_mom, max_mom);
 	TH1D *h_sa_mom_result = new TH1D("h_sa_mom_result", "", bin_mom, min_mom, max_mom);
-	//t->Project("h_mom_result","Lp_orig");
-	
-	//TH1D *h_mom_gen_cm = new TH1D( "h_mom_gen_cm", "", bin_mom, min_mom_cm, max_mom_cm);
-	//TH1D *h_mom_result_cm = new TH1D( "h_mom_result_cm", "", bin_mom, min_mom_cm, max_mom_cm);
-	//TH1D *h_sa_mom_result_cm = new TH1D("h_sa_mom_result_cm", "", bin_mom, min_mom_cm, max_mom_cm);
+	//t->Project("h_mom_result","Rp_orig");
 
-	TH1D *h_vp_mom = new TH1D( "h_vp_mom", "", bin_mom, min_mom, max_mom);
-	TH1D *h_vp_mom2 = new TH1D( "h_vp_mom2", "w/ HRS-R Acceptance", bin_mom, min_mom, max_mom);
-	TH1D *h_vp_mom_result = new TH1D("h_vp_mom_result", "", bin_mom, min_mom, max_mom);
-	TH1D *h_vp_mom_result2 = new TH1D("h_vp_mom_result2", "", bin_mom, min_mom, max_mom);//w/ RHRS Acceptance
-	TH1D *h_vp_mom_result3 = new TH1D("h_vp_mom_result3", "", bin_mom, min_mom*1000., max_mom*1000.);//w/ RHRS Acceptance
-	SetTitle(h_vp_mom_result3, "", "Momentum [MeV/c]", "Integrated VP Flux [#gamma#lower[-0.2]{#scale[0.5]{#bullet}}MeV^{-1}#lower[-0.2]{#scale[0.5]{#bullet}}electron^{-1}]");
-	//h_vp_mom_result3->GetXaxis()->SetNdivisions(505, kFALSE);
-	//h_vp_mom_result3->SetMarkerColor(kBlack);
-	h_vp_mom_result3->SetLineColor(kBlack);
-	h_vp_mom_result3->SetLineWidth(2);
-	TH2D *h_th_mom = new TH2D( "h_th_mom", "", bin_2D_th, 0.,20.,bin_2D_mom, 1.95, 2.25);
-	TH2D *h_momL_momR = new TH2D( "h_momL_momR", "", 50, 1.73, 1.93 ,50., 1.95, 2.25);
-	TH1D *h_momL = new TH1D( "h_momL", "", 200,1.95,2.25);
-	TH1D *h_th_cm = new TH1D( "h_th_cm", "", 100.,0.,20.);
-	TH1D *h_th_cm2 = new TH1D( "h_th_cm2", "", 100.,0.,20.);
+	TH1D *h_mom_gen_cm = new TH1D( "h_mom_gen_cm", "", bin_mom, min_mom_cm, max_mom_cm);
+	TH1D *h_mom_result_cm = new TH1D( "h_mom_result_cm", "", bin_mom, min_mom_cm, max_mom_cm);
+	TH1D *h_sa_mom_result_cm = new TH1D("h_sa_mom_result_cm", "", bin_mom, min_mom_cm, max_mom_cm);
 
+	TH1D *h_momR = new TH1D( "h_momR", "", 200,1.73,1.93);
 	int n1, n2;
 	double val;
 	double err;
@@ -217,6 +147,7 @@ int main(int argc, char** argv){
 	float L_mom=0.;
 	float L_th=0.;
 	float L_ph=0.;
+	float vertex=0.;
 	tree->SetBranchStatus("*",0);
 	tree->SetBranchStatus("Rp_gen",1);tree->SetBranchAddress("Rp_gen",&R_mom);
 	tree->SetBranchStatus("Rth_gen",1);tree->SetBranchAddress("Rth_gen",&R_th);
@@ -224,6 +155,7 @@ int main(int argc, char** argv){
 	tree->SetBranchStatus("Lp_gen",1);tree->SetBranchAddress("Lp_gen",&L_mom);
 	tree->SetBranchStatus("Lth_gen",1);tree->SetBranchAddress("Lth_gen",&L_th);
     tree->SetBranchStatus("Lph_gen"    ,1);tree->SetBranchAddress("Lph_gen"    ,&L_ph     );
+    tree->SetBranchStatus("zposi"    ,1);tree->SetBranchAddress("zposi"    ,&vertex     );
     ENum = tree->GetEntries();
   for(int i=0;i<ENum;i++){
     tree->GetEntry(i);
@@ -231,9 +163,6 @@ int main(int argc, char** argv){
 	
 	L_mom /= 1000.;//MeV-->GeV
 	R_mom /= 1000.;//MeV-->GeV
-	//R_mom = 1.85;//GeV/c
-	//R_th=0.;
-	//R_ph=0.;
 	double Einc  = 4.318;//[GeV]
 	//double Escat = 2.1;//[GeV]
 	double Escat = L_mom;//[GeV]
@@ -253,14 +182,20 @@ int main(int argc, char** argv){
 		//h_mom_gen->SetBinContent(h_mom_gen->FindBin(mom),deltaE);
 		//h_mom_result->SetBinContent(h_mom_gen->FindBin(mom),mom);
 		for(int i=0;i<bin_mom;i++){
-		//h_mom_gen->SetBinContent(i,26147*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//first try
-		//h_mom_gen->SetBinContent(i,2583235*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//LHRS 1,000,000 (2020/10/4)
-		//h_mom_gen->SetBinContent(i,2582007*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//LHRS_new 1,000,000 (2020/10/17)// true density
-		//h_mom_gen->SetBinContent(i,5688035*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//LHRS_big 1,000,000 (2020/10/27)
-		h_mom_gen->SetBinContent(i,5695419*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//LHRS_Lambda_grnd 1,000,000 (2020/11/22)
-		//h_mom_gen->SetBinContent(i,5990331*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//LHRS_datafit 1,000,000 (2021/1/6)
-		//h_mom_gen->SetBinContent(i,5696881*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//LHRS_SigmaZ_grnd 1,000,000 (2020/11/22)
-		//h_mom_gen->SetBinContent(i,2549979*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//RHRS 1,000,000 (2020/10/4)
+		//h_mom_gen->SetBinContent(i,26147*(1./189.)*(max_mom-min_mom)/bin_mom);//first try
+		//h_mom_gen->SetBinContent(i,2547932*(1./163.8)*1000.*(max_mom-min_mom)/bin_mom);//RHRS_new 1,000,000 (2020/10/18)
+		//h_mom_gen->SetBinContent(i,5682429*(1./163.8)*1000.*(max_mom-min_mom)/bin_mom);//RHRS2 1,000,000 (2020/11/2)// true density
+		//h_mom_gen->SetBinContent(i,168647157*(1./163.8)*1000.*(max_mom-min_mom)/bin_mom);//RHRS_cm 1,000,000 (2020/11/21)// true density
+		//h_mom_gen->SetBinContent(i,5710184*(1./163.8)*1000.*(max_mom-min_mom)/bin_mom);//RHRS_big 1,000,000 (2020/10/27)// true density
+		h_mom_gen->SetBinContent(i,5676226*(1./163.8)*1000.*(max_mom-min_mom)/bin_mom);//RHRS_grnd 1,000,000 (2020/11/22)// true density
+		//h_mom_gen_cm->SetBinContent(i,2547932*(4./25.)*1000.*(1./163.8)*(max_mom_cm-min_mom_cm)/bin_mom);//RHRS_new 1,000,000 (2020/10/18)
+		h_mom_gen_cm->SetBinContent(i,168647157*1000.*(1./163.8)*(max_mom_cm-min_mom_cm)/bin_mom);//RHRS_cm 1,000,000 (2020/11/21)
+		//h_mom_gen->SetBinContent(i,2549979*(1./163.8)*1000.*(max_mom-min_mom)/bin_mom);//RHRS 1,000,000 (2020/10/4), w/ z dep.
+		//h_mom_gen_cm->SetBinContent(i,2549979*(4./25.)*1000.*(1./163.8)*(max_mom_cm-min_mom_cm)/bin_mom);//RHRS 1,000,000 (2020/10/4), w/ z dep.
+		//h_mom_gen->SetBinContent(i,2549979*(1./163.8)*1000.*(max_mom-min_mom)/bin_mom);//RHRS 1,000,000 (2020/10/4)
+		//h_mom_gen_cm->SetBinContent(i,2549979*(1./163.8)*1000.*(max_mom_cm-min_mom_cm)/bin_mom);//RHRS 1,000,000 (2020/10/4)
+		//h_mom_gen->SetBinContent(i,5248172*(1./163.8)*1000.*(max_mom-min_mom)/bin_mom);//BOTH 1,000,000 (2020/10/4)
+		//h_mom_gen_cm->SetBinContent(i,5248172*(1./163.8)*1000.*(max_mom_cm-min_mom_cm)/bin_mom);//BOTH 1,000,000 (2020/10/4)
 		}
 	double vpflux=Escat*kg/(137*2*PI*PI*Einc*Qsq*(1-eps));
 	double k = MAX*gRandom->Uniform();
@@ -270,7 +205,6 @@ int main(int argc, char** argv){
 //cout<<"kg="<<kg<<endl;
 //cout<<"eps="<<eps<<endl;
 
-	//cout<<"vpflux vs k = "<<vpflux<<" : "<<k<<endl;
 	
 	    //===== Right Hand Coordinate ====//
 	    //th and phi are originally meant tan(theta) and tan(phi),
@@ -378,42 +312,17 @@ int main(int argc, char** argv){
 		double tan_lab1 = sin(theta_gk_cm)/(gamma*(cos(theta_gk_cm)+beta*sqrt(MK*MK+pR_cm*pR_cm)/pR_cm));
 		double tan_lab2 = sin(theta_gk_cm)/(gamma*(cos(theta_gk_cm)+(omega*Mp-Qsq*Qsq)/(omega*Mp+Mp*Mp)));
 
-//===Angle partition===//
-		//h_mom_result->Fill(L_mom);
-		//if(theta_gk_cm*180./PI>=6.&&theta_gk_cm*180./PI<10.)h_mom_result->Fill(L_mom);
-		h_mom_result->Fill(L_mom);
-		//h_mom_result->Fill(L_mom);
-		h_th_mom->Fill(theta_gk_cm*180./PI,L_mom);
-		h_momL_momR->Fill(R_mom,L_mom);
-		if(R_mom>1.74&&R_mom<1.91)h_momL->Fill(L_mom);
-		h_th_cm->Fill(theta_gk_cm*180./PI);
-		if(L_mom<2.12)h_th_cm2->Fill(theta_gk_cm*180./PI);
-	 if(vpflux>k){//Full
-		h_vp_mom->Fill(L_mom);
-		//if(L_mom>2.08&&theta_gk_cm*180./PI>=6.&&theta_gk_cm*180./PI<10.)
-		if(L_mom>2.04&&L_mom<2.17){
-		//if(L_mom<2.12&&theta_gk_cm*180./PI>=6.&&theta_gk_cm*180./PI<10.){//partition
-//Partition templete
-//L_mom>2.08&&Qsq<0.5 (Lambda, Qsq)
-//L_mom<2.12&&Qsq<0.5 (Sigma0, Qsq)
-//L_mom>2.08&&theta_gk_cm*180./PI<8 (Lambda, theta_gk_cm*180./PI)
-//L_mom<2.12&&theta_gk_cm*180./PI<8 (Sigma0, theta_gk_cm*180./PI)
-		//if(L_mom>2.010&&L_mom<2.160){//Full Mom. cut
-		//if(L_mom>2.092&&L_mom<2.160){//L_mom>2.08(Lambda), L_mom<2.12(Simga0)
-		//if(L_mom<2.108&&L_mom>2.010){//L_mom>2.08(Lambda), L_mom<2.12(Simga0)
-		//change
-		//if(L_mom<2.160&&L_mom>2.092&&theta_gk_cm*180./PI>=8.){//L_mom>2.082(Lambda), L_mom<2.108(Simga0)
-		//if(L_mom<2.160&&L_mom>2.092&&Qsq>=0.5){//L_mom>2.082(Lambda), L_mom<2.108(Simga0)
-		//if(L_mom<2.108&&L_mom>2.010&&theta_gk_cm*180./PI>=8.){//L_mom>2.082(Lambda), L_mom<2.108(Simga0)
-		//if(L_mom<2.108&&L_mom>2.010&&Qsq>=0.5){//L_mom>2.082(Lambda), L_mom<2.108(Simga0)
-		h_vp_mom2->Fill(L_mom);
-		//if(L_mom>2.1)h_vp_mom2->Fill(L_mom);
-		}
-	}
+		h_mom_result_cm->Fill(pR_cm);
+		
+		//Z partition; RHRS_SIMC_z1(,z2,z3,z4,z5).dat//5 partition
+		//Z partition; RHRS_SIMC_10_z0(,z1,z2,z3,z4,z5,z6,z7,z8,z9).dat//10 partition
+		//if(8.<=vertex&&vertex<10.)h_mom_result->Fill(R_mom);
+		h_mom_result->Fill(R_mom);
+
+
+		if(L_mom>2.&&L_mom<2.21)h_momR->Fill(R_mom);
 	}
 
-	double vpflux_tot_mom=0.;
-	double vpflux_tot_mom_err=0.;
 	for(int i=0; i<bin_mom; i++){
 		n1 = 0;
 		n1 = (int)h_mom_gen->GetBinContent(i+1);
@@ -431,38 +340,18 @@ int main(int argc, char** argv){
 		if(n1!=0 && n2!=0)err = val * sqrt(1./n2 + 1./n1 - 2./sqrt(1.*n1*n2));
 		h_sa_mom_result->SetBinError(i+1, err);
 
-		// === VP Flux ===
+		// === all cuts in CM frame ===
+		n1 = 0;
+		n1 = (int)h_mom_gen_cm->GetBinContent(i+1);
 		n2 = 0;
 		val = 0.;
 		err = 0.;
-		n2 = (int)h_vp_mom->GetBinContent(i+1);
-		//cout<<"nbin_mom:"<<i<<endl;
-		//cout<<"n1="<<n1<<endl;
-		//cout<<"n2="<<n2<<endl;
-		if(n1!=0 && n2!=0)val = volume*(1.0*n2/n1);//*1000.;//MeV->GeV
-		h_vp_mom_result->SetBinContent(i+1, val);
+		n2 = (int)h_mom_result_cm->GetBinContent(i+1);
+		if(n1!=0 && n2!=0)val = Domega*(1.0*n2/n1);
+		h_sa_mom_result_cm->SetBinContent(i+1, val);
 		if(n1!=0 && n2!=0)err = val * sqrt(1./n2 + 1./n1 - 2./sqrt(1.*n1*n2));
-		h_vp_mom_result->SetBinError(i+1, err);
-
-		// === VP Flux (w/ RHRS Acceptance)===
-		n2 = 0;
-		val = 0.;
-		err = 0.;
-		n2 = (int)h_vp_mom2->GetBinContent(i+1);
-		//cout<<"nbin_mom:"<<i<<endl;
-		//cout<<"n1="<<n1<<endl;
-		//cout<<"n2="<<n2<<endl;
-		if(n1!=0 && n2!=0)val = volume*(1.0*n2/n1);//*1000;//MeV->GeV
-		h_vp_mom_result2->SetBinContent(i+1, val);
-		if(n1!=0 && n2!=0)err = val * sqrt(1./n2 + 1./n1 - 2./sqrt(1.*n1*n2));
-		h_vp_mom_result2->SetBinError(i+1, err);
-
-		double bin_width=(max_mom-min_mom)/bin_mom;//GeV/c
-		vpflux_tot_mom+=val*bin_width;
-		vpflux_tot_mom_err+=sqrt(err*bin_width*err*bin_width);
+		h_sa_mom_result_cm->SetBinError(i+1, err);
 	}
-	cout<<"vpflux_tot_mom="<<vpflux_tot_mom<<endl;
-	cout<<"vpflux_tot_mom_err="<<vpflux_tot_mom_err<<endl;
 
 ////////////////////
 // Draw histgrams //
@@ -474,7 +363,7 @@ int main(int argc, char** argv){
 	lth->SetLineColor(4);
 
 	TCanvas *c1 = new TCanvas("c1", "Momentum Acceptance (Lab)");
-	TCanvas *c2 = new TCanvas("c2", "Virtual Photon Flux");
+	TCanvas *c2 = new TCanvas("c2", "Angular Acceptance (CM)");
 
 
 	//======= Momentum Acceptance (Lab) ======
@@ -485,8 +374,8 @@ int main(int argc, char** argv){
 	SetTitle(h_sa_mom_result, "", "Momentum [GeV/c]", "Solid Angle [msr]");
 //	h_sa_mom_result->GetXaxis()->SetNdivisions(506, kFALSE);
 	h_sa_mom_result->GetXaxis()->SetNdivisions(505, kFALSE);
-	h_sa_mom_result->SetMarkerColor(kRed);
-	h_sa_mom_result->SetLineColor(kRed);
+	h_sa_mom_result->SetMarkerColor(kSpring-1);
+	h_sa_mom_result->SetLineColor(kSpring-1);
 	h_sa_mom_result->SetLineWidth(2);
 //	h_sa_mom_result->Draw("same");
 	h_sa_mom_result->Draw("e2");
@@ -505,76 +394,52 @@ int main(int argc, char** argv){
 	h_mom_result->SetLineColor(kAzure);
 	h_mom_result->Draw("same");
 
-	//======= VP Flux  ======
+	//======= Momentum Acceptance (CM) ======
 	c2->Divide(2,2);
 	c2->cd(1);
-	//SetTitle(h_vp_mom_result, "Integrated VP Flux vs. Momentum (w/ all Cuts)", "Momentum [GeV/c]", "Integrated VP Flux [/GeV]");
-		//h_vp_mom_result->Scale(bin_mom);
-	h_vp_mom_result->GetXaxis()->SetNdivisions(505, kFALSE);
-	h_vp_mom_result2->Draw();
+//	hframe = (TH1D*)gPad->DrawFrame( min_mom_gen_cm, 0., max_mom_gen_cm, Domega + 0.5);
+	//SetTitle(h_sa_mom_result_cm, "Solid Angle vs. Momentum at Reference Plane (CM)", "Momentum [GeV/c]", "Solid Angle [msr]");
+	SetTitle(h_sa_mom_result_cm, "Solid Angle vs. Momentum in CM (w/ all Cuts)", "Momentum [GeV/c]", "Solid Angle [msr]");
+//	h_sa_mom_result_cm->GetXaxis()->SetNdivisions(506, kFALSE);
+	h_sa_mom_result_cm->GetXaxis()->SetNdivisions(505, kFALSE);
+//	h_sa_mom_result_cm->Draw("same");
+	h_sa_mom_result_cm->Draw();
+//	lmom->Draw("same");
 	c2->cd(2);
-	h_vp_mom_result->GetXaxis()->SetNdivisions(505, kFALSE);
-	h_vp_mom_result->Draw();
-		//h_vp_mom_result2->Scale(bin_mom);
-	h_vp_mom_result2->GetXaxis()->SetNdivisions(505, kFALSE);
-	h_vp_mom_result2->SetLineColor(kAzure);
-	h_vp_mom_result2->Draw("");
-	double ymax = (h_vp_mom_result->GetBinContent(h_vp_mom_result->GetMaximumBin()));
-	TLine *RHRS_min = new TLine( 2.08, 0., 2.08, 1.1*ymax);
-	TLine *RHRS_max = new TLine( 2.12, 0., 2.12, 1.1*ymax);
-	RHRS_min->SetLineColor(kRed);
-	RHRS_max->SetLineColor(kRed);
-	RHRS_min->Draw("same");//Lambda
-	//RHRS_max->Draw("same");//Sigma0
+	SetTitle(h_mom_gen_cm, "Solid Angle vs. Momentum in CM (generated)", "Momentum [GeV/c]", "Solid Angle [msr]");
+	h_mom_gen_cm->GetXaxis()->SetNdivisions(505, kFALSE);
+	h_mom_gen_cm->Draw();
 	c2->cd(3);
-	h_vp_mom->Draw();
+	SetTitle(h_mom_result_cm, "Solid Angle vs. Momentum in CM (cut)", "Momentum [GeV/c]", "Solid Angle [msr]");
+	h_mom_result_cm->GetXaxis()->SetNdivisions(505, kFALSE);
+	h_mom_result_cm->Draw();
+	c2->cd(4);
+	h_mom_gen_cm->Draw();
+	h_mom_result_cm->SetLineColor(kAzure);
+	h_mom_result_cm->Draw("same");
 
-	TCanvas *c3 = new TCanvas("c3", "test");
-	c3->Divide(2,2);
-	c3->cd(1);
-	h_th_mom->Draw("colz");
-	c3->cd(2);
-	h_th_cm->Draw("");
-	h_th_cm2->SetLineColor(kRed);
-	h_th_cm2->Draw("same");
-	c3->cd(3);
-	h_momL_momR->Draw("colz");
-	c3->cd(4);
-	h_momL->Draw("");
+	TCanvas *c3 = new TCanvas("c3", "c3");
+	h_momR->Draw("");
 
 	TCanvas *c4 = new TCanvas("c4", "c4");
-	h_sa_mom_result->Draw("e2");
+	SetTitle(h_sa_mom_result, "", "Momentum [GeV/c]", "Solid Angle [msr]");
+	h_sa_mom_result->SetMaximum(6.);
+	h_sa_mom_result->SetNdivisions(505);
+	h_sa_mom_result->Draw("e2 same");
 	h_sa_mom_result->Draw("p same");
 
 	TCanvas *c5 = new TCanvas("c5", "c5");
+	SetTitle(h_mom_gen, "", "Momentum [GeV/c]", "Events");
+	h_mom_gen->SetNdivisions(505);
+	h_mom_result->SetNdivisions(505);
 	h_mom_gen->Draw();
 	h_mom_result->SetLineColor(kAzure);
 	h_mom_result->Draw("same");
 
-	//label
-	ofstream fout("vpflux_SIMC.dat");//LHRS
-	//ofstream fout("vpflux_dummy.dat");//RHRS
-		fout<<"#VP Flux Calculation with SIMC Acceptance"<<endl;
-		fout<<"#1.8<pe[GeV/c]<2.4, 150 partition --> 1bin=4MeV/c"<<endl;
-		double vpflux_temp;
-		double vpflux_total=0.;
-	for(int i=0; i<bin_mom; i++){
-		vpflux_temp = h_vp_mom_result2->GetBinContent(i+1);
-		double vpflux_tempe = h_vp_mom_result2->GetBinError(i+1);
-		h_vp_mom_result3->SetBinContent(i+1,vpflux_temp*0.001);
-		h_vp_mom_result3->SetBinError(i+1,vpflux_tempe*0.001);
-		double vpflux_temp_ = vpflux_temp;// * 0.004/bin_mom;
-		fout<<i+1<<" "<<vpflux_temp_<<endl;
-		vpflux_total+=vpflux_temp_;
-	}
-	
-	cout<<"vpflux_total="<<vpflux_total<<endl;
-	TCanvas *c6 = new TCanvas("c6", "c6");
-	h_vp_mom_result3->Draw("E");
-c6->Print("vpflux_full_MeV.pdf");
-
-//c4->Print("LHRS_acceptance.pdf");
-//c5->Print("LHRS_mc_gen.pdf");
+//c4->Print("RHRS_acceptance.pdf");
+//c5->Print("RHRS_mc_gen.pdf");
+c4->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/mthesis_Fig/pdf/acceptance_RHRS.pdf");
+c5->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/mthesis_Fig/pdf/acceptance_howtoR.pdf");
 
 	if(!BatchFlag){
 		theApp.Run();
@@ -585,31 +450,30 @@ c6->Print("vpflux_full_MeV.pdf");
 		c1 ->Print(Form("%s[",PDFFile.str().c_str()) );
 		c1 ->Print(Form("%s" ,PDFFile.str().c_str()) );
 		c2 ->Print(Form("%s" ,PDFFile.str().c_str()) );
-		c3 ->Print(Form("%s" ,PDFFile.str().c_str()) );
-		c3 ->Print(Form("%s]" ,PDFFile.str().c_str()) );
+		c2 ->Print(Form("%s]" ,PDFFile.str().c_str()) );
 	}
-//c1->Close();
-//c2->Close();
-//c3->Close();
+c1->Close();
+c2->Close();
+c3->Close();
+c4->Close();
+c5->Close();
+	
 	
 
-	//label
-	ofstream fout2("LHRS_SIMC.dat");//LHRS
-	//ofstream fout2("RHRS_SIMC.dat");//RHRS
-		fout2<<"#Acceptance by SIMC"<<endl;
-		fout2<<"#1.8<pe[GeV/c]<2.4, 150 partition --> 1bin=4MeV/c"<<endl;
-		double Acceptance_temp;
-		double Acceptance_total=0.;
-		int Acceptance_bin=0;
-	for(int i=0; i<bin_mom; i++){
-		Acceptance_temp = h_sa_mom_result->GetBinContent(i+1);
-		Acceptance_temp = Acceptance_temp;
-		fout2<<i+1<<" "<<Acceptance_temp<<endl;
-		Acceptance_total+=Acceptance_temp;
-		if(Acceptance_temp!=0)Acceptance_bin++;
-	}
-	cout<<"Acceptance (average)="<<Acceptance_total/(double)Acceptance_bin<<endl;
-
+//	ofstream fout2("RHRS_SIMC_10_z9.dat");//RHRS
+//		fout2<<"#Acceptance by SIMC"<<endl;
+//		fout2<<"#1.8<pe[GeV/c]<2.4, 150 partition --> 1bin=4MeV/c"<<endl;
+//		double Acceptance_temp;
+//		double Acceptance_total=0.;
+//		int Acceptance_bin=0;
+//	for(int i=0; i<bin_mom; i++){
+//		Acceptance_temp = h_sa_mom_result->GetBinContent(i+1);
+//		Acceptance_temp = Acceptance_temp;
+//		fout2<<i+1<<" "<<Acceptance_temp<<endl;
+//		Acceptance_total+=Acceptance_temp;
+//		if(Acceptance_temp!=0)Acceptance_bin++;
+//	}
+//	cout<<"Acceptance (average)="<<Acceptance_total/(double)Acceptance_bin<<endl;
 
 	cout<< "Finish!" << endl;
 	return 0;

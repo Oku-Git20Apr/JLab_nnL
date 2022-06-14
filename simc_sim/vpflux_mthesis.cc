@@ -1,6 +1,8 @@
 //------------------//
 // VP Flux Integral //
 //------------------//
+//K. Okuyama (2020.12.17)
+//mom bin: 150=>100
 
 
 
@@ -69,7 +71,6 @@ int main(int argc, char** argv){
 	//string filename = "LHRS_new";//tehta_width=0.067 rad
 	//string filename = "LHRS_big";//thetawidth=0.1 rad
 	string filename = "LHRS_Lambda_grnd";//thetawidth=0.1 rad
-	//string filename = "LHRS_datafit";//thetawidth=0.1 rad
 	//string filename = "LHRS_SigmaZ_grnd";//thetawidth=0.1 rad
 	//string filename = "BOTH";
 	//string filename = "RHRS";
@@ -159,10 +160,10 @@ int main(int argc, char** argv){
 	cout<< "volume = " << volume <<endl;
 
 
-	int bin_mom = 150;
+	int bin_mom = 100;
 	double min_mom = 1.9;//nnL
 	double max_mom = 2.3;//nnL
-	int bin_th = 150;
+	int bin_th = 100;
 	//double min_th = 0.10;
 	//double max_th = 0.35;
 	double min_th = 0.95;//cos
@@ -186,12 +187,6 @@ int main(int argc, char** argv){
 	TH1D *h_vp_mom2 = new TH1D( "h_vp_mom2", "w/ HRS-R Acceptance", bin_mom, min_mom, max_mom);
 	TH1D *h_vp_mom_result = new TH1D("h_vp_mom_result", "", bin_mom, min_mom, max_mom);
 	TH1D *h_vp_mom_result2 = new TH1D("h_vp_mom_result2", "", bin_mom, min_mom, max_mom);//w/ RHRS Acceptance
-	TH1D *h_vp_mom_result3 = new TH1D("h_vp_mom_result3", "", bin_mom, min_mom*1000., max_mom*1000.);//w/ RHRS Acceptance
-	SetTitle(h_vp_mom_result3, "", "Momentum [MeV/c]", "Integrated VP Flux [#gamma#lower[-0.2]{#scale[0.5]{#bullet}}MeV^{-1}#lower[-0.2]{#scale[0.5]{#bullet}}electron^{-1}]");
-	//h_vp_mom_result3->GetXaxis()->SetNdivisions(505, kFALSE);
-	//h_vp_mom_result3->SetMarkerColor(kBlack);
-	h_vp_mom_result3->SetLineColor(kBlack);
-	h_vp_mom_result3->SetLineWidth(2);
 	TH2D *h_th_mom = new TH2D( "h_th_mom", "", bin_2D_th, 0.,20.,bin_2D_mom, 1.95, 2.25);
 	TH2D *h_momL_momR = new TH2D( "h_momL_momR", "", 50, 1.73, 1.93 ,50., 1.95, 2.25);
 	TH1D *h_momL = new TH1D( "h_momL", "", 200,1.95,2.25);
@@ -258,7 +253,6 @@ int main(int argc, char** argv){
 		//h_mom_gen->SetBinContent(i,2582007*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//LHRS_new 1,000,000 (2020/10/17)// true density
 		//h_mom_gen->SetBinContent(i,5688035*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//LHRS_big 1,000,000 (2020/10/27)
 		h_mom_gen->SetBinContent(i,5695419*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//LHRS_Lambda_grnd 1,000,000 (2020/11/22)
-		//h_mom_gen->SetBinContent(i,5990331*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//LHRS_datafit 1,000,000 (2021/1/6)
 		//h_mom_gen->SetBinContent(i,5696881*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//LHRS_SigmaZ_grnd 1,000,000 (2020/11/22)
 		//h_mom_gen->SetBinContent(i,2549979*(1./189.)*1000.*(max_mom-min_mom)/bin_mom);//RHRS 1,000,000 (2020/10/4)
 		}
@@ -390,22 +384,14 @@ int main(int argc, char** argv){
 		if(L_mom<2.12)h_th_cm2->Fill(theta_gk_cm*180./PI);
 	 if(vpflux>k){//Full
 		h_vp_mom->Fill(L_mom);
-		//if(L_mom>2.08&&theta_gk_cm*180./PI>=6.&&theta_gk_cm*180./PI<10.)
-		if(L_mom>2.04&&L_mom<2.17){
+		//if(L_mom>2.08&&theta_gk_cm*180./PI>=6.&&theta_gk_cm*180./PI<10.){
 		//if(L_mom<2.12&&theta_gk_cm*180./PI>=6.&&theta_gk_cm*180./PI<10.){//partition
 //Partition templete
 //L_mom>2.08&&Qsq<0.5 (Lambda, Qsq)
 //L_mom<2.12&&Qsq<0.5 (Sigma0, Qsq)
 //L_mom>2.08&&theta_gk_cm*180./PI<8 (Lambda, theta_gk_cm*180./PI)
 //L_mom<2.12&&theta_gk_cm*180./PI<8 (Sigma0, theta_gk_cm*180./PI)
-		//if(L_mom>2.010&&L_mom<2.160){//Full Mom. cut
-		//if(L_mom>2.092&&L_mom<2.160){//L_mom>2.08(Lambda), L_mom<2.12(Simga0)
-		//if(L_mom<2.108&&L_mom>2.010){//L_mom>2.08(Lambda), L_mom<2.12(Simga0)
-		//change
-		//if(L_mom<2.160&&L_mom>2.092&&theta_gk_cm*180./PI>=8.){//L_mom>2.082(Lambda), L_mom<2.108(Simga0)
-		//if(L_mom<2.160&&L_mom>2.092&&Qsq>=0.5){//L_mom>2.082(Lambda), L_mom<2.108(Simga0)
-		//if(L_mom<2.108&&L_mom>2.010&&theta_gk_cm*180./PI>=8.){//L_mom>2.082(Lambda), L_mom<2.108(Simga0)
-		//if(L_mom<2.108&&L_mom>2.010&&Qsq>=0.5){//L_mom>2.082(Lambda), L_mom<2.108(Simga0)
+		if(L_mom>2.010&&L_mom<2.108){//L_mom>2.08(Lambda), L_mom<2.12(Simga0)
 		h_vp_mom2->Fill(L_mom);
 		//if(L_mom>2.1)h_vp_mom2->Fill(L_mom);
 		}
@@ -543,38 +529,31 @@ int main(int argc, char** argv){
 	h_momL->Draw("");
 
 	TCanvas *c4 = new TCanvas("c4", "c4");
-	h_sa_mom_result->Draw("e2");
+	SetTitle(h_sa_mom_result, "", "Momentum [GeV/c]", "Solid Angle [msr]");
+	h_sa_mom_result->SetMaximum(6.);
+	h_sa_mom_result->SetNdivisions(505);
+	h_sa_mom_result->Draw("e2 same");
 	h_sa_mom_result->Draw("p same");
 
 	TCanvas *c5 = new TCanvas("c5", "c5");
+	SetTitle(h_mom_gen, "", "Momentum [GeV/c]", "Events");
+	h_mom_gen->SetNdivisions(505);
 	h_mom_gen->Draw();
+	h_mom_result->SetNdivisions(505);
 	h_mom_result->SetLineColor(kAzure);
 	h_mom_result->Draw("same");
 
-	//label
-	ofstream fout("vpflux_SIMC.dat");//LHRS
-	//ofstream fout("vpflux_dummy.dat");//RHRS
-		fout<<"#VP Flux Calculation with SIMC Acceptance"<<endl;
-		fout<<"#1.8<pe[GeV/c]<2.4, 150 partition --> 1bin=4MeV/c"<<endl;
-		double vpflux_temp;
-		double vpflux_total=0.;
-	for(int i=0; i<bin_mom; i++){
-		vpflux_temp = h_vp_mom_result2->GetBinContent(i+1);
-		double vpflux_tempe = h_vp_mom_result2->GetBinError(i+1);
-		h_vp_mom_result3->SetBinContent(i+1,vpflux_temp*0.001);
-		h_vp_mom_result3->SetBinError(i+1,vpflux_tempe*0.001);
-		double vpflux_temp_ = vpflux_temp;// * 0.004/bin_mom;
-		fout<<i+1<<" "<<vpflux_temp_<<endl;
-		vpflux_total+=vpflux_temp_;
-	}
-	
-	cout<<"vpflux_total="<<vpflux_total<<endl;
 	TCanvas *c6 = new TCanvas("c6", "c6");
-	h_vp_mom_result3->Draw("E");
-c6->Print("vpflux_full_MeV.pdf");
+	SetTitle(h_vp_mom_result, "", "Momentum [GeV/c]", "Integrated VP Flux [#gamma#lower[-0.2]{#scale[0.5]{#bullet}}GeV^{-1}#lower[-0.2]{#scale[0.5]{#bullet}}electron^{-1}]");
+	h_vp_mom_result->SetNdivisions(505);
+	h_vp_mom_result->Draw("");
+	
 
 //c4->Print("LHRS_acceptance.pdf");
 //c5->Print("LHRS_mc_gen.pdf");
+//c4->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/mthesis_Fig/pdf/acceptance_LHRS.pdf");
+//c5->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/mthesis_Fig/pdf/acceptance_howtoL.pdf");
+//c6->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/mthesis_Fig/pdf/vpflux_full.pdf");
 
 	if(!BatchFlag){
 		theApp.Run();
@@ -592,6 +571,21 @@ c6->Print("vpflux_full_MeV.pdf");
 //c2->Close();
 //c3->Close();
 	
+	//label
+	ofstream fout("vpflux_SIMC.dat");//LHRS
+	//ofstream fout("vpflux_dummy.dat");//RHRS
+		fout<<"#VP Flux Calculation with SIMC Acceptance"<<endl;
+		fout<<"#1.8<pe[GeV/c]<2.4, 150 partition --> 1bin=4MeV/c"<<endl;
+		double vpflux_temp;
+		double vpflux_total=0.;
+	for(int i=0; i<bin_mom; i++){
+		vpflux_temp = h_vp_mom_result2->GetBinContent(i+1);
+		vpflux_temp = vpflux_temp;// * 0.004/bin_mom;
+		fout<<i+1<<" "<<vpflux_temp<<endl;
+		vpflux_total+=vpflux_temp;
+	}
+	
+	cout<<"vpflux_total="<<vpflux_total<<endl;
 
 	//label
 	ofstream fout2("LHRS_SIMC.dat");//LHRS

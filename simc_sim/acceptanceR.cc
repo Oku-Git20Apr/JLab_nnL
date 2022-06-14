@@ -36,10 +36,11 @@ int main(int argc, char** argv){
 	int option;
 	//string filename = "1H_kaon";
 	//string filename = "RHRS_new";//0<theta_max<0.067
-	//string filename = "RHRS_big";//0<theta_max<0.01
-	string filename = "RHRS_cm";//0<theta_max<0.01
-	//string filename = "RHRS2";//0<theta_max<0.01
-	bool BatchFlag = false;
+	//string filename = "RHRS_big";//0<theta_max<0.1
+	string filename = "RHRS_grnd";//0<theta_max<0.1
+	//string filename = "RHRS_cm";//0<theta_max<0.1
+	//string filename = "RHRS2";//0<theta_max<0.1
+	bool BatchFlag = true;
 	bool PDFFlag = true;
 
   TApplication theApp("App", &argc, argv);
@@ -71,8 +72,8 @@ int main(int argc, char** argv){
 	
 	centraltheta=13.2*PI/180.;
 	//thetawidth=0.067;//new
-	//thetawidth=0.1;//big
-	thetawidth=PI;//CM
+	thetawidth=0.1;//big
+	//thetawidth=PI;//CM
 	centralphi=0.;
 	phiwidth=2*PI;
 	cout<< "central theta = " << centraltheta*180/PI << " [deg]" << endl;
@@ -182,8 +183,9 @@ int main(int argc, char** argv){
 		//h_mom_gen->SetBinContent(i,26147*(1./189.)*(max_mom-min_mom)/bin_mom);//first try
 		//h_mom_gen->SetBinContent(i,2547932*(1./163.8)*1000.*(max_mom-min_mom)/bin_mom);//RHRS_new 1,000,000 (2020/10/18)
 		//h_mom_gen->SetBinContent(i,5682429*(1./163.8)*1000.*(max_mom-min_mom)/bin_mom);//RHRS2 1,000,000 (2020/11/2)// true density
-		h_mom_gen->SetBinContent(i,168647157*(1./163.8)*1000.*(max_mom-min_mom)/bin_mom);//RHRS_cm 1,000,000 (2020/11/21)// true density
+		//h_mom_gen->SetBinContent(i,168647157*(1./163.8)*1000.*(max_mom-min_mom)/bin_mom);//RHRS_cm 1,000,000 (2020/11/21)// true density
 		//h_mom_gen->SetBinContent(i,5710184*(1./163.8)*1000.*(max_mom-min_mom)/bin_mom);//RHRS_big 1,000,000 (2020/10/27)// true density
+		h_mom_gen->SetBinContent(i,5676226*(1./163.8)*(2./25.)*1000.*(max_mom-min_mom)/bin_mom);//RHRS_grnd 1,000,000 (2020/11/22)// true density
 		//h_mom_gen_cm->SetBinContent(i,2547932*(4./25.)*1000.*(1./163.8)*(max_mom_cm-min_mom_cm)/bin_mom);//RHRS_new 1,000,000 (2020/10/18)
 		h_mom_gen_cm->SetBinContent(i,168647157*1000.*(1./163.8)*(max_mom_cm-min_mom_cm)/bin_mom);//RHRS_cm 1,000,000 (2020/11/21)
 		//h_mom_gen->SetBinContent(i,2549979*(1./163.8)*1000.*(max_mom-min_mom)/bin_mom);//RHRS 1,000,000 (2020/10/4), w/ z dep.
@@ -310,9 +312,10 @@ int main(int argc, char** argv){
 
 		h_mom_result_cm->Fill(pR_cm);
 		
-		//Z partition; SIMC_RHRS_z1(,z2,z3,z4,z5).dat
-		//if(6.<=vertex&&vertex<10.)h_mom_result->Fill(R_mom);
-		h_mom_result->Fill(R_mom);
+		//Z partition; RHRS_SIMC_z1(,z2,z3,z4,z5).dat//5 partition
+		//Z partition; RHRS_SIMC_10_z0(,z1,z2,z3,z4,z5,z6,z7,z8,z9).dat//10 partition
+		if(8.<=vertex&&vertex<10.)h_mom_result->Fill(R_mom);
+		//h_mom_result->Fill(R_mom);
 
 
 		if(L_mom>2.&&L_mom<2.21)h_momR->Fill(R_mom);
@@ -366,7 +369,7 @@ int main(int argc, char** argv){
 	c1->cd(1);
 //	hframe = (TH1D*)gPad->DrawFrame( min_mom_gen, 0., max_mom_gen, Domega + 0.5);
 	//SetTitle(h_sa_mom_result, "Solid Angle vs. Momentum at Reference Plane", "Momentum [GeV/c]", "Solid Angle [msr]");
-	SetTitle(h_sa_mom_result, "Solid Angle vs. Momentum (w/ all Cuts)", "Momentum [GeV/c]", "Solid Angle [msr]");
+	SetTitle(h_sa_mom_result, "", "Momentum [GeV/c]", "Solid Angle [msr]");
 //	h_sa_mom_result->GetXaxis()->SetNdivisions(506, kFALSE);
 	h_sa_mom_result->GetXaxis()->SetNdivisions(505, kFALSE);
 	h_sa_mom_result->SetMarkerColor(kSpring-1);
@@ -377,11 +380,11 @@ int main(int argc, char** argv){
 	h_sa_mom_result->Draw("p same");
 //	lmom->Draw("same");
 	c1->cd(2);
-	SetTitle(h_mom_gen, "Solid Angle vs. Momentum (generated)", "Momentum [GeV/c]", "Solid Angle [msr]");
+	SetTitle(h_mom_gen, "", "Momentum [GeV/c]", "");
 	h_mom_gen->GetXaxis()->SetNdivisions(505, kFALSE);
 	h_mom_gen->Draw();
 	c1->cd(3);
-	SetTitle(h_mom_result, "Solid Angle vs. Momentum (cut)", "Momentum [GeV/c]", "Solid Angle [msr]");
+	SetTitle(h_mom_result, "", "Momentum [GeV/c]", "");
 	h_mom_result->GetXaxis()->SetNdivisions(505, kFALSE);
 	h_mom_result->Draw();
 	c1->cd(4);
@@ -416,6 +419,18 @@ int main(int argc, char** argv){
 	TCanvas *c3 = new TCanvas("c3", "c3");
 	h_momR->Draw("");
 
+	TCanvas *c4 = new TCanvas("c4", "c4");
+	h_sa_mom_result->Draw("e2");
+	h_sa_mom_result->Draw("p same");
+
+	TCanvas *c5 = new TCanvas("c5", "c5");
+	h_mom_gen->Draw();
+	h_mom_result->SetLineColor(kAzure);
+	h_mom_result->Draw("same");
+
+//c4->Print("RHRS_acceptance.pdf");
+//c5->Print("RHRS_mc_gen.pdf");
+
 	if(!BatchFlag){
 		theApp.Run();
 	}
@@ -429,24 +444,26 @@ int main(int argc, char** argv){
 	}
 c1->Close();
 c2->Close();
+c3->Close();
+c4->Close();
+c5->Close();
 	
 	
 
-	ofstream fout2("RHRS_SIMC.dat");//RHRS
-		fout2<<"#Acceptance by SIMC"<<endl;
-		fout2<<"#1.8<pe[GeV/c]<2.4, 150 partition --> 1bin=4MeV/c"<<endl;
-		double Acceptance_temp;
-		double Acceptance_total=0.;
-		int Acceptance_bin=0;
-	for(int i=0; i<bin_mom; i++){
-		Acceptance_temp = h_sa_mom_result->GetBinContent(i+1);
-		Acceptance_temp = Acceptance_temp;
-		fout2<<i+1<<" "<<Acceptance_temp<<endl;
-		Acceptance_total+=Acceptance_temp;
-		if(Acceptance_temp!=0)Acceptance_bin++;
-	}
-	cout<<"Acceptance (average)="<<Acceptance_total/(double)Acceptance_bin<<endl;
-
+//	ofstream fout2("RHRS_SIMC_10_z9.dat");//RHRS
+//		fout2<<"#Acceptance by SIMC"<<endl;
+//		fout2<<"#1.8<pe[GeV/c]<2.4, 150 partition --> 1bin=4MeV/c"<<endl;
+//		double Acceptance_temp;
+//		double Acceptance_total=0.;
+//		int Acceptance_bin=0;
+//	for(int i=0; i<bin_mom; i++){
+//		Acceptance_temp = h_sa_mom_result->GetBinContent(i+1);
+//		Acceptance_temp = Acceptance_temp;
+//		fout2<<i+1<<" "<<Acceptance_temp<<endl;
+//		Acceptance_total+=Acceptance_temp;
+//		if(Acceptance_temp!=0)Acceptance_bin++;
+//	}
+//	cout<<"Acceptance (average)="<<Acceptance_total/(double)Acceptance_bin<<endl;
 
 	cout<< "Finish!" << endl;
 	return 0;

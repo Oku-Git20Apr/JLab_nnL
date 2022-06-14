@@ -33,9 +33,21 @@ TARGET2=    vpflux
 OBJS2  =    vpflux.o
 TARGET3=    acceptanceR 
 OBJS3  =    acceptanceR.o
+TARGET4=    vpflux_mthesis 
+OBJS4  =    vpflux_mthesis.o
+TARGET5=    acceptanceR_mthesis 
+OBJS5  =    acceptanceR_mthesis.o
+TARGET6=    acceptanceR_2022 
+OBJS6  =    acceptanceR_2022.o
+TARGET7=    acceptanceL_2022 
+OBJS7  =    acceptanceL_2022.o
 
 all: $(TARGET2)\
-		$(TARGET3)
+		$(TARGET3)\
+		$(TARGET4)\
+		$(TARGET5)\
+		$(TARGET6)\
+		$(TARGET7)
 
 $(LIBDIR)/%.o : %.cc
 	$(CXX) $(CFLAGS) -c -o $@ $< $(CXXFLAGS)
@@ -53,6 +65,18 @@ $(TARGET2): $(patsubst %,$(LIBDIR)/%,$(OBJS2))
 	$(CXX) $(CFLAGS) -o $(BINDIR)/$@ $< $(CXXLIBS) $(CXXFLAGS)
 
 $(TARGET3): $(patsubst %,$(LIBDIR)/%,$(OBJS3))
+	$(CXX) $(CFLAGS) -o $(BINDIR)/$@ $< $(CXXLIBS) $(CXXFLAGS)
+
+$(TARGET4): $(patsubst %,$(LIBDIR)/%,$(OBJS4))
+	$(CXX) $(CFLAGS) -o $(BINDIR)/$@ $< $(CXXLIBS) $(CXXFLAGS)
+
+$(TARGET5): $(patsubst %,$(LIBDIR)/%,$(OBJS5))
+	$(CXX) $(CFLAGS) -o $(BINDIR)/$@ $< $(CXXLIBS) $(CXXFLAGS)
+
+$(TARGET6): $(patsubst %,$(LIBDIR)/%,$(OBJS6))
+	$(CXX) $(CFLAGS) -o $(BINDIR)/$@ $< $(CXXLIBS) $(CXXFLAGS)
+
+$(TARGET7): $(patsubst %,$(LIBDIR)/%,$(OBJS7))
 	$(CXX) $(CFLAGS) -o $(BINDIR)/$@ $< $(CXXLIBS) $(CXXFLAGS)
 
 .PHONY: clean
