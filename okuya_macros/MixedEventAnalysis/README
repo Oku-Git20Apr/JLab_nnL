@@ -47,3 +47,15 @@
 basically, identical with "mea_mthesis.C"
 GeV --> MeV
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+*mea_llccrr_effK.C (latest ver.)
+- 2022/6/11 update
+- elist fixed, new acceptance map, 100bin
+--> bgmea_llccrr_new_2022effK.root
+(bgmea_llccrr_2022effK.root is old ver., before fix)
+
+*mea_llccrr_new_tripleDCS2022.C
+- latest ver. for deriving tripleDCS. (1/e/RHRS/LHRS)
+- 2022/6/9 update
+- elist fixed
+--> bgmea_llccrr_new_tripleDCS2022.root
