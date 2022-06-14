@@ -609,7 +609,7 @@ cout << "Param file : " << AcceptanceR_table.c_str() << endl;
   h_zR_Y->GetYaxis()->SetTitle("(-1)*Y(FP) [cm]");
   h_zR_Y->GetYaxis()->SetTitleOffset(0.965);
   //h_zR_Y->GetZaxis()->SetLabelOffset(-0.005);
-  TH2F* h_zz    = new TH2F("h_zz"   ,""   , 1000,-25.,25.,1000,  -25., 25.); 
+  TH2F* h_zz    = new TH2F("h_zz"   ,""   , 100,-25.,25.,100,  -25., 25.); 
   h_zz->GetXaxis()->SetTitle("Z-vertex (HRS-R) [cm]");
   h_zz->GetYaxis()->SetTitle("Z-vertex (HRS-L) [cm]");
   h_zz->GetXaxis()->SetTitleColor(kGreen+2);
@@ -904,7 +904,7 @@ cout<<"Entries: "<<ENum<<endl;
 			cos_ekcm_gkcm->Fill(cos(theta_gk_cm),cos(theta_ek_cm));
 			if(theta_gk_cm*180./PI>=8.)h_pepk->Fill(R_mom,L_mom);
 		}
-		if(R_Tr&&R_FP&&L_Tr&&L_FP){
+		if(R_Tr&&R_FP&&L_Tr&&L_FP&&ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&ct_cut){
 		h_zz->Fill(R_tr_vz*100.,L_tr_vz*100.);
 		h_zL->Fill(L_tr_vz*100.);
 		h_zR->Fill(R_tr_vz*100.);
@@ -1104,10 +1104,10 @@ cout<<"Entries: "<<ENum<<endl;
 	gStyle->SetPalette(55);
 	h_zR_Y->Draw("colz");
 	
-c3->Print("./pdf/zz_recon.pdf");
-c4->Print("./pdf/z_single.pdf");
-c6->Print("./pdf/zL_Y.pdf");
-c7->Print("./pdf/zR_Y.pdf");
+c3->Print("./pdf/zz_recon_acctcut.pdf");
+//c4->Print("./pdf/z_single.pdf");
+//c6->Print("./pdf/zL_Y.pdf");
+//c7->Print("./pdf/zR_Y.pdf");
 
 cout << "Well done!" << endl;
 }//fit

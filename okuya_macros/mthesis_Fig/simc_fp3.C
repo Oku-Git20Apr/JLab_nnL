@@ -247,7 +247,9 @@ void simc_fp3(){
   h_pepk_simc->GetYaxis()->SetTitle("p_{e'} [MeV/c]");
   h_pepk_simc->SetNdivisions(505);
   //h_pepk_simc->GetZaxis()->SetLabelOffset(-0.005);
-  tree_simc->Project("h_pepk_simc","Lp_rec:Rp_rec","");
+  tree_simc->Project("h_pepk_simc","Lp_rec-10.:Rp_rec","e_xpfp<0.17*e_xfp/100.+0.025&&e_xpfp>0.17*e_xfp/100.-0.035&&e_xpfp<0.40*e_xfp/100.+0.130&&h_xpfp<0.17*h_xfp/100.+0.025&&h_xpfp>0.17*h_xfp/100.-0.035&&h_xpfp<0.40*h_xfp/100.+0.130&&e_xpfp>0.40*e_xfp/100.-0.130&&h_xpfp>0.40*h_xfp/100.-0.130");
+
+
   TH1D* h_pe_simc = new TH1D("h_pe_simc", "p_{e'}" ,200,1980.,2220.);
   h_pe_simc->GetXaxis()->SetTitle("Momentum [MeV/c]");
   h_pe_simc->GetYaxis()->SetTitle("Counts");
@@ -1438,29 +1440,30 @@ cout << "Print is starting" << endl;
 	//"SIMC_vs_noCalib.pdf
 	//"SIMC_FP_Rebuild_all.pdf //2021/7/11 simc_fp3.C
 	//"SIMC_FP_Rebuild_mom.pdf //2021/7/11 simc_fp_momcut.C
+	//"SIMC_Rebuilt_fpcut.pdf //2022/1/18 simc_fp3.C, pepk(w/ FP cut)
 	
-	c10->Print("SIMC_FP_Rebuilt_all.pdf[");
-	c10->Print("SIMC_FP_Rebuilt_all.pdf[");//pepk simc
-	c20->Print("SIMC_FP_Rebuilt_all.pdf");//pepk data
-	c30->Print("SIMC_FP_Rebuilt_all.pdf");//pepk same
-	c50->Print("SIMC_FP_Rebuilt_all.pdf");//FP 1D
-	c51->Print("SIMC_FP_Rebuilt_all.pdf");//FP 1D
-	//c60->Print("SIMC_FP_Rebuilt_all.pdf");//FPxtar 2D
-	//c61->Print("SIMC_FP_Rebuilt_all.pdf");//FPxtar 2D
-	c64->Print("SIMC_FP_Rebuilt_all.pdf");//FP vs Mom. 2D
-	c70->Print("SIMC_FP_Rebuilt_all.pdf");//FP 2D
-	c71->Print("SIMC_FP_Rebuilt_all.pdf");//FP 2D
-	c72->Print("SIMC_FP_Rebuilt_all.pdf");//FP 2D
-	c73->Print("SIMC_FP_Rebuilt_all.pdf");//FP 2D
-	c80->Print("SIMC_FP_Rebuilt_all.pdf");//tar 2D
-	c81->Print("SIMC_FP_Rebuilt_all.pdf");//tar 2D
-	c90->Print("SIMC_FP_Rebuilt_all.pdf");//FPxtar 2D
-	c91->Print("SIMC_FP_Rebuilt_all.pdf");//FPxtar 2D
-	c92->Print("SIMC_FP_Rebuilt_all.pdf");//FPxtar 2D
-	c93->Print("SIMC_FP_Rebuilt_all.pdf");//FPxtar 2D
-	c94->Print("SIMC_FP_Rebuilt_all.pdf");//FPxtar 2D
-	c95->Print("SIMC_FP_Rebuilt_all.pdf");//FPxtar 2D
-	c95->Print("SIMC_FP_Rebuilt_all.pdf]");//FPxtar 2D
+	c10->Print("SIMC_Rebuilt_fpcut.pdf[");
+	c10->Print("SIMC_Rebuilt_fpcut.pdf[");//pepk simc
+	c20->Print("SIMC_Rebuilt_fpcut.pdf");//pepk data
+	c30->Print("SIMC_Rebuilt_fpcut.pdf");//pepk same
+	c50->Print("SIMC_Rebuilt_fpcut.pdf");//FP 1D
+	c51->Print("SIMC_Rebuilt_fpcut.pdf");//FP 1D
+	//c60->Print("SIMC_Rebuilt_fpcut.pdf");//FPxtar 2D
+	//c61->Print("SIMC_Rebuilt_fpcut.pdf");//FPxtar 2D
+	c64->Print("SIMC_Rebuilt_fpcut.pdf");//FP vs Mom. 2D
+	c70->Print("SIMC_Rebuilt_fpcut.pdf");//FP 2D
+	c71->Print("SIMC_Rebuilt_fpcut.pdf");//FP 2D
+	c72->Print("SIMC_Rebuilt_fpcut.pdf");//FP 2D
+	c73->Print("SIMC_Rebuilt_fpcut.pdf");//FP 2D
+	c80->Print("SIMC_Rebuilt_fpcut.pdf");//tar 2D
+	c81->Print("SIMC_Rebuilt_fpcut.pdf");//tar 2D
+	c90->Print("SIMC_Rebuilt_fpcut.pdf");//FPxtar 2D
+	c91->Print("SIMC_Rebuilt_fpcut.pdf");//FPxtar 2D
+	c92->Print("SIMC_Rebuilt_fpcut.pdf");//FPxtar 2D
+	c93->Print("SIMC_Rebuilt_fpcut.pdf");//FPxtar 2D
+	c94->Print("SIMC_Rebuilt_fpcut.pdf");//FPxtar 2D
+	c95->Print("SIMC_Rebuilt_fpcut.pdf");//FPxtar 2D
+	c95->Print("SIMC_Rebuilt_fpcut.pdf]");//FPxtar 2D
 	
 cout << "Well done!" << endl;
 }//fit
