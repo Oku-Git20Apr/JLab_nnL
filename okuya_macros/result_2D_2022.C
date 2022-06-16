@@ -465,14 +465,20 @@ cout << "Param file : " << AcceptanceR_table_z9.c_str() << endl;
  //const double fit_min_mm=-0.01;
  //const double fit_max_mm=0.085;
  const double fit_min_mm=-0.005;
- //const double fit_max_mm=0.085;
- const double fit_max_mm=0.105;
- 
+
 //change
+ //const double fit_max_mm=0.085;//Angle 2-div.
+ const double fit_max_mm=0.105;//Full (Mom cut)
+ 
  const double fmin_mm=-0.05;//out of range
  const double fmax_mm=2.20;//out of range
  const double fmin_mm_inside=-0.05;//Full (Mom cut)
+
+//change
  const double fmax_mm_inside=0.15;//Full (Mom cut)
+ const double fmax_mm_insideS=0.15;//Full (Mom cut)
+ //const double fmax_mm_inside=0.100;//Angle 2-div.(Mom cut)
+ //const double fmax_mm_insideS=0.110;//Angle 2-div.(Mom cut)
  
  //const double fmin_mm=-0.01;
  //const double fmax_mm=0.12;
@@ -1347,9 +1353,9 @@ cout<<"Entries in Cointime gate: "<<ENum<<endl;
 //MM spctrum to be fitted (2020/10/18)
 //Choose one from the list below
 //===CHANGE===//
-	//hmm_wo_bg_fom_strict->Add(hcs_L_fom_strict,hcs_bg_fom_strict,1.0,-1.0);//All by hcs
-	//hmm_wo_bg_fom_strict->Scale(1./150.);
-	hmm_wo_bg_fom_strict->Add(hmm_L_fom_strict,hmm_bg_fom_strict,1.0,-1.0);//All by hmm
+	hmm_wo_bg_fom_strict->Add(hcs_L_fom_strict,hcs_bg_fom_strict,1.0,-1.0);//All by hcs
+	hmm_wo_bg_fom_strict->Scale(1./150.);
+	//hmm_wo_bg_fom_strict->Add(hmm_L_fom_strict,hmm_bg_fom_strict,1.0,-1.0);//All by hmm
 	//hmm_wo_bg_fom_strict->Add(hcs_L_new_cm2_1,hcs_bg_new_cm2_1,1.0,-1.0);//2 div.
 	//hmm_wo_bg_fom_strict->Add(hcs_L_new_cm2_2,hcs_bg_new_cm2_2,1.0,-1.0);//2 div.
 	//hmm_wo_bg_fom_strict->Scale(2./150.);
@@ -1675,8 +1681,8 @@ case 3: //Fixed from old fit
 
 
 //change ENum???
-	 fmm_strict_Lexp->FixParameter(14,(double)ENum_strict*0.021*0.001);//scale(1.8%(pion)+0.3%(Al)) //B.G. ratio
-	 //fmm_strict_Lexp->FixParameter(14,(double)ENum_strict_cm2_1*0.021*0.001);//scale(1.8%(pion)+0.3%(Al)) //B.G. ratio
+	 fmm_strict_Lexp->FixParameter(14,(double)ENum_strict_cs*0.021*0.001);//scale(1.8%(pion)+0.3%(Al)) //B.G. ratio
+	 /////fmm_strict_Lexp->FixParameter(14,(double)ENum_strict_cm2_2*0.021*0.001);//scale(1.8%(pion)+0.3%(Al)) //B.G. ratio
 	 //fmm_strict_Lexp->FixParameter(14,(double)ENum_strict_cs_cm2_1*0.021*0.001);//scale(1.8%(pion)+0.3%(Al)) //B.G. ratio
 	 fmm_strict_Lexp->FixParameter(15,Al_par1);//mean
 	 fmm_strict_Lexp->FixParameter(16,Al_par2);//Gsigma
@@ -1772,7 +1778,7 @@ case 3: //Fixed from old fit
 	cout<<"Number of Lambda w/o radiative tail (TF1 Integral) = "<<nofL_old_strict<<endl;
 	cout<<"Number of Lambda w/o radiative tail (TH1F Integral) = "<<nofL_old_hist_strict<<endl;
 
-	double nofS_strict_inside = fmm_Sigma_only_strict->Integral(fmin_mm_inside,fmax_mm_inside);
+	double nofS_strict_inside = fmm_Sigma_only_strict->Integral(fmin_mm_inside,fmax_mm_insideS);
 	double nofS_strict = fmm_Sigma_only_strict->Integral(fmin_mm,fmax_mm);
 	double nofS_old_strict = fmm_Sigma_only_strict->Integral(def_mean_S-0.008,def_mean_S+0.008);
 	double nofS_bg_strict = fmm_bg_only_strict->Integral(def_mean_S-0.008,def_mean_S+0.008);
