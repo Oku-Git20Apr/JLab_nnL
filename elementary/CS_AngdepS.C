@@ -224,7 +224,7 @@ void CS_AngdepS(){
   ax->SetTitleSize(0.05);  ax->SetTitleOffset(0.90);
   ax->SetMaxDigits(3);
   //ax->SetTitle("cos(#theta_{K}^{c.m.})");
-  ax->SetTitle("#theta_{#gamma K}^{CM} [degree]");
+  ax->SetTitle("#theta_{#gamma K}^{c.m.} [deg]");
 
   TGaxis *ay = new TGaxis(0,0, 0,0.5, 0,0.5, 505 );
   //((TGaxis*)h2->GetYaxis())->SetMaxDigits(2);
@@ -233,7 +233,7 @@ void CS_AngdepS(){
   ay->SetLabelFont(42); ay->SetTitleFont(42); ay->CenterTitle();
   ay->SetLabelOffset(0.01);
   ay->SetTitleSize(0.05);  ay->SetTitleOffset(0.90);
-  ay->SetTitle("d#sigma/d#Omega_{K}^{CM} [#mub/sr]");
+  ay->SetTitle("d#sigma/d#Omega_{K}^{c.m.} [#mub/sr]");
 
   TGraphErrors *Ref = new TGraphErrors(4);
   Ref->SetPoint(0,0.52,0.378);
@@ -327,7 +327,8 @@ void CS_AngdepS(){
 	double x_result[1], y_result[1], xe_result[1], xel_result[1], xeh_result[1], ye_result[1], yel_result[1], yeh_result[1];
 	double x2_result[2], y2_result[2], xe2_result[2], xel2_result[2], xeh2_result[2], ye2_result[2], yel2_result[2], yeh2_result[2];
 	double x3_result[3], y3_result[3], xe3_result[3], ye3_result[3], yel3_result[3], yeh3_result[3];
-	string result_in = "./result_input.dat";//D.C.S. Result
+	//string result_in = "./result_input.dat";//D.C.S. Result
+	string result_in = "./result_input_2022.dat";//D.C.S. Result
 	string buf;
 	int npoint = 0;
 	int npoint2 = 0;
@@ -428,24 +429,27 @@ cout << "Param file : " << result_in.c_str() << endl;
 
 
 
-  TGraphAsymmErrors *gr_result = new TGraphAsymmErrors(1, x_result, y_result, xel_result, xeh_result, yel_result, yeh_result);
-  //TGraphErrors *gr_result = new TGraphErrors(1, x_result, y_result, xe_result, ye_result);
+  //TGraphAsymmErrors *gr_result = new TGraphAsymmErrors(1, x_result, y_result, xel_result, xeh_result, yel_result, yeh_result);
+  TGraphErrors *gr_result = new TGraphErrors(1, x_result, y_result, xe_result, ye_result);
   gr_result->SetMarkerSize(1.5);
   gr_result->SetMarkerStyle(21);
-  gr_result->SetFillStyle(3004);
-  //gr_result->SetLineColor(2);
-  gr_result->SetFillColor(1);
+  //gr_result->SetFillStyle(3004);
+  gr_result->SetLineColor(2);
+  gr_result->SetLineWidth(2);
+  //gr_result->SetFillColor(1);
   gr_result->SetMarkerColor(2);
-  TGraphAsymmErrors *gr2_result = new TGraphAsymmErrors(2, x2_result, y2_result, xel2_result, xeh2_result, yel2_result, yeh2_result);
-  //TGraphErrors *gr2_result = new TGraphErrors(2, x2_result, y2_result, xe2_result, ye2_result);
+  //TGraphAsymmErrors *gr2_result = new TGraphAsymmErrors(2, x2_result, y2_result, xel2_result, xeh2_result, yel2_result, yeh2_result);
+  TGraphErrors *gr2_result = new TGraphErrors(2, x2_result, y2_result, xe2_result, ye2_result);
   gr2_result->SetMarkerSize(1.5);
   gr2_result->SetMarkerStyle(21);
-  gr2_result->SetFillStyle(3005);
-  //gr2_result->SetLineColor(kViolet);
+  //gr2_result->SetFillStyle(3005);
+  gr2_result->SetLineColor(kAzure);
+  gr2_result->SetLineWidth(2);
   gr2_result->SetFillColor(1);
   gr2_result->SetMarkerColor(4);
 
-  TCanvas *c1 = new TCanvas("c1","c1",1400,950);
+  //TCanvas *c1 = new TCanvas("c1","c1",1400,950);
+  TCanvas *c1 = new TCanvas("c1","c1",1300,950);
   c1->Divide(1,1,0.0001,0.0001);
   c1->cd(1);
   h2->Draw();
@@ -532,18 +536,18 @@ TBox *b2_stat2 = new TBox(x2_result[1]-xe2_result[1],y2_result[1]-ye2_result[1],
 //	b3_3->SetFillStyle(0);
 //	b3_3->SetLineColor(4);
 //	b3_3->SetLineWidth(1);
-  //gr3_result->Draw("P2same");
-  gr2_result->Draw("P2same");
-  //gr_result->Draw("P2same");
   //b3_1->Draw();
   //b3_2->Draw();
   //b3_3->Draw();
   b2_1->Draw();
   b2_2->Draw();
-  b2_stat1->Draw();
-  b2_stat2->Draw();
-  //b->Draw();
+  //b2_stat1->Draw();
+  //b2_stat2->Draw();
+  b->Draw();
   //b_stat->Draw();
+  //gr3_result->Draw("P2same");
+  gr2_result->Draw("Psame");
+  gr_result->Draw("Psame");
   ax->Draw();
   ay->Draw();
   leg->Draw();
