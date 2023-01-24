@@ -1,0 +1,14 @@
+FPcut_comp.C & FPmom_comp.C
+- Comparison of FP cut and Mom. cut
+- FPcut_comp.C is based on FP.C
+--> w/o FP cut and w/ FP cut
+- FPmom_comp.C is based on simc_fp3.C
+--> w/ FP cut and w/ FP&Mom. cut
+
+Acceptance
+--> SIMC/rootfile/okuyamacro/acceptanceR_2022.C
+--> SIMC/rootfile/okuyamacro/acceptanceL_2022.C
+--> ../result_2D_2022_tripleDCS.C (2D map)
+
+SIMC Radiative tail
+--> ../radiative_2022.C

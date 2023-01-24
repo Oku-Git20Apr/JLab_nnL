@@ -70,6 +70,8 @@ TARGET24= h2all_1_etap
 OBJS24=   h2all_1_etap.o Setting.o Tree.o ParamMan.o
 TARGET25= h2all_2_etap
 OBJS25=   h2all_2_etap.o Setting.o Tree.o ParamMan.o
+TARGET26= h2all_500
+OBJS26=   h2all_500.o Setting.o Tree.o ParamMan.o
 #TARGET14= okuyana 
 #OBJS14=   okuyana.o Setting.o Tree.o ParamMan.o
 
@@ -82,6 +84,7 @@ all:$(TARGET13)\
      $(TARGET23)\
      $(TARGET24)\
      $(TARGET25)\
+     $(TARGET26)\
 #     $(TARGET11)
 #$(TARGET1)\
 #     $(TARGET2)\
@@ -149,6 +152,8 @@ $(TARGET23): $(patsubst %,$(LIBDIR)/%,$(OBJS23))
 $(TARGET24): $(patsubst %,$(LIBDIR)/%,$(OBJS24))
 	$(CXX) $(CFLAGS) -o $(BINDIR)/$@ $^ $(CXXLIBS) $(CXXFLAGS)
 $(TARGET25): $(patsubst %,$(LIBDIR)/%,$(OBJS25))
+	$(CXX) $(CFLAGS) -o $(BINDIR)/$@ $^ $(CXXLIBS) $(CXXFLAGS)
+$(TARGET26): $(patsubst %,$(LIBDIR)/%,$(OBJS26))
 	$(CXX) $(CFLAGS) -o $(BINDIR)/$@ $^ $(CXXLIBS) $(CXXFLAGS)
 .PHONY: clean
 clean:

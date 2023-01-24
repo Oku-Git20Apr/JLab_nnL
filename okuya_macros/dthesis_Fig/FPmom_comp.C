@@ -33,11 +33,38 @@ double FP_cut4(double *x, double *par){
 	double flag = par[0];//L or R
 	return 0.40*x0/100.-0.130;
 }
+void SetTH2(TH2 *h, TString name, TString xname, TString yname, double min=0.8){
+  h->SetTitle(name);
+  h->SetMinimum(min);
+  h->SetLineWidth(0);
+  h->SetTitleSize(0.05,"");
+  h->SetMarkerStyle(20);
+  h->SetMarkerSize(1.5);
+  h->SetMarkerColor(1);
 
-void simc_fp3(){
+  h->GetXaxis()->SetTitle(xname);
+  h->GetXaxis()->CenterTitle();
+  h->GetXaxis()->SetTitleFont(42);
+  h->GetXaxis()->SetTitleOffset(1.20);
+  h->GetXaxis()->SetTitleSize(0.04);
+  h->GetXaxis()->SetLabelFont(42);
+  h->GetXaxis()->SetLabelOffset(0.01);
+
+  h->GetYaxis()->SetTitle(yname);
+  h->GetYaxis()->CenterTitle();
+  h->GetYaxis()->SetTitleFont(42);
+  h->GetYaxis()->SetTitleOffset(1.40);
+  h->GetYaxis()->SetTitleSize(0.04);
+  h->GetYaxis()->SetLabelFont(42);
+  h->GetYaxis()->SetLabelOffset(0.01);
+  ((TGaxis*)h->GetYaxis())->SetMaxDigits(4);
+}
+
+void FPmom_comp(){
   
 /*-- Input file --*/
-  TFile *file = new TFile("../h2all_2020Nov.root","read");
+  //TFile *file = new TFile("../h2all_2_2020Nov.root","read");
+  TFile *file = new TFile("../h2all_500.root","read");
   //TFile *file_simc = new TFile("/data/41a/ELS/okuyama/SIMC_jlab/SIMC/rootfiles/BOTH_LS.root","read");// L:S0=3:1 (0.9M vs 0.3M) 2020/12/10
   TFile *file_simc = new TFile("/data/41a/ELS/okuyama/SIMC_jlab/SIMC/rootfiles/rad_Alupdate.root","read");// L:S0=3:1 (0.9M vs 0.3M) 
   //TFile *file_simc = new TFile("/data/41a/ELS/okuyama/SIMC_jlab/SIMC/rootfiles/rad_update_momminus10.root","read");// L:S0=3:1 (0.9M vs 0.3M) 
@@ -383,19 +410,29 @@ void simc_fp3(){
   h_R_x_y_simc->GetXaxis()->SetTitle("Y(FP) [cm]");
   tree_simc->Project("h_R_x_y_simc","h_xfp:h_yfp+0.516","");
 //X-theta
-  TH2D* h_L_th_x_data       = new TH2D("h_L_th_x_data"      ,"h_L_th_x_data"   ,80,  -80., 80.   ,80,   -0.12,  0.12);
-  h_L_th_x_data->GetYaxis()->SetTitle("#theta(FP) [rad]");
-  h_L_th_x_data->GetXaxis()->SetTitle("X(FP) [cm]");
-  TH2D* h_L_th_x_simc       = new TH2D("h_L_th_x_simc"      ,"h_L_th_x_simc"   ,80,  -80., 80.   ,80,   -0.12,  0.12);
-  h_L_th_x_simc->GetYaxis()->SetTitle("#theta(FP) [rad]");
+  TH2D* h_L_th_x_data       = new TH2D("h_L_th_x_data"      ,"h_L_th_x_data"   ,100,  -80., 80.   ,100,   -0.16,  0.16);
+  //h_L_th_x_data->GetYaxis()->SetTitle("X'(FP) [rad]");
+  //h_L_th_x_data->GetXaxis()->SetTitle("X(FP) [cm]");
+  SetTH2(h_L_th_x_data, "", "X(FP) [cm]", "X'(FP) [rad]", 0.4);
+  TH2D* h_L_th_x_mom       = new TH2D("h_L_th_x_mom"      ,"h_L_th_x_mom"   ,100,  -80., 80.   ,100,   -0.16,  0.16);
+  //h_L_th_x_mom->GetYaxis()->SetTitle("X'(FP) [rad]");
+  //h_L_th_x_mom->GetXaxis()->SetTitle("X(FP) [cm]");
+  SetTH2(h_L_th_x_mom, "", "X(FP) [cm]", "X'(FP) [rad]", 0.4);
+  TH2D* h_L_th_x_simc       = new TH2D("h_L_th_x_simc"      ,"h_L_th_x_simc"   ,100,  -80., 80.   ,100,   -0.16,  0.16);
+  h_L_th_x_simc->GetYaxis()->SetTitle("X'(FP) [rad]");
   h_L_th_x_simc->GetXaxis()->SetTitle("X(FP) [cm]");
   tree_simc->Project("h_L_th_x_simc","e_xpfp:e_xfp","");
   //tree_simc->Project("h_L_th_x_simc","e_xpfp:e_xfp","e_xpfp<0.17*e_xfp/100.+0.025&&e_xpfp>0.17*e_xfp/100.-0.035&&e_xpfp<0.40*e_xfp/100.+0.130");
-  TH2D* h_R_th_x_data       = new TH2D("h_R_th_x_data"      ,"h_R_th_x_data"   ,80,  -80., 80.   ,80,   -0.12,  0.12);
-  h_R_th_x_data->GetYaxis()->SetTitle("#theta(FP) [rad]");
-  h_R_th_x_data->GetXaxis()->SetTitle("X(FP) [cm]");
-  TH2D* h_R_th_x_simc       = new TH2D("h_R_th_x_simc"      ,"h_R_th_x_simc"   ,80,  -80., 80.   ,80,   -0.12,  0.12);
-  h_R_th_x_simc->GetYaxis()->SetTitle("#theta(FP) [rad]");
+  TH2D* h_R_th_x_data       = new TH2D("h_R_th_x_data"      ,"h_R_th_x_data"   ,100,  -80., 80.   ,100,   -0.16,  0.16);
+  //h_R_th_x_data->GetYaxis()->SetTitle("X'(FP) [rad]");
+  //h_R_th_x_data->GetXaxis()->SetTitle("X(FP) [cm]");
+  SetTH2(h_R_th_x_data, "", "X(FP) [cm]", "X'(FP) [rad]", 0.4);
+  TH2D* h_R_th_x_mom       = new TH2D("h_R_th_x_mom"      ,"h_R_th_x_mom"   ,100,  -80., 80.   ,100,   -0.16,  0.16);
+  //h_R_th_x_mom->GetYaxis()->SetTitle("X'(FP) [rad]");
+  //h_R_th_x_mom->GetXaxis()->SetTitle("X(FP) [cm]");
+  SetTH2(h_R_th_x_mom, "", "X(FP) [cm]", "X'(FP) [rad]", 0.4);
+  TH2D* h_R_th_x_simc       = new TH2D("h_R_th_x_simc"      ,"h_R_th_x_simc"   ,100,  -80., 80.   ,100,   -0.16,  0.16);
+  h_R_th_x_simc->GetYaxis()->SetTitle("X'(FP) [rad]");
   h_R_th_x_simc->GetXaxis()->SetTitle("X(FP) [cm]");
   tree_simc->Project("h_R_th_x_simc","h_xpfp:h_xfp","");
   //tree_simc->Project("h_R_th_x_simc","h_xpfp:h_xfp","h_xpfp<0.17*h_xfp/100.+0.025&&h_xpfp>0.17*h_xfp/100.-0.035&&h_xpfp<0.40*h_xfp/100.+0.130");
@@ -865,7 +902,8 @@ cout<<"Entries: "<<ENum<<endl;
 		//if(tan_lab1!=tan_lab2)cout<<"tan1="<<atan(tan_lab1)<<", tan2="<<atan(tan_lab2)<<"theta_gk_lab="<<theta_gk_lab<<endl;
 
 
-		if(event_selection&&ct_cut){
+		//if(event_selection&&ct_cut){
+		if(1){
 			gklab_gkcm->Fill(theta_gk_lab,theta_gk_cm);
 			gklab_eklab->Fill(theta_gk_lab,theta_ek);
 			eelab_eklab->Fill(theta_ee,theta_ek);
@@ -893,6 +931,11 @@ cout<<"Entries: "<<ENum<<endl;
 			h_R_x_y_data->Fill(R_tr_y*100.,R_tr_x*100.);
 			h_L_th_x_data->Fill(L_tr_x*100.,L_tr_th);
 			h_R_th_x_data->Fill(R_tr_x*100.,R_tr_th);
+			if(R_tr_p>1.76&&R_tr_p<1.9&&L_tr_p>2.01&&L_tr_p<2.16){//mom cut
+				h_L_th_x_mom->Fill(L_tr_x*100.,L_tr_th);
+				h_R_th_x_mom->Fill(R_tr_x*100.,R_tr_th);
+			}
+				
 			h_L_ph_y_data->Fill(L_tr_y*100.,L_tr_ph);
 			h_R_ph_y_data->Fill(R_tr_y*100.,R_tr_ph);
 			h_L_ph_th_data->Fill(L_tr_th,L_tr_ph);
@@ -947,353 +990,525 @@ cout<<"Entries: "<<ENum<<endl;
 
 }//ENum
 
-cout<<"Integral"<<endl;
-cout<<"h_pe(mom_cut)="<<h_pe->Integral(h_pe->FindBin(2010.),h_pe->FindBin(2160.))<<endl;
-cout<<"h_pe="<<h_pe->Integral()<<endl;
-cout<<"h_pk(mom_cut)="<<h_pk->Integral(h_pk->FindBin(1760.),h_pk->FindBin(1900.))<<endl;
-cout<<"h_pk="<<h_pk->Integral()<<endl;
-cout<<"h_pe_simc(mom_cut)="<<h_pe_simc->Integral(h_pe_simc->FindBin(2010.),h_pe_simc->FindBin(2160.))<<endl;
-cout<<"h_pe_simc="<<h_pe_simc->Integral()<<endl;
-cout<<"h_pk_simc(mom_cut)="<<h_pk_simc->Integral(h_pk_simc->FindBin(1760.),h_pk_simc->FindBin(1900.))<<endl;
-cout<<"h_pk_simc="<<h_pk_simc->Integral()<<endl;
-cout<<"GetEntries"<<endl;
-cout<<"h_pe="<<h_pe->GetEntries()<<endl;
-cout<<"h_pk="<<h_pk->GetEntries()<<endl;
-cout<<"h_pe_simc="<<h_pe_simc->GetEntries()<<endl;
-cout<<"h_pk_simc="<<h_pk_simc->GetEntries()<<endl;
-
-///-----********-----///
-// c10: pe, pk, simc
-// c20: pe, pk, data
-// c30: pe, pk, same
-// c40: pe, pk, chi-square
+//cout<<"Integral"<<endl;
+//cout<<"h_pe(mom_cut)="<<h_pe->Integral(h_pe->FindBin(2010.),h_pe->FindBin(2160.))<<endl;
+//cout<<"h_pe="<<h_pe->Integral()<<endl;
+//cout<<"h_pk(mom_cut)="<<h_pk->Integral(h_pk->FindBin(1760.),h_pk->FindBin(1900.))<<endl;
+//cout<<"h_pk="<<h_pk->Integral()<<endl;
+//cout<<"h_pe_simc(mom_cut)="<<h_pe_simc->Integral(h_pe_simc->FindBin(2010.),h_pe_simc->FindBin(2160.))<<endl;
+//cout<<"h_pe_simc="<<h_pe_simc->Integral()<<endl;
+//cout<<"h_pk_simc(mom_cut)="<<h_pk_simc->Integral(h_pk_simc->FindBin(1760.),h_pk_simc->FindBin(1900.))<<endl;
+//cout<<"h_pk_simc="<<h_pk_simc->Integral()<<endl;
+//cout<<"GetEntries"<<endl;
+//cout<<"h_pe="<<h_pe->GetEntries()<<endl;
+//cout<<"h_pk="<<h_pk->GetEntries()<<endl;
+//cout<<"h_pe_simc="<<h_pe_simc->GetEntries()<<endl;
+//cout<<"h_pk_simc="<<h_pk_simc->GetEntries()<<endl;
 //
-// c50: FP_HRS-R 1D
-// c51: FP_HRS-L 1D
+/////-----********-----///
+//// c10: pe, pk, simc
+//// c20: pe, pk, data
+//// c30: pe, pk, same
+//// c40: pe, pk, chi-square
+////
+//// c50: FP_HRS-R 1D
+//// c51: FP_HRS-L 1D
+////
+//// c60: 
+//// c61: 
+//// c64: 
+/////-----********-----///
 //
-// c60: 
-// c61: 
-// c64: 
-///-----********-----///
-
-
-	double dtemp, stemp;
-	TCanvas* c10 = new TCanvas("c10","c10",900.,900.);
-	c10->Divide(2,2);
-	c10->cd(1);
-	h_pe_simc->SetNdivisions(505);
-	h_pe_simc->Draw("");
-	c10->cd(2);
-	h_pk_simc->SetNdivisions(505);
-	h_pk_simc->Draw("");
-	c10->cd(3);
-	gPad->SetLeftMargin(0.15);
-	gPad->SetRightMargin(0.15);
-	gPad->SetTopMargin(0.15);
-	gPad->SetBottomMargin(0.15);
-	h_pepk_simc->Draw("colz");
-	TCanvas* c20 = new TCanvas("c20","c20",900.,900.);
-	c20->Divide(2,2);
-	c20->cd(1);
-	h_pe->Draw("");
-	c20->cd(2);
-	h_pk->Draw("");
-	c20->cd(3);
-	gPad->SetLeftMargin(0.15);
-	gPad->SetRightMargin(0.15);
-	gPad->SetTopMargin(0.15);
-	gPad->SetBottomMargin(0.15);
-	h_pepk->Draw("colz");
-	TCanvas* c30 = new TCanvas("c30","c30",900.,900.);
-	h_pe->SetLineColor(kAzure);
-	h_pk->SetLineColor(kAzure);
-	h_pe_simc->SetLineColor(kRed);
-	h_pk_simc->SetLineColor(kRed);
-	c30->Divide(2,2);
-	c30->cd(1);
-	h_pe->Draw("");
-	//h_pe_simc->Scale(1863./922483.);//orig
-	//h_pe_simc->Scale(2421./1.2e+6);
-	//h_pe_simc->Scale(2081./923474.);//rec
-	stemp=h_pe_simc->Integral();
-	dtemp=h_pe->Integral();
-	cout<<"stemp="<<stemp<<endl;
-	cout<<"dtemp="<<dtemp<<endl;
-	h_pe_simc->Scale(dtemp/stemp);
-	h_pe_simc->Draw("same");
-	c30->cd(2);
-	h_pk->SetNdivisions(505);
-	h_pk->Draw("");
-	//h_pk_simc->Scale(2226./1041430.);//rec
-	//h_pk_simc->Scale(2286./1040300.);//orig
-	//h_pk_simc->Scale(1863./1040300.);
-	//h_pk_simc->Scale(2421./1.2e+6);
-	stemp=h_pk_simc->Integral();
-	dtemp=h_pk->Integral();
-	h_pk_simc->Scale(dtemp/stemp);
-	h_pk_simc->Draw("same");
-	c30->cd(3);
-	h_pe->Draw("e");
-	h_pe_simc->Draw("same");
-	//h_pe_simc_FPcut->Scale(2081./923474.);//rec
-	stemp=h_pe_simc_FPcut->Integral();
-	dtemp=h_pe->Integral();
-	h_pe_simc_FPcut->Scale(dtemp/stemp);
-	h_pe_simc_FPcut->SetLineColor(kGreen);
-	h_pe_simc_FPcut->Draw("same");
-	c30->cd(4);
-	h_pk->Draw("e");
-	h_pk_simc->Draw("same");
-	//h_pk_simc_FPcut->Scale(2226./1041430.);//rec
-	stemp=h_pk_simc_FPcut->Integral();
-	dtemp=h_pk->Integral();
-	h_pk_simc_FPcut->Scale(dtemp/stemp);
-	h_pk_simc_FPcut->SetLineColor(kGreen);
-	h_pk_simc_FPcut->Draw("same");
-	
-	TCanvas* c40 = new TCanvas("c40","c40",900.,900.);
-    TH1D* h_pe_chisq = new TH1D("h_pe_chisq", "#chi_{e'}^{2}" ,200,1980.,2220.);
-    TH1D* h_pk_chisq = new TH1D("h_pk_chisq", "#chi_{K}^{2}" ,200,1720.,1940.);
-	double e_data, e_expt, e_temp, e_chisq=0.;
-	double k_data, k_expt, k_temp, k_chisq=0.;
-	int e_bin=0, k_bin=0;
-	for(int i=0;i<200;i++){
-		e_data = h_pe->GetBinContent(i+1);
-		e_expt = h_pe_simc->GetBinContent(i+1);
-		if(e_expt==0.)e_temp=0.01;
-		else e_temp = (e_data - e_expt)*(e_data - e_expt)/e_expt;
-		//e_temp = (e_data - e_expt)*(e_data - e_expt)/e_expt;
-		if(h_pe->GetBinCenter(i+1)>2010.&&h_pe->GetBinCenter(i+1)<2160.){e_chisq += e_temp;e_bin++;}
-		//e_chisq += e_temp;e_bin++;
-		h_pe_chisq->SetBinContent(i+1,e_temp);
-		k_data = h_pk->GetBinContent(i+1);
-		k_expt = h_pk_simc->GetBinContent(i+1);
-		if(k_expt==0.)k_temp=0.01;
-		else k_temp = (k_data - k_expt)*(k_data - k_expt)/k_expt;
-		//k_temp = (k_data - k_expt)*(k_data - k_expt)/k_expt;
-		if(h_pk->GetBinCenter(i+1)>1760.&&h_pk->GetBinCenter(i+1)<1900.){k_chisq += k_temp;k_bin++;}
-		//k_chisq += k_temp;k_bin++;
-		h_pk_chisq->SetBinContent(i+1,k_temp);
-	}
-	c40->Divide(2,2);
-	c40->cd(1);
-	h_pe->Draw("e");
-	h_pe_simc->Draw("same");
-	c40->cd(2);
-	h_pk->Draw("e");
-	h_pk_simc->Draw("same");
-	c40->cd(3);
-	h_pe_chisq->Draw("");
-	c40->cd(4);
-	h_pk_chisq->SetNdivisions(505);
-	h_pk_chisq->Draw("");
-	
-	cout<<"e chi-square = "<<e_chisq<<endl;
-	cout<<"e bin = "<<e_bin<<endl;
-	cout<<"k chi-square = "<<k_chisq<<endl;
-	cout<<"k bin = "<<k_bin<<endl;
-//	c3->Print("./pdf/mm_tight.pdf");
-//	c4->Print("./pdf/mm_wobg_tight.pdf");
-
-cout << "h_R_y_simc = "<<h_R_y_simc->Integral()<<endl;
-cout << "h_R_y_data = "<<h_R_y_data->Integral()<<endl;
-cout << "h_R_x_simc = "<<h_R_x_simc->Integral()<<endl;
-cout << "h_R_x_data = "<<h_R_x_data->Integral()<<endl;
-cout << "h_R_th_simc = "<<h_R_th_simc->Integral()<<endl;
-cout << "h_R_ph_data = "<<h_R_ph_data->Integral()<<endl;
-cout << "h_R_tg_th_simc = "<<h_R_tg_th_simc->Integral()<<endl;
-cout << "h_R_tg_ph_data = "<<h_R_tg_ph_data->Integral()<<endl;
-cout << "h_L_y_simc = "<<h_L_y_simc->Integral()<<endl;
-cout << "h_L_y_data = "<<h_L_y_data->Integral()<<endl;
-cout << "h_L_x_simc = "<<h_L_x_simc->Integral()<<endl;
-cout << "h_L_x_data = "<<h_L_x_data->Integral()<<endl;
-cout << "h_L_th_simc = "<<h_L_th_simc->Integral()<<endl;
-cout << "h_L_ph_data = "<<h_L_ph_data->Integral()<<endl;
-cout << "h_L_tg_th_simc = "<<h_L_tg_th_simc->Integral()<<endl;
-cout << "h_L_tg_ph_data = "<<h_L_tg_ph_data->Integral()<<endl;
-
-	TCanvas* c50 = new TCanvas("c50","c50",900.,900.);
-	c50->Divide(3,2);
-	c50->cd(1);
-	stemp=h_R_y_simc->Integral();
-	dtemp=h_R_y_data->Integral();
-	cout<<"stemp="<<stemp<<endl;
-	cout<<"dtemp="<<dtemp<<endl;
-	h_R_y_simc->Scale(dtemp/stemp);
-	h_R_y_data->Draw("e");
-	//h_R_y_data->Fit("gausn");
-	h_R_y_simc->Draw("histsame");
-	//h_R_y_simc->Fit("gausn");
-	c50->cd(2);
-	stemp=h_R_x_simc->Integral();
-	dtemp=h_R_x_data->Integral();
-	h_R_x_simc->Scale(dtemp/stemp);
-	h_R_x_data->Draw("e");
-	h_R_x_simc->Draw("histsame");
-	c50->cd(3);
-	stemp=h_R_th_simc->Integral();
-	dtemp=h_R_th_data->Integral();
-	h_R_th_simc->Scale(dtemp/stemp);
-	h_R_th_data->Draw("e");
-	h_R_th_simc->Draw("histsame");
-	c50->cd(4);
-	stemp=h_R_ph_simc->Integral();
-	dtemp=h_R_ph_data->Integral();
-	h_R_ph_simc->Scale(dtemp/stemp);
-	h_R_ph_data->Draw("e");
-	h_R_ph_simc->Draw("histsame");
-	c50->cd(5);
-	stemp=h_R_tg_th_simc->Integral();
-	dtemp=h_R_tg_th_data->Integral();
-	h_R_tg_th_simc->Scale(dtemp/stemp);
-	h_R_tg_th_data->Draw("e");
-	h_R_tg_th_simc->Draw("histsame");
-	c50->cd(6);
-	stemp=h_R_tg_ph_simc->Integral();
-	dtemp=h_R_tg_ph_data->Integral();
-	h_R_tg_ph_simc->Scale(dtemp/stemp);
-	h_R_tg_ph_data->Draw("e");
-	h_R_tg_ph_simc->Draw("histsame");
-	
-	TCanvas* c51 = new TCanvas("c51","c51",900.,900.);
-	c51->Divide(3,2);
-	c51->cd(1);
-	stemp=h_L_y_simc->Integral();
-	dtemp=h_L_y_data->Integral();
-	h_L_y_simc->Scale(dtemp/stemp);
-	h_L_y_data->Draw("e");
-	//h_L_y_data->Fit("gausn");
-	h_L_y_simc->Draw("histsame");
-	//h_L_y_simc->Fit("gausn");
-	c51->cd(2);
-	stemp=h_L_x_simc->Integral();
-	dtemp=h_L_x_data->Integral();
-	h_L_x_simc->Scale(dtemp/stemp);
-	h_L_x_data->Draw("e");
-	h_L_x_simc->Draw("histsame");
-	c51->cd(3);
-	stemp=h_L_th_simc->Integral();
-	dtemp=h_L_th_data->Integral();
-	h_L_th_simc->Scale(dtemp/stemp);
-	h_L_th_data->Draw("e");
-	h_L_th_simc->Draw("histsame");
-	c51->cd(4);
-	stemp=h_L_ph_simc->Integral();
-	dtemp=h_L_ph_data->Integral();
-	h_L_ph_simc->Scale(dtemp/stemp);
-	h_L_ph_data->Draw("e");
-	h_L_ph_simc->Draw("histsame");
-	c51->cd(5);
-	stemp=h_L_tg_th_simc->Integral();
-	dtemp=h_L_tg_th_data->Integral();
-	h_L_tg_th_simc->Scale(dtemp/stemp);
-	h_L_tg_th_data->Draw("e");
-	h_L_tg_th_simc->Draw("histsame");
-	c51->cd(6);
-	stemp=h_L_tg_ph_simc->Integral();
-	dtemp=h_L_tg_ph_data->Integral();
-	h_L_tg_ph_simc->Scale(dtemp/stemp);
-	h_L_tg_ph_data->Draw("e");
-	h_L_tg_ph_simc->Draw("histsame");
-
-cout << "h_R_y_simc = "<<h_R_y_simc->Integral()<<endl;
-cout << "h_R_y_data = "<<h_R_y_data->Integral()<<endl;
-cout << "h_R_x_simc = "<<h_R_x_simc->Integral()<<endl;
-cout << "h_R_x_data = "<<h_R_x_data->Integral()<<endl;
-cout << "h_R_th_simc = "<<h_R_th_simc->Integral()<<endl;
-cout << "h_R_ph_data = "<<h_R_ph_data->Integral()<<endl;
-cout << "h_R_tg_th_simc = "<<h_R_tg_th_simc->Integral()<<endl;
-cout << "h_R_tg_ph_data = "<<h_R_tg_ph_data->Integral()<<endl;
-cout << "h_L_y_simc = "<<h_L_y_simc->Integral()<<endl;
-cout << "h_L_y_data = "<<h_L_y_data->Integral()<<endl;
-cout << "h_L_x_simc = "<<h_L_x_simc->Integral()<<endl;
-cout << "h_L_x_data = "<<h_L_x_data->Integral()<<endl;
-cout << "h_L_th_simc = "<<h_L_th_simc->Integral()<<endl;
-cout << "h_L_ph_data = "<<h_L_ph_data->Integral()<<endl;
-cout << "h_L_tg_th_simc = "<<h_L_tg_th_simc->Integral()<<endl;
-cout << "h_L_tg_ph_data = "<<h_L_tg_ph_data->Integral()<<endl;
-
-	gStyle->SetPadLeftMargin(0.15);
-	gStyle->SetPadRightMargin(0.15);
-	gStyle->SetPadTopMargin(0.15);
-	gStyle->SetPadBottomMargin(0.15);
-
-//	TCanvas* c60 = new TCanvas("c60","c60",900.,900.);
-//	c60->Divide(2,2);
-//	c60->cd(1);
-//	h_L_tg_ph_y_simc->Draw("colz");
-//	c60->cd(2);
-//	h_L_tg_ph_y_data->Draw("colz");
-//	c60->cd(3);
-//	h_L_tg_th_x_simc->Draw("colz");
-//	c60->cd(4);
-//	h_L_tg_th_x_data->Draw("colz");
-//	TCanvas* c61 = new TCanvas("c61","c61",900.,900.);
-//	c61->Divide(2,2);
-//	c61->cd(1);
-//	h_R_tg_ph_y_simc->Draw("colz");
-//	c61->cd(2);
-//	h_R_tg_ph_y_data->Draw("colz");
-//	c61->cd(3);
-//	h_R_tg_th_x_simc->Draw("colz");
-//	c61->cd(4);
-//	h_R_tg_th_x_data->Draw("colz");
+//
+//	double dtemp, stemp;
+//	TCanvas* c10 = new TCanvas("c10","c10",900.,900.);
+//	c10->Divide(2,2);
+//	c10->cd(1);
+//	h_pe_simc->SetNdivisions(505);
+//	h_pe_simc->Draw("");
+//	c10->cd(2);
+//	h_pk_simc->SetNdivisions(505);
+//	h_pk_simc->Draw("");
+//	c10->cd(3);
+//	gPad->SetLeftMargin(0.15);
+//	gPad->SetRightMargin(0.15);
+//	gPad->SetTopMargin(0.15);
+//	gPad->SetBottomMargin(0.15);
+//	h_pepk_simc->Draw("colz");
+//	TCanvas* c20 = new TCanvas("c20","c20",900.,900.);
+//	c20->Divide(2,2);
+//	c20->cd(1);
+//	h_pe->Draw("");
+//	c20->cd(2);
+//	h_pk->Draw("");
+//	c20->cd(3);
+//	gPad->SetLeftMargin(0.15);
+//	gPad->SetRightMargin(0.15);
+//	gPad->SetTopMargin(0.15);
+//	gPad->SetBottomMargin(0.15);
+//	h_pepk->Draw("colz");
+//	TCanvas* c30 = new TCanvas("c30","c30",900.,900.);
+//	h_pe->SetLineColor(kAzure);
+//	h_pk->SetLineColor(kAzure);
+//	h_pe_simc->SetLineColor(kRed);
+//	h_pk_simc->SetLineColor(kRed);
+//	c30->Divide(2,2);
+//	c30->cd(1);
+//	h_pe->Draw("");
+//	//h_pe_simc->Scale(1863./922483.);//orig
+//	//h_pe_simc->Scale(2421./1.2e+6);
+//	//h_pe_simc->Scale(2081./923474.);//rec
+//	stemp=h_pe_simc->Integral();
+//	dtemp=h_pe->Integral();
+//	cout<<"stemp="<<stemp<<endl;
+//	cout<<"dtemp="<<dtemp<<endl;
+//	h_pe_simc->Scale(dtemp/stemp);
+//	h_pe_simc->Draw("same");
+//	c30->cd(2);
+//	h_pk->SetNdivisions(505);
+//	h_pk->Draw("");
+//	//h_pk_simc->Scale(2226./1041430.);//rec
+//	//h_pk_simc->Scale(2286./1040300.);//orig
+//	//h_pk_simc->Scale(1863./1040300.);
+//	//h_pk_simc->Scale(2421./1.2e+6);
+//	stemp=h_pk_simc->Integral();
+//	dtemp=h_pk->Integral();
+//	h_pk_simc->Scale(dtemp/stemp);
+//	h_pk_simc->Draw("same");
+//	c30->cd(3);
+//	h_pe->Draw("e");
+//	h_pe_simc->Draw("same");
+//	//h_pe_simc_FPcut->Scale(2081./923474.);//rec
+//	stemp=h_pe_simc_FPcut->Integral();
+//	dtemp=h_pe->Integral();
+//	h_pe_simc_FPcut->Scale(dtemp/stemp);
+//	h_pe_simc_FPcut->SetLineColor(kGreen);
+//	h_pe_simc_FPcut->Draw("same");
+//	c30->cd(4);
+//	h_pk->Draw("e");
+//	h_pk_simc->Draw("same");
+//	//h_pk_simc_FPcut->Scale(2226./1041430.);//rec
+//	stemp=h_pk_simc_FPcut->Integral();
+//	dtemp=h_pk->Integral();
+//	h_pk_simc_FPcut->Scale(dtemp/stemp);
+//	h_pk_simc_FPcut->SetLineColor(kGreen);
+//	h_pk_simc_FPcut->Draw("same");
 //	
-//	TCanvas* c62 = new TCanvas("c62","c62",900.,900.);
-//	c62->Divide(2,2);
-//	c62->cd(1);
-//  	h_R_y_vz_simc->Draw("colz");    
-//	c62->cd(2);
-//	h_R_y_vz_data->Draw("colz");    
-//	c62->cd(3);
-//  	h_L_y_vz_simc->Draw("colz");
-//	c62->cd(4);
-//  	h_L_y_vz_data->Draw("colz");
+//	TCanvas* c40 = new TCanvas("c40","c40",900.,900.);
+//    TH1D* h_pe_chisq = new TH1D("h_pe_chisq", "#chi_{e'}^{2}" ,200,1980.,2220.);
+//    TH1D* h_pk_chisq = new TH1D("h_pk_chisq", "#chi_{K}^{2}" ,200,1720.,1940.);
+//	double e_data, e_expt, e_temp, e_chisq=0.;
+//	double k_data, k_expt, k_temp, k_chisq=0.;
+//	int e_bin=0, k_bin=0;
+//	for(int i=0;i<200;i++){
+//		e_data = h_pe->GetBinContent(i+1);
+//		e_expt = h_pe_simc->GetBinContent(i+1);
+//		if(e_expt==0.)e_temp=0.01;
+//		else e_temp = (e_data - e_expt)*(e_data - e_expt)/e_expt;
+//		//e_temp = (e_data - e_expt)*(e_data - e_expt)/e_expt;
+//		if(h_pe->GetBinCenter(i+1)>2010.&&h_pe->GetBinCenter(i+1)<2160.){e_chisq += e_temp;e_bin++;}
+//		//e_chisq += e_temp;e_bin++;
+//		h_pe_chisq->SetBinContent(i+1,e_temp);
+//		k_data = h_pk->GetBinContent(i+1);
+//		k_expt = h_pk_simc->GetBinContent(i+1);
+//		if(k_expt==0.)k_temp=0.01;
+//		else k_temp = (k_data - k_expt)*(k_data - k_expt)/k_expt;
+//		//k_temp = (k_data - k_expt)*(k_data - k_expt)/k_expt;
+//		if(h_pk->GetBinCenter(i+1)>1760.&&h_pk->GetBinCenter(i+1)<1900.){k_chisq += k_temp;k_bin++;}
+//		//k_chisq += k_temp;k_bin++;
+//		h_pk_chisq->SetBinContent(i+1,k_temp);
+//	}
+//	c40->Divide(2,2);
+//	c40->cd(1);
+//	h_pe->Draw("e");
+//	h_pe_simc->Draw("same");
+//	c40->cd(2);
+//	h_pk->Draw("e");
+//	h_pk_simc->Draw("same");
+//	c40->cd(3);
+//	h_pe_chisq->Draw("");
+//	c40->cd(4);
+//	h_pk_chisq->SetNdivisions(505);
+//	h_pk_chisq->Draw("");
+//	
+//	cout<<"e chi-square = "<<e_chisq<<endl;
+//	cout<<"e bin = "<<e_bin<<endl;
+//	cout<<"k chi-square = "<<k_chisq<<endl;
+//	cout<<"k bin = "<<k_bin<<endl;
+////	c3->Print("./pdf/mm_tight.pdf");
+////	c4->Print("./pdf/mm_wobg_tight.pdf");
 //
-//	TCanvas* c63 = new TCanvas("c63","c63",900.,900.);
-//	c63->Divide(2,2);
-//	c63->cd(1);
-//  	h_R_ph_vz_simc->Draw("colz");    
-//	c63->cd(2);
-//	h_R_ph_vz_data->Draw("colz");    
-//	c63->cd(3);
-//  	h_L_ph_vz_simc->Draw("colz");
-//	c63->cd(4);
-//  	h_L_ph_vz_data->Draw("colz");
+//cout << "h_R_y_simc = "<<h_R_y_simc->Integral()<<endl;
+//cout << "h_R_y_data = "<<h_R_y_data->Integral()<<endl;
+//cout << "h_R_x_simc = "<<h_R_x_simc->Integral()<<endl;
+//cout << "h_R_x_data = "<<h_R_x_data->Integral()<<endl;
+//cout << "h_R_th_simc = "<<h_R_th_simc->Integral()<<endl;
+//cout << "h_R_ph_data = "<<h_R_ph_data->Integral()<<endl;
+//cout << "h_R_tg_th_simc = "<<h_R_tg_th_simc->Integral()<<endl;
+//cout << "h_R_tg_ph_data = "<<h_R_tg_ph_data->Integral()<<endl;
+//cout << "h_L_y_simc = "<<h_L_y_simc->Integral()<<endl;
+//cout << "h_L_y_data = "<<h_L_y_data->Integral()<<endl;
+//cout << "h_L_x_simc = "<<h_L_x_simc->Integral()<<endl;
+//cout << "h_L_x_data = "<<h_L_x_data->Integral()<<endl;
+//cout << "h_L_th_simc = "<<h_L_th_simc->Integral()<<endl;
+//cout << "h_L_ph_data = "<<h_L_ph_data->Integral()<<endl;
+//cout << "h_L_tg_th_simc = "<<h_L_tg_th_simc->Integral()<<endl;
+//cout << "h_L_tg_ph_data = "<<h_L_tg_ph_data->Integral()<<endl;
+//
+//	TCanvas* c50 = new TCanvas("c50","c50",900.,900.);
+//	c50->Divide(3,2);
+//	c50->cd(1);
+//	stemp=h_R_y_simc->Integral();
+//	dtemp=h_R_y_data->Integral();
+//	cout<<"stemp="<<stemp<<endl;
+//	cout<<"dtemp="<<dtemp<<endl;
+//	h_R_y_simc->Scale(dtemp/stemp);
+//	h_R_y_data->Draw("e");
+//	//h_R_y_data->Fit("gausn");
+//	h_R_y_simc->Draw("histsame");
+//	//h_R_y_simc->Fit("gausn");
+//	c50->cd(2);
+//	stemp=h_R_x_simc->Integral();
+//	dtemp=h_R_x_data->Integral();
+//	h_R_x_simc->Scale(dtemp/stemp);
+//	h_R_x_data->Draw("e");
+//	h_R_x_simc->Draw("histsame");
+//	c50->cd(3);
+//	stemp=h_R_th_simc->Integral();
+//	dtemp=h_R_th_data->Integral();
+//	h_R_th_simc->Scale(dtemp/stemp);
+//	h_R_th_data->Draw("e");
+//	h_R_th_simc->Draw("histsame");
+//	c50->cd(4);
+//	stemp=h_R_ph_simc->Integral();
+//	dtemp=h_R_ph_data->Integral();
+//	h_R_ph_simc->Scale(dtemp/stemp);
+//	h_R_ph_data->Draw("e");
+//	h_R_ph_simc->Draw("histsame");
+//	c50->cd(5);
+//	stemp=h_R_tg_th_simc->Integral();
+//	dtemp=h_R_tg_th_data->Integral();
+//	h_R_tg_th_simc->Scale(dtemp/stemp);
+//	h_R_tg_th_data->Draw("e");
+//	h_R_tg_th_simc->Draw("histsame");
+//	c50->cd(6);
+//	stemp=h_R_tg_ph_simc->Integral();
+//	dtemp=h_R_tg_ph_data->Integral();
+//	h_R_tg_ph_simc->Scale(dtemp/stemp);
+//	h_R_tg_ph_data->Draw("e");
+//	h_R_tg_ph_simc->Draw("histsame");
+//	
+//	TCanvas* c51 = new TCanvas("c51","c51",900.,900.);
+//	c51->Divide(3,2);
+//	c51->cd(1);
+//	stemp=h_L_y_simc->Integral();
+//	dtemp=h_L_y_data->Integral();
+//	h_L_y_simc->Scale(dtemp/stemp);
+//	h_L_y_data->Draw("e");
+//	//h_L_y_data->Fit("gausn");
+//	h_L_y_simc->Draw("histsame");
+//	//h_L_y_simc->Fit("gausn");
+//	c51->cd(2);
+//	stemp=h_L_x_simc->Integral();
+//	dtemp=h_L_x_data->Integral();
+//	h_L_x_simc->Scale(dtemp/stemp);
+//	h_L_x_data->Draw("e");
+//	h_L_x_simc->Draw("histsame");
+//	c51->cd(3);
+//	stemp=h_L_th_simc->Integral();
+//	dtemp=h_L_th_data->Integral();
+//	h_L_th_simc->Scale(dtemp/stemp);
+//	h_L_th_data->Draw("e");
+//	h_L_th_simc->Draw("histsame");
+//	c51->cd(4);
+//	stemp=h_L_ph_simc->Integral();
+//	dtemp=h_L_ph_data->Integral();
+//	h_L_ph_simc->Scale(dtemp/stemp);
+//	h_L_ph_data->Draw("e");
+//	h_L_ph_simc->Draw("histsame");
+//	c51->cd(5);
+//	stemp=h_L_tg_th_simc->Integral();
+//	dtemp=h_L_tg_th_data->Integral();
+//	h_L_tg_th_simc->Scale(dtemp/stemp);
+//	h_L_tg_th_data->Draw("e");
+//	h_L_tg_th_simc->Draw("histsame");
+//	c51->cd(6);
+//	stemp=h_L_tg_ph_simc->Integral();
+//	dtemp=h_L_tg_ph_data->Integral();
+//	h_L_tg_ph_simc->Scale(dtemp/stemp);
+//	h_L_tg_ph_data->Draw("e");
+//	h_L_tg_ph_simc->Draw("histsame");
+//
+//cout << "h_R_y_simc = "<<h_R_y_simc->Integral()<<endl;
+//cout << "h_R_y_data = "<<h_R_y_data->Integral()<<endl;
+//cout << "h_R_x_simc = "<<h_R_x_simc->Integral()<<endl;
+//cout << "h_R_x_data = "<<h_R_x_data->Integral()<<endl;
+//cout << "h_R_th_simc = "<<h_R_th_simc->Integral()<<endl;
+//cout << "h_R_ph_data = "<<h_R_ph_data->Integral()<<endl;
+//cout << "h_R_tg_th_simc = "<<h_R_tg_th_simc->Integral()<<endl;
+//cout << "h_R_tg_ph_data = "<<h_R_tg_ph_data->Integral()<<endl;
+//cout << "h_L_y_simc = "<<h_L_y_simc->Integral()<<endl;
+//cout << "h_L_y_data = "<<h_L_y_data->Integral()<<endl;
+//cout << "h_L_x_simc = "<<h_L_x_simc->Integral()<<endl;
+//cout << "h_L_x_data = "<<h_L_x_data->Integral()<<endl;
+//cout << "h_L_th_simc = "<<h_L_th_simc->Integral()<<endl;
+//cout << "h_L_ph_data = "<<h_L_ph_data->Integral()<<endl;
+//cout << "h_L_tg_th_simc = "<<h_L_tg_th_simc->Integral()<<endl;
+//cout << "h_L_tg_ph_data = "<<h_L_tg_ph_data->Integral()<<endl;
+//
+//	gStyle->SetPadLeftMargin(0.15);
+//	gStyle->SetPadRightMargin(0.15);
+//	gStyle->SetPadTopMargin(0.15);
+//	gStyle->SetPadBottomMargin(0.15);
+//
+////	TCanvas* c60 = new TCanvas("c60","c60",900.,900.);
+////	c60->Divide(2,2);
+////	c60->cd(1);
+////	h_L_tg_ph_y_simc->Draw("colz");
+////	c60->cd(2);
+////	h_L_tg_ph_y_data->Draw("colz");
+////	c60->cd(3);
+////	h_L_tg_th_x_simc->Draw("colz");
+////	c60->cd(4);
+////	h_L_tg_th_x_data->Draw("colz");
+////	TCanvas* c61 = new TCanvas("c61","c61",900.,900.);
+////	c61->Divide(2,2);
+////	c61->cd(1);
+////	h_R_tg_ph_y_simc->Draw("colz");
+////	c61->cd(2);
+////	h_R_tg_ph_y_data->Draw("colz");
+////	c61->cd(3);
+////	h_R_tg_th_x_simc->Draw("colz");
+////	c61->cd(4);
+////	h_R_tg_th_x_data->Draw("colz");
+////	
+////	TCanvas* c62 = new TCanvas("c62","c62",900.,900.);
+////	c62->Divide(2,2);
+////	c62->cd(1);
+////  	h_R_y_vz_simc->Draw("colz");    
+////	c62->cd(2);
+////	h_R_y_vz_data->Draw("colz");    
+////	c62->cd(3);
+////  	h_L_y_vz_simc->Draw("colz");
+////	c62->cd(4);
+////  	h_L_y_vz_data->Draw("colz");
+////
+////	TCanvas* c63 = new TCanvas("c63","c63",900.,900.);
+////	c63->Divide(2,2);
+////	c63->cd(1);
+////  	h_R_ph_vz_simc->Draw("colz");    
+////	c63->cd(2);
+////	h_R_ph_vz_data->Draw("colz");    
+////	c63->cd(3);
+////  	h_L_ph_vz_simc->Draw("colz");
+////	c63->cd(4);
+////  	h_L_ph_vz_data->Draw("colz");
+//
+//
+//
+//
+////Each Pad Size are changed.
+//	gStyle->SetPadLeftMargin(0.15);
+//	gStyle->SetPadRightMargin(0.15);
+//	gStyle->SetPadTopMargin(0.15);
+//	gStyle->SetPadBottomMargin(0.15);
+//
+//	TCanvas* c64 = new TCanvas("c64","c64",900.,900.);
+//	c64->Divide(2,2);
+//	c64->cd(1);
+//  	h_R_p_x_simc->Draw("colz");    
+//	c64->cd(2);
+//  	h_R_p_x_data->Draw("colz");    
+//	c64->cd(3);
+//  	h_L_p_x_simc->Draw("colz");    
+//	c64->cd(4);
+//  	h_L_p_x_data->Draw("colz");    
+//
+//	TCanvas* c70 = new TCanvas("c70","c70 (FP)",900.,900.);
+//	c70->Divide(2,2);
+//	c70->cd(1);
+//  	h_R_x_y_simc->Draw("colz");    
+//	c70->cd(2);
+//  	h_R_x_y_data->Draw("colz");    
+//	c70->cd(3);
+//  	h_L_x_y_simc->Draw("colz");    
+//	c70->cd(4);
+//  	h_L_x_y_data->Draw("colz");    
+//
+//	TCanvas* c71 = new TCanvas("c71","c71 (FP)",900.,900.);
+//	c71->Divide(2,2);
+//	TF1* func_fp1 = new TF1("func_fp1",FP_cut1,-80.,80.,1);
+//	func_fp1->SetNpx(600);
+//	func_fp1->SetParameter(1,0);
+//	func_fp1->SetLineColor(kRed);
+//	func_fp1->SetLineWidth(4);
+//	TF1* func_fp2 = new TF1("func_fp2",FP_cut2,-80.,80.,1);
+//	func_fp2->SetNpx(600);
+//	func_fp2->SetParameter(1,0);
+//	func_fp2->SetLineColor(kRed);
+//	func_fp2->SetLineWidth(4);
+//	TF1* func_fp3 = new TF1("func_fp3",FP_cut3,-80.,80.,1);
+//	func_fp3->SetNpx(600);
+//	func_fp3->SetParameter(1,0);
+//	func_fp3->SetLineColor(kRed);
+//	func_fp3->SetLineWidth(4);
+//	TF1* func_fp4 = new TF1("func_fp4",FP_cut4,-80.,80.,1);
+//	func_fp4->SetNpx(600);
+//	func_fp4->SetParameter(1,0);
+//	func_fp4->SetLineColor(kViolet);
+//	func_fp4->SetLineWidth(4);
+//	c71->cd(1);
+//  	h_R_th_x_simc->Draw("colz");    
+//	func_fp1->Draw("same");
+//	func_fp2->Draw("same");
+//	func_fp3->Draw("same");
+//	func_fp4->Draw("same");
+//	c71->cd(2);
+//  	h_R_th_x_data->Draw("colz");    
+//	func_fp1->Draw("same");
+//	func_fp2->Draw("same");
+//	func_fp3->Draw("same");
+//	func_fp4->Draw("same");
+//	c71->cd(3);
+//  	h_L_th_x_simc->Draw("colz");    
+//	func_fp1->Draw("same");
+//	func_fp2->Draw("same");
+//	func_fp3->Draw("same");
+//	func_fp4->Draw("same");
+//	c71->cd(4);
+//  	h_L_th_x_data->Draw("colz");    
+//	func_fp1->Draw("same");
+//	func_fp2->Draw("same");
+//	func_fp3->Draw("same");
+//	func_fp4->Draw("same");
+//
+//	TCanvas* c72 = new TCanvas("c72","c72 (FP)",900.,900.);
+//	c72->Divide(2,2);
+//	c72->cd(1);
+//  	h_R_ph_y_simc->Draw("colz");    
+//	c72->cd(2);
+//  	h_R_ph_y_data->Draw("colz");    
+//	c72->cd(3);
+//  	h_L_ph_y_simc->Draw("colz");    
+//	c72->cd(4);
+//  	h_L_ph_y_data->Draw("colz");    
+//
+//	TCanvas* c73 = new TCanvas("c73","c73 (FP)",900.,900.);
+//	c73->Divide(2,2);
+//	c73->cd(1);
+//  	h_R_ph_th_simc->Draw("colz");    
+//	c73->cd(2);
+//  	h_R_ph_th_data->Draw("colz");    
+//	c73->cd(3);
+//  	h_L_ph_th_simc->Draw("colz");    
+//	c73->cd(4);
+//  	h_L_ph_th_data->Draw("colz");    
+//
+//	TCanvas* c80 = new TCanvas("c80","c80 (tar)",900.,900.);
+//	c80->Divide(2,2);
+//	c80->cd(1);
+//  	h_R_tg_ph_tg_th_simc->Draw("colz");    
+//	c80->cd(2);
+//  	h_R_tg_ph_tg_th_data->Draw("colz");    
+//	c80->cd(3);
+//  	h_L_tg_ph_tg_th_simc->Draw("colz");    
+//	c80->cd(4);
+//  	h_L_tg_ph_tg_th_data->Draw("colz");    
+//
+//	TCanvas* c81 = new TCanvas("c81","c81 (tar)",900.,900.);
+//	c81->Divide(2,2);
+//	c81->cd(1);
+//  	h_R_z_tg_ph_simc->Draw("colz");    
+//	c81->cd(2);
+//  	h_R_z_tg_ph_data->Draw("colz");    
+//	c81->cd(3);
+//  	h_L_z_tg_ph_simc->Draw("colz");    
+//	c81->cd(4);
+//  	h_L_z_tg_ph_data->Draw("colz");    
+//
+//	TCanvas* c90 = new TCanvas("c90","c90 (FP x tar)",900.,900.);
+//	c90->Divide(2,2);
+//	c90->cd(1);
+//	h_R_tg_th_x_simc->Draw("colz");
+//	c90->cd(2);
+//	h_R_tg_th_x_data->Draw("colz");
+//	c90->cd(3);
+//	h_L_tg_th_x_simc->Draw("colz");
+//	c90->cd(4);
+//	h_L_tg_th_x_data->Draw("colz");
+//
+//	TCanvas* c91 = new TCanvas("c91","c91 (FP x tar)",900.,900.);
+//	c91->Divide(2,2);
+//	c91->cd(1);
+//	h_R_tg_th_th_simc->Draw("colz");
+//	c91->cd(2);
+//	h_R_tg_th_th_data->Draw("colz");
+//	c91->cd(3);
+//	h_L_tg_th_th_simc->Draw("colz");
+//	c91->cd(4);
+//	h_L_tg_th_th_data->Draw("colz");
+//
+//	TCanvas* c92 = new TCanvas("c92","c92 (FP x tar)",900.,900.);
+//	c92->Divide(2,2);
+//	c92->cd(1);
+//	h_R_tg_ph_y_simc->Draw("colz");
+//	c92->cd(2);
+//	h_R_tg_ph_y_data->Draw("colz");
+//	c92->cd(3);
+//	h_L_tg_ph_y_simc->Draw("colz");
+//	c92->cd(4);
+//	h_L_tg_ph_y_data->Draw("colz");
+//
+//	TCanvas* c93 = new TCanvas("c93","c93 (FP x tar)",900.,900.);
+//	c93->Divide(2,2);
+//	c93->cd(1);
+//	h_R_tg_ph_ph_simc->Draw("colz");
+//	c93->cd(2);
+//	h_R_tg_ph_ph_data->Draw("colz");
+//	c93->cd(3);
+//	h_L_tg_ph_ph_simc->Draw("colz");
+//	c93->cd(4);
+//	h_L_tg_ph_ph_data->Draw("colz");
+//
+//	TCanvas* c94 = new TCanvas("c94","c94 (tar)",900.,900.);
+//	c94->Divide(2,2);
+//	c94->cd(1);
+//  	h_R_z_y_simc->Draw("colz");    
+//	c94->cd(2);
+//  	h_R_z_y_data->Draw("colz");    
+//	c94->cd(3);
+//  	h_L_z_y_simc->Draw("colz");    
+//	c94->cd(4);
+//  	h_L_z_y_data->Draw("colz");    
+//
+//	TCanvas* c95 = new TCanvas("c95","c95 (tar)",900.,900.);
+//	c95->Divide(2,2);
+//	c95->cd(1);
+//  	h_R_z_ph_simc->Draw("colz");    
+//	c95->cd(2);
+//  	h_R_z_ph_data->Draw("colz");    
+//	c95->cd(3);
+//  	h_L_z_ph_simc->Draw("colz");    
+//	c95->cd(4);
+//  	h_L_z_ph_data->Draw("colz");    
+//
+//	TCanvas* c100 = new TCanvas("c100","c100 (2023/1/9)",900.,900.);
+//	c100->Divide(2,2);
+//	c100->cd(1);
+//  	h_R_z_mom_simc->Draw("colz");    
+//	c100->cd(2);
+//  	h_R_z_mom_data->Draw("colz");    
+//	c100->cd(3);
+//  	h_L_z_mom_simc->Draw("colz");    
+//	c100->cd(4);
+//  	h_L_z_mom_data->Draw("colz");    
 
 
-
-
-//Each Pad Size are changed.
-	gStyle->SetPadLeftMargin(0.15);
-	gStyle->SetPadRightMargin(0.15);
-	gStyle->SetPadTopMargin(0.15);
-	gStyle->SetPadBottomMargin(0.15);
-
-	TCanvas* c64 = new TCanvas("c64","c64",900.,900.);
-	c64->Divide(2,2);
-	c64->cd(1);
-  	h_R_p_x_simc->Draw("colz");    
-	c64->cd(2);
-  	h_R_p_x_data->Draw("colz");    
-	c64->cd(3);
-  	h_L_p_x_simc->Draw("colz");    
-	c64->cd(4);
-  	h_L_p_x_data->Draw("colz");    
-
-	TCanvas* c70 = new TCanvas("c70","c70 (FP)",900.,900.);
-	c70->Divide(2,2);
-	c70->cd(1);
-  	h_R_x_y_simc->Draw("colz");    
-	c70->cd(2);
-  	h_R_x_y_data->Draw("colz");    
-	c70->cd(3);
-  	h_L_x_y_simc->Draw("colz");    
-	c70->cd(4);
-  	h_L_x_y_data->Draw("colz");    
-
-	TCanvas* c71 = new TCanvas("c71","c71 (FP)",900.,900.);
-	c71->Divide(2,2);
+//added for D-thesis (2023.1.20)
+	TCanvas* c201 = new TCanvas("c201","c201 (FP)",800.,800.);
+	TCanvas* c202 = new TCanvas("c202","c202 (FP)",800.,800.);
+	TCanvas* c203 = new TCanvas("c203","c203 (FP)",800.,800.);
+	TCanvas* c204 = new TCanvas("c204","c204 (FP)",800.,800.);
 	TF1* func_fp1 = new TF1("func_fp1",FP_cut1,-80.,80.,1);
 	func_fp1->SetNpx(600);
 	func_fp1->SetParameter(1,0);
@@ -1314,151 +1529,50 @@ cout << "h_L_tg_ph_data = "<<h_L_tg_ph_data->Integral()<<endl;
 	func_fp4->SetParameter(1,0);
 	func_fp4->SetLineColor(kViolet);
 	func_fp4->SetLineWidth(4);
-	c71->cd(1);
-  	h_R_th_x_simc->Draw("colz");    
-	func_fp1->Draw("same");
-	func_fp2->Draw("same");
-	func_fp3->Draw("same");
-	func_fp4->Draw("same");
-	c71->cd(2);
-  	h_R_th_x_data->Draw("colz");    
-	func_fp1->Draw("same");
-	func_fp2->Draw("same");
-	func_fp3->Draw("same");
-	func_fp4->Draw("same");
-	c71->cd(3);
-  	h_L_th_x_simc->Draw("colz");    
-	func_fp1->Draw("same");
-	func_fp2->Draw("same");
-	func_fp3->Draw("same");
-	func_fp4->Draw("same");
-	c71->cd(4);
+	c201->cd();
+	c201->SetLeftMargin(0.14);
+	c201->SetRightMargin(0.14);
+	c201->SetTopMargin(0.14);
+	c201->SetBottomMargin(0.14);
+  	h_L_th_x_data->GetYaxis()->SetDecimals(2);    
+  	h_L_th_x_data->GetXaxis()->SetDecimals(2);    
   	h_L_th_x_data->Draw("colz");    
 	func_fp1->Draw("same");
 	func_fp2->Draw("same");
 	func_fp3->Draw("same");
-	func_fp4->Draw("same");
-
-	TCanvas* c72 = new TCanvas("c72","c72 (FP)",900.,900.);
-	c72->Divide(2,2);
-	c72->cd(1);
-  	h_R_ph_y_simc->Draw("colz");    
-	c72->cd(2);
-  	h_R_ph_y_data->Draw("colz");    
-	c72->cd(3);
-  	h_L_ph_y_simc->Draw("colz");    
-	c72->cd(4);
-  	h_L_ph_y_data->Draw("colz");    
-
-	TCanvas* c73 = new TCanvas("c73","c73 (FP)",900.,900.);
-	c73->Divide(2,2);
-	c73->cd(1);
-  	h_R_ph_th_simc->Draw("colz");    
-	c73->cd(2);
-  	h_R_ph_th_data->Draw("colz");    
-	c73->cd(3);
-  	h_L_ph_th_simc->Draw("colz");    
-	c73->cd(4);
-  	h_L_ph_th_data->Draw("colz");    
-
-	TCanvas* c80 = new TCanvas("c80","c80 (tar)",900.,900.);
-	c80->Divide(2,2);
-	c80->cd(1);
-  	h_R_tg_ph_tg_th_simc->Draw("colz");    
-	c80->cd(2);
-  	h_R_tg_ph_tg_th_data->Draw("colz");    
-	c80->cd(3);
-  	h_L_tg_ph_tg_th_simc->Draw("colz");    
-	c80->cd(4);
-  	h_L_tg_ph_tg_th_data->Draw("colz");    
-
-	TCanvas* c81 = new TCanvas("c81","c81 (tar)",900.,900.);
-	c81->Divide(2,2);
-	c81->cd(1);
-  	h_R_z_tg_ph_simc->Draw("colz");    
-	c81->cd(2);
-  	h_R_z_tg_ph_data->Draw("colz");    
-	c81->cd(3);
-  	h_L_z_tg_ph_simc->Draw("colz");    
-	c81->cd(4);
-  	h_L_z_tg_ph_data->Draw("colz");    
-
-	TCanvas* c90 = new TCanvas("c90","c90 (FP x tar)",900.,900.);
-	c90->Divide(2,2);
-	c90->cd(1);
-	h_R_tg_th_x_simc->Draw("colz");
-	c90->cd(2);
-	h_R_tg_th_x_data->Draw("colz");
-	c90->cd(3);
-	h_L_tg_th_x_simc->Draw("colz");
-	c90->cd(4);
-	h_L_tg_th_x_data->Draw("colz");
-
-	TCanvas* c91 = new TCanvas("c91","c91 (FP x tar)",900.,900.);
-	c91->Divide(2,2);
-	c91->cd(1);
-	h_R_tg_th_th_simc->Draw("colz");
-	c91->cd(2);
-	h_R_tg_th_th_data->Draw("colz");
-	c91->cd(3);
-	h_L_tg_th_th_simc->Draw("colz");
-	c91->cd(4);
-	h_L_tg_th_th_data->Draw("colz");
-
-	TCanvas* c92 = new TCanvas("c92","c92 (FP x tar)",900.,900.);
-	c92->Divide(2,2);
-	c92->cd(1);
-	h_R_tg_ph_y_simc->Draw("colz");
-	c92->cd(2);
-	h_R_tg_ph_y_data->Draw("colz");
-	c92->cd(3);
-	h_L_tg_ph_y_simc->Draw("colz");
-	c92->cd(4);
-	h_L_tg_ph_y_data->Draw("colz");
-
-	TCanvas* c93 = new TCanvas("c93","c93 (FP x tar)",900.,900.);
-	c93->Divide(2,2);
-	c93->cd(1);
-	h_R_tg_ph_ph_simc->Draw("colz");
-	c93->cd(2);
-	h_R_tg_ph_ph_data->Draw("colz");
-	c93->cd(3);
-	h_L_tg_ph_ph_simc->Draw("colz");
-	c93->cd(4);
-	h_L_tg_ph_ph_data->Draw("colz");
-
-	TCanvas* c94 = new TCanvas("c94","c94 (tar)",900.,900.);
-	c94->Divide(2,2);
-	c94->cd(1);
-  	h_R_z_y_simc->Draw("colz");    
-	c94->cd(2);
-  	h_R_z_y_data->Draw("colz");    
-	c94->cd(3);
-  	h_L_z_y_simc->Draw("colz");    
-	c94->cd(4);
-  	h_L_z_y_data->Draw("colz");    
-
-	TCanvas* c95 = new TCanvas("c95","c95 (tar)",900.,900.);
-	c95->Divide(2,2);
-	c95->cd(1);
-  	h_R_z_ph_simc->Draw("colz");    
-	c95->cd(2);
-  	h_R_z_ph_data->Draw("colz");    
-	c95->cd(3);
-  	h_L_z_ph_simc->Draw("colz");    
-	c95->cd(4);
-  	h_L_z_ph_data->Draw("colz");    
-
-	TCanvas* c100 = new TCanvas("c100","c100 (2023/1/9)",900.,900.);
-	c100->Divide(2,2);
-	c100->cd(1);
-  	h_R_z_mom_simc->Draw("colz");    
-	c100->cd(2);
-  	h_R_z_mom_data->Draw("colz");    
-	c100->cd(3);
-  	h_L_z_mom_simc->Draw("colz");    
-	c100->cd(4);
-  	h_L_z_mom_data->Draw("colz");    
+	c202->cd();
+	c202->SetLeftMargin(0.14);
+	c202->SetRightMargin(0.14);
+	c202->SetTopMargin(0.14);
+	c202->SetBottomMargin(0.14);
+  	h_L_th_x_mom->GetYaxis()->SetDecimals(2);    
+  	h_L_th_x_mom->GetXaxis()->SetDecimals(2);    
+  	h_L_th_x_mom->Draw("colz");    
+	func_fp1->Draw("same");
+	func_fp2->Draw("same");
+	func_fp3->Draw("same");
+	c203->cd();
+	c203->SetLeftMargin(0.14);
+	c203->SetRightMargin(0.14);
+	c203->SetTopMargin(0.14);
+	c203->SetBottomMargin(0.14);
+  	h_R_th_x_data->GetYaxis()->SetDecimals(2);    
+  	h_R_th_x_data->GetXaxis()->SetDecimals(2);    
+  	h_R_th_x_data->Draw("colz");    
+	func_fp1->Draw("same");
+	func_fp2->Draw("same");
+	func_fp3->Draw("same");
+	c204->cd();
+	c204->SetLeftMargin(0.14);
+	c204->SetRightMargin(0.14);
+	c204->SetTopMargin(0.14);
+	c204->SetBottomMargin(0.14);
+  	h_R_th_x_mom->GetYaxis()->SetDecimals(2);    
+  	h_R_th_x_mom->GetXaxis()->SetDecimals(2);    
+  	h_R_th_x_mom->Draw("colz");    
+	func_fp1->Draw("same");
+	func_fp2->Draw("same");
+	func_fp3->Draw("same");
 
 /*--- Print ---*/
 cout << "Print is starting" << endl;
@@ -1470,28 +1584,32 @@ cout << "Print is starting" << endl;
 	//"SIMC_FP_Rebuild_mom.pdf //2021/7/11 simc_fp_momcut.C
 	//"SIMC_Rebuilt_fpcut.pdf //2022/1/18 simc_fp3.C, pepk(w/ FP cut)
 	
-	c10->Print("SIMC_Rebuilt_fpcut.pdf[");
-	c10->Print("SIMC_Rebuilt_fpcut.pdf[");//pepk simc
-	c20->Print("SIMC_Rebuilt_fpcut.pdf");//pepk data
-	c30->Print("SIMC_Rebuilt_fpcut.pdf");//pepk same
-	c50->Print("SIMC_Rebuilt_fpcut.pdf");//FP 1D
-	c51->Print("SIMC_Rebuilt_fpcut.pdf");//FP 1D
-	//c60->Print("SIMC_Rebuilt_fpcut.pdf");//FPxtar 2D
-	//c61->Print("SIMC_Rebuilt_fpcut.pdf");//FPxtar 2D
-	c64->Print("SIMC_Rebuilt_fpcut.pdf");//FP vs Mom. 2D
-	c70->Print("SIMC_Rebuilt_fpcut.pdf");//FP 2D
-	c71->Print("SIMC_Rebuilt_fpcut.pdf");//FP 2D
-	c72->Print("SIMC_Rebuilt_fpcut.pdf");//FP 2D
-	c73->Print("SIMC_Rebuilt_fpcut.pdf");//FP 2D
-	c80->Print("SIMC_Rebuilt_fpcut.pdf");//tar 2D
-	c81->Print("SIMC_Rebuilt_fpcut.pdf");//tar 2D
-	c90->Print("SIMC_Rebuilt_fpcut.pdf");//FPxtar 2D
-	c91->Print("SIMC_Rebuilt_fpcut.pdf");//FPxtar 2D
-	c92->Print("SIMC_Rebuilt_fpcut.pdf");//FPxtar 2D
-	c93->Print("SIMC_Rebuilt_fpcut.pdf");//FPxtar 2D
-	c94->Print("SIMC_Rebuilt_fpcut.pdf");//FPxtar 2D
-	c95->Print("SIMC_Rebuilt_fpcut.pdf");//FPxtar 2D
-	c95->Print("SIMC_Rebuilt_fpcut.pdf]");//FPxtar 2D
+//	c10->Print("SIMC_Rebuilt_fpcut.pdf[");
+//	c10->Print("SIMC_Rebuilt_fpcut.pdf[");//pepk simc
+//	c20->Print("SIMC_Rebuilt_fpcut.pdf");//pepk data
+//	c30->Print("SIMC_Rebuilt_fpcut.pdf");//pepk same
+//	c50->Print("SIMC_Rebuilt_fpcut.pdf");//FP 1D
+//	c51->Print("SIMC_Rebuilt_fpcut.pdf");//FP 1D
+//	//c60->Print("SIMC_Rebuilt_fpcut.pdf");//FPxtar 2D
+//	//c61->Print("SIMC_Rebuilt_fpcut.pdf");//FPxtar 2D
+//	c64->Print("SIMC_Rebuilt_fpcut.pdf");//FP vs Mom. 2D
+//	c70->Print("SIMC_Rebuilt_fpcut.pdf");//FP 2D
+//	c71->Print("SIMC_Rebuilt_fpcut.pdf");//FP 2D
+//	c72->Print("SIMC_Rebuilt_fpcut.pdf");//FP 2D
+//	c73->Print("SIMC_Rebuilt_fpcut.pdf");//FP 2D
+//	c80->Print("SIMC_Rebuilt_fpcut.pdf");//tar 2D
+//	c81->Print("SIMC_Rebuilt_fpcut.pdf");//tar 2D
+//	c90->Print("SIMC_Rebuilt_fpcut.pdf");//FPxtar 2D
+//	c91->Print("SIMC_Rebuilt_fpcut.pdf");//FPxtar 2D
+//	c92->Print("SIMC_Rebuilt_fpcut.pdf");//FPxtar 2D
+//	c93->Print("SIMC_Rebuilt_fpcut.pdf");//FPxtar 2D
+//	c94->Print("SIMC_Rebuilt_fpcut.pdf");//FPxtar 2D
+//	c95->Print("SIMC_Rebuilt_fpcut.pdf");//FPxtar 2D
+//	c95->Print("SIMC_Rebuilt_fpcut.pdf]");//FPxtar 2D
 	
+c201->Print("SIMC_Rebuilt_FPcut1.pdf");//L w/ FP cut
+c202->Print("SIMC_Rebuilt_FPcut2.pdf");//L w/ FP,Mom cut
+c203->Print("SIMC_Rebuilt_FPcut3.pdf");//R w/ FP cut
+c204->Print("SIMC_Rebuilt_FPcut4.pdf");//R w/ FP,Mom cut
 cout << "Well done!" << endl;
 }//fit

@@ -424,6 +424,8 @@ cout << "Param file : " << AcceptanceR_table_z9.c_str() << endl;
 	cout<<"HRS-R Acceptance (z9 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
 
   TH2F* Acceptance_mapR = new TH2F("Acceptance_mapR","#Delta#Omega_{K}^{lab}(p_{K},Z)",100,1.6,2.0,10,-10.,10.);
+  Acceptance_mapR->GetXaxis()->SetTitle("Momentum [GeV/c]");
+  Acceptance_mapR->GetYaxis()->SetTitle("Z-vertex [cm]");
 	for(int i=0;i<100;i++){
 		for(int j=0;j<10;j++){
 			Acceptance_mapR->SetBinContent(i+1,j+1,RHRS_table[i][j]*1000.);
@@ -656,6 +658,8 @@ cout << "Param file : " << AcceptanceL_table_z9.c_str() << endl;
 	cout<<"HRS-L Acceptance (z9 average)="<<LHRS_total/(double)LHRS_total_bin<<endl;
 
   TH2F* Acceptance_mapL = new TH2F("Acceptance_mapL","#Delta#Omega_{e'}^{lab}(p_{e'},Z)",100,1.9,2.3,10,-10.,10.);
+  Acceptance_mapL->GetXaxis()->SetTitle("Momentum [GeV/c]");
+  Acceptance_mapL->GetYaxis()->SetTitle("Z-vertex [cm]");
 	for(int i=0;i<100;i++){
 		for(int j=0;j<10;j++){
 			Acceptance_mapL->SetBinContent(i+1,j+1,LHRS_table[i][j]*1000.);
@@ -2042,9 +2046,21 @@ case 3: //Fixed from old fit
 	 if(displayON)c2plus->Print("result_2D_2022_temp.pdf");
 
 	 TCanvas* c2ppR = new TCanvas("c2ppR","");
-	 Acceptance_mapR->Draw("colz");
+	 TH2D* hfppR = (TH2D*)c2ppR->DrawFrame(1.76,-10.,1.90,10.);
+	 hfppR->GetXaxis()->SetTitle("Momentum [GeV/c]");
+	 hfppR->GetYaxis()->SetTitle("Z-vertex [cm]");
+	 //Acceptance_mapR->Draw("lego2z");
+	 Acceptance_mapR->GetZaxis()->SetRangeUser(3.,6.);
+	 Acceptance_mapR->Draw("colzsame");
+	 c2ppR->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/dthesis_Fig/pdf/acceptance2d_RHRS.pdf");
 	 TCanvas* c2ppL = new TCanvas("c2ppL","");
-	 Acceptance_mapL->Draw("colz");
+	 TH2D* hfppL = (TH2D*)c2ppL->DrawFrame(2.01,-10.,2.16,10.);
+	 hfppL->GetXaxis()->SetTitle("Momentum [GeV/c]");
+	 hfppL->GetYaxis()->SetTitle("Z-vertex [cm]");
+	 //Acceptance_mapL->Draw("lego2z");
+	 Acceptance_mapL->GetZaxis()->SetRangeUser(3.,6.);
+	 Acceptance_mapL->Draw("colzsame");
+	 c2ppL->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/dthesis_Fig/pdf/acceptance2d_LHRS.pdf");
 
 #if 0
 /****************************************/

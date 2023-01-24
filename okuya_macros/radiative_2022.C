@@ -625,8 +625,8 @@ cout<<"Entries(SIMC Lambda): "<<ENum_simcL<<endl;
 	//cout<<"theta_gk_cm="<<theta_gk_cm*180./PI<<endl;
 	if(L_L_xpfp<0.17*L_L_xfp/100.+0.025&&L_L_xpfp>0.17*L_L_xfp/100.-0.035&&L_L_xpfp<0.40*L_L_xfp/100.+0.130&&L_L_xpfp>0.40*L_L_xfp/100.-0.130&&L_R_xpfp<0.17*L_R_xfp/100.+0.025&&L_R_xpfp>0.17*L_R_xfp/100.-0.035&&L_R_xpfp<0.40*L_R_xfp/100.+0.130&&L_R_xpfp>0.40*L_R_xfp/100.-0.130){
 	//change
-		//if(L_momR>1.760&&L_momR<1.900&&L_momL>2.010&&L_momL<2.160)hmm_simcL->Fill(ran*1000.);
-		if(theta_gk_cm*180./PI>=8.&&L_momR>1.760&&L_momR<1.900&&L_momL>2.010&&L_momL<2.160)hmm_simcL->Fill(ran*1000.);
+		if(L_momR>1.760&&L_momR<1.900&&L_momL>2.010&&L_momL<2.160)hmm_simcL->Fill(ran*1000.);
+		//if(theta_gk_cm*180./PI>=8.&&L_momR>1.760&&L_momR<1.900&&L_momL>2.010&&L_momL<2.160)hmm_simcL->Fill(ran*1000.);
 		//if(Qsq>=0.5&&L_momR>1.760&&L_momR<1.900&&L_momL>2.010&&L_momL<2.160)hmm_simcL->Fill(ran*1000.);
 	}//FP cut
 }
@@ -737,8 +737,8 @@ cout<<"Entries(SIMC Sigma0): "<<ENum_simcS<<endl;
 
 	if(S_L_xpfp<0.17*S_L_xfp/100.+0.025&&S_L_xpfp>0.17*S_L_xfp/100.-0.035&&S_L_xpfp<0.40*S_L_xfp/100.+0.130&&S_L_xpfp>0.40*S_L_xfp/100.-0.130&&S_R_xpfp<0.17*S_R_xfp/100.+0.025&&S_R_xpfp>0.17*S_R_xfp/100.-0.035&&S_R_xpfp<0.40*S_R_xfp/100.+0.130&&S_R_xpfp>0.40*S_R_xfp/100.-0.130){
 	//change
-		//if(S_momR>1.760&&S_momR<1.900&&S_momL>2.010&&S_momL<2.160)hmm_simcS->Fill(ran*1000.);
-		if(theta_gk_cm*180./PI>=8.&&S_momR>1.760&&S_momR<1.900&&S_momL>2.010&&S_momL<2.160)hmm_simcS->Fill(ran*1000.);
+		if(S_momR>1.760&&S_momR<1.900&&S_momL>2.010&&S_momL<2.160)hmm_simcS->Fill(ran*1000.);
+		//if(theta_gk_cm*180./PI>=8.&&S_momR>1.760&&S_momR<1.900&&S_momL>2.010&&S_momL<2.160)hmm_simcS->Fill(ran*1000.);
 		//if(Qsq>=0.5&&S_momR>1.760&&S_momR<1.900&&S_momL>2.010&&S_momL<2.160)hmm_simcS->Fill(ran*1000.);
 	}//FP cut
 }
@@ -1078,8 +1078,8 @@ cout<<"Entries: "<<ENum<<endl;
 		//if(tan_lab1!=tan_lab2)cout<<"tan1="<<atan(tan_lab1)<<", tan2="<<atan(tan_lab2)<<"theta_gk_lab="<<theta_gk_lab<<endl;
 
 		//change
-		//if(event_selection&&ct_cut)hmm_L_fom_best->Fill(mm*1000.);
-		if(event_selection&&ct_cut&&theta_gk_cm*180./PI>=8.)hmm_L_fom_best->Fill(mm*1000.);
+		if(event_selection&&ct_cut)hmm_L_fom_best->Fill(mm*1000.);
+		//if(event_selection&&ct_cut&&theta_gk_cm*180./PI>=8.)hmm_L_fom_best->Fill(mm*1000.);
 		//if(event_selection&&ct_cut&&Qsq>=0.5)hmm_L_fom_best->Fill(mm*1000.);
 		if(event_selection_nocut&&ct_cut)hmm_L_fom_nocut->Fill(mm);
 
@@ -1116,8 +1116,8 @@ cout<<"Entries: "<<ENum<<endl;
 }//ENum
 	//THStack *hs = (THStack*)file_G4->Get("new_mm1stack0_12");
 	//change
-	//TH1F* hmm_bg_temp = (TH1F*)file_mea->Get("hmm_mixacc_result_new");
-	TH1F* hmm_bg_temp = (TH1F*)file_mea->Get("hmm_mixacc_result_new_cm2_2");
+	TH1F* hmm_bg_temp = (TH1F*)file_mea->Get("hmm_mixacc_result_new");
+	//TH1F* hmm_bg_temp = (TH1F*)file_mea->Get("hmm_mixacc_result_new_cm2_2");
 	//TH1F* hmm_bg_temp = (TH1F*)file_mea->Get("hmm_mixacc_result_new_Qsq2_2");
 
 	for(int i=0;i<300;i++){
@@ -1200,8 +1200,8 @@ cout<<"hmm_L(data): "<<hmm_wobg_fom_best->Integral(hmm_wobg_fom_best->FindBin(de
 	//hmm_simcL->Scale(833.828/330870.);//2021Apr.//MAX
 	//hmm_simcS->Scale(283.282*283.282/202332./299.470);//2021Apr.//MAX
 	
-	//hmm_simcL->Scale(840.453/354084.);//2022//Full(gen)
-	//hmm_simcS->Scale(295.703*295.703/187535./314.213);//2022//Full(gen)
+	hmm_simcL->Scale(840.453/354084.);//2022//Full(gen)
+	hmm_simcS->Scale(295.703*295.703/187535./314.213);//2022//Full(gen)
 	//hmm_simcL->Scale(836.453/357066.);//2022//Full
 	//hmm_simcS->Scale(285.696*285.696/199277./296.423);//2022//Full
 	//hmm_simcL->Scale(518./171561.);//2022//Qsq2_1
@@ -1210,8 +1210,8 @@ cout<<"hmm_L(data): "<<hmm_wobg_fom_best->Integral(hmm_wobg_fom_best->FindBin(de
 	//hmm_simcS->Scale(61.7035*61.7035/74811./65.7607);//2022//Qsq2_2
 	//hmm_simcL->Scale(440.84/205483.);//2022//cm2_1
 	//hmm_simcS->Scale(105.808*105.808/98027./111.881);//2022//cm2_1
-	hmm_simcL->Scale(395.613/151583.);//2022//cm2_2
-	hmm_simcS->Scale(179.888*179.888/102148./183.489);//2022//cm2_2
+	//hmm_simcL->Scale(395.613/151583.);//2022//cm2_2
+	//hmm_simcS->Scale(179.888*179.888/102148./183.489);//2022//cm2_2
 
 	hmm_simc->Add(hmm_simcL,hmm_simcS,1.0,1.0);
 	hmm_simc->SetLineColor(kRed);
@@ -1238,6 +1238,7 @@ cout<<"hmm_G4: "<<hmm_G4->Integral()<<endl;
 cout<<"hmm_simc: "<<hmm_simc->Integral()<<endl;
 
 //c5->Print("SIMC_rad20220118.pdf");
+c5->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/dthesis_Fig/pdf/hmm_rad_simc.pdf");
 
 cout << "Well done!" << endl;
 }
