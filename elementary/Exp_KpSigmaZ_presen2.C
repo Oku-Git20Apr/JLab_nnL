@@ -834,7 +834,7 @@ double ye7[4] = {//LEPS W=2.163 GeV
   ax->SetLabelOffset(0.01);
   ax->SetTitleSize(0.06);  ax->SetTitleOffset(0.80);
   ax->SetMaxDigits(3);
-  ax->SetTitle("#theta_{#gammaK}^{CM} [degree]");
+  ax->SetTitle("#theta_{#gammaK}^{CM} [deg]");
 
   //TGaxis *ay = new TGaxis(-1,0, -1,0.5, 0,0.5, 505 );
   TGaxis *ay = new TGaxis(0,0, 0,0.5, 0,0.5, 505 );
@@ -998,20 +998,22 @@ double ye7[4] = {//LEPS W=2.163 GeV
   ////gr2_result->SetLineColor(kViolet);
   ////gr2_result->SetFillColor(103);
   //gr2_result->SetMarkerColor(3);
-  TGraphAsymmErrors *gr_result = new TGraphAsymmErrors(1, x_result, y_result, xel_result, xeh_result, yel_result, yeh_result);
-  //TGraphErrors *gr_result = new TGraphErrors(1, x_result, y_result, xe_result, ye_result);
+  //TGraphAsymmErrors *gr_result = new TGraphAsymmErrors(1, x_result, y_result, xel_result, xeh_result, yel_result, yeh_result);
+  TGraphErrors *gr_result = new TGraphErrors(1, x_result, y_result, xe_result, ye_result);
   gr_result->SetMarkerSize(1.5);
   gr_result->SetMarkerStyle(21);
-  gr_result->SetFillStyle(3004);
-  //gr_result->SetLineColor(2);
+  //gr_result->SetFillStyle(3004);
+  gr_result->SetLineColor(2);
+  gr_result->SetLineWidth(2);
   //gr_result->SetFillColor(2);
   gr_result->SetMarkerColor(2);
-  TGraphAsymmErrors *gr2_result = new TGraphAsymmErrors(2, x2_result, y2_result, xel2_result, xeh2_result, yel2_result, yeh2_result);
-  //TGraphErrors *gr2_result = new TGraphErrors(2, x2_result, y2_result, xe2_result, ye2_result);
+  //TGraphAsymmErrors *gr2_result = new TGraphAsymmErrors(2, x2_result, y2_result, xel2_result, xeh2_result, yel2_result, yeh2_result);
+  TGraphErrors *gr2_result = new TGraphErrors(2, x2_result, y2_result, xe2_result, ye2_result);
   gr2_result->SetMarkerSize(1.5);
   gr2_result->SetMarkerStyle(21);
-  gr2_result->SetFillStyle(3005);
-  //gr2_result->SetLineColor(kViolet);
+  //gr2_result->SetFillStyle(3005);
+  gr2_result->SetLineColor(kAzure);
+  gr2_result->SetLineWidth(2);
   //gr2_result->SetFillColor(103);
   gr2_result->SetMarkerColor(4);
 //  TGraphErrors *gr3_result = new TGraphErrors(3, x3_result, y3_result, xe3_result, ye3_result);
@@ -1105,8 +1107,8 @@ TBox *b2_stat2 = new TBox(x2_result[1]-xe2_result[1],y2_result[1]-ye2_result[1],
 //	b3_3->SetLineColor(4);
 //	b3_3->SetLineWidth(1);
 //  gr3_result->Draw("P2same");
- // gr2_result->Draw("P2same");
-  //gr_result->Draw("P2same");
+  //gr2_result->Draw("Psame");
+  gr_result->Draw("Psame");
 //  b3_1->Draw();
 //  b3_2->Draw();
 //  b3_3->Draw();
@@ -1114,11 +1116,11 @@ TBox *b2_stat2 = new TBox(x2_result[1]-xe2_result[1],y2_result[1]-ye2_result[1],
  // b2_2->Draw();
  // b2_stat1->Draw();
  // b2_stat2->Draw();
-  //b->Draw();
+  b->Draw();
   //b_stat->Draw();
   ax->Draw();
   ay->Draw();
-//  leg->Draw();
+  leg->Draw();
 //for(int i=1;i<200;i++){
 //dataset1->SetSelection(i);
 //cout<<i<<": "<<dataset1->GetKinematics()->GetW()<<endl;
@@ -1131,4 +1133,5 @@ TBox *b2_stat2 = new TBox(x2_result[1]-xe2_result[1],y2_result[1]-ye2_result[1],
 //}
 //c1->Print("Elementary_gpKS.pdf");
 //c1->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/mthesis_Fig/pdf/CS_thetadepS2.pdf");
+c1->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/mthesis_Fig/pdf/symp_gpKS.pdf");
 }
