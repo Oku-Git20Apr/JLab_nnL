@@ -3,14 +3,14 @@
 //--  Differential Cross Section  --//
 //----------------------------------//
 //
-//This is "result_2D_2022"
+//This is taken over from "result_2D_2022"
 //
 //K. Okuyama (Nov. 21, 2020)
 //K. Okuyama (Dec. 14, 2020)//Mom cut
 //K. Okuyama (May. 11, 2021)//Fitting w/ pion, Al
 //K. Okuyama (Jan. 28, 2022)//Kaon SR event by event (pick up from PathLength/mom_calib.C)
 //K. Okuyama (Feb. 1, 2022)//change it readable
-//K. Okuyama (May 27, 2022)//Triple D.C.S.
+//K. Okuyama (Jan. 26, 2023)//change it readable
 //
 //This is taken over from result_2D.C
 //	but directly taken over from result_2D_Jan.C
@@ -20,60 +20,6 @@
 //subtracting Al and Pion contamination
 //No array branch mode 
 
-void SetTH1(TH1 *h, TString name, TString xname, TString yname, int LColor, int FStyle, int FColor){
-  h->SetTitle(name);
-  h->SetLineColor(LColor);
-  h->SetLineWidth(1);
-  h->SetFillStyle(FStyle);
-  h->SetFillColor(FColor);
-
-  h->SetTitleFont(42,"");
-  h->SetTitleSize(0.04,"");
-
-  h->GetXaxis()->SetTitle(xname);
-  h->GetXaxis()->CenterTitle();
-  h->GetXaxis()->SetTitleFont(42);
-  h->GetXaxis()->SetTitleOffset(1.20);
-  h->GetXaxis()->SetTitleSize(0.04);
-  h->GetXaxis()->SetLabelFont(42);
-  h->GetXaxis()->SetLabelOffset(0.01);
-  h->GetXaxis()->SetNdivisions(505);
-
-  h->GetYaxis()->SetTitle(yname);
-  h->GetYaxis()->CenterTitle();
-  h->GetYaxis()->SetTitleFont(42);
-  h->GetYaxis()->SetTitleOffset(1.20);
-  h->GetYaxis()->SetTitleSize(0.04);
-  h->GetYaxis()->SetLabelFont(42);
-  h->GetYaxis()->SetLabelOffset(0.01);
-  ((TGaxis*)h->GetYaxis())->SetMaxDigits(4);
-}
-void SetTH2(TH2 *h, TString name, TString xname, TString yname, double min=0.8){
-  h->SetTitle(name);
-  h->SetMinimum(min);
-  h->SetLineWidth(0);
-  h->SetTitleSize(0.05,"");
-  h->SetMarkerStyle(20);
-  h->SetMarkerSize(1.5);
-  h->SetMarkerColor(1);
-
-  h->GetXaxis()->SetTitle(xname);
-  h->GetXaxis()->CenterTitle();
-  h->GetXaxis()->SetTitleFont(42);
-  h->GetXaxis()->SetTitleOffset(1.20);
-  h->GetXaxis()->SetTitleSize(0.04);
-  h->GetXaxis()->SetLabelFont(42);
-  h->GetXaxis()->SetLabelOffset(0.01);
-
-  h->GetYaxis()->SetTitle(yname);
-  h->GetYaxis()->CenterTitle();
-  h->GetYaxis()->SetTitleFont(42);
-  h->GetYaxis()->SetTitleOffset(1.40);
-  h->GetYaxis()->SetTitleSize(0.04);
-  h->GetYaxis()->SetLabelFont(42);
-  h->GetYaxis()->SetLabelOffset(0.01);
-  ((TGaxis*)h->GetYaxis())->SetMaxDigits(4);
-}
 //Voigt Function
 double F_Voigt( double *x, double *par )
   {
@@ -200,16 +146,16 @@ double FMM_2BG( double *x, double *par ){
 
 }
 
-void result_2D_2022_tripleDCS(){
+void mea_systematics_2023(){
 	string pdfname = "fitting.pdf";
 cout << "Output pdf file name is " << pdfname << endl;
   
   TFile *file = new TFile("h2all_2020Nov.root","read");//2020Nov updated
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_momDec.root","read");// 2020/12/14 Mom cut 
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_2021Jan.root","read");// 2021/1/4 Mom cut 
-  //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_llccrr_2022effK.root","read");// 2022/1/30 Mom cut & effK in cs
-  TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_llccrr_new_tripleDCS2022.root","read");// 2022/6/5 Mom cut & effK in cs && LHRS in cs
-  double nbunch = 6000.;//effetive bunches (6 bunches x 1000 mixtures)
+  TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_lll_effK.root","read");// 2023/1/26 Mom cut & effK in cs
+  //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_llccrr_new_tripleDCS2022.root","read");// 2022/6/5 Mom cut & effK in cs && LHRS in cs
+  double nbunch = 1500.;//effetive bunches (3 bunches x 500 mixtures)
   TTree *tree = (TTree*)file->Get("tree_out");
 
 //---  DAQ Efficiency ---//
@@ -258,17 +204,17 @@ cout << "Param file : " << daq_file.c_str() << endl;
 	int RHRS_total_bin=0;
 /*----- -10 < z < -8 -----*/
 	string AcceptanceR_table_z0 = "./information/RHRS_SIMC100bin_10_z0.dat";//Acceptance Table (SIMC)
-	string bufR_z0;
+	string buf_z0;
 
-	ifstream ifpR_z0(AcceptanceR_table_z0.c_str(),ios::in);
-	if (ifpR_z0.fail()){ cout << "Failed" << endl; exit(1);}
+	ifstream ifp_z0(AcceptanceR_table_z0.c_str(),ios::in);
+	if (ifp_z0.fail()){ cout << "Failed" << endl; exit(1);}
 cout << "Param file : " << AcceptanceR_table_z0.c_str() << endl;
 	while(1){
-		getline(ifpR_z0,bufR_z0);
-		if(bufR_z0[0]=='#'){continue;}
-		if(ifpR_z0.eof())break;
-		stringstream sbufR_z0(bufR_z0);
-		sbufR_z0 >> RHRS_bin >> RHRS_SIMC;
+		getline(ifp_z0,buf_z0);
+		if(buf_z0[0]=='#'){continue;}
+		if(ifp_z0.eof())break;
+		stringstream sbuf_z0(buf_z0);
+		sbuf_z0 >> RHRS_bin >> RHRS_SIMC;
 		//cout << RHRS_bin << ", " << RHRS_SIMC <<endl;
 
 		RHRS_table[RHRS_bin-1][0] = RHRS_SIMC*0.001;//sr
@@ -278,17 +224,17 @@ cout << "Param file : " << AcceptanceR_table_z0.c_str() << endl;
 	cout<<"HRS-R Acceptance (z0 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
 /*----- -8 < z < -6 -----*/
 	string AcceptanceR_table_z1 = "./information/RHRS_SIMC100bin_10_z1.dat";//Acceptance Table (SIMC)
-	string bufR_z1;
+	string buf_z1;
 
-	ifstream ifpR_z1(AcceptanceR_table_z1.c_str(),ios::in);
-	if (ifpR_z1.fail()){ cout << "Failed" << endl; exit(1);}
+	ifstream ifp_z1(AcceptanceR_table_z1.c_str(),ios::in);
+	if (ifp_z1.fail()){ cout << "Failed" << endl; exit(1);}
 cout << "Param file : " << AcceptanceR_table_z1.c_str() << endl;
 	while(1){
-		getline(ifpR_z1,bufR_z1);
-		if(bufR_z1[0]=='#'){continue;}
-		if(ifpR_z1.eof())break;
-		stringstream sbufR_z1(bufR_z1);
-		sbufR_z1 >> RHRS_bin >> RHRS_SIMC;
+		getline(ifp_z1,buf_z1);
+		if(buf_z1[0]=='#'){continue;}
+		if(ifp_z1.eof())break;
+		stringstream sbuf_z1(buf_z1);
+		sbuf_z1 >> RHRS_bin >> RHRS_SIMC;
 		//cout << RHRS_bin << ", " << RHRS_SIMC <<endl;
 
 		RHRS_table[RHRS_bin-1][1] = RHRS_SIMC*0.001;//sr
@@ -298,19 +244,19 @@ cout << "Param file : " << AcceptanceR_table_z1.c_str() << endl;
 	cout<<"HRS-R Acceptance (z1 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
 /*----- -6 < z < -4 -----*/
 	string AcceptanceR_table_z2 = "./information/RHRS_SIMC100bin_10_z2.dat";//Acceptance Table (SIMC)
-	string bufR_z2;
+	string buf_z2;
 	RHRS_total=0.;
 	RHRS_total_bin=0;
 
-	ifstream ifpR_z2(AcceptanceR_table_z2.c_str(),ios::in);
-	if (ifpR_z2.fail()){ cout << "Failed" << endl; exit(1);}
+	ifstream ifp_z2(AcceptanceR_table_z2.c_str(),ios::in);
+	if (ifp_z2.fail()){ cout << "Failed" << endl; exit(1);}
 cout << "Param file : " << AcceptanceR_table_z2.c_str() << endl;
 	while(1){
-		getline(ifpR_z2,bufR_z2);
-		if(bufR_z2[0]=='#'){continue;}
-		if(ifpR_z2.eof())break;
-		stringstream sbufR_z2(bufR_z2);
-		sbufR_z2 >> RHRS_bin >> RHRS_SIMC;
+		getline(ifp_z2,buf_z2);
+		if(buf_z2[0]=='#'){continue;}
+		if(ifp_z2.eof())break;
+		stringstream sbuf_z2(buf_z2);
+		sbuf_z2 >> RHRS_bin >> RHRS_SIMC;
 		//cout << RHRS_bin << ", " << RHRS_SIMC <<endl;
 
 		RHRS_table[RHRS_bin-1][2] = RHRS_SIMC*0.001;//sr
@@ -320,19 +266,19 @@ cout << "Param file : " << AcceptanceR_table_z2.c_str() << endl;
 	cout<<"HRS-R Acceptance (z2 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
 /*----- -4 < z < -2 -----*/
 	string AcceptanceR_table_z3 = "./information/RHRS_SIMC100bin_10_z3.dat";//Acceptance Table (SIMC)
-	string bufR_z3;
+	string buf_z3;
 	RHRS_total=0.;
 	RHRS_total_bin=0;
 
-	ifstream ifpR_z3(AcceptanceR_table_z3.c_str(),ios::in);
-	if (ifpR_z3.fail()){ cout << "Failed" << endl; exit(1);}
+	ifstream ifp_z3(AcceptanceR_table_z3.c_str(),ios::in);
+	if (ifp_z3.fail()){ cout << "Failed" << endl; exit(1);}
 cout << "Param file : " << AcceptanceR_table_z3.c_str() << endl;
 	while(1){
-		getline(ifpR_z3,bufR_z3);
-		if(bufR_z3[0]=='#'){continue;}
-		if(ifpR_z3.eof())break;
-		stringstream sbufR_z3(bufR_z3);
-		sbufR_z3 >> RHRS_bin >> RHRS_SIMC;
+		getline(ifp_z3,buf_z3);
+		if(buf_z3[0]=='#'){continue;}
+		if(ifp_z3.eof())break;
+		stringstream sbuf_z3(buf_z3);
+		sbuf_z3 >> RHRS_bin >> RHRS_SIMC;
 		//cout << RHRS_bin << ", " << RHRS_SIMC <<endl;
 
 		RHRS_table[RHRS_bin-1][3] = RHRS_SIMC*0.001;//sr
@@ -342,19 +288,19 @@ cout << "Param file : " << AcceptanceR_table_z3.c_str() << endl;
 	cout<<"HRS-R Acceptance (z3 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
 /*----- -2 < z < 0 -----*/
 	string AcceptanceR_table_z4 = "./information/RHRS_SIMC100bin_10_z4.dat";//Acceptance Table (SIMC)
-	string bufR_z4;
+	string buf_z4;
 	RHRS_total=0.;
 	RHRS_total_bin=0;
 
-	ifstream ifpR_z4(AcceptanceR_table_z4.c_str(),ios::in);
-	if (ifpR_z4.fail()){ cout << "Failed" << endl; exit(1);}
+	ifstream ifp_z4(AcceptanceR_table_z4.c_str(),ios::in);
+	if (ifp_z4.fail()){ cout << "Failed" << endl; exit(1);}
 cout << "Param file : " << AcceptanceR_table_z4.c_str() << endl;
 	while(1){
-		getline(ifpR_z4,bufR_z4);
-		if(bufR_z4[0]=='#'){continue;}
-		if(ifpR_z4.eof())break;
-		stringstream sbufR_z4(bufR_z4);
-		sbufR_z4 >> RHRS_bin >> RHRS_SIMC;
+		getline(ifp_z4,buf_z4);
+		if(buf_z4[0]=='#'){continue;}
+		if(ifp_z4.eof())break;
+		stringstream sbuf_z4(buf_z4);
+		sbuf_z4 >> RHRS_bin >> RHRS_SIMC;
 		//cout << RHRS_bin << ", " << RHRS_SIMC <<endl;
 
 		RHRS_table[RHRS_bin-1][4] = RHRS_SIMC*0.001;//sr
@@ -364,19 +310,19 @@ cout << "Param file : " << AcceptanceR_table_z4.c_str() << endl;
 	cout<<"HRS-R Acceptance (z4 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
 /*----- 0 < z < 2 -----*/
 	string AcceptanceR_table_z5 = "./information/RHRS_SIMC100bin_10_z5.dat";//Acceptance Table (SIMC)
-	string bufR_z5;
+	string buf_z5;
 	RHRS_total=0.;
 	RHRS_total_bin=0;
 
-	ifstream ifpR_z5(AcceptanceR_table_z5.c_str(),ios::in);
-	if (ifpR_z5.fail()){ cout << "Failed" << endl; exit(1);}
+	ifstream ifp_z5(AcceptanceR_table_z5.c_str(),ios::in);
+	if (ifp_z5.fail()){ cout << "Failed" << endl; exit(1);}
 cout << "Param file : " << AcceptanceR_table_z5.c_str() << endl;
 	while(1){
-		getline(ifpR_z5,bufR_z5);
-		if(bufR_z5[0]=='#'){continue;}
-		if(ifpR_z5.eof())break;
-		stringstream sbufR_z5(bufR_z5);
-		sbufR_z5 >> RHRS_bin >> RHRS_SIMC;
+		getline(ifp_z5,buf_z5);
+		if(buf_z5[0]=='#'){continue;}
+		if(ifp_z5.eof())break;
+		stringstream sbuf_z5(buf_z5);
+		sbuf_z5 >> RHRS_bin >> RHRS_SIMC;
 		//cout << RHRS_bin << ", " << RHRS_SIMC <<endl;
 
 		RHRS_table[RHRS_bin-1][5] = RHRS_SIMC*0.001;//sr
@@ -386,19 +332,19 @@ cout << "Param file : " << AcceptanceR_table_z5.c_str() << endl;
 	cout<<"HRS-R Acceptance (z5 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
 /*----- 2 < z < 4 -----*/
 	string AcceptanceR_table_z6 = "./information/RHRS_SIMC100bin_10_z6.dat";//Acceptance Table (SIMC)
-	string bufR_z6;
+	string buf_z6;
 	RHRS_total=0.;
 	RHRS_total_bin=0;
 
-	ifstream ifpR_z6(AcceptanceR_table_z6.c_str(),ios::in);
-	if (ifpR_z6.fail()){ cout << "Failed" << endl; exit(1);}
+	ifstream ifp_z6(AcceptanceR_table_z6.c_str(),ios::in);
+	if (ifp_z6.fail()){ cout << "Failed" << endl; exit(1);}
 cout << "Param file : " << AcceptanceR_table_z6.c_str() << endl;
 	while(1){
-		getline(ifpR_z6,bufR_z6);
-		if(bufR_z6[0]=='#'){continue;}
-		if(ifpR_z6.eof())break;
-		stringstream sbufR_z6(bufR_z6);
-		sbufR_z6 >> RHRS_bin >> RHRS_SIMC;
+		getline(ifp_z6,buf_z6);
+		if(buf_z6[0]=='#'){continue;}
+		if(ifp_z6.eof())break;
+		stringstream sbuf_z6(buf_z6);
+		sbuf_z6 >> RHRS_bin >> RHRS_SIMC;
 		//cout << RHRS_bin << ", " << RHRS_SIMC <<endl;
 
 		RHRS_table[RHRS_bin-1][6] = RHRS_SIMC*0.001;//sr
@@ -408,45 +354,41 @@ cout << "Param file : " << AcceptanceR_table_z6.c_str() << endl;
 	cout<<"HRS-R Acceptance (z6 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
 /*----- 4 < z < 6 -----*/
 	string AcceptanceR_table_z7 = "./information/RHRS_SIMC100bin_10_z7.dat";//Acceptance Table (SIMC)
-	string bufR_z7;
+	string buf_z7;
 	RHRS_total=0.;
 	RHRS_total_bin=0;
 
-	ifstream ifpR_z7(AcceptanceR_table_z7.c_str(),ios::in);
-	if (ifpR_z7.fail()){ cout << "Failed" << endl; exit(1);}
+	ifstream ifp_z7(AcceptanceR_table_z7.c_str(),ios::in);
+	if (ifp_z7.fail()){ cout << "Failed" << endl; exit(1);}
 cout << "Param file : " << AcceptanceR_table_z7.c_str() << endl;
 	while(1){
-		getline(ifpR_z7,bufR_z7);
-		if(bufR_z7[0]=='#'){continue;}
-		if(ifpR_z7.eof())break;
-		stringstream sbufR_z7(bufR_z7);
-		sbufR_z7 >> RHRS_bin >> RHRS_SIMC;
+		getline(ifp_z7,buf_z7);
+		if(buf_z7[0]=='#'){continue;}
+		if(ifp_z7.eof())break;
+		stringstream sbuf_z7(buf_z7);
+		sbuf_z7 >> RHRS_bin >> RHRS_SIMC;
 		//cout << RHRS_bin << ", " << RHRS_SIMC <<endl;
 
 		RHRS_table[RHRS_bin-1][7] = RHRS_SIMC*0.001;//sr
 		RHRS_total+=RHRS_SIMC;
 		if(RHRS_SIMC!=0)RHRS_total_bin++;
 	}
-	ifpR_z1.close();
-	ifpR_z2.close();
-	ifpR_z3.close();
-	ifpR_z4.close();
 	cout<<"HRS-R Acceptance (z7 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
 /*----- 6 < z < 8 -----*/
 	string AcceptanceR_table_z8 = "./information/RHRS_SIMC100bin_10_z8.dat";//Acceptance Table (SIMC)
-	string bufR_z8;
+	string buf_z8;
 	RHRS_total=0.;
 	RHRS_total_bin=0;
 
-	ifstream ifpR_z8(AcceptanceR_table_z8.c_str(),ios::in);
-	if (ifpR_z8.fail()){ cout << "Failed" << endl; exit(1);}
+	ifstream ifp_z8(AcceptanceR_table_z8.c_str(),ios::in);
+	if (ifp_z8.fail()){ cout << "Failed" << endl; exit(1);}
 cout << "Param file : " << AcceptanceR_table_z8.c_str() << endl;
 	while(1){
-		getline(ifpR_z8,bufR_z8);
-		if(bufR_z8[0]=='#'){continue;}
-		if(ifpR_z8.eof())break;
-		stringstream sbufR_z8(bufR_z8);
-		sbufR_z8 >> RHRS_bin >> RHRS_SIMC;
+		getline(ifp_z8,buf_z8);
+		if(buf_z8[0]=='#'){continue;}
+		if(ifp_z8.eof())break;
+		stringstream sbuf_z8(buf_z8);
+		sbuf_z8 >> RHRS_bin >> RHRS_SIMC;
 		//cout << RHRS_bin << ", " << RHRS_SIMC <<endl;
 
 		RHRS_table[RHRS_bin-1][8] = RHRS_SIMC*0.001;//sr
@@ -456,19 +398,19 @@ cout << "Param file : " << AcceptanceR_table_z8.c_str() << endl;
 	cout<<"HRS-R Acceptance (z8 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
 /*----- 8 < z < 10 -----*/
 	string AcceptanceR_table_z9 = "./information/RHRS_SIMC100bin_10_z9.dat";//Acceptance Table (SIMC)
-	string bufR_z9;
+	string buf_z9;
 	RHRS_total=0.;
 	RHRS_total_bin=0;
 
-	ifstream ifpR_z9(AcceptanceR_table_z9.c_str(),ios::in);
-	if (ifpR_z9.fail()){ cout << "Failed" << endl; exit(1);}
+	ifstream ifp_z9(AcceptanceR_table_z9.c_str(),ios::in);
+	if (ifp_z9.fail()){ cout << "Failed" << endl; exit(1);}
 cout << "Param file : " << AcceptanceR_table_z9.c_str() << endl;
 	while(1){
-		getline(ifpR_z9,bufR_z9);
-		if(bufR_z9[0]=='#'){continue;}
-		if(ifpR_z9.eof())break;
-		stringstream sbufR_z9(bufR_z9);
-		sbufR_z9 >> RHRS_bin >> RHRS_SIMC;
+		getline(ifp_z9,buf_z9);
+		if(buf_z9[0]=='#'){continue;}
+		if(ifp_z9.eof())break;
+		stringstream sbuf_z9(buf_z9);
+		sbuf_z9 >> RHRS_bin >> RHRS_SIMC;
 		//cout << RHRS_bin << ", " << RHRS_SIMC <<endl;
 
 		RHRS_table[RHRS_bin-1][9] = RHRS_SIMC*0.001;//sr
@@ -477,246 +419,10 @@ cout << "Param file : " << AcceptanceR_table_z9.c_str() << endl;
 	}
 	cout<<"HRS-R Acceptance (z9 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
 
-  TH2F* Acceptance_mapR = new TH2F("Acceptance_mapR","#Delta#Omega_{K}^{lab}(p_{K},Z)",100,1.6,2.0,10,-10.,10.);
-  Acceptance_mapR->GetXaxis()->SetTitle("Momentum [GeV/c]");
-  Acceptance_mapR->GetYaxis()->SetTitle("Z-vertex [cm]");
+  TH2F* Acceptance_map = new TH2F("Acceptance_map","#Delta#Omega_{K}^{lab}(p_{K},Z)",100,1.6,2.0,10,-10.,10.);
 	for(int i=0;i<100;i++){
 		for(int j=0;j<10;j++){
-			Acceptance_mapR->SetBinContent(i+1,j+1,RHRS_table[i][j]*1000.);
-		}
-	}
-
-//----------------HRS-L Acceptance-----------------//
-
-	int LHRS_bin;
-	double LHRS_SIMC;
-	double LHRS_table[100][10];//1.9<pk[GeV/c]<2.3, 100 partition --> 1bin=4MeV/c
-							   //-10<Z-vertex <10,   10 partition --> 1bin=2cm
-	double LHRS_total=0.;
-	int LHRS_total_bin=0;
-/*----- -10 < z < -8 -----*/
-	string AcceptanceL_table_z0 = "./information/LHRS_SIMC100bin_10_z0.dat";//Acceptance Table (SIMC)
-	string bufL_z0;
-
-	ifstream ifpL_z0(AcceptanceL_table_z0.c_str(),ios::in);
-	if (ifpL_z0.fail()){ cout << "Failed" << endl; exit(1);}
-cout << "Param file : " << AcceptanceL_table_z0.c_str() << endl;
-	while(1){
-		getline(ifpL_z0,bufL_z0);
-		if(bufL_z0[0]=='#'){continue;}
-		if(ifpL_z0.eof())break;
-		stringstream sbufL_z0(bufL_z0);
-		sbufL_z0 >> LHRS_bin >> LHRS_SIMC;
-		//cout << LHRS_bin << ", " << LHRS_SIMC <<endl;
-
-		LHRS_table[LHRS_bin-1][0] = LHRS_SIMC*0.001;//sr
-		LHRS_total+=LHRS_SIMC;
-		if(LHRS_SIMC!=0)LHRS_total_bin++;
-	}
-	cout<<"HRS-L Acceptance (z0 average)="<<LHRS_total/(double)LHRS_total_bin<<endl;
-/*----- -8 < z < -6 -----*/
-	string AcceptanceL_table_z1 = "./information/LHRS_SIMC100bin_10_z1.dat";//Acceptance Table (SIMC)
-	string bufL_z1;
-
-	ifstream ifpL_z1(AcceptanceL_table_z1.c_str(),ios::in);
-	if (ifpL_z1.fail()){ cout << "Failed" << endl; exit(1);}
-cout << "Param file : " << AcceptanceL_table_z1.c_str() << endl;
-	while(1){
-		getline(ifpL_z1,bufL_z1);
-		if(bufL_z1[0]=='#'){continue;}
-		if(ifpL_z1.eof())break;
-		stringstream sbufL_z1(bufL_z1);
-		sbufL_z1 >> LHRS_bin >> LHRS_SIMC;
-		//cout << LHRS_bin << ", " << LHRS_SIMC <<endl;
-
-		LHRS_table[LHRS_bin-1][1] = LHRS_SIMC*0.001;//sr
-		LHRS_total+=LHRS_SIMC;
-		if(LHRS_SIMC!=0)LHRS_total_bin++;
-	}
-	cout<<"HRS-L Acceptance (z1 average)="<<LHRS_total/(double)LHRS_total_bin<<endl;
-/*----- -6 < z < -4 -----*/
-	string AcceptanceL_table_z2 = "./information/LHRS_SIMC100bin_10_z2.dat";//Acceptance Table (SIMC)
-	string bufL_z2;
-	LHRS_total=0.;
-	LHRS_total_bin=0;
-
-	ifstream ifpL_z2(AcceptanceL_table_z2.c_str(),ios::in);
-	if (ifpL_z2.fail()){ cout << "Failed" << endl; exit(1);}
-cout << "Param file : " << AcceptanceL_table_z2.c_str() << endl;
-	while(1){
-		getline(ifpL_z2,bufL_z2);
-		if(bufL_z2[0]=='#'){continue;}
-		if(ifpL_z2.eof())break;
-		stringstream sbufL_z2(bufL_z2);
-		sbufL_z2 >> LHRS_bin >> LHRS_SIMC;
-		//cout << LHRS_bin << ", " << LHRS_SIMC <<endl;
-
-		LHRS_table[LHRS_bin-1][2] = LHRS_SIMC*0.001;//sr
-		LHRS_total+=LHRS_SIMC;
-		if(LHRS_SIMC!=0)LHRS_total_bin++;
-	}
-	cout<<"HRS-L Acceptance (z2 average)="<<LHRS_total/(double)LHRS_total_bin<<endl;
-/*----- -4 < z < -2 -----*/
-	string AcceptanceL_table_z3 = "./information/LHRS_SIMC100bin_10_z3.dat";//Acceptance Table (SIMC)
-	string bufL_z3;
-	LHRS_total=0.;
-	LHRS_total_bin=0;
-
-	ifstream ifpL_z3(AcceptanceL_table_z3.c_str(),ios::in);
-	if (ifpL_z3.fail()){ cout << "Failed" << endl; exit(1);}
-cout << "Param file : " << AcceptanceL_table_z3.c_str() << endl;
-	while(1){
-		getline(ifpL_z3,bufL_z3);
-		if(bufL_z3[0]=='#'){continue;}
-		if(ifpL_z3.eof())break;
-		stringstream sbufL_z3(bufL_z3);
-		sbufL_z3 >> LHRS_bin >> LHRS_SIMC;
-		//cout << LHRS_bin << ", " << LHRS_SIMC <<endl;
-
-		LHRS_table[LHRS_bin-1][3] = LHRS_SIMC*0.001;//sr
-		LHRS_total+=LHRS_SIMC;
-		if(LHRS_SIMC!=0)LHRS_total_bin++;
-	}
-	cout<<"HRS-L Acceptance (z3 average)="<<LHRS_total/(double)LHRS_total_bin<<endl;
-/*----- -2 < z < 0 -----*/
-	string AcceptanceL_table_z4 = "./information/LHRS_SIMC100bin_10_z4.dat";//Acceptance Table (SIMC)
-	string bufL_z4;
-	LHRS_total=0.;
-	LHRS_total_bin=0;
-
-	ifstream ifpL_z4(AcceptanceL_table_z4.c_str(),ios::in);
-	if (ifpL_z4.fail()){ cout << "Failed" << endl; exit(1);}
-cout << "Param file : " << AcceptanceL_table_z4.c_str() << endl;
-	while(1){
-		getline(ifpL_z4,bufL_z4);
-		if(bufL_z4[0]=='#'){continue;}
-		if(ifpL_z4.eof())break;
-		stringstream sbufL_z4(bufL_z4);
-		sbufL_z4 >> LHRS_bin >> LHRS_SIMC;
-		//cout << LHRS_bin << ", " << LHRS_SIMC <<endl;
-
-		LHRS_table[LHRS_bin-1][4] = LHRS_SIMC*0.001;//sr
-		LHRS_total+=LHRS_SIMC;
-		if(LHRS_SIMC!=0)LHRS_total_bin++;
-	}
-	cout<<"HRS-L Acceptance (z4 average)="<<LHRS_total/(double)LHRS_total_bin<<endl;
-/*----- 0 < z < 2 -----*/
-	string AcceptanceL_table_z5 = "./information/LHRS_SIMC100bin_10_z5.dat";//Acceptance Table (SIMC)
-	string bufL_z5;
-	LHRS_total=0.;
-	LHRS_total_bin=0;
-
-	ifstream ifpL_z5(AcceptanceL_table_z5.c_str(),ios::in);
-	if (ifpL_z5.fail()){ cout << "Failed" << endl; exit(1);}
-cout << "Param file : " << AcceptanceL_table_z5.c_str() << endl;
-	while(1){
-		getline(ifpL_z5,bufL_z5);
-		if(bufL_z5[0]=='#'){continue;}
-		if(ifpL_z5.eof())break;
-		stringstream sbufL_z5(bufL_z5);
-		sbufL_z5 >> LHRS_bin >> LHRS_SIMC;
-		//cout << LHRS_bin << ", " << LHRS_SIMC <<endl;
-
-		LHRS_table[LHRS_bin-1][5] = LHRS_SIMC*0.001;//sr
-		LHRS_total+=LHRS_SIMC;
-		if(LHRS_SIMC!=0)LHRS_total_bin++;
-	}
-	cout<<"HRS-L Acceptance (z5 average)="<<LHRS_total/(double)LHRS_total_bin<<endl;
-/*----- 2 < z < 4 -----*/
-	string AcceptanceL_table_z6 = "./information/LHRS_SIMC100bin_10_z6.dat";//Acceptance Table (SIMC)
-	string bufL_z6;
-	LHRS_total=0.;
-	LHRS_total_bin=0;
-
-	ifstream ifpL_z6(AcceptanceL_table_z6.c_str(),ios::in);
-	if (ifpL_z6.fail()){ cout << "Failed" << endl; exit(1);}
-cout << "Param file : " << AcceptanceL_table_z6.c_str() << endl;
-	while(1){
-		getline(ifpL_z6,bufL_z6);
-		if(bufL_z6[0]=='#'){continue;}
-		if(ifpL_z6.eof())break;
-		stringstream sbufL_z6(bufL_z6);
-		sbufL_z6 >> LHRS_bin >> LHRS_SIMC;
-		//cout << LHRS_bin << ", " << LHRS_SIMC <<endl;
-
-		LHRS_table[LHRS_bin-1][6] = LHRS_SIMC*0.001;//sr
-		LHRS_total+=LHRS_SIMC;
-		if(LHRS_SIMC!=0)LHRS_total_bin++;
-	}
-	cout<<"HRS-L Acceptance (z6 average)="<<LHRS_total/(double)LHRS_total_bin<<endl;
-/*----- 4 < z < 6 -----*/
-	string AcceptanceL_table_z7 = "./information/LHRS_SIMC100bin_10_z7.dat";//Acceptance Table (SIMC)
-	string bufL_z7;
-	LHRS_total=0.;
-	LHRS_total_bin=0;
-
-	ifstream ifpL_z7(AcceptanceL_table_z7.c_str(),ios::in);
-	if (ifpL_z7.fail()){ cout << "Failed" << endl; exit(1);}
-cout << "Param file : " << AcceptanceL_table_z7.c_str() << endl;
-	while(1){
-		getline(ifpL_z7,bufL_z7);
-		if(bufL_z7[0]=='#'){continue;}
-		if(ifpL_z7.eof())break;
-		stringstream sbufL_z7(bufL_z7);
-		sbufL_z7 >> LHRS_bin >> LHRS_SIMC;
-		//cout << LHRS_bin << ", " << LHRS_SIMC <<endl;
-
-		LHRS_table[LHRS_bin-1][7] = LHRS_SIMC*0.001;//sr
-		LHRS_total+=LHRS_SIMC;
-		if(LHRS_SIMC!=0)LHRS_total_bin++;
-	}
-	cout<<"HRS-L Acceptance (z7 average)="<<LHRS_total/(double)LHRS_total_bin<<endl;
-/*----- 6 < z < 8 -----*/
-	string AcceptanceL_table_z8 = "./information/LHRS_SIMC100bin_10_z8.dat";//Acceptance Table (SIMC)
-	string bufL_z8;
-	LHRS_total=0.;
-	LHRS_total_bin=0;
-
-	ifstream ifpL_z8(AcceptanceL_table_z8.c_str(),ios::in);
-	if (ifpL_z8.fail()){ cout << "Failed" << endl; exit(1);}
-cout << "Param file : " << AcceptanceL_table_z8.c_str() << endl;
-	while(1){
-		getline(ifpL_z8,bufL_z8);
-		if(bufL_z8[0]=='#'){continue;}
-		if(ifpL_z8.eof())break;
-		stringstream sbufL_z8(bufL_z8);
-		sbufL_z8 >> LHRS_bin >> LHRS_SIMC;
-		//cout << LHRS_bin << ", " << LHRS_SIMC <<endl;
-
-		LHRS_table[LHRS_bin-1][8] = LHRS_SIMC*0.001;//sr
-		LHRS_total+=LHRS_SIMC;
-		if(LHRS_SIMC!=0)LHRS_total_bin++;
-	}
-	cout<<"HRS-L Acceptance (z8 average)="<<LHRS_total/(double)LHRS_total_bin<<endl;
-/*----- 8 < z < 10 -----*/
-	string AcceptanceL_table_z9 = "./information/LHRS_SIMC100bin_10_z9.dat";//Acceptance Table (SIMC)
-	string bufL_z9;
-	LHRS_total=0.;
-	LHRS_total_bin=0;
-
-	ifstream ifpL_z9(AcceptanceL_table_z9.c_str(),ios::in);
-	if (ifpL_z9.fail()){ cout << "Failed" << endl; exit(1);}
-cout << "Param file : " << AcceptanceL_table_z9.c_str() << endl;
-	while(1){
-		getline(ifpL_z9,bufL_z9);
-		if(bufL_z9[0]=='#'){continue;}
-		if(ifpL_z9.eof())break;
-		stringstream sbufL_z9(bufL_z9);
-		sbufL_z9 >> LHRS_bin >> LHRS_SIMC;
-		//cout << LHRS_bin << ", " << LHRS_SIMC <<endl;
-
-		LHRS_table[LHRS_bin-1][9] = LHRS_SIMC*0.001;//sr
-		LHRS_total+=LHRS_SIMC;
-		if(LHRS_SIMC!=0)LHRS_total_bin++;
-	}
-	cout<<"HRS-L Acceptance (z9 average)="<<LHRS_total/(double)LHRS_total_bin<<endl;
-
-  TH2F* Acceptance_mapL = new TH2F("Acceptance_mapL","#Delta#Omega_{e'}^{lab}(p_{e'},Z)",100,1.9,2.3,10,-10.,10.);
-  Acceptance_mapL->GetXaxis()->SetTitle("Momentum [GeV/c]");
-  Acceptance_mapL->GetYaxis()->SetTitle("Z-vertex [cm]");
-	for(int i=0;i<100;i++){
-		for(int j=0;j<10;j++){
-			Acceptance_mapL->SetBinContent(i+1,j+1,LHRS_table[i][j]*1000.);
+			Acceptance_map->SetBinContent(i+1,j+1,RHRS_table[i][j]*1000.);
 		}
 	}
     
@@ -760,14 +466,20 @@ cout << "Param file : " << AcceptanceL_table_z9.c_str() << endl;
  //const double fit_min_mm=-0.01;
  //const double fit_max_mm=0.085;
  const double fit_min_mm=-0.005;
- //const double fit_max_mm=0.085;
- const double fit_max_mm=0.100;
- 
+
 //change
- //const double fmin_mm=-0.05;//out of range
- //const double fmax_mm=2.20;//out of range
- const double fmin_mm=-0.05;//Full (Mom cut)
- const double fmax_mm=0.15;//Full (Mom cut)
+ //const double fit_max_mm=0.085;//Angle 2-div.
+ const double fit_max_mm=0.105;//Full (Mom cut)
+ 
+ const double fmin_mm=-0.05;//out of range
+ const double fmax_mm=2.20;//out of range
+ const double fmin_mm_inside=-0.05;//Full (Mom cut)
+
+//change
+ const double fmax_mm_inside=0.15;//Full (Mom cut)
+ const double fmax_mm_insideS=0.15;//Full (Mom cut)
+ //const double fmax_mm_inside=0.100;//Angle 2-div.(Mom cut)
+ //const double fmax_mm_insideS=0.110;//Angle 2-div.(Mom cut)
  
  //const double fmin_mm=-0.01;
  //const double fmax_mm=0.12;
@@ -1099,7 +811,7 @@ cout << "Param file : " << AcceptanceL_table_z9.c_str() << endl;
 		double effK	 = 0.140;
 		double efficiency = effAC*effZ*effFP*effch2*effct*effDAQ*efftr*effK;
 		double RHRS  = 0.005;
-		double LHRS  = 0.005;
+		//double LHRS  = 0.006;
 		double Charge= 4.6486;//[C]
 		double ee	 = 1.602*pow(10.,-19);
 		double Ne	 = Charge/ee;//Num of e
@@ -1281,7 +993,11 @@ cout<<"Entries in Cointime gate: "<<ENum<<endl;
 		
 		if(event_selection&&ct_cut)hmm_L_fom_best->Fill(mm);
 		//if(event_selection_new&&ct_cut)hmm_L_fom_strict->Fill(mm);
-		if(event_selection_strict&&ct_cut){hmm_L_fom_strict->Fill(mm);ENum_strict++;}
+		if(event_selection_strict&&ct_cut){
+			hmm_L_fom_strict->Fill(mm);
+			ENum_strict++;
+			//if(mm<-0.03||mm>0.12)cout<<"mm="<<mm<<", L_mom="<<L_mom<<", R_mom="<<R_mom<<", L_tr_tg_th="<<L_tr_tg_th<<", R_tr_tg_th="<<R_tr_tg_th<<", L_tr_tg_ph="<<L_tr_tg_ph<<", R_tr_tg_ph="<<R_tr_tg_ph<<endl;
+		}
 		//if(event_selection_momS6&&ct_cut)hmm_L_fom_strict->Fill(mm);
 
 
@@ -1378,32 +1094,19 @@ cout<<"Entries in Cointime gate: "<<ENum<<endl;
 		//}else{cs=0.;} 
 		//int kbin = (int)((R_mom-1.5)/0.004);
 		//int zbin = (int)((((L_tr_vz+R_tr_vz)/2.)+0.1)/0.02);
-		int kbinR = (int)((R_mom-1.6)*100./0.4);
-		if(event_selection&&ct_cut&&kbinR>=0 &&kbinR<100){
-		if((L_tr_vz+R_tr_vz)/2.>=-0.10&&(L_tr_vz+R_tr_vz)/2.<-0.08)RHRS = RHRS_table[kbinR][0];
-		else if((L_tr_vz+R_tr_vz)/2.>=-0.08&&(L_tr_vz+R_tr_vz)/2.<-0.06)RHRS = RHRS_table[kbinR][1];
-		else if((L_tr_vz+R_tr_vz)/2.>=-0.06&&(L_tr_vz+R_tr_vz)/2.<-0.04)RHRS = RHRS_table[kbinR][2];
-		else if((L_tr_vz+R_tr_vz)/2.>=-0.04&&(L_tr_vz+R_tr_vz)/2.<-0.02)RHRS = RHRS_table[kbinR][3];
-		else if((L_tr_vz+R_tr_vz)/2.>=-0.02&&(L_tr_vz+R_tr_vz)/2.<0.)RHRS = RHRS_table[kbinR][4];
-		else if((L_tr_vz+R_tr_vz)/2.>=0.  &&(L_tr_vz+R_tr_vz)/2.<0.02)RHRS = RHRS_table[kbinR][5];
-		else if((L_tr_vz+R_tr_vz)/2.>=0.02&&(L_tr_vz+R_tr_vz)/2.<0.04)RHRS = RHRS_table[kbinR][6];
-		else if((L_tr_vz+R_tr_vz)/2.>=0.04&&(L_tr_vz+R_tr_vz)/2.<0.06)RHRS = RHRS_table[kbinR][7];
-		else if((L_tr_vz+R_tr_vz)/2.>=0.06&&(L_tr_vz+R_tr_vz)/2.<0.08)RHRS = RHRS_table[kbinR][8];
-		else if((L_tr_vz+R_tr_vz)/2.>=0.08&&(L_tr_vz+R_tr_vz)/2.<0.10)RHRS = RHRS_table[kbinR][9];
+		int kbin = (int)((R_mom-1.6)*100./0.4);
+		if(event_selection&&ct_cut&&kbin>=0 &&kbin<100){
+		if((L_tr_vz+R_tr_vz)/2.>=-0.10&&(L_tr_vz+R_tr_vz)/2.<-0.08)RHRS = RHRS_table[kbin][0];
+		else if((L_tr_vz+R_tr_vz)/2.>=-0.08&&(L_tr_vz+R_tr_vz)/2.<-0.06)RHRS = RHRS_table[kbin][1];
+		else if((L_tr_vz+R_tr_vz)/2.>=-0.06&&(L_tr_vz+R_tr_vz)/2.<-0.04)RHRS = RHRS_table[kbin][2];
+		else if((L_tr_vz+R_tr_vz)/2.>=-0.04&&(L_tr_vz+R_tr_vz)/2.<-0.02)RHRS = RHRS_table[kbin][3];
+		else if((L_tr_vz+R_tr_vz)/2.>=-0.02&&(L_tr_vz+R_tr_vz)/2.<0.)RHRS = RHRS_table[kbin][4];
+		else if((L_tr_vz+R_tr_vz)/2.>=0.&&(L_tr_vz+R_tr_vz)/2.<0.02)RHRS = RHRS_table[kbin][5];
+		else if((L_tr_vz+R_tr_vz)/2.>=0.02&&(L_tr_vz+R_tr_vz)/2.<0.04)RHRS = RHRS_table[kbin][6];
+		else if((L_tr_vz+R_tr_vz)/2.>=0.04&&(L_tr_vz+R_tr_vz)/2.<0.06)RHRS = RHRS_table[kbin][7];
+		else if((L_tr_vz+R_tr_vz)/2.>=0.06&&(L_tr_vz+R_tr_vz)/2.<0.08)RHRS = RHRS_table[kbin][8];
+		else if((L_tr_vz+R_tr_vz)/2.>=0.08&&(L_tr_vz+R_tr_vz)/2.<0.10)RHRS = RHRS_table[kbin][9];
 		else cout<<"Z Error"<<(L_tr_vz+R_tr_vz)/2.<<endl;
-
-		int kbinR = (int)((R_mom-1.6)*100./0.4);
-		int kbinL = (int)((L_mom-1.9)*100./0.4);
-		for(int zbin=0;zbin<10;zbin++){
-		//int zbin=0;
-		//while(zbin<10){ 
-			if((L_tr_vz+R_tr_vz)/2.>=-0.10+(0.02*(double)zbin)&&(L_tr_vz+R_tr_vz)/2.<-0.08+(0.02*(double)zbin)){
-				RHRS = RHRS_table[kbinR][zbin];
-				LHRS = LHRS_table[kbinL][zbin];
-			}
-		}
-			//	zbin++;
-			//else cout<<"Z Error: zbin does NOT exist!"<<(L_tr_vz+R_tr_vz)/2.<<endl;
 
 		effDAQ = daq_table[nrun-111000];
 		if(effDAQ==0.2)cout<<"Starange!!! DAQ Eff. of run"<<nrun<<" does not exist."<<endl;
@@ -1420,7 +1123,7 @@ cout<<"Entries in Cointime gate: "<<ENum<<endl;
 		//-------------
 
 		//if(RHRS!=0.&&effDAQ!=0.)cs = labtocm/effDAQ/RHRS;//[nb/sr]
-		if(LHRS!=0&&RHRS!=0.&&effDAQ!=0.)cs = labtocm/effDAQ/LHRS/RHRS/effK;//[nb/sr]
+		if(RHRS!=0.&&effDAQ!=0.)cs = labtocm/effDAQ/RHRS/effK;//[nb/sr]
 		else cs=0.;
 		}else{cs=0.;}
 		double cs_temp = cs*labtocm;
@@ -1435,7 +1138,7 @@ cout<<"Entries in Cointime gate: "<<ENum<<endl;
 
 		if(event_selection_new&&ct_cut){
 			hcs_L_fom_strict->Fill(mm,cs);
-			if(cs>0.)ENum_strict_cs+=cs/25000.;
+			if(cs>0.)ENum_strict_cs+=cs/150.;
 		}
 		//if(event_selection_momS6&&ct_cut)hcs_L_fom_strict->Fill(mm,cs);
 		//
@@ -1448,15 +1151,15 @@ cout<<"Entries in Cointime gate: "<<ENum<<endl;
 			gklab_eklab->Fill(theta_gk_lab,theta_ek);
 			eelab_eklab->Fill(theta_ee,theta_ek);
 			eklab_gkcm->Fill(theta_ek,theta_gk_cm);
-			if(cm2_angle1_cut){hcs_L_cm2_1->Fill(mm,cs);if(cs>0.)ENum_strict_cs_cm2_1+=cs;}
-			if(cm2_angle2_cut){hcs_L_cm2_2->Fill(mm,cs);if(cs>0.)ENum_strict_cs_cm2_2+=cs;}
-			if(cm3_angle1_cut){hcs_L_cm3_1->Fill(mm,cs);if(cs>0.)ENum_strict_cs_cm3_1+=cs;}
-			if(cm3_angle2_cut){hcs_L_cm3_2->Fill(mm,cs);if(cs>0.)ENum_strict_cs_cm3_2+=cs;}
-			if(cm3_angle3_cut){hcs_L_cm3_3->Fill(mm,cs);if(cs>0.)ENum_strict_cs_cm3_3+=cs;}
-			if(cm4_angle1_cut){hcs_L_cm4_1->Fill(mm,cs);if(cs>0.)ENum_strict_cs_cm4_1+=cs;}
-			if(cm4_angle2_cut){hcs_L_cm4_2->Fill(mm,cs);if(cs>0.)ENum_strict_cs_cm4_2+=cs;}
-			if(cm4_angle3_cut){hcs_L_cm4_3->Fill(mm,cs);if(cs>0.)ENum_strict_cs_cm4_3+=cs;}
-			if(cm4_angle4_cut){hcs_L_cm4_4->Fill(mm,cs);if(cs>0.)ENum_strict_cs_cm4_4+=cs;}
+			if(cm2_angle1_cut){hcs_L_cm2_1->Fill(mm,cs);}
+			if(cm2_angle2_cut){hcs_L_cm2_2->Fill(mm,cs);}
+			if(cm3_angle1_cut){hcs_L_cm3_1->Fill(mm,cs);}
+			if(cm3_angle2_cut){hcs_L_cm3_2->Fill(mm,cs);}
+			if(cm3_angle3_cut){hcs_L_cm3_3->Fill(mm,cs);}
+			if(cm4_angle1_cut){hcs_L_cm4_1->Fill(mm,cs);}
+			if(cm4_angle2_cut){hcs_L_cm4_2->Fill(mm,cs);}
+			if(cm4_angle3_cut){hcs_L_cm4_3->Fill(mm,cs);}
+			if(cm4_angle4_cut){hcs_L_cm4_4->Fill(mm,cs);}
 		}
 		if(event_selection_new&&ct_cut){
 			if(cm2_angle1_cut){hmm_L_new_cm2_1->Fill(mm);ENum_strict_cm2_1++;}
@@ -1468,28 +1171,29 @@ cout<<"Entries in Cointime gate: "<<ENum<<endl;
 			if(cm4_angle2_cut){hmm_L_new_cm4_2->Fill(mm);ENum_strict_cm4_2++;}
 			if(cm4_angle3_cut){hmm_L_new_cm4_3->Fill(mm);ENum_strict_cm4_3++;}
 			if(cm4_angle4_cut){hmm_L_new_cm4_4->Fill(mm);ENum_strict_cm4_4++;}
-			if(cm2_angle1_cut){hcs_L_new_cm2_1->Fill(mm,cs);if(cs>0.)ENum_strict_cs_cm2_1+=cs;}
-			if(cm2_angle2_cut){hcs_L_new_cm2_2->Fill(mm,cs);if(cs>0.)ENum_strict_cs_cm2_2+=cs;}
-			if(cm3_angle1_cut){hcs_L_new_cm3_1->Fill(mm,cs);if(cs>0.)ENum_strict_cs_cm3_1+=cs;}
-			if(cm3_angle2_cut){hcs_L_new_cm3_2->Fill(mm,cs);if(cs>0.)ENum_strict_cs_cm3_2+=cs;}
-			if(cm3_angle3_cut){hcs_L_new_cm3_3->Fill(mm,cs);if(cs>0.)ENum_strict_cs_cm3_3+=cs;}
-			if(cm4_angle1_cut){hcs_L_new_cm4_1->Fill(mm,cs);if(cs>0.)ENum_strict_cs_cm4_1+=cs;}
-			if(cm4_angle2_cut){hcs_L_new_cm4_2->Fill(mm,cs);if(cs>0.)ENum_strict_cs_cm4_2+=cs;}
-			if(cm4_angle3_cut){hcs_L_new_cm4_3->Fill(mm,cs);if(cs>0.)ENum_strict_cs_cm4_3+=cs;}
-			if(cm4_angle4_cut){hcs_L_new_cm4_4->Fill(mm,cs);if(cs>0.)ENum_strict_cs_cm4_4+=cs;}
-			if(Qsq2_1_cut){hmm_L_new_Qsq2_1->Fill(mm);ENum_strict_cm2_1++;}
-			if(Qsq2_2_cut){hmm_L_new_Qsq2_2->Fill(mm);ENum_strict_cm2_2++;}
-			if(Qsq3_1_cut){hmm_L_new_Qsq3_1->Fill(mm);ENum_strict_cm3_1++;}
-			if(Qsq3_2_cut){hmm_L_new_Qsq3_2->Fill(mm);ENum_strict_cm3_2++;}
-			if(Qsq3_3_cut){hmm_L_new_Qsq3_3->Fill(mm);ENum_strict_cm3_3++;}
-			if(Qsq2_1_cut){hcs_L_new_Qsq2_1->Fill(mm,cs);if(cs>0.)ENum_strict_cs_cm2_1+=cs;}
-			if(Qsq2_2_cut){hcs_L_new_Qsq2_2->Fill(mm,cs);if(cs>0.)ENum_strict_cs_cm2_2+=cs;}
-			if(Qsq3_1_cut){hcs_L_new_Qsq3_1->Fill(mm,cs);if(cs>0.)ENum_strict_cs_cm3_1+=cs;}
-			if(Qsq3_2_cut){hcs_L_new_Qsq3_2->Fill(mm,cs);if(cs>0.)ENum_strict_cs_cm3_2+=cs;}
-			if(Qsq3_3_cut){hcs_L_new_Qsq3_3->Fill(mm,cs);if(cs>0.)ENum_strict_cs_cm3_3+=cs;}
+			if(cm2_angle1_cut){hcs_L_new_cm2_1->Fill(mm,cs);if(cs>0.)ENum_strict_cs_cm2_1+=cs*2./150.;}
+			if(cm2_angle2_cut){hcs_L_new_cm2_2->Fill(mm,cs);if(cs>0.)ENum_strict_cs_cm2_2+=cs*2./150.;}
+			if(cm3_angle1_cut){hcs_L_new_cm3_1->Fill(mm,cs);if(cs>0.)ENum_strict_cs_cm3_1+=cs*3./150.;}
+			if(cm3_angle2_cut){hcs_L_new_cm3_2->Fill(mm,cs);if(cs>0.)ENum_strict_cs_cm3_2+=cs*3./150.;}
+			if(cm3_angle3_cut){hcs_L_new_cm3_3->Fill(mm,cs);if(cs>0.)ENum_strict_cs_cm3_3+=cs*3./150.;}
+			if(cm4_angle1_cut){hcs_L_new_cm4_1->Fill(mm,cs);if(cs>0.)ENum_strict_cs_cm4_1+=cs*4./150.;}
+			if(cm4_angle2_cut){hcs_L_new_cm4_2->Fill(mm,cs);if(cs>0.)ENum_strict_cs_cm4_2+=cs*4./150.;}
+			if(cm4_angle3_cut){hcs_L_new_cm4_3->Fill(mm,cs);if(cs>0.)ENum_strict_cs_cm4_3+=cs*4./150.;}
+			if(cm4_angle4_cut){hcs_L_new_cm4_4->Fill(mm,cs);if(cs>0.)ENum_strict_cs_cm4_4+=cs*4./150.;}
+			if(Qsq2_1_cut){hmm_L_new_Qsq2_1->Fill(mm);ENum_strict_Qsq2_1++;}
+			if(Qsq2_2_cut){hmm_L_new_Qsq2_2->Fill(mm);ENum_strict_Qsq2_2++;}
+			if(Qsq3_1_cut){hmm_L_new_Qsq3_1->Fill(mm);ENum_strict_Qsq3_1++;}
+			if(Qsq3_2_cut){hmm_L_new_Qsq3_2->Fill(mm);ENum_strict_Qsq3_2++;}
+			if(Qsq3_3_cut){hmm_L_new_Qsq3_3->Fill(mm);ENum_strict_Qsq3_3++;}
+			if(Qsq2_1_cut){hcs_L_new_Qsq2_1->Fill(mm,cs);if(cs>0.)ENum_strict_cs_Qsq2_1+=cs*2./150.;}
+			if(Qsq2_2_cut){hcs_L_new_Qsq2_2->Fill(mm,cs);if(cs>0.)ENum_strict_cs_Qsq2_2+=cs*2./150.;}
+			if(Qsq3_1_cut){hcs_L_new_Qsq3_1->Fill(mm,cs);if(cs>0.)ENum_strict_cs_Qsq3_1+=cs*3./150.;}
+			if(Qsq3_2_cut){hcs_L_new_Qsq3_2->Fill(mm,cs);if(cs>0.)ENum_strict_cs_Qsq3_2+=cs*3./150.;}
+			if(Qsq3_3_cut){hcs_L_new_Qsq3_3->Fill(mm,cs);if(cs>0.)ENum_strict_cs_Qsq3_3+=cs*3./150.;}
 		}
 
 		if(ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&(fabs(R_tr_vz-L_tr_vz)<0.025)&&(fabs(fabs(R_tr_vz+L_tr_vz)/2.-0.12)<0.01||fabs(fabs(R_tr_vz+L_tr_vz)/2.+0.12)<0.01)&&ct_cut)hmm_Al_fom_noZ_new->Fill(mm);//Al selection
+		//if(ac1sum<3.75&&ac2sum>3.&&ac2sum<20.&&R_Tr&&R_FP&&L_Tr&&L_FP&&(fabs(R_tr_vz-L_tr_vz)<0.025)&&(fabs(fabs(R_tr_vz+L_tr_vz)/2.-0.12)<0.01||fabs(fabs(R_tr_vz+L_tr_vz)/2.+0.12)<0.01)&&ct_cut)hmm_Al_fom_noZ_new->Fill(mm);//Al selection
 
 }//ENum
 
@@ -1610,7 +1314,6 @@ cout<<"Entries in Cointime gate: "<<ENum<<endl;
 	//cs	 = pow(10.,33.)/(ntar_h2*efficiency*RHRS*Ng);//[nb/sr]
 	effDAQ= 0.950;
 	RHRS  = 0.0055;
-	LHRS  = 0.0055;
 	effK= 0.14;
 	double labtocm = 0.126;
 //comment out Feb. 1, why was this needed?
@@ -1652,15 +1355,17 @@ cout<<"Entries in Cointime gate: "<<ENum<<endl;
 //Choose one from the list below
 //===CHANGE===//
 	hmm_wo_bg_fom_strict->Add(hcs_L_fom_strict,hcs_bg_fom_strict,1.0,-1.0);//All by hcs
-	hmm_wo_bg_fom_strict->Scale(1./25000.);
+	hmm_wo_bg_fom_strict->Scale(1./150.);
 	//hmm_wo_bg_fom_strict->Add(hmm_L_fom_strict,hmm_bg_fom_strict,1.0,-1.0);//All by hmm
 	//hmm_wo_bg_fom_strict->Add(hcs_L_new_cm2_1,hcs_bg_new_cm2_1,1.0,-1.0);//2 div.
 	//hmm_wo_bg_fom_strict->Add(hcs_L_new_cm2_2,hcs_bg_new_cm2_2,1.0,-1.0);//2 div.
+	//hmm_wo_bg_fom_strict->Scale(2./150.);
 	//hmm_wo_bg_fom_strict->Add(hcs_L_new_cm3_1,hcs_bg_new_cm3_1,1.0,-1.0);//3 div.
 	//hmm_wo_bg_fom_strict->Add(hcs_L_new_cm3_2,hcs_bg_new_cm3_2,1.0,-1.0);//3 div.
 	//hmm_wo_bg_fom_strict->Add(hcs_L_new_cm3_3,hcs_bg_new_cm3_3,1.0,-1.0);//3 div.
 	//hmm_wo_bg_fom_strict->Add(hcs_L_new_Qsq2_1,hcs_bg_new_Qsq2_1,1.0,-1.0);//2 div.
 	//hmm_wo_bg_fom_strict->Add(hcs_L_new_Qsq2_2,hcs_bg_new_Qsq2_2,1.0,-1.0);//2 div.
+	//hmm_wo_bg_fom_strict->Scale(2./150.);
 	//hmm_wo_bg_fom_strict->Add(hcs_L_new_Qsq3_1,hcs_bg_new_Qsq3_1,1.0,-1.0);//3 div.
 	//hmm_wo_bg_fom_strict->Add(hcs_L_new_Qsq3_2,hcs_bg_new_Qsq3_2,1.0,-1.0);//3 div.
 	//hmm_wo_bg_fom_strict->Add(hcs_L_new_Qsq3_3,hcs_bg_new_Qsq3_3,1.0,-1.0);//3 div.
@@ -1698,6 +1403,7 @@ cout<<"Entries in Cointime gate: "<<ENum<<endl;
 	
 //For Al B.G. function fitting
 	hmm_Al_wobg_fom_noZ_new->Add(hmm_Al_fom_noZ_new,hmm_Albg_fom_noZ_new,1.0,-1.0);
+	//hmm_Al_wobg_fom_noZ_new->Add(hmm_Al_fom_noZ_new,hmm_Albg_fom_nocut,1.0,-1.0);
 
 	//hmm_pi_wobg_fom_nocut->Add(hmm_Al_fom_nocut,hmm_Albg_fom_nocut,1.0,-1.0);
 	//hmm_wo_bg_cm2_1->Add(hcs_L_cm2_1,hmm_bg_cm2_1,1.0,-1.0);
@@ -1734,10 +1440,10 @@ cout<<"Entries in Cointime gate: "<<ENum<<endl;
 	 TF1 *fAl_new=new TF1("fAl_new",F_Voigt,fit_min_mm,fit_max_mm,4);
 	 fAl_new->SetNpx(2000);
 	 fAl_new->SetTitle("Al selected (new)");
-	 fAl_new->SetParameters(2.,0.05,0.04,0.001);
+	 fAl_new->SetParameters(1.,0.05,0.04,0.0001);
 	 fAl_new->SetParLimits(0,0.,10000.);
 	 fAl_new->SetLineColor(kRed);
-	 hmm_Al_wobg_fom_noZ_new->Fit("fAl_new","N","",0.,0.08);
+	 hmm_Al_wobg_fom_noZ_new->Fit("fAl_new","I","",0.02,0.10);
 	 double Al_par0 = fAl_new->GetParameter(0);
 	 double Al_par1 = fAl_new->GetParameter(1);
 	 double Al_par2 = fAl_new->GetParameter(2);
@@ -1750,7 +1456,7 @@ cout<<"Entries in Cointime gate: "<<ENum<<endl;
 	 fpion->SetParameters(3.,0.05,0.04,0.001);
 	 fpion->SetParLimits(0,0.,10000.);
 	 fpion->SetLineColor(kRed);
-	 hmm_pi_wobg_fom_best->Fit("fpion","N","",0.,0.1);
+	 hmm_pi_wobg_fom_best->Fit("fpion","I","",0.,0.1);
 	 double pion_par0 = fpion->GetParameter(0);
 	 double pion_par1 = fpion->GetParameter(1);
 	 double pion_par2 = fpion->GetParameter(2);
@@ -1779,11 +1485,12 @@ cout<<"Entries in Cointime gate: "<<ENum<<endl;
 	 fmm_strict_Lexp->SetNpx(20000);
 	 fmm_strict_Lexp->SetTitle("Missing Mass (strict)");
 
-int fit_flag = 3;
+//change
+int fit_flag = 1;
 	//1: Fixed from SIMC (most reliable)
 	//2: Free			 (chi-square is the best)
 	//3: Fixed from data (out of acceptance)
-	
+
 //Free Fit
 #if 0
 //mean_L_best=-0.001;
@@ -1820,15 +1527,40 @@ int fit_flag = 3;
 //	 //fmm_strict_Lexp->SetParameter(15,0.05);//mean
 //	 //fmm_strict_Lexp->SetParameter(16,0.04);//Gsigma
 //	 //fmm_strict_Lexp->SetParameter(17,0.01);//Lfwhm
+	 fmm_strict_Lexp->SetParameter(0,0.000658);
+	 fmm_strict_Lexp->SetParameter(1,-0.001258);
+	 fmm_strict_Lexp->SetParameter(2,1.42394);
+	 fmm_strict_Lexp->SetParameter(3,0.00108);
+	 fmm_strict_Lexp->SetParameter(4,0.06493);
+	 fmm_strict_Lexp->SetParameter(5,0.003);
+	 fmm_strict_Lexp->SetParameter(6,0.692);
+	 fmm_strict_Lexp->SetParameter(7,0.0001579);
+	 fmm_strict_Lexp->SetParameter(8,0.0761140);
+	 fmm_strict_Lexp->SetParameter(9,0.551341);
+	 fmm_strict_Lexp->SetParameter(10,0.00168);
+	 fmm_strict_Lexp->SetParameter(11,0.1107);
+	 fmm_strict_Lexp->SetParameter(12,-0.08095);
+	 fmm_strict_Lexp->SetParameter(13,1.499);
+	 fmm_strict_Lexp->FixParameter(14,(double)ENum_strict*0.021*0.001);//scale(1.8%(pion)+0.3%(Al)) //B.G. ratio
+	 fmm_strict_Lexp->FixParameter(15,Al_par1);//mean
+	 fmm_strict_Lexp->FixParameter(16,Al_par2);//Gsigma
+	 fmm_strict_Lexp->FixParameter(17,Al_par3);//Lfwhm
+	 fmm_strict_Lexp->FixParameter(18,pion_par1);//mean
+	 fmm_strict_Lexp->FixParameter(19,pion_par2);//Gsigma
+	 fmm_strict_Lexp->FixParameter(20,pion_par3);//Lfwhm
+	 fmm_strict_Lexp->FixParameter(21,0.3/1.8);//Al vs Pi
 //	 fmm_strict_Lexp->SetParameter(14,6.);//scale
-//	 fmm_strict_Lexp->SetParLimits(14,0.,1000000.);//scale
-//
+//e	 fmm_strict_Lexp->SetParLimits(14,0.,1000000.);//scale
 #endif
 
+
 //Fix Fit
+#if 1
 //Lambda//
 	 fmm_strict_Lexp->SetParLimits(2,0.,1000.);//positive
 	 fmm_strict_Lexp->SetParLimits(9,0.,300.);//positive
+	 fmm_strict_Lexp->SetParLimits(5,-0.005,0.005);//peak pos.
+	 fmm_strict_Lexp->SetParLimits(12,-0.085,-0.065);//peak pos.
 	 //fmm_strict_Lexp->SetParLimits(1,def_mean_L-def_sig_L,def_mean_L+def_sig_L);
 	 //fmm_strict_Lexp->SetParLimits(3,0.,0.01);
 	 //fmm_strict_Lexp->SetParLimits(4,0.005,0.08);
@@ -1948,8 +1680,11 @@ case 3: //Fixed from old fit
 	 break;
 }
 
-	 //fmm_strict_Lexp->FixParameter(14,(double)ENum_strict*0.021*0.001);//scale(1.8%(pion)+0.3%(Al)) //B.G. ratio
+
+//change ENum???
 	 fmm_strict_Lexp->FixParameter(14,(double)ENum_strict_cs*0.021*0.001);//scale(1.8%(pion)+0.3%(Al)) //B.G. ratio
+	 /////fmm_strict_Lexp->FixParameter(14,(double)ENum_strict_cm2_2*0.021*0.001);//scale(1.8%(pion)+0.3%(Al)) //B.G. ratio
+	 //fmm_strict_Lexp->FixParameter(14,(double)ENum_strict_cs_cm2_1*0.021*0.001);//scale(1.8%(pion)+0.3%(Al)) //B.G. ratio
 	 fmm_strict_Lexp->FixParameter(15,Al_par1);//mean
 	 fmm_strict_Lexp->FixParameter(16,Al_par2);//Gsigma
 	 fmm_strict_Lexp->FixParameter(17,Al_par3);//Lfwhm
@@ -1986,10 +1721,11 @@ case 3: //Fixed from old fit
 	 ////fmm_strict_Lexp->SetParLimits(15,-0.085,-0.055);
 	 //fmm_strict_Lexp->SetParameter(13,0.6);
 	 //fmm_strict_Lexp->SetParLimits(13,0.,1.5);//relative strength
+#endif
 
-//change
-	 hmm_wo_bg_fom_strict->Fit("fmm_strict_Lexp","I","",fit_min_mm,fit_max_mm);//Total fitting w/ 4Poly BG
-	 //hmm_wo_bg_fom_strict->Fit("fmm_strict_Lexp","LLI","",fit_min_mm,fit_max_mm);//Total fitting w/ 4Poly BG
+	 //change
+	 hmm_wo_bg_fom_strict->Fit("fmm_strict_Lexp","I","",fit_min_mm,fit_max_mm);//Total fitting (full) w/ 4Poly BG
+	 //hmm_wo_bg_fom_strict->Fit("fmm_strict_Lexp","LLI","",fit_min_mm,fit_max_mm);//Total fitting (div.) w/ 4Poly BG
 	 double chisq_strict = fmm_strict_Lexp->GetChisquare();
 	 double dof_strict  = fmm_strict_Lexp->GetNDF();
 	 cout<<"chisq_strict="<<chisq_strict<<endl;
@@ -2029,25 +1765,31 @@ case 3: //Fixed from old fit
 	 fmm_bg_only_strict->SetParameter(6,fmm_strict_Lexp->GetParameter(20));
 	 fmm_bg_only_strict->SetParameter(7,fmm_strict_Lexp->GetParameter(21));
 
+	double nofL_strict_inside = fmm_Lambda_only_strict->Integral(fmin_mm_inside,fmax_mm_inside);
 	double nofL_strict = fmm_Lambda_only_strict->Integral(fmin_mm,fmax_mm);
 	double nofL_old_strict = fmm_Lambda_only_strict->Integral(-0.006,0.006);
 	double nofL_bg_strict = fmm_bg_only_strict->Integral(-0.006,0.006);
+	nofL_strict_inside = nofL_strict_inside/fit_bin_width;
 	nofL_strict = nofL_strict/fit_bin_width;
 	nofL_old_strict = nofL_old_strict/fit_bin_width;
 	nofL_bg_strict = nofL_bg_strict/fit_bin_width;
 	double nofL_old_hist_strict=hmm_wo_bg_fom_strict->Integral(hmm_wo_bg_fom_strict->FindBin(-0.006),hmm_wo_bg_fom_strict->FindBin(0.006)-nofL_bg_strict);
-	cout<<"Number of Lambda (TF1 Integral) = "<<nofL_strict<<endl;
+	cout<<"Number of Lambda (TF1 Integral, inside) = "<<nofL_strict_inside<<endl;
+	cout<<"Number of Lambda (TF1 Integral, out of acceptance) = "<<nofL_strict<<endl;
 	cout<<"Number of Lambda w/o radiative tail (TF1 Integral) = "<<nofL_old_strict<<endl;
 	cout<<"Number of Lambda w/o radiative tail (TH1F Integral) = "<<nofL_old_hist_strict<<endl;
 
+	double nofS_strict_inside = fmm_Sigma_only_strict->Integral(fmin_mm_inside,fmax_mm_insideS);
 	double nofS_strict = fmm_Sigma_only_strict->Integral(fmin_mm,fmax_mm);
 	double nofS_old_strict = fmm_Sigma_only_strict->Integral(def_mean_S-0.008,def_mean_S+0.008);
 	double nofS_bg_strict = fmm_bg_only_strict->Integral(def_mean_S-0.008,def_mean_S+0.008);
+	nofS_strict_inside = nofS_strict_inside/fit_bin_width;
 	nofS_strict = nofS_strict/fit_bin_width;
 	nofS_old_strict = nofS_old_strict/fit_bin_width;
 	nofS_bg_strict = nofS_bg_strict/fit_bin_width;
 	double nofS_old_hist_strict=hmm_wo_bg_fom_strict->Integral(hmm_wo_bg_fom_strict->FindBin(def_mean_S-0.008),hmm_wo_bg_fom_strict->FindBin(def_mean_S+0.008))-nofS_bg_strict;
-	cout<<"Number of Sigma (TF1 Integral) = "<<nofS_strict<<endl;
+	cout<<"Number of Sigma (TF1 Integral, inside) = "<<nofS_strict_inside<<endl;
+	cout<<"Number of Sigma (TF1 Integral, out of acceptance) = "<<nofS_strict<<endl;
 	cout<<"Number of Sigma w/o radiative tail (TF1 Integral) = "<<nofS_old_strict<<endl;
 	cout<<"Number of Sigma w/o radiative tail (TH1F Integral) = "<<nofS_old_hist_strict<<endl;
 
@@ -2099,20 +1841,6 @@ case 3: //Fixed from old fit
 	 //fS_strict->Draw("same");
 	 if(displayON)c2plus->Print("result_2D_2022_temp.pdf");
 
-	 TCanvas* c2ppR = new TCanvas("c2ppR","");
-	 TH2D* hfppR = (TH2D*)c2ppR->DrawFrame(1.76,-10.,1.90,10.);
- 	 SetTH2(hfppR, "", "Momentum [GeV/c]", "Z-vertex [cm]", 0.4);
-	 //Acceptance_mapR->Draw("lego2z");
-	 Acceptance_mapR->GetZaxis()->SetRangeUser(3.,6.);
-	 Acceptance_mapR->Draw("colzsame");
-	 c2ppR->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/dthesis_Fig/pdf/acceptance2d_RHRS.pdf");
-	 TCanvas* c2ppL = new TCanvas("c2ppL","");
-	 TH2D* hfppL = (TH2D*)c2ppL->DrawFrame(2.01,-10.,2.16,10.);
- 	 SetTH2(hfppL, "", "Momentum [GeV/c]", "Z-vertex [cm]", 0.4);
-	 //Acceptance_mapL->Draw("lego2z");
-	 Acceptance_mapL->GetZaxis()->SetRangeUser(3.,6.);
-	 Acceptance_mapL->Draw("colzsame");
-	 c2ppL->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/dthesis_Fig/pdf/acceptance2d_LHRS.pdf");
 
 #if 0
 /****************************************/
@@ -2399,7 +2127,7 @@ cout<<"BEST CUT START"<<endl;
 	fmm_Lambda_only->Draw("");
 	fmm_Sigma_only ->Draw("same");
 	hmm_wo_bg_fom_best->Draw("same");
-	//Acceptance_mapR->Draw("lego2z");
+	//Acceptance_map->Draw("lego2z");
 	
 	TCanvas* c20 = new TCanvas("c20","c20");
 	 hmm_Al_wobg_fom_noZ_new->Draw("");
@@ -2411,6 +2139,14 @@ cout<<"BEST CUT START"<<endl;
 	//c20->cd(3);
 	//h_pepk->Draw("colz");
 #endif
+	TCanvas* c30 = new TCanvas("c30","c30");
+	c30->Divide(2,1);
+	c30->cd(1);
+	 hmm_Al_wobg_fom_noZ_new->Draw("");
+	 fAl_new->Draw("same");
+	c30->cd(2);
+	 hmm_pi_wobg_fom_best->Draw("");
+	 fpion->Draw("same");
 cout << "Well done!" << endl;
 
 }//fit

@@ -1,0 +1,36 @@
+#error estimation
+#2022.1.26 updates for D-thesis
+#After Momentum cuts!
+#1 --> nominator
+#2 --> denominator
+#
+# by Clopper-Pearson
+#
+#flag | Eff_label | value
+1 1 1359.79 #best 
+2 1 1648.44 #noZ
+1 2 1359.79 #best 
+2 2 2260.23 #noAC
+1 3 1359.79 #best 
+2 3 1375.75 #noCT
+1 5 1359.79 #strict 
+2 5 2260.23 #noAC
+1 6 1359.79 #strict 
+2 6 1375.75 #noCT
+#
+#
+##Sigma0
+1 7 368.256 #best 
+2 7 482.833 #noZ
+1 8 368.256 #best 
+2 8 622.886 #noAC
+1 9 368.256 #best 
+2 9 379.817 #noCT
+1 10 368.256 #strict 
+2 10 622.886 #noAC
+1 11 368.256 #strict 
+2 11 379.817 #noCT
+#
+#
+1 12 41.53 #Al
+2 12 13742.43 #Al

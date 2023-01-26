@@ -2007,10 +2007,10 @@ cout<<"BEST CUT START"<<endl;
 	
 ///*--- Print ---*/
 cout << "Print is starting" << endl;
-	//c2->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/mthesis_Fig/pdf/hmm_rad_strict.pdf");
-	//c3->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/mthesis_Fig/pdf/hmm_rad_noZ.pdf");
-	//c6->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/mthesis_Fig/pdf/hmm_rad_noAC.pdf");
-	//c8->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/mthesis_Fig/pdf/hmm_rad_noCT.pdf");
+	c2->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/dthesis_Fig/pdf/eff_wall.pdf");
+	c3->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/dthesis_Fig/pdf/eff_noZ.pdf");
+	c6->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/dthesis_Fig/pdf/eff_noAC.pdf");
+	c8->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/dthesis_Fig/pdf/eff_noCT.pdf");
 //	c1->Print(Form("%s[",pdfname.c_str()));
 //	c1->Print(Form("%s",pdfname.c_str()));
 //	c2->Print(Form("%s",pdfname.c_str()));

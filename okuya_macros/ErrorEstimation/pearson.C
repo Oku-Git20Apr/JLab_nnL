@@ -8,7 +8,8 @@
 //
 void pearson(){ 
 
-	string error_in = "./input/error_input.dat";//center value of error
+	//string error_in = "./input/error_input.dat";//center value of error
+	string error_in = "./input/error_input_2023.dat";//updated 2023.1.26
 	//string ofname = "./input/error_out.pdf";
 
 	string buf;
