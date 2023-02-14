@@ -2099,19 +2099,35 @@ case 3: //Fixed from old fit
 	 //fS_strict->Draw("same");
 	 if(displayON)c2plus->Print("result_2D_2022_temp.pdf");
 
-	 TCanvas* c2ppR = new TCanvas("c2ppR","");
+	 TCanvas* c2ppR = new TCanvas("c2ppR","",800,800);
 	 TH2D* hfppR = (TH2D*)c2ppR->DrawFrame(1.76,-10.,1.90,10.);
  	 SetTH2(hfppR, "", "Momentum [GeV/c]", "Z-vertex [cm]", 0.4);
 	 //Acceptance_mapR->Draw("lego2z");
 	 Acceptance_mapR->GetZaxis()->SetRangeUser(3.,6.);
 	 Acceptance_mapR->Draw("colzsame");
+	 c2ppR->SetLeftMargin(0.14);
+	 c2ppR->SetRightMargin(0.14);
+	 c2ppR->SetTopMargin(0.14);
+	 c2ppR->SetBottomMargin(0.14);
+	 c2ppR->Modified();
+	 c2ppR->Update();
+	 gPad->Modified();
+	 gPad->Update();
 	 c2ppR->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/dthesis_Fig/pdf/acceptance2d_RHRS.pdf");
-	 TCanvas* c2ppL = new TCanvas("c2ppL","");
+	 TCanvas* c2ppL = new TCanvas("c2ppL","",800,800);
 	 TH2D* hfppL = (TH2D*)c2ppL->DrawFrame(2.01,-10.,2.16,10.);
  	 SetTH2(hfppL, "", "Momentum [GeV/c]", "Z-vertex [cm]", 0.4);
 	 //Acceptance_mapL->Draw("lego2z");
 	 Acceptance_mapL->GetZaxis()->SetRangeUser(3.,6.);
 	 Acceptance_mapL->Draw("colzsame");
+	 c2ppL->SetLeftMargin(0.14);
+	 c2ppL->SetRightMargin(0.14);
+	 c2ppL->SetTopMargin(0.14);
+	 c2ppL->SetBottomMargin(0.14);
+	 c2ppL->Modified();
+	 c2ppL->Update();
+	 gPad->Modified();
+	 gPad->Update();
 	 c2ppL->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/dthesis_Fig/pdf/acceptance2d_LHRS.pdf");
 
 #if 0
