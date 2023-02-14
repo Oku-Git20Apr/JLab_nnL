@@ -153,9 +153,10 @@ cout << "Output pdf file name is " << pdfname << endl;
   TFile *file = new TFile("h2all_2020Nov.root","read");//2020Nov updated
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_momDec.root","read");// 2020/12/14 Mom cut 
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_2021Jan.root","read");// 2021/1/4 Mom cut 
-  TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_lll_effK.root","read");// 2023/1/26 Mom cut & effK in cs
+  TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_rrr_effK.root","read");// 2023/1/26 Mom cut & effK in cs
+  //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_llccrr_new_2022effK.root","read");// 2023/1/26 Mom cut & effK in cs
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_llccrr_new_tripleDCS2022.root","read");// 2022/6/5 Mom cut & effK in cs && LHRS in cs
-  double nbunch = 1500.;//effetive bunches (3 bunches x 500 mixtures)
+  double nbunch = 900.;//effetive bunches (3 bunches x 300 mixtures)
   TTree *tree = (TTree*)file->Get("tree_out");
 
 //---  DAQ Efficiency ---//
@@ -1354,8 +1355,8 @@ cout<<"Entries in Cointime gate: "<<ENum<<endl;
 //MM spctrum to be fitted (2020/10/18)
 //Choose one from the list below
 //===CHANGE===//
-	hmm_wo_bg_fom_strict->Add(hcs_L_fom_strict,hcs_bg_fom_strict,1.0,-1.0);//All by hcs
-	hmm_wo_bg_fom_strict->Scale(1./150.);
+	//hmm_wo_bg_fom_strict->Add(hcs_L_fom_strict,hcs_bg_fom_strict,1.0,-1.0);//All by hcs
+	//hmm_wo_bg_fom_strict->Scale(1./150.);
 	//hmm_wo_bg_fom_strict->Add(hmm_L_fom_strict,hmm_bg_fom_strict,1.0,-1.0);//All by hmm
 	//hmm_wo_bg_fom_strict->Add(hcs_L_new_cm2_1,hcs_bg_new_cm2_1,1.0,-1.0);//2 div.
 	//hmm_wo_bg_fom_strict->Add(hcs_L_new_cm2_2,hcs_bg_new_cm2_2,1.0,-1.0);//2 div.
@@ -1374,7 +1375,7 @@ cout<<"Entries in Cointime gate: "<<ENum<<endl;
 	//hmm_wo_bg_fom_strict->Add(hcs_L_new_cm4_3,hcs_bg_new_cm4_3,1.0,-1.0);//4 div.
 	//hmm_wo_bg_fom_strict->Add(hcs_L_new_cm4_4,hcs_bg_new_cm4_4,1.0,-1.0);//4 div.
 //MM
-	//hmm_wo_bg_fom_strict->Add(hmm_L_fom_strict,hmm_bg_fom_strict,1.0,-1.0);//All
+	hmm_wo_bg_fom_strict->Add(hmm_L_fom_strict,hmm_bg_fom_strict,1.0,-1.0);//All
 	//hmm_wo_bg_fom_strict->Add(hmm_L_new_cm2_1,hmm_bg_new_cm2_1,1.0,-1.0);//2 div.
 	//hmm_wo_bg_fom_strict->Add(hmm_L_new_cm2_2,hmm_bg_new_cm2_2,1.0,-1.0);//2 div.
 	//hmm_wo_bg_fom_strict->Add(hmm_L_new_cm3_1,hmm_bg_new_cm3_1,1.0,-1.0);//3 div.
@@ -1486,7 +1487,7 @@ cout<<"Entries in Cointime gate: "<<ENum<<endl;
 	 fmm_strict_Lexp->SetTitle("Missing Mass (strict)");
 
 //change
-int fit_flag = 1;
+int fit_flag = 3;
 	//1: Fixed from SIMC (most reliable)
 	//2: Free			 (chi-square is the best)
 	//3: Fixed from data (out of acceptance)
@@ -1682,7 +1683,8 @@ case 3: //Fixed from old fit
 
 
 //change ENum???
-	 fmm_strict_Lexp->FixParameter(14,(double)ENum_strict_cs*0.021*0.001);//scale(1.8%(pion)+0.3%(Al)) //B.G. ratio
+	 fmm_strict_Lexp->FixParameter(14,(double)ENum_strict*0.021*0.001);//scale(1.8%(pion)+0.3%(Al)) //B.G. ratio
+	 //fmm_strict_Lexp->FixParameter(14,(double)ENum_strict_cs*0.021*0.001);//scale(1.8%(pion)+0.3%(Al)) //B.G. ratio
 	 /////fmm_strict_Lexp->FixParameter(14,(double)ENum_strict_cm2_2*0.021*0.001);//scale(1.8%(pion)+0.3%(Al)) //B.G. ratio
 	 //fmm_strict_Lexp->FixParameter(14,(double)ENum_strict_cs_cm2_1*0.021*0.001);//scale(1.8%(pion)+0.3%(Al)) //B.G. ratio
 	 fmm_strict_Lexp->FixParameter(15,Al_par1);//mean

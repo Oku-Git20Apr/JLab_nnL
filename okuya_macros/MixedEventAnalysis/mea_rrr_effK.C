@@ -44,7 +44,7 @@ double F1_sr(double *x, double *par){//Survival Ratio with Path Length (from Coi
 
 void mea_rrr_effK(){
 	string pdfname = "temp.pdf";
-	string rootname= "bgmea_temp.root";
+	string rootname= "bgmea_temp_rrr.root";
 cout << "Output pdf file name is " << pdfname << endl;
 cout << "Output root file name is " << rootname << endl;
   
@@ -633,14 +633,14 @@ cout << "Param file : " << AcceptanceR_table_z9.c_str() << endl;
   int ENum=0;
  // tree->Draw(">>elist", "abs(ct_orig+7*2.0)<1.0||abs(ct_orig+2*2.0)<1.0||abs(ct_orig+1.0*2.0)<1.0||abs(ct_orig-4.0*2.0)<1.0||abs(ct_orig-5.0*2.0)<1.0||abs(ct_orig-6.0*2.0)<1.0");
   //tree->Draw(">>elist", "abs(ct_orig+9.0*2.012)<1.006||abs(ct_orig+8.0*2.012)<1.006||abs(ct_orig+2.0*2.012)<1.006||abs(ct_orig+1.0*2.012)<1.006||abs(ct_orig-6.0*2.012)<1.006||abs(ct_orig-7.0*2.012)<1.006&&Rp_c>1.760&&Rp_c<1.900&&2.010<Lp_c&&Lp_c<2.160");
-  tree->Draw(">>elist", "abs(ct_orig-5.0*2.012)<1.006||abs(ct_orig-6.0*2.012)<1.006||abs(ct_orig-7.0*2.012)<1.006&&Rp_c>1.760&&Rp_c<1.900&&2.010<Lp_c&&Lp_c<2.160");//2023/1/26
+  tree->Draw(">>elist", "(abs(ct_orig-5.0*2.012)<1.006||abs(ct_orig-6.0*2.012)<1.006||abs(ct_orig-7.0*2.012)<1.006)&&Rp_c>1.760&&Rp_c<1.900&&2.010<Lp_c&&Lp_c<2.160");//2023/1/26
   TEventList *elist = (TEventList*)gROOT->FindObject("elist");
   ENum = elist->GetN(); 
   //ENum = tree->GetEntries();
 cout<<"Entries: "<<ENum<<endl;
   int time_div=ENum/100;
   if(ENum<100000)time_div=10000;
-  int nmix = 1000;//Num of mix
+  int nmix = 300;//Num of mix
   double mass,mm;
   TLorentzVector L_4vec;
   TLorentzVector R_4vec;
