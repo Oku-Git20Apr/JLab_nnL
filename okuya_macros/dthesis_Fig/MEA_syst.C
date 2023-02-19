@@ -308,9 +308,9 @@ void MEA_syst(){
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea6.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
   TFile *file_mea = new TFile("../MixedEventAnalysis/bgmea_2020Nov.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
   TFile *file_mthesis = new TFile("../MixedEventAnalysis/trash/bgmea_mthesis_2020Nov.root","read");
-  TFile *file_lll = new TFile("../MixedEventAnalysis/trash/bgmea_lll.root","read");
-  TFile *file_lcr = new TFile("../MixedEventAnalysis/trash/bgmea_lcr.root","read");
-  TFile *file_rrr = new TFile("../MixedEventAnalysis/trash/bgmea_rrr.root","read");
+  TFile *file_lll = new TFile("../MixedEventAnalysis/bgmea_lll_effK.root","read");
+  TFile *file_lcr = new TFile("../MixedEventAnalysis/bgmea_lcr_effK.root","read");
+  TFile *file_rrr = new TFile("../MixedEventAnalysis/bgmea_rrr_effK.root","read");
   double nbunch = 6000.;//effetive bunches (6 bunches x 5 mixtures)
  // TTree *tree_old = (TTree*)file->Get("tree_out");
 //cout<<"Please wait a moment. CloneTree() is working..."<<endl;

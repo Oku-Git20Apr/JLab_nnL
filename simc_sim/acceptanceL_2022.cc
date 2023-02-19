@@ -138,6 +138,7 @@ int main(int argc, char** argv){
 	TH1D *h_vp_mom = new TH1D( "h_vp_mom", "", bin_mom, min_mom, max_mom);
 	TH1D *h_vp_mom2 = new TH1D( "h_vp_mom2", "w/ HRS-R Acceptance", bin_mom, min_mom, max_mom);
 	TH1D *h_vp_mom_result = new TH1D("h_vp_mom_result", "", bin_mom, min_mom, max_mom);
+	TH1D *h_vp_mom_result_MeV = new TH1D("h_vp_mom_result_MeV", "", bin_mom, min_mom*1000., max_mom*1000.);
 	TH1D *h_vp_mom_result2 = new TH1D("h_vp_mom_result2", "w/ HRS-R Acceptance", bin_mom, min_mom, max_mom);//w/ RHRS Acceptance
 	TH2D *h_th_mom = new TH2D( "h_th_mom", "", bin_2D_th, 0.,20.,bin_2D_mom, 1.95, 2.25);
 	TH2D *h_momL_momR = new TH2D( "h_momL_momR", "", 50, 1.73, 1.93 ,50., 1.95, 2.25);
@@ -240,6 +241,33 @@ int main(int argc, char** argv){
 //cout<<"eps="<<eps<<endl;
 //cout<<"vpflux vs k = "<<vpflux<<" : "<<k<<endl;
 	
+	double x0 = L_mom;//GeV
+	double MT = Mp;//Target Mass
+	double MM = ML;//Missing Mass
+	double th_ee = centraltheta;//theta;
+	double th_ek = centraltheta;//-L_th;
+	double th_epk = th_ee+th_ek;
+	double Ee = Einc;//GeV
+	double cosine_ek = TMath::Cos(th_ek);
+	double cosine_ee = TMath::Cos(th_ee);
+	double cosine_epk = TMath::Cos(th_epk);
+	double Ex=TMath::Sqrt(x0*x0+Me*Me);
+	double pe=TMath::Sqrt(Ee*Ee-Me*Me);
+	 double a = 2.*(Ee+MT-Ex)-2.*pe*cosine_ek+2.*x0*cosine_epk;
+     double b = (Ee+MT-Ex)*(Ee+MT-Ex)-pe*pe-x0*x0+2.*x0*pe*cosine_ee+MK*MK-MM*MM;
+	double aa = 2.*(Ee+MT-Ex);
+	double bb = -2.*pe*cosine_ek+2.*x0*cosine_epk;
+	double cc = b;
+	double tmp1 = aa*aa-bb*bb;
+	double tmp2 = bb*cc;
+	double tmptmp = tmp1*(aa*aa*MK*MK-cc*cc);
+	double tmp3 = tmp2*tmp2-tmptmp;
+	double pk_thre = (-1.*tmp2+sqrt(tmp3))/tmp1;
+    // cout<<"a="<<a<<endl;
+    // cout<<"b="<<b<<endl;
+	//double pk_thre = b/a;
+    // cout<<"pk_thre="<<pk_thre<<endl;
+
 	    //===== Right Hand Coordinate ====//
 	    //th and phi are originally meant tan(theta) and tan(phi),
 	    //so, they should not be treated like tan(R_tr_tr_th) //2020.6.30 Okuyama
@@ -349,8 +377,8 @@ int main(int argc, char** argv){
 //===Angle partition===//
 		//h_mom_result->Fill(L_mom);
 		//if(theta_gk_cm*180./PI>=6.&&theta_gk_cm*180./PI<10.)h_mom_result->Fill(L_mom);
-		if(8.<=vertex&&vertex<10.)h_mom_result->Fill(L_mom);//zzz
-		//h_mom_result->Fill(L_mom);
+		//if(8.<=vertex&&vertex<10.)h_mom_result->Fill(L_mom);//zzz
+		h_mom_result->Fill(L_mom);//zzz
 		h_th_mom->Fill(theta_gk_cm*180./PI,L_mom);
 		h_momL_momR->Fill(R_mom,L_mom);
 		if(R_mom>1.74&&R_mom<1.91)h_momL->Fill(L_mom);
@@ -367,7 +395,9 @@ int main(int argc, char** argv){
 //L_mom<2.12&&theta_gk_cm*180./PI<8 (Sigma0, theta_gk_cm*180./PI)
 		//change
 		//if(L_mom>2.010&&L_mom<2.108&&theta_gk_cm*180./PI>=8.)//Sigma0
-		if(L_mom>2.092&&L_mom<2.160&&theta_gk_cm*180./PI>=8.){//Lambda
+		//if(L_mom>2.092&&L_mom<2.160&&theta_gk_cm*180./PI>=8.){//Lambda
+		if(L_mom>2.092&&L_mom<2.160){//Lambda
+		//if(L_mom>2.07562&&L_mom<2.160&&pk_thre<1.900){//test to elimanate syst. error (2023/2/19)
 		h_vp_mom2->Fill(L_mom);
 		//if(L_mom>2.1)h_vp_mom2->Fill(L_mom);
 		}
@@ -416,8 +446,10 @@ int main(int argc, char** argv){
 		//cout<<"n2="<<n2<<endl;
 		if(n1!=0 && n2!=0)val = volume*(1.0*n2/n1);//*1000;//MeV->GeV
 		h_vp_mom_result2->SetBinContent(i+1, val);
+		h_vp_mom_result_MeV->SetBinContent(i+1, val/1000.);
 		if(n1!=0 && n2!=0)err = val * sqrt(1./n2 + 1./n1 - 2./sqrt(1.*n1*n2));
 		h_vp_mom_result2->SetBinError(i+1, err);
+		h_vp_mom_result_MeV->SetBinError(i+1, err/1000.);
 
 		double bin_width=(max_mom-min_mom)/bin_mom;//GeV/c
 		vpflux_tot_mom+=val*bin_width;
@@ -513,6 +545,7 @@ int main(int argc, char** argv){
 
 	TCanvas *c5 = new TCanvas("c5", "c5");
 	SetTitle(h_mom_gen, "", "Momentum [GeV/c]", "Events");
+	c5->SetLogy(1);
 	h_mom_gen->SetNdivisions(505);
 	h_mom_gen->Draw();
 	h_mom_result->SetNdivisions(505);
@@ -523,6 +556,32 @@ int main(int argc, char** argv){
 	SetTitle(h_vp_mom_result, "", "Momentum [GeV/c]", "Integrated VP Flux [#gamma#lower[-0.2]{#scale[0.5]{#bullet}}GeV^{-1}#lower[-0.2]{#scale[0.5]{#bullet}}electron^{-1}]");
 	h_vp_mom_result->SetNdivisions(505);
 	h_vp_mom_result->Draw("");
+
+	TCanvas *c7 = new TCanvas("c7", "c7");
+	double ymaximum = (h_vp_mom_result_MeV->GetBinContent(h_vp_mom_result_MeV->GetMaximumBin()));
+	TH1D *hf2 = (TH1D*)gPad->DrawFrame( 2000., 0., 2200., ymaximum*1.1);
+	SetTitle(hf2, "", "Momentum [MeV/c]", "Integrated VP Flux [#gamma#lower[-0.2]{#scale[0.5]{#bullet}}MeV^{-1}#lower[-0.2]{#scale[0.5]{#bullet}}electron^{-1}]");
+	hf2->SetNdivisions(504);
+	//h_vp_mom_result_MeV->GetXaxis()->SetNdivisions(505, kFALSE);
+	//h_vp_mom_result_MeV->GetYaxis()->SetNdivisions(505, kFALSE);
+	//h_vp_mom_result_MeV->SetNdivisions(505);
+	//SetTitle(h_vp_mom_result_MeV, "", "Momentum [MeV/c]", "Integrated VP Flux [#gamma#lower[-0.2]{#scale[0.5]{#bullet}}MeV^{-1}#lower[-0.2]{#scale[0.5]{#bullet}}electron^{-1}]");
+	h_vp_mom_result_MeV->Draw("same");
+	TLine *l_below = new TLine( 2010., 0., 2010., ymaximum*0.9);
+	TLine *l_above = new TLine( 2160., 0., 2160., ymaximum*0.9);
+	l_below->SetLineColor(kAzure);
+	l_above->SetLineColor(kAzure);
+	l_below->Draw("same");
+	l_above->Draw("same");
+	c7->SetLeftMargin(0.14);
+	c7->SetRightMargin(0.14);
+	c7->SetTopMargin(0.14);
+	c7->SetBottomMargin(0.14);
+	c7->Modified();
+	c7->Update();
+	gPad->Modified();
+	gPad->Update();
+	c7->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/dthesis_Fig/pdf/vpflux_full_MeV_mom.pdf");
 	
 	TCanvas *c10 = new TCanvas("c10", "FP cut");
 	c10->Divide(2,1);
@@ -531,19 +590,21 @@ int main(int argc, char** argv){
 	c10->cd(2);
 	h2_test2->Draw("colz");
 
+//	c4->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/dthesis_Fig/pdf/acceptance_LHRS.pdf");
+//	c5->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/dthesis_Fig/pdf/acceptance_howtoL.pdf");
 
 	if(!BatchFlag){
 		theApp.Run();
 	}
 
-	if(PDFFlag){
-		cout << "Creating a PDF file ... " << endl;
-		c1 ->Print(Form("%s[",PDFFile.str().c_str()) );
-		c1 ->Print(Form("%s" ,PDFFile.str().c_str()) );
-		c2 ->Print(Form("%s" ,PDFFile.str().c_str()) );
-		c3 ->Print(Form("%s" ,PDFFile.str().c_str()) );
-		c3 ->Print(Form("%s]" ,PDFFile.str().c_str()) );
-	}
+//	if(PDFFlag){
+//		cout << "Creating a PDF file ... " << endl;
+//		c1 ->Print(Form("%s[",PDFFile.str().c_str()) );
+//		c1 ->Print(Form("%s" ,PDFFile.str().c_str()) );
+//		c2 ->Print(Form("%s" ,PDFFile.str().c_str()) );
+//		c3 ->Print(Form("%s" ,PDFFile.str().c_str()) );
+//		c3 ->Print(Form("%s]" ,PDFFile.str().c_str()) );
+//	}
 //c1->Close();
 //c2->Close();
 //c3->Close();
@@ -581,22 +642,22 @@ int main(int argc, char** argv){
 //	}
 //	cout<<"Acceptance (average)="<<Acceptance_total/(double)Acceptance_bin<<endl;
 
-	ofstream fout2("LHRS_SIMC100bin_10_z9.dat");//LHRS//zzz
-	//ofstream fout2("LHRS_SIMC10.dat");//LHRS//zzz
-		fout2<<"#Acceptance by SIMC"<<endl;
-		fout2<<"#1.9<pe[GeV/c]<2.3, 100 partition --> 1bin=4MeV/c"<<endl;
-		double Acceptance_temp;
-		double Acceptance_total=0.;
-		int Acceptance_bin=0;
-	for(int i=0; i<bin_mom; i++){
-		Acceptance_temp = h_sa_mom_result->GetBinContent(i+1);
-		fout2<<i+1<<" "<<h_sa_mom_result->GetBinContent(i+1)<<" "<<h_sa_mom_result->GetBinError(i+1)<<endl;
-		Acceptance_total+=Acceptance_temp;
-		if(Acceptance_temp!=0)Acceptance_bin++;
-	}
-//	fout2<<"Acceptance (average)="<<Acceptance_total/(double)Acceptance_bin<<endl;
-	fout2.close();
-	cout<<"Acceptance (average)="<<Acceptance_total/(double)Acceptance_bin<<endl;
+//	//ofstream fout2("LHRS_SIMC100bin_10_z9.dat");//LHRS//zzz
+//	ofstream fout2("LHRS_SIMC10.dat");//LHRS//zzz
+//		fout2<<"#Acceptance by SIMC"<<endl;
+//		fout2<<"#1.9<pe[GeV/c]<2.3, 100 partition --> 1bin=4MeV/c"<<endl;
+//		double Acceptance_temp;
+//		double Acceptance_total=0.;
+//		int Acceptance_bin=0;
+//	for(int i=0; i<bin_mom; i++){
+//		Acceptance_temp = h_sa_mom_result->GetBinContent(i+1);
+//		fout2<<i+1<<" "<<h_sa_mom_result->GetBinContent(i+1)<<" "<<h_sa_mom_result->GetBinError(i+1)<<endl;
+//		Acceptance_total+=Acceptance_temp;
+//		if(Acceptance_temp!=0)Acceptance_bin++;
+//	}
+////	fout2<<"Acceptance (average)="<<Acceptance_total/(double)Acceptance_bin<<endl;
+//	fout2.close();
+//	cout<<"Acceptance (average)="<<Acceptance_total/(double)Acceptance_bin<<endl;
 
 	cout<< "Finish!" << endl;
 	return 0;

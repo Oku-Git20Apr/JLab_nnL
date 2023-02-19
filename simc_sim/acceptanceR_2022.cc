@@ -200,7 +200,7 @@ int main(int argc, char** argv){
 		//h_mom_result->SetBinContent(h_mom_gen->FindBin(mom),mom);
 		for(int i=0;i<bin_mom;i++){
 		//h_mom_gen->SetBinContent(i,5676226*(1./163.8)*1000.*(max_mom-min_mom)/bin_mom);//RHRS_grnd 1,000,000 (2020/11/22)// true density
-		h_mom_gen->SetBinContent(i,56012944*(1./163.8)*1000.*0.1*(max_mom-min_mom)/bin_mom);//RHRS_grnd_large 10,000,000 (2022/6/2)// true density
+		h_mom_gen->SetBinContent(i,56012944*(1./163.8)*1000.*(max_mom-min_mom)/bin_mom);//RHRS_grnd_large 10,000,000 (2022/6/2)// true density
 		h_mom_gen_cm->SetBinContent(i,168647157*1000.*(1./163.8)*(max_mom_cm-min_mom_cm)/bin_mom);//RHRS_cm 1,000,000 (2020/11/21)
 		}
 		//h_mom_result->SetBinContent(h_mom_gen->FindBin(mom),mom);
@@ -317,8 +317,8 @@ int main(int argc, char** argv){
 		
 		//Z partition; RHRS_SIMC_z1(,z2,z3,z4,z5).dat//5 partition
 		//Z partition; RHRS_SIMC_10_z0(,z1,z2,z3,z4,z5,z6,z7,z8,z9).dat//10 partition
-		if(8.<=vertex&&vertex<10.)h_mom_result->Fill(R_mom);//zzz
-		//h_mom_result->Fill(R_mom);
+		//if(8.<=vertex&&vertex<10.)h_mom_result->Fill(R_mom);//zzz
+		h_mom_result->Fill(R_mom);//zzz
 
 
 		if(L_mom>2.&&L_mom<2.21)h_momR->Fill(R_mom);
@@ -431,6 +431,7 @@ int main(int argc, char** argv){
 
 	TCanvas *c5 = new TCanvas("c5", "c5");
 	SetTitle(h_mom_gen, "", "Momentum [GeV/c]", "Events");
+	c5->SetLogy(1);
 	h_mom_gen->SetNdivisions(505);
 	h_mom_result->SetNdivisions(505);
 	h_mom_gen->Draw();
@@ -448,6 +449,9 @@ int main(int argc, char** argv){
 	h2_test1->Draw("colz");
 	c10->cd(2);
 	h2_test2->Draw("colz");
+
+	c4->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/dthesis_Fig/pdf/acceptance_RHRS.pdf");
+	c5->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/dthesis_Fig/pdf/acceptance_howtoR.pdf");
 
 	if(!BatchFlag){
 		theApp.Run();
@@ -468,8 +472,8 @@ c5->Close();
 	
 	
 
-	ofstream fout2("RHRS_SIMC100bin_10_z9.dat");//RHRS//zzz
-	//ofstream fout2("RHRS_SIMC2.dat");//RHRS//zzz
+	//ofstream fout2("RHRS_SIMC100bin_10_z9.dat");//RHRS//zzz
+	ofstream fout2("RHRS_SIMC2.dat");//RHRS//zzz
 		fout2<<"#Acceptance by SIMC"<<endl;
 		fout2<<"#1.6<pe[GeV/c]<2.0, 100 partition --> 1bin=4MeV/c"<<endl;
 		double Acceptance_temp;

@@ -124,6 +124,11 @@ cout<<"Al Contamination"<<endl;
 cout<<pEff1->GetEfficiency(13)<<endl;
 cout<<pEff1->GetEfficiencyErrorLow(13)<<endl;
 cout<<pEff1->GetEfficiencyErrorUp(13)<<endl;
+
+cout<<"TEST"<<endl;
+cout<<pEff1->GetEfficiency(14)<<endl;
+cout<<pEff1->GetEfficiencyErrorLow(14)<<endl;
+cout<<pEff1->GetEfficiencyErrorUp(14)<<endl;
 //  cout<<"Print is starting"<<endl;
 //  cout<<"pdf name: "<<ofname<<endl;
 //	 c1->Print(Form("%s[",ofname.c_str()));
