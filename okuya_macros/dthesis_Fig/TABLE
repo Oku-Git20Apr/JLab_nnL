@@ -29,3 +29,8 @@ Multifoil_dist.C
 Chi2FP.C
 --> Calculate efficiencies of FP & Chi2 cuts
 (FP.C was before the Mom. cut)
+
+kinematics.C
+--> Calculate kinematics observables with experimental data
+kinematics_center.C
+--> Calculate kinematics observables with experimental setup (center)

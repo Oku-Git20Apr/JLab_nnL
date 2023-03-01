@@ -2,12 +2,12 @@
 //--  Full Kinematics        --//
 //-----------------------------//
 //
-//K. Okuyama (Feb. 21, 2023)
+//K. Okuyama (March 1, 2023)
 //from kinematics.C
 //array --> no array
 
-void kinematics(){
-	string pdfname = "kinematics.pdf";
+void kinematics_center(){
+	string pdfname = "kinematics_center.pdf";
 cout << "Output pdf file name is " << pdfname << endl;
   
   TFile *file = new TFile("../h2all_2020Nov.root","read");//input file (default: h2all1.root)
@@ -160,15 +160,11 @@ const double PI=3.14159265359;
   h_labtocm->GetYaxis()->SetTitle("Counts");
   h_labtocm->SetLineColor(kAzure);
   TH2D* h_qw = new TH2D("h_qw", "Q^{2}:W" ,20,2.05,2.25,60,0.2,0.8);
-  h_qw->SetStats(0);
   h_qw->GetXaxis()->SetTitle("W [GeV]");
   h_qw->GetYaxis()->SetTitle("Q^{2} [(GeV/c)^{2}]");
-  TH2D* h_thph_ee = new TH2D("h_thph_ee", "theta_ee:phi_ee" ,1000,0.1,0.35,1000,PI/2-1.,PI/2+1.);
-  h_thph_ee->SetStats(0);
-  TH2D* h_thph_ek = new TH2D("h_thph_ek", "theta_ek:phi_ek" ,1000,0.1,0.35,1000,3*PI/2-1.,3*PI/2+1.);
-  h_thph_ek->SetStats(0);
-  TH2D* h_thph_g = new TH2D("h_thph_g", "theta_g:phi_g" ,1000,0.1,0.35,1000,3*PI/2-1.,3*PI/2+1.);
-  h_thph_g->SetStats(0);
+  TH2D* h_thph_ee = new TH2D("h_thph_ee", "theta_ee:phi_ee" ,100,0.1,0.35,100,PI/2-1.,PI/2+1.);
+  TH2D* h_thph_ek = new TH2D("h_thph_ek", "theta_ek:phi_ek" ,100,0.1,0.35,100,3*PI/2-1.,3*PI/2+1.);
+  TH2D* h_thph_g = new TH2D("h_thph_g", "theta_g:phi_g" ,100,0.1,0.35,100,3*PI/2-1.,3*PI/2+1.);
   TH1D* h_pR_lab = new TH1D("h_pR_lab", "p_{K}^{lab}" ,100,1.7,1.95);
   h_pR_lab->GetXaxis()->SetTitle("p_{K}^{lab} [GeV/c]");
   h_pR_lab->GetYaxis()->SetTitle("Counts");
@@ -178,7 +174,6 @@ const double PI=3.14159265359;
   h_pR_cm->GetYaxis()->SetTitle("Counts");
   h_pR_cm->SetLineColor(kAzure);
   TH2D* h2_pR_lab_cm = new TH2D("h_pR_lab_cm", "h_pR_lab_cm" ,1000,1.7,1.95,1000,0.0,1.0);
-  h2_pR_lab_cm->SetStats(0);
 
   TH3D *h3_uni = new TH3D("h3_uni","(#theta_{#gamma K},#phi_{#gamma K})",100,-1.,1.,100.,-1.,1.,100.,-1.,1.);
   h3_uni->SetFillColor(kBlack);
@@ -193,7 +188,6 @@ const double PI=3.14159265359;
   h3_gk_cm->SetLineColor(kRed);
   h3_gk_cm->SetMarkerColor(kRed);
   TH2D* h2_gk = new TH2D("h2_gk", "(#theta_{#gamma K}^{c.m.},#phi_{#gamma K})" ,50,0.,18.,50,0.,360.);
-  h2_gk->SetStats(0);
   h2_gk->GetXaxis()->SetTitle("#theta_{#gamma K}^{c.m.} [deg]");
   h2_gk->GetYaxis()->SetTitle("#phi_{#gamma K} [deg]");
 
@@ -221,6 +215,7 @@ const double PI=3.14159265359;
   tree->Draw(">>elist" , "fabs(ct_orig)<1.006");//ctsum (does NOT dintinguish #track)
   TEventList *elist = (TEventList*)gROOT->FindObject("elist");
   int ENum = elist->GetN(); 
+ENum=10;
 cout<<"Entries: "<<ENum<<endl;
   int time_div=ENum/25;
   if(ENum<100000)time_div=10000;
@@ -279,6 +274,13 @@ cout<<"Entries: "<<ENum<<endl;
 	    //===== Right Hand Coordinate ====//
 	    //th and phi are originally meant tan(theta) and tan(phi),
 	    //so, they should not be treated like tan(R_tr_tr_th) //2020.6.30 Okuyama
+//CENTER//
+	    L_mom=2.10;//GeV
+	    R_mom=1.82;//GeV
+		L_tr_tg_th=0.;
+		R_tr_tg_th=0.;
+		L_tr_tg_ph=0.;
+		R_tr_tg_ph=0.;
 		
 	    double R_pz = R_mom/sqrt(1.0*1.0 + pow((R_tr_tg_th), 2.0) + pow(( R_tr_tg_ph),2.0) );
 	    double R_px = R_pz * (R_tr_tg_th );
@@ -415,8 +417,7 @@ cout<<"Entries: "<<ENum<<endl;
 		double zz_cm = cos(theta_gk_cm);
 
 
-		//if(event_selection&&Lambda){
-		if(event_selection){
+		//if(event_selection){
 		h_theta_ee ->Fill(theta_ee);
 		h_phi_ee ->Fill(phi_ee);
 		h_theta_ek ->Fill(theta_ek);
@@ -443,7 +444,7 @@ cout<<"Entries: "<<ENum<<endl;
 		h3_gk->Fill(xx,yy,zz);
 		h3_gk_cm->Fill(xx_cm,yy_cm,zz_cm);
 		h2_gk->Fill(theta_gk_cm*180./PI,phi_k*180./PI);
-		}
+		//}
 
 }//ENum
 
@@ -540,15 +541,6 @@ cout << "Print is starting" << endl;
 	c12->Print(Form("%s",pdfname.c_str()));
 	c13->Print(Form("%s",pdfname.c_str()));
 	c13->Print(Form("%s]",pdfname.c_str()));
-
-	c5->Print("./pdf/Qsq_wMom.pdf");
-	c6->Print("./pdf/theta_gk_wMom.pdf");
-	c7->Print("./pdf/CM_wMom.pdf");
-	c8->Print("./pdf/W_wMom.pdf");
-	c9->Print("./pdf/QsqW_wMom.pdf");
-	c11->Print("./pdf/theta_lab_ph_3d_wMom.pdf");
-	c12->Print("./pdf/theta_cm_ph_3d_wMom.pdf");
-	c13->Print("./pdf/theta_cm_ph_2d_wMom.pdf");
 
 cout << "Well done!" << endl;
 }//kinematics
