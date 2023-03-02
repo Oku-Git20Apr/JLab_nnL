@@ -2,13 +2,65 @@
 //--  Full Kinematics        --//
 //-----------------------------//
 //
-//K. Okuyama (March 1, 2023)
+//K. Okuyama (Feb. 21, 2023)
 //from kinematics.C
 //array --> no array
+void SetTH1(TH1 *h, TString name, TString xname, TString yname, int LColor, int FStyle, int FColor){
+  h->SetTitle(name);
+  h->SetLineColor(LColor);
+  h->SetLineWidth(1);
+  h->SetFillStyle(FStyle);
+  h->SetFillColor(FColor);
+
+  h->SetTitleFont(42,"");
+  h->SetTitleSize(0.04,"");
+
+  h->GetXaxis()->SetTitle(xname);
+  h->GetXaxis()->CenterTitle();
+  h->GetXaxis()->SetTitleFont(42);
+  h->GetXaxis()->SetTitleOffset(1.10);
+  h->GetXaxis()->SetTitleSize(0.05);
+  h->GetXaxis()->SetLabelFont(42);
+  h->GetXaxis()->SetLabelOffset(0.01);
+  h->GetXaxis()->SetNdivisions(505);
+
+  h->GetYaxis()->SetTitle(yname);
+  h->GetYaxis()->CenterTitle();
+  h->GetYaxis()->SetTitleFont(42);
+  h->GetYaxis()->SetTitleOffset(1.00);
+  h->GetYaxis()->SetTitleSize(0.05);
+  h->GetYaxis()->SetLabelFont(42);
+  h->GetYaxis()->SetLabelOffset(0.01);
+  ((TGaxis*)h->GetYaxis())->SetMaxDigits(4);
+}
+void SetTH2(TH2 *h, TString name, TString xname, TString yname, double min=0.8){
+  h->SetTitle(name);
+  h->SetMinimum(min);
+  h->SetLineWidth(0);
+  h->SetTitleSize(0.05,"");
+  h->SetMarkerStyle(20);
+  h->SetMarkerSize(1.5);
+  h->SetMarkerColor(1);
+
+  h->GetXaxis()->SetTitle(xname);
+  h->GetXaxis()->CenterTitle();
+  h->GetXaxis()->SetTitleFont(42);
+  h->GetXaxis()->SetTitleOffset(1.10);
+  h->GetXaxis()->SetTitleSize(0.06);
+  h->GetXaxis()->SetLabelFont(42);
+  h->GetXaxis()->SetLabelOffset(0.01);
+
+  h->GetYaxis()->SetTitle(yname);
+  h->GetYaxis()->CenterTitle();
+  h->GetYaxis()->SetTitleFont(42);
+  h->GetYaxis()->SetTitleOffset(1.00);
+  h->GetYaxis()->SetTitleSize(0.06);
+  h->GetYaxis()->SetLabelFont(42);
+  h->GetYaxis()->SetLabelOffset(0.01);
+  ((TGaxis*)h->GetYaxis())->SetMaxDigits(4);
+}
 
 void kinematics_center(){
-	string pdfname = "kinematics_center.pdf";
-cout << "Output pdf file name is " << pdfname << endl;
   
   TFile *file = new TFile("../h2all_2020Nov.root","read");//input file (default: h2all1.root)
   TTree *tree = (TTree*)file->Get("tree_out");
@@ -105,75 +157,56 @@ const double PI=3.14159265359;
 //---------------------------------------//
 
 //scattered electrons, kaons
-  TH1D* h_theta_ee = new TH1D("h_theta_ee", "theta_ee",200,0.1,0.35);
-  TH1D* h_phi_ee = new TH1D("h_phi_ee", "phi_ee",200,0.,PI);
-  TH1D* h_theta_ek = new TH1D("h_theta_ek", "theta_ek",200,0.1,0.35);
-  TH1D* h_phi_ek = new TH1D("h_phi_ek", "phi_ek",200,3*PI/2-1.,3*PI/2+1.);
-  h_theta_ee->SetLineColor(kAzure);
-  h_phi_ee->SetLineColor(kAzure);
-  h_theta_ek->SetLineColor(kAzure);
-  h_phi_ek->SetLineColor(kAzure);
+  TH1D* h_theta_ee = new TH1D("h_theta_ee", "",200,5.,20.);
+  TH1D* h_phi_ee = new TH1D("h_phi_ee", "",200,0.,180.);
+  TH1D* h_theta_ek = new TH1D("h_theta_ek", "",200,5.,20.);
+  TH1D* h_phi_ek = new TH1D("h_phi_ek", "",200,210.,330.);
+  SetTH1(h_theta_ee, "", "#theta_{ee'} [deg]", "Counts", kAzure, kRed, kRed);
+  SetTH1(h_phi_ee, "", "#phi_{ee'} [deg]", "Counts", kAzure, kRed, kRed);
+  SetTH1(h_theta_ek, "", "#theta_{eK} [deg]", "Counts", kAzure, kRed, kRed);
+  SetTH1(h_phi_ek, "", "#phi_{eK} [deg]", "Counts", kAzure, kRed, kRed);
 
 //virtual photon
-  TH1D* h_theta_g = new TH1D("h_theta_g", "theta_g",200,0.1,0.35);
-  h_theta_g->SetLineColor(kAzure);
-  TH1D* h_phi_g = new TH1D("h_phi_g", "phi_g",200,3*PI/2-1.,3*PI/2+1.);
-  h_phi_g->SetLineColor(kAzure);
-  TH1D* h_theta_gk_lab = new TH1D("h_theta_gk_lab", "#theta_{#gamma K}^{lab}",70,0.,7.);
-  h_theta_gk_lab->GetXaxis()->SetTitle("#theta_{#gamma K}^{lab} [deg]");
-  h_theta_gk_lab->GetYaxis()->SetTitle("Counts");
-  h_theta_gk_lab->SetLineColor(kAzure);
-  TH1D* h_theta_gk_cm = new TH1D("h_theta_gk_cm", "#theta_{#gamma K}^{CM}",180,0.,18.);
-  h_theta_gk_cm->GetXaxis()->SetTitle("#theta_{#gamma K}^{CM} [deg]");
-  h_theta_gk_cm->GetYaxis()->SetTitle("Counts");
-  h_theta_gk_cm->SetLineColor(kAzure);
-  TH1D* h_cos_gk_lab = new TH1D("h_cos_gk_lab", "cos(#theta_{#gamma K}^{lab})",100,0.97,1.0);
-  h_cos_gk_lab->GetXaxis()->SetTitle("cos(#theta_{#gamma K}^{lab})");
-  h_cos_gk_lab->GetYaxis()->SetTitle("Counts");
-  h_cos_gk_lab->SetLineColor(kAzure);
-  TH1D* h_cos_gk_cm = new TH1D("h_cos_gk_cm", "cos(#theta_{#gamma K}^{CM})",100,0.8,1.0);
-  h_cos_gk_cm->GetXaxis()->SetTitle("cos(#theta_{#gamma K}^{CM})");
-  h_cos_gk_cm->GetYaxis()->SetTitle("Counts");
-  h_cos_gk_cm->SetLineColor(kAzure);
-  TH1D* h_mom_g = new TH1D("h_mom_g", "mom_g",100,2.1,2.5);
-  h_mom_g->SetLineColor(kAzure);
-  TH1D* h_phi_k = new TH1D("h_phi_k","h_phi_k",100,0.,360.);
-  h_phi_k->GetXaxis()->SetTitle("#phi_{K} [deg]");
-  h_phi_k->GetYaxis()->SetTitle("Counts");
-  h_phi_k->SetLineColor(kAzure);
-  TH1D* h_phi_k_cos = new TH1D("h_phi_k_cos","h_phi_k_cos",100,-1.1,1.1);
-  h_phi_k_cos->SetLineColor(kAzure);
-  h_phi_k_cos->GetXaxis()->SetTitle("cos(#phi_{K})");
-  h_phi_k_cos->GetYaxis()->SetTitle("Counts");
+  TH1D* h_theta_g = new TH1D("h_theta_g", "",200,5.,20.);
+  SetTH1(h_theta_g, "", "#theta_{e#gamma} [deg]", "Counts", kAzure, kRed, kRed);
+  TH1D* h_phi_g = new TH1D("h_phi_g", "",200,210.,330.);
+  SetTH1(h_phi_g, "", "#phi_{e#gamma} [deg]", "Counts", kAzure, kRed, kRed);
+  TH1D* h_theta_gk_lab = new TH1D("h_theta_gk_lab", "",70,0.,7.);
+  SetTH1(h_theta_gk_lab, "", "#theta_{#gamma K}^{lab} [deg]", "Counts", kAzure, kRed, kRed);
+  TH1D* h_theta_gk_cm = new TH1D("h_theta_gk_cm", "",180,0.,18.);
+  SetTH1(h_theta_gk_cm, "", "#theta_{#gamma K}^{c.m.} [deg]", "Counts", kAzure, kRed, kRed);
+  TH1D* h_cos_gk_lab = new TH1D("h_cos_gk_lab", "",100,0.97,1.0);
+  SetTH1(h_cos_gk_lab, "", "cos(#theta_{#gamma K}^{lab})", "Counts", kAzure, kBlack, kBlack);
+  TH1D* h_cos_gk_cm = new TH1D("h_cos_gk_cm", "",100,0.8,1.0);
+  SetTH1(h_cos_gk_cm, "", "cos(#theta_{#gamma K}^{c.m.})", "Counts", kAzure, kBlack, kBlack);
+  TH1D* h_mom_g = new TH1D("h_mom_g", "",100,2.1,2.5);
+  SetTH1(h_mom_g, "", "P_{#gamma} [GeV/c]", "Counts", kAzure, kRed, kRed);
+  TH1D* h_phi_k = new TH1D("h_phi_k","",100,0.,360.);
+  SetTH1(h_phi_k, "", "#phi_{#gamma K} [deg]", "Counts", kAzure, kRed, kRed);
+  TH1D* h_phi_k_cos = new TH1D("h_phi_k_cos","",100,-1.1,1.1);
+  SetTH1(h_phi_k_cos, "", "cos(#phi_{#gamma K})", "Counts", kAzure, kRed, kRed);
 
 //Q2, W
-  TH1D* h_qsq = new TH1D("h_qsq", "Q^{2}",150,0.2,0.8);
-  h_qsq->GetXaxis()->SetTitle("Q^{2} [(GeV/c)^{2}]");
-  h_qsq->GetYaxis()->SetTitle("Counts");
-  h_qsq->SetLineColor(kAzure);
-  TH1D* h_w = new TH1D("h_w", "W",100,2.05,2.25);
-  h_w->GetXaxis()->SetTitle("W [GeV]");
-  h_w->GetYaxis()->SetTitle("Counts");
-  h_w->SetLineColor(kAzure);
-  TH1D* h_labtocm = new TH1D("h_labtocm", "labtocm",100,0.0,0.25);
-  h_labtocm->GetXaxis()->SetTitle("(d#sigma/d#Omega)_{CM}/(d#sigma/d#Omega)_{lab}");
-  h_labtocm->GetYaxis()->SetTitle("Counts");
-  h_labtocm->SetLineColor(kAzure);
-  TH2D* h_qw = new TH2D("h_qw", "Q^{2}:W" ,20,2.05,2.25,60,0.2,0.8);
-  h_qw->GetXaxis()->SetTitle("W [GeV]");
-  h_qw->GetYaxis()->SetTitle("Q^{2} [(GeV/c)^{2}]");
-  TH2D* h_thph_ee = new TH2D("h_thph_ee", "theta_ee:phi_ee" ,100,0.1,0.35,100,PI/2-1.,PI/2+1.);
-  TH2D* h_thph_ek = new TH2D("h_thph_ek", "theta_ek:phi_ek" ,100,0.1,0.35,100,3*PI/2-1.,3*PI/2+1.);
-  TH2D* h_thph_g = new TH2D("h_thph_g", "theta_g:phi_g" ,100,0.1,0.35,100,3*PI/2-1.,3*PI/2+1.);
-  TH1D* h_pR_lab = new TH1D("h_pR_lab", "p_{K}^{lab}" ,100,1.7,1.95);
-  h_pR_lab->GetXaxis()->SetTitle("p_{K}^{lab} [GeV/c]");
-  h_pR_lab->GetYaxis()->SetTitle("Counts");
-  h_pR_lab->SetLineColor(kAzure);
-  TH1D* h_pR_cm = new TH1D("h_pR_cm", "p_{K}^{CM}" ,50,0.5,0.75);
-  h_pR_cm->GetXaxis()->SetTitle("p_{K}^{CM} [GeV/c]");
-  h_pR_cm->GetYaxis()->SetTitle("Counts");
-  h_pR_cm->SetLineColor(kAzure);
-  TH2D* h2_pR_lab_cm = new TH2D("h_pR_lab_cm", "h_pR_lab_cm" ,1000,1.7,1.95,1000,0.0,1.0);
+  TH1D* h_qsq = new TH1D("h_qsq", "",150,0.2,0.8);
+  SetTH1(h_qsq, "", "Q^{2} [(GeV/c)^{2}]", "Counts", kAzure, kRed, kRed);
+  TH1D* h_w = new TH1D("h_w", "",100,2.05,2.25);
+  SetTH1(h_w, "", "W [GeV]", "Counts", kAzure, kRed, kRed);
+  TH1D* h_labtocm = new TH1D("h_labtocm", "",100,0.0,0.25);
+  SetTH1(h_labtocm, "", "(d#sigma/d#Omega)_{c.m.}/(d#sigma/d#Omega)_{lab}", "Counts", kAzure, kRed, kRed);
+  TH2D* h_qw = new TH2D("h_qw", "" ,20,2.05,2.25,60,0.2,0.8);
+  SetTH2(h_qw, "", "Q^{2} [(GeV/c)^{2}]", "W [GeV]", 0.4);
+  TH2D* h_thph_ee = new TH2D("h_thph_ee", "" ,200,5.,20.,200,0.,180.);
+  SetTH2(h_thph_ee, "", "#theta_{ee'} [deg]", "#phi_{ee'} [deg]", 0.4);
+  TH2D* h_thph_ek = new TH2D("h_thph_ek", "" ,200,5.,20.,200,210.,330.);
+  SetTH2(h_thph_ek, "", "#theta_{eK} [deg]", "#phi_{eK} [deg]", 0.4);
+  TH2D* h_thph_g = new TH2D("h_thph_g", "" ,200,5.,20.,200,210.,330.);
+  SetTH2(h_thph_g, "", "#theta_{e#gamma} [deg]", "#phi_{e#gamma} [deg]", 0.4);
+  TH1D* h_pR_lab = new TH1D("h_pR_lab", "" ,100,1.7,1.95);
+  SetTH1(h_pR_lab, "", "p_{K}^{lab} [GeV/c]", "Counts", kAzure, kRed, kRed);
+  TH1D* h_pR_cm = new TH1D("h_pR_cm", "" ,50,0.5,0.75);
+  SetTH1(h_pR_cm, "", "p_{K}^{c.m.} [GeV/c]", "Counts", kAzure, kRed, kRed);
+  TH2D* h2_pR_lab_cm = new TH2D("h_pR_lab_cm", "" ,1000,1.7,1.95,1000,0.0,1.0);
+  SetTH2(h2_pR_lab_cm, "", "p_{K}^{lab} [GeV/c]", "p_{K}^{c.m.} [GeV/c]", 0.4);
 
   TH3D *h3_uni = new TH3D("h3_uni","(#theta_{#gamma K},#phi_{#gamma K})",100,-1.,1.,100.,-1.,1.,100.,-1.,1.);
   h3_uni->SetFillColor(kBlack);
@@ -187,7 +220,7 @@ const double PI=3.14159265359;
   h3_gk_cm->SetFillColor(kRed);
   h3_gk_cm->SetLineColor(kRed);
   h3_gk_cm->SetMarkerColor(kRed);
-  TH2D* h2_gk = new TH2D("h2_gk", "(#theta_{#gamma K}^{c.m.},#phi_{#gamma K})" ,50,0.,18.,50,0.,360.);
+  TH2D* h2_gk = new TH2D("h2_gk", "" ,50,0.,18.,50,0.,360.);
   h2_gk->GetXaxis()->SetTitle("#theta_{#gamma K}^{c.m.} [deg]");
   h2_gk->GetYaxis()->SetTitle("#phi_{#gamma K} [deg]");
 
@@ -215,7 +248,6 @@ const double PI=3.14159265359;
   tree->Draw(">>elist" , "fabs(ct_orig)<1.006");//ctsum (does NOT dintinguish #track)
   TEventList *elist = (TEventList*)gROOT->FindObject("elist");
   int ENum = elist->GetN(); 
-ENum=10;
 cout<<"Entries: "<<ENum<<endl;
   int time_div=ENum/25;
   if(ENum<100000)time_div=10000;
@@ -275,6 +307,7 @@ cout<<"Entries: "<<ENum<<endl;
 	    //th and phi are originally meant tan(theta) and tan(phi),
 	    //so, they should not be treated like tan(R_tr_tr_th) //2020.6.30 Okuyama
 //CENTER//
+	    B_mom=4.318;//GeV
 	    L_mom=2.10;//GeV
 	    R_mom=1.82;//GeV
 		L_tr_tg_th=0.;
@@ -417,16 +450,15 @@ cout<<"Entries: "<<ENum<<endl;
 		double zz_cm = cos(theta_gk_cm);
 
 
-		//if(event_selection){
-		h_theta_ee ->Fill(theta_ee);
-		h_phi_ee ->Fill(phi_ee);
-		h_theta_ek ->Fill(theta_ek);
-		h_phi_ek ->Fill(phi_ek);
-		h_theta_g ->Fill(theta_g);
-		h_phi_g ->Fill(phi_g);
-		h_thph_ee ->Fill(theta_ee,phi_ee);
-		h_thph_ek->Fill(theta_ek,phi_ek);
-		h_thph_g->Fill(theta_g,phi_g);
+		h_theta_ee ->Fill(theta_ee*180./PI);
+		h_phi_ee ->Fill(phi_ee*180./PI);
+		h_theta_ek ->Fill(theta_ek*180./PI);
+		h_phi_ek ->Fill(phi_ek*180./PI);
+		h_theta_g ->Fill(theta_g*180./PI);
+		h_phi_g ->Fill(phi_g*180./PI);
+		h_thph_ee ->Fill(theta_ee*180./PI,phi_ee*180./PI);
+		h_thph_ek->Fill(theta_ek*180./PI,phi_ek*180./PI);
+		h_thph_g->Fill(theta_g*180./PI,phi_g*180./PI);
 		h_mom_g->Fill(mom_g);
 		h_qsq->Fill(Qsq);
 		h_w->Fill(W);
@@ -444,7 +476,6 @@ cout<<"Entries: "<<ENum<<endl;
 		h3_gk->Fill(xx,yy,zz);
 		h3_gk_cm->Fill(xx_cm,yy_cm,zz_cm);
 		h2_gk->Fill(theta_gk_cm*180./PI,phi_k*180./PI);
-		//}
 
 }//ENum
 
@@ -452,56 +483,156 @@ cout<<"Entries: "<<ENum<<endl;
 	c1->Divide(2,2);
 	c1->cd(1);
 	h_theta_ee->Draw("");
+	gPad->SetLeftMargin(0.14);
+	gPad->SetRightMargin(0.14);
+	gPad->SetTopMargin(0.14);
+	gPad->SetBottomMargin(0.14);
 	c1->cd(2);
 	h_phi_ee->Draw("");
+	gPad->SetLeftMargin(0.14);
+	gPad->SetRightMargin(0.14);
+	gPad->SetTopMargin(0.14);
+	gPad->SetBottomMargin(0.14);
 	c1->cd(3);
 	h_thph_ee->Draw("colz");
+	gPad->SetLeftMargin(0.14);
+	gPad->SetRightMargin(0.14);
+	gPad->SetTopMargin(0.14);
+	gPad->SetBottomMargin(0.14);
+	c1->Modified();
+	c1->Update();
+	gPad->Modified();
+	gPad->Update();
 	TCanvas* c2 = new TCanvas("c2","c2");
 	c2->Divide(2,2);
 	c2->cd(1);
 	h_theta_ek->Draw("");
+	gPad->SetLeftMargin(0.14);
+	gPad->SetRightMargin(0.14);
+	gPad->SetTopMargin(0.14);
+	gPad->SetBottomMargin(0.14);
 	c2->cd(2);
 	h_phi_ek->Draw("");
+	gPad->SetLeftMargin(0.14);
+	gPad->SetRightMargin(0.14);
+	gPad->SetTopMargin(0.14);
+	gPad->SetBottomMargin(0.14);
 	c2->cd(3);
 	h_thph_ek->Draw("colz");
+	gPad->SetLeftMargin(0.14);
+	gPad->SetRightMargin(0.14);
+	gPad->SetTopMargin(0.14);
+	gPad->SetBottomMargin(0.14);
 	TCanvas* c3 = new TCanvas("c3","c3");
 	c3->Divide(2,2);
 	c3->cd(1);
 	h_theta_g->Draw("");
+	gPad->SetLeftMargin(0.14);
+	gPad->SetRightMargin(0.14);
+	gPad->SetTopMargin(0.14);
+	gPad->SetBottomMargin(0.14);
 	c3->cd(2);
 	h_phi_g->Draw("");
+	gPad->SetLeftMargin(0.14);
+	gPad->SetRightMargin(0.14);
+	gPad->SetTopMargin(0.14);
+	gPad->SetBottomMargin(0.14);
 	c3->cd(3);
 	h_thph_g->Draw("colz");
+	gPad->SetLeftMargin(0.14);
+	gPad->SetRightMargin(0.14);
+	gPad->SetTopMargin(0.14);
+	gPad->SetBottomMargin(0.14);
 	TCanvas* c4 = new TCanvas("c4","c4");
 	h_mom_g->Draw("");
+	gPad->SetLeftMargin(0.14);
+	gPad->SetRightMargin(0.14);
+	gPad->SetTopMargin(0.14);
+	gPad->SetBottomMargin(0.14);
 	TCanvas* c5 = new TCanvas("c5","c5");
 	h_qsq->Draw("");
+	gPad->SetLeftMargin(0.14);
+	gPad->SetRightMargin(0.14);
+	gPad->SetTopMargin(0.14);
+	gPad->SetBottomMargin(0.14);
 	TCanvas* c6 = new TCanvas("c6","c6");
 	c6->Divide(2,2);
 	c6->cd(1);
 	h_theta_gk_lab->Draw("");
+	gPad->SetLeftMargin(0.14);
+	gPad->SetRightMargin(0.14);
+	gPad->SetTopMargin(0.14);
+	gPad->SetBottomMargin(0.14);
 	c6->cd(2);
 	h_theta_gk_cm->Draw("");
+	gPad->SetLeftMargin(0.14);
+	gPad->SetRightMargin(0.14);
+	gPad->SetTopMargin(0.14);
+	gPad->SetBottomMargin(0.14);
 	c6->cd(3);
 	h_cos_gk_lab->Draw("");
+	gPad->SetLeftMargin(0.14);
+	gPad->SetRightMargin(0.14);
+	gPad->SetTopMargin(0.14);
+	gPad->SetBottomMargin(0.14);
 	c6->cd(4);
 	h_cos_gk_cm->Draw("");
+	gPad->SetLeftMargin(0.14);
+	gPad->SetRightMargin(0.14);
+	gPad->SetTopMargin(0.14);
+	gPad->SetBottomMargin(0.14);
 	TCanvas* c7 = new TCanvas("c7","c7");
 	c7->Divide(2,2);
 	c7->cd(1);
 	h_pR_lab->Draw("");
+	gPad->SetLeftMargin(0.14);
+	gPad->SetRightMargin(0.14);
+	gPad->SetTopMargin(0.14);
+	gPad->SetBottomMargin(0.14);
 	c7->cd(2);
 	h_pR_cm->Draw("");
+	gPad->SetLeftMargin(0.14);
+	gPad->SetRightMargin(0.14);
+	gPad->SetTopMargin(0.14);
+	gPad->SetBottomMargin(0.14);
 	c7->cd(3);
 	h_phi_k->Draw("");
+	gPad->SetLeftMargin(0.14);
+	gPad->SetRightMargin(0.14);
+	gPad->SetTopMargin(0.14);
+	gPad->SetBottomMargin(0.14);
 	c7->cd(4);
 	h_phi_k_cos->Draw("");
+	gPad->SetLeftMargin(0.14);
+	gPad->SetRightMargin(0.14);
+	gPad->SetTopMargin(0.14);
+	gPad->SetBottomMargin(0.14);
 	TCanvas* c8 = new TCanvas("c8","c8");
 	h_w->Draw("");
+	gPad->SetLeftMargin(0.14);
+	gPad->SetRightMargin(0.14);
+	gPad->SetTopMargin(0.14);
+	gPad->SetBottomMargin(0.14);
 	TCanvas* c9 = new TCanvas("c9","c9");
 	h_qw->Draw("colz");
+	c9->SetLeftMargin(0.14);
+	c9->SetRightMargin(0.14);
+	c9->SetTopMargin(0.14);
+	c9->SetBottomMargin(0.14);
+	c9->Modified();
+	c9->Update();
+	gPad->Modified();
+	gPad->Update();
 	TCanvas* c10 = new TCanvas("c10","c10");
 	h_labtocm->Draw("");
+	c10->SetLeftMargin(0.14);
+	c10->SetRightMargin(0.14);
+	c10->SetTopMargin(0.14);
+	c10->SetBottomMargin(0.14);
+	c10->Modified();
+	c10->Update();
+	gPad->Modified();
+	gPad->Update();
 	TCanvas* c11 = new TCanvas("c11","c11");
 	for(int i=0;i<10000;i++){
 		double theta_gen = acos(gRandom->Uniform(-1.,1.));
@@ -523,8 +654,18 @@ cout<<"Entries: "<<ENum<<endl;
 	h3_gk_cm->Draw("same");
 	TCanvas* c13 = new TCanvas("c13","c13");
 	h2_gk->Draw("colz");
+	c13->SetLeftMargin(0.14);
+	c13->SetRightMargin(0.14);
+	c13->SetTopMargin(0.14);
+	c13->SetBottomMargin(0.14);
+	c13->Modified();
+	c13->Update();
+	gPad->Modified();
+	gPad->Update();
 
 /*--- Print ---*/
+	string pdfname = "./pdf/kinematics_Cen.pdf";
+cout << "Output pdf file name is " << pdfname << endl;
 cout << "Print is starting" << endl;
 	c1->Print(Form("%s[",pdfname.c_str()));
 	c1->Print(Form("%s",pdfname.c_str()));
@@ -541,6 +682,5 @@ cout << "Print is starting" << endl;
 	c12->Print(Form("%s",pdfname.c_str()));
 	c13->Print(Form("%s",pdfname.c_str()));
 	c13->Print(Form("%s]",pdfname.c_str()));
-
 cout << "Well done!" << endl;
 }//kinematics
