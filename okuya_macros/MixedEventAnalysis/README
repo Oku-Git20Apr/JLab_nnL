@@ -61,3 +61,8 @@ GeV --> MeV
 - 2022/6/9 update
 - elist fixed
 --> bgmea_llccrr_new_tripleDCS2022.root
+
+*mea_llccrr_effK_phi.C (latest ver. --> phi dependence)
+- 2023/5/2 created
+- same as mea_llccrr_effK.C
+- for phi dependence (phi0: all, phi1: |phi|<pi/4, phi2 outside of phi1)
