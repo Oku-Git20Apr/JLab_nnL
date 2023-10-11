@@ -175,7 +175,7 @@ double FMM_2BG( double *x, double *par ){
 
 }
 
-void result_2D_2023phi(){
+void result_2D_2023theta1(){
 	string pdfname = "fitting.pdf";
 cout << "Output pdf file name is " << pdfname << endl;
   
@@ -184,7 +184,7 @@ cout << "Output pdf file name is " << pdfname << endl;
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_momDec.root","read");// 2020/12/14 Mom cut 
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_2021Jan.root","read");// 2021/1/4 Mom cut 
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_llccrr_new_2022effK.root","read");// 2022/1/30 Mom cut & effK in cs
-  TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_llccrr_new_2022effK_phi0.root","read");// 2023/10/6 Mom cut & effK in cs & 4.313 GeV & nmix750
+  TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_llccrr_new_2022effK_theta1.root","read");// 2023/10/6 Mom cut & effK in cs & 4.313 GeV & nmix750
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_llccrr_new_tripleDCS2022.root","read");// 2022/6/5 Mom cut & effK in cs && LHRS in cs
   double nbunch = 4500.;//effetive bunches (6 bunches x 750 mixtures)
   TTree *tree = (TTree*)file->Get("tree_out");
@@ -234,7 +234,7 @@ cout << "Param file : " << daq_file.c_str() << endl;
 	double RHRS_total=0.;
 	int RHRS_total_bin=0;
 /*----- -10 < z < -8 -----*/
-	string AcceptanceR_table_z0 = "./information/RHRS_SIMC2023_10_z0_phi0.dat";//Acceptance Table (SIMC) //change
+	string AcceptanceR_table_z0 = "./information/RHRS_SIMC2023_10_z0_theta1.dat";//Acceptance Table (SIMC) //change
 	string buf_z0;
 
 	ifstream ifp_z0(AcceptanceR_table_z0.c_str(),ios::in);
@@ -254,7 +254,7 @@ cout << "Param file : " << AcceptanceR_table_z0.c_str() << endl;
 	}
 	cout<<"HRS-R Acceptance (z0 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
 /*----- -8 < z < -6 -----*/
-	string AcceptanceR_table_z1 = "./information/RHRS_SIMC2023_10_z1_phi0.dat";//Acceptance Table (SIMC)
+	string AcceptanceR_table_z1 = "./information/RHRS_SIMC2023_10_z1_theta1.dat";//Acceptance Table (SIMC)
 	string buf_z1;
 
 	ifstream ifp_z1(AcceptanceR_table_z1.c_str(),ios::in);
@@ -274,7 +274,7 @@ cout << "Param file : " << AcceptanceR_table_z1.c_str() << endl;
 	}
 	cout<<"HRS-R Acceptance (z1 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
 /*----- -6 < z < -4 -----*/
-	string AcceptanceR_table_z2 = "./information/RHRS_SIMC2023_10_z2_phi0.dat";//Acceptance Table (SIMC)
+	string AcceptanceR_table_z2 = "./information/RHRS_SIMC2023_10_z2_theta1.dat";//Acceptance Table (SIMC)
 	string buf_z2;
 	RHRS_total=0.;
 	RHRS_total_bin=0;
@@ -296,7 +296,7 @@ cout << "Param file : " << AcceptanceR_table_z2.c_str() << endl;
 	}
 	cout<<"HRS-R Acceptance (z2 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
 /*----- -4 < z < -2 -----*/
-	string AcceptanceR_table_z3 = "./information/RHRS_SIMC2023_10_z3_phi0.dat";//Acceptance Table (SIMC)
+	string AcceptanceR_table_z3 = "./information/RHRS_SIMC2023_10_z3_theta1.dat";//Acceptance Table (SIMC)
 	string buf_z3;
 	RHRS_total=0.;
 	RHRS_total_bin=0;
@@ -318,7 +318,7 @@ cout << "Param file : " << AcceptanceR_table_z3.c_str() << endl;
 	}
 	cout<<"HRS-R Acceptance (z3 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
 /*----- -2 < z < 0 -----*/
-	string AcceptanceR_table_z4 = "./information/RHRS_SIMC2023_10_z4_phi0.dat";//Acceptance Table (SIMC)
+	string AcceptanceR_table_z4 = "./information/RHRS_SIMC2023_10_z4_theta1.dat";//Acceptance Table (SIMC)
 	string buf_z4;
 	RHRS_total=0.;
 	RHRS_total_bin=0;
@@ -340,7 +340,7 @@ cout << "Param file : " << AcceptanceR_table_z4.c_str() << endl;
 	}
 	cout<<"HRS-R Acceptance (z4 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
 /*----- 0 < z < 2 -----*/
-	string AcceptanceR_table_z5 = "./information/RHRS_SIMC2023_10_z5_phi0.dat";//Acceptance Table (SIMC)
+	string AcceptanceR_table_z5 = "./information/RHRS_SIMC2023_10_z5_theta1.dat";//Acceptance Table (SIMC)
 	string buf_z5;
 	RHRS_total=0.;
 	RHRS_total_bin=0;
@@ -362,7 +362,7 @@ cout << "Param file : " << AcceptanceR_table_z5.c_str() << endl;
 	}
 	cout<<"HRS-R Acceptance (z5 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
 /*----- 2 < z < 4 -----*/
-	string AcceptanceR_table_z6 = "./information/RHRS_SIMC2023_10_z6_phi0.dat";//Acceptance Table (SIMC)
+	string AcceptanceR_table_z6 = "./information/RHRS_SIMC2023_10_z6_theta1.dat";//Acceptance Table (SIMC)
 	string buf_z6;
 	RHRS_total=0.;
 	RHRS_total_bin=0;
@@ -384,7 +384,7 @@ cout << "Param file : " << AcceptanceR_table_z6.c_str() << endl;
 	}
 	cout<<"HRS-R Acceptance (z6 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
 /*----- 4 < z < 6 -----*/
-	string AcceptanceR_table_z7 = "./information/RHRS_SIMC2023_10_z7_phi0.dat";//Acceptance Table (SIMC)
+	string AcceptanceR_table_z7 = "./information/RHRS_SIMC2023_10_z7_theta1.dat";//Acceptance Table (SIMC)
 	string buf_z7;
 	RHRS_total=0.;
 	RHRS_total_bin=0;
@@ -406,7 +406,7 @@ cout << "Param file : " << AcceptanceR_table_z7.c_str() << endl;
 	}
 	cout<<"HRS-R Acceptance (z7 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
 /*----- 6 < z < 8 -----*/
-	string AcceptanceR_table_z8 = "./information/RHRS_SIMC2023_10_z8_phi0.dat";//Acceptance Table (SIMC)
+	string AcceptanceR_table_z8 = "./information/RHRS_SIMC2023_10_z8_theta1.dat";//Acceptance Table (SIMC)
 	string buf_z8;
 	RHRS_total=0.;
 	RHRS_total_bin=0;
@@ -428,7 +428,7 @@ cout << "Param file : " << AcceptanceR_table_z8.c_str() << endl;
 	}
 	cout<<"HRS-R Acceptance (z8 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
 /*----- 8 < z < 10 -----*/
-	string AcceptanceR_table_z9 = "./information/RHRS_SIMC2023_10_z9_phi0.dat";//Acceptance Table (SIMC)
+	string AcceptanceR_table_z9 = "./information/RHRS_SIMC2023_10_z9_theta1.dat";//Acceptance Table (SIMC)
 	string buf_z9;
 	RHRS_total=0.;
 	RHRS_total_bin=0;
@@ -1102,10 +1102,8 @@ cout<<"Entries in Cointime gate: "<<ENum<<endl;
 		if(sgn>0.){phi_k = acos(phi_k_cos);}
 		else{phi_k = 2*PI-acos(phi_k_cos);}
 //change
-		if(abs(phi_k-PI)<=PI/2.&&ct_cut==true){ct_cut=true;}//phi0
-		//if(abs(phi_k-PI)<=PI/4.&&ct_cut==true){ct_cut=true;}//phi1
-		//if(abs(phi_k-PI)>PI/4.&&abs(phi_k-PI)<=PI/2.&&ct_cut==true){ct_cut=true;}//phi2
-		//if(abs(phi_k-PI)<=PI/3.&&ct_cut==true){ct_cut=true;}//phi3
+		if(theta_gk_cm*180./PI<8.&&ct_cut==true){ct_cut=true;}//theta1
+		//if(theta_gk_cm*180./PI>=8.&&ct_cut==true){ct_cut=true;}//theta2
 		else{ct_cut=false;}
 //cout<<"beta="<<beta<<endl;
 //cout<<"gamma="<<gamma<<endl;
@@ -1300,8 +1298,8 @@ cout<<"Entries in Cointime gate: "<<ENum<<endl;
 	//TH1F* hmm_pi_fom_nocut=(TH1F*)file->Get("hmm_pi_fom_noZ");
 	//TH1F* hmm_pi_fom_best=(TH1F*)file->Get("hmm_pi_fom_best");
 	TH1F* hmm_bg_fom_best=(TH1F*)file_mea->Get("hmm_mixacc_result_best");
-	TH1F* hmm_bg_fom_strict=(TH1F*)file_mea->Get("hmm_mixacc_result_new_phi1_1");//change//phi1_1,phi2_1,phi2_2,phi2_3
-	TH1F* hcs_bg_fom_strict=(TH1F*)file_mea->Get("hcs_mixacc_result_new_phi1_1");//change 
+	TH1F* hmm_bg_fom_strict=(TH1F*)file_mea->Get("hmm_mixacc_result_new_cm2_1");//change//cm2_1,cm2_2
+	TH1F* hcs_bg_fom_strict=(TH1F*)file_mea->Get("hcs_mixacc_result_new_cm2_1");//change 
 	//TH1F* hmm_bg_fom_strict=(TH1F*)file_mea->Get("hmm_mixacc_result_momS6");
 	//TH1F* hcs_bg_fom_strict=(TH1F*)file_mea->Get("hcs_mixacc_result_momS6");
 	
@@ -1425,9 +1423,9 @@ cout<<"Entries in Cointime gate: "<<ENum<<endl;
 //MM spctrum to be fitted (2020/10/18)
 //Choose one from the list below
 //===CHANGE===//
-	hmm_wo_bg_fom_strict->Add(hcs_L_fom_strict,hcs_bg_fom_strict,1.0,-1.0);//All by hcs
-	hmm_wo_bg_fom_strict->Scale(1./150.);
-	//hmm_wo_bg_fom_strict->Add(hmm_L_fom_strict,hmm_bg_fom_strict,1.0,-1.0);//All by hmm
+	//hmm_wo_bg_fom_strict->Add(hcs_L_fom_strict,hcs_bg_fom_strict,1.0,-1.0);//All by hcs
+	//hmm_wo_bg_fom_strict->Scale(1./150.);
+	hmm_wo_bg_fom_strict->Add(hmm_L_fom_strict,hmm_bg_fom_strict,1.0,-1.0);//All by hmm
 	//hmm_wo_bg_fom_strict->Add(hcs_L_new_cm2_1,hcs_bg_new_cm2_1,1.0,-1.0);//2 div.
 	//hmm_wo_bg_fom_strict->Add(hcs_L_new_cm2_2,hcs_bg_new_cm2_2,1.0,-1.0);//2 div.
 	//hmm_wo_bg_fom_strict->Scale(2./150.);
@@ -1743,8 +1741,8 @@ case 3: //Fixed from old fit
 
 
 //change ENum???
-	 fmm_strict_Lexp->FixParameter(14,(double)ENum_strict_cs*0.021*0.001);//scale(1.8%(pion)+0.3%(Al)) //B.G. ratio
-	 //fmm_strict_Lexp->FixParameter(14,(double)ENum_strict*0.021*0.001);//scale(1.8%(pion)+0.3%(Al)) //B.G. ratio
+	 //fmm_strict_Lexp->FixParameter(14,(double)ENum_strict_cs*0.021*0.001);//scale(1.8%(pion)+0.3%(Al)) //B.G. ratio
+	 fmm_strict_Lexp->FixParameter(14,(double)ENum_strict*0.021*0.001);//scale(1.8%(pion)+0.3%(Al)) //B.G. ratio
 	 /////fmm_strict_Lexp->FixParameter(14,(double)ENum_strict_cm2_2*0.021*0.001);//scale(1.8%(pion)+0.3%(Al)) //B.G. ratio
 	 //fmm_strict_Lexp->FixParameter(14,(double)ENum_strict_cs_cm2_1*0.021*0.001);//scale(1.8%(pion)+0.3%(Al)) //B.G. ratio
 	 fmm_strict_Lexp->FixParameter(15,Al_par1);//mean

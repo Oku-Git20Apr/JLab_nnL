@@ -48,13 +48,16 @@ basically, identical with "mea_mthesis.C"
 GeV --> MeV
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-*mea_llccrr_effK.C (latest ver.)
+*mea_llccrr_effK.C
 - 2022/6/11 update
 - elist fixed, new acceptance map, 100bin
 --> bgmea_llccrr_new_2022effK.root
 (bgmea_llccrr_2022effK.root is old ver., before fix)
 --> mea_lll_effK.C, mea_lcr_effK.C, mea_rrr_effK.C for D-thesis
 (bgmea_lll_effK.root, etc.)
+==>2023/10/6 update
+- SIMC 4.313 GeV, nmix=750
+--> bgmea_llccrr_new_2023.root
 
 *mea_llccrr_new_tripleDCS2022.C
 - latest ver. for deriving tripleDCS. (1/e/RHRS/LHRS)
@@ -66,3 +69,5 @@ GeV --> MeV
 - 2023/5/2 created
 - same as mea_llccrr_effK.C
 - for phi dependence (phi0: all, phi1: |phi|<pi/4, phi2 outside of phi1)
+--> 2023/10/6 updated according to "mea_llccrr_effK.C" update
+--> bgmea_llccrr_new_2023phi0,phi1,phi2,theta1,theta2.root

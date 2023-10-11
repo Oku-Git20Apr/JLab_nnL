@@ -11,6 +11,7 @@
 //K. Okuyama (Dec. 21, 2020)//Check for M-thesis
 //K. Okuyama (Dec. 24, 2020)//Check for M-thesis
 //K. Okuyama (Jan. 9, 2023)//After the Mom cut for D-thesis
+//K. Okuyama (Oct. 7, 2023)//SIMC 4.313 GeV
 //
 //
 //
@@ -243,9 +244,10 @@ cout << "Output pdf file name is " << pdfname << endl;
 	//ACCBGの引き算はmea_hist.ccから
   //TFile *file_mea = new TFile("../MixedEventAnalysis/bgmea_llccrr_Lsingle_new.root","read");//input file of BG(MEA) histo.(default: bgmea6.root)
   //TFile *file_mea = new TFile("../MixedEventAnalysis/bgmea_csbase.root","read");//input file of BG(MEA) histo.(default: bgmea6.root)
-  TFile *file_mea = new TFile("../MixedEventAnalysis/bgmea_llccrr_new_2022effK.root","read");//input file of BG(MEA) histo.(default: bgmea6.root)
+  //TFile *file_mea = new TFile("../MixedEventAnalysis/bgmea_llccrr_new_2022effK.root","read");//input file of BG(MEA) histo.(default: bgmea6.root)
+  TFile *file_mea = new TFile("../MixedEventAnalysis/bgmea_llccrr_new_2023.root","read");//2023/10/7 SIMC 4.313 GeV
   //TFile *file_mea = new TFile("../MixedEventAnalysis/bgmea_llccrr_new_new.root","read");//input file of BG(MEA) histo.(default: bgmea6.root)
-  double nbunch = 6000.;//effetive bunches (6 bunches x 1000 mixtures)
+  double nbunch = 4500.;//effetive bunches (6 bunches x 1000 mixtures)
   
 //Systematic study
 //TFile *file_mea = new TFile("./temp/bgmea_rrr.root","read");//input file of BG(MEA) histo.(default: bgmea3.root)
@@ -2007,10 +2009,10 @@ cout<<"BEST CUT START"<<endl;
 	
 ///*--- Print ---*/
 cout << "Print is starting" << endl;
-	c2->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/dthesis_Fig/pdf/eff_wall.pdf");
-	c3->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/dthesis_Fig/pdf/eff_noZ.pdf");
-	c6->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/dthesis_Fig/pdf/eff_noAC.pdf");
-	c8->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/dthesis_Fig/pdf/eff_noCT.pdf");
+	//c2->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/dthesis_Fig/pdf/eff_wall.pdf");
+	//c3->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/dthesis_Fig/pdf/eff_noZ.pdf");
+	//c6->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/dthesis_Fig/pdf/eff_noAC.pdf");
+	//c8->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/dthesis_Fig/pdf/eff_noCT.pdf");
 //	c1->Print(Form("%s[",pdfname.c_str()));
 //	c1->Print(Form("%s",pdfname.c_str()));
 //	c2->Print(Form("%s",pdfname.c_str()));

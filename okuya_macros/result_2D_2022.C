@@ -18,6 +18,34 @@
 //Kaon survival ratio (event by event)
 //subtracting Al and Pion contamination
 //No array branch mode 
+void SetTH2(TH2 *h, TString name, TString xname, TString yname, double min=0.8){
+  h->SetTitle(name);
+  h->SetMinimum(min);
+  h->SetLineWidth(0);
+  h->SetTitleSize(0.05,"");
+  h->SetMarkerStyle(20);
+  h->SetMarkerSize(1.5);
+  h->SetMarkerColor(1);
+
+  h->GetXaxis()->SetTitle(xname);
+  h->GetXaxis()->CenterTitle();
+  h->GetXaxis()->SetTitleFont(42);
+  h->GetXaxis()->SetTitleOffset(1.20);
+  h->GetXaxis()->SetTitleSize(0.05);
+  h->GetXaxis()->SetLabelFont(42);
+  h->GetXaxis()->SetLabelOffset(0.01);
+  h->GetXaxis()->SetDecimals(2);
+
+  h->GetYaxis()->SetTitle(yname);
+  h->GetYaxis()->CenterTitle();
+  h->GetYaxis()->SetTitleFont(42);
+  h->GetYaxis()->SetTitleOffset(1.20);
+  h->GetYaxis()->SetTitleSize(0.05);
+  h->GetYaxis()->SetLabelFont(42);
+  h->GetYaxis()->SetLabelOffset(0.01);
+  h->GetYaxis()->SetDecimals(2);
+  ((TGaxis*)h->GetYaxis())->SetMaxDigits(4);
+}
 
 //Voigt Function
 double F_Voigt( double *x, double *par )
@@ -153,6 +181,7 @@ cout << "Output pdf file name is " << pdfname << endl;
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_momDec.root","read");// 2020/12/14 Mom cut 
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_2021Jan.root","read");// 2021/1/4 Mom cut 
   TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_llccrr_new_2022effK.root","read");// 2022/1/30 Mom cut & effK in cs
+  //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_llccrr_new_2023.root","read");// 2023/9/30 Mom cut & effK in cs & 4.326 GeV & nmix750
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_llccrr_new_tripleDCS2022.root","read");// 2022/6/5 Mom cut & effK in cs && LHRS in cs
   double nbunch = 6000.;//effetive bunches (6 bunches x 1000 mixtures)
   TTree *tree = (TTree*)file->Get("tree_out");
@@ -678,6 +707,17 @@ cout << "Param file : " << AcceptanceR_table_z9.c_str() << endl;
   TH2D* h_pepk = new TH2D("h_pepk", "p_{K} vs p_{e'}" ,50,1720.,1940.,50,1980.,2220.);
   TH1D* h_pe = new TH1D("h_pe", "p_{e'}" ,200,1980.,2220.);
   TH1D* h_pk = new TH1D("h_pk", "p_{K}" ,200,1720.,1940.);
+//added 2023/7/19 for D-thesis Chap.5
+  TH2F* h_mm_Qsq = new TH2F("h_mm_Qsq","",100,-100.,200.,50,0.2,0.8);
+  SetTH2(h_mm_Qsq, "", "Missing Mass - M_{#Lambda} [MeV/c^{2}]", "Q^{2} [(GeV/c)^{2}]", 0.4);
+  TH2F* h_mm_W = new TH2F("h_mm_W","",100,-100.,200.,50,2.05,2.25);
+  SetTH2(h_mm_W, "", "Missing Mass - M_{#Lambda} [MeV/c^{2}]", "W [GeV/c]", 0.4);
+  TH2F* h_mm_theta_gk_cm = new TH2F("h_mm_theta_gk_cm","",100,-100.,200.,50,-5.,25.);
+  SetTH2(h_mm_theta_gk_cm, "", "Missing Mass - M_{#Lambda} [MeV/c^{2}]", "#theta_{#gamma K}^{c.m.} [deg]", 0.4);
+  TH2F* h_mm_phi_gk = new TH2F("h_mm_phi_gk","",100,-100.,200.,50,0.,360.);
+  SetTH2(h_mm_phi_gk, "", "Missing Mass - M_{#Lambda} [MeV/c^{2}]", "#phi_{#gamma K} [deg]", 0.4);
+  TH2F* h_mm_eps = new TH2F("h_mm_eps","",100,-100.,200.,50,0.74,0.8);
+  SetTH2(h_mm_eps, "", "Missing Mass - M_{#Lambda} [MeV/c^{2}]", "Transverse polarization #varepsilon", 0.4);
   
   h1 ->SetLineColor(2);
   h1->SetLineWidth(2);
@@ -1040,6 +1080,23 @@ cout<<"Entries in Cointime gate: "<<ENum<<endl;
 //theta_gk_cm=0.12;
 		double gamma=1./sqrt(1-beta*beta);
 		double ER_cm=sqrt(pR_cm*pR_cm+MK*MK);
+		double W = sqrt((omega+Mp)*(omega+Mp)-mom_g*mom_g);
+		double q2=Qsq+omega*omega;
+		double eps=1/(1+2*(q2/Qsq)*tan(theta_ee/2)*tan(theta_ee/2));
+//Phi dependence
+		TVector3 G_3vec = G_4vec.Vect();
+		TVector3 L_3vec = L_4vec.Vect();
+		TVector3 R_3vec = R_4vec.Vect();
+		TVector3 l_3vec = G_3vec.Cross(L_3vec);
+		TVector3 r_3vec = G_3vec.Cross(R_3vec);
+		TVector3 s_3vec = l_3vec.Cross(r_3vec);//for sgn(sign(phi_k))
+		TVector3 axis_3vec;
+		axis_3vec.SetXYZ(0.,-1.,0.);//along VP flux
+		double sgn = s_3vec*axis_3vec;
+		double phi_k_cos = (l_3vec*r_3vec)/l_3vec.Mag()/r_3vec.Mag();
+		double phi_k;
+		if(sgn>0.){phi_k = acos(phi_k_cos);}
+		else{phi_k = 2*PI-acos(phi_k_cos);}
 //cout<<"beta="<<beta<<endl;
 //cout<<"gamma="<<gamma<<endl;
 
@@ -1138,6 +1195,11 @@ cout<<"Entries in Cointime gate: "<<ENum<<endl;
 		if(event_selection_new&&ct_cut){
 			hcs_L_fom_strict->Fill(mm,cs);
 			if(cs>0.)ENum_strict_cs+=cs/150.;
+			h_mm_Qsq->Fill(mm*1000.,Qsq);
+			h_mm_W->Fill(mm*1000.,W);
+			h_mm_theta_gk_cm->Fill(mm*1000.,theta_gk_cm*180./PI);
+			h_mm_phi_gk->Fill(mm*1000.,phi_k*180./PI);
+			h_mm_eps->Fill(mm*1000.,eps);
 		}
 		//if(event_selection_momS6&&ct_cut)hcs_L_fom_strict->Fill(mm,cs);
 		//
@@ -1485,7 +1547,7 @@ cout<<"Entries in Cointime gate: "<<ENum<<endl;
 	 fmm_strict_Lexp->SetTitle("Missing Mass (strict)");
 
 //change
-int fit_flag = 1;
+int fit_flag = 3;
 	//1: Fixed from SIMC (most reliable)
 	//2: Free			 (chi-square is the best)
 	//3: Fixed from data (out of acceptance)
@@ -2137,6 +2199,68 @@ cout<<"BEST CUT START"<<endl;
 	//h_pk->Draw("");
 	//c20->cd(3);
 	//h_pepk->Draw("colz");
+#endif
+#if 0
+	TCanvas* cQsq = new TCanvas("cQsq","cQsq");
+	h_mm_Qsq->Draw("colz");
+	cQsq->SetLeftMargin(0.14);
+	cQsq->SetRightMargin(0.14);
+	cQsq->SetTopMargin(0.14);
+	cQsq->SetBottomMargin(0.14);
+	cQsq->Modified();
+	cQsq->Update();
+	gPad->Modified();
+	gPad->Update();
+	
+	TCanvas* cW = new TCanvas("cW","cW");
+	h_mm_W->Draw("colz");
+	cW->SetLeftMargin(0.14);
+	cW->SetRightMargin(0.14);
+	cW->SetTopMargin(0.14);
+	cW->SetBottomMargin(0.14);
+	cW->Modified();
+	cW->Update();
+	gPad->Modified();
+	gPad->Update();
+
+	TCanvas* cth = new TCanvas("cth","cth");
+	h_mm_theta_gk_cm->Draw("colz");
+	cth->SetLeftMargin(0.14);
+	cth->SetRightMargin(0.14);
+	cth->SetTopMargin(0.14);
+	cth->SetBottomMargin(0.14);
+	cth->Modified();
+	cth->Update();
+	gPad->Modified();
+	gPad->Update();
+
+	TCanvas* cph = new TCanvas("cph","cph");
+	h_mm_phi_gk->Draw("colz");
+	cph->SetLeftMargin(0.14);
+	cph->SetRightMargin(0.14);
+	cph->SetTopMargin(0.14);
+	cph->SetBottomMargin(0.14);
+	cph->Modified();
+	cph->Update();
+	gPad->Modified();
+	gPad->Update();
+
+	TCanvas* ceps = new TCanvas("ceps","ceps");
+	h_mm_eps->Draw("colz");
+	ceps->SetLeftMargin(0.14);
+	ceps->SetRightMargin(0.14);
+	ceps->SetTopMargin(0.14);
+	ceps->SetBottomMargin(0.14);
+	ceps->Modified();
+	ceps->Update();
+	gPad->Modified();
+	gPad->Update();
+
+	cQsq->Print("dthesis_Fig/pdf/h_mm_Qsq.pdf");
+	cW->Print("dthesis_Fig/pdf/h_mm_W.pdf");
+	cth->Print("dthesis_Fig/pdf/h_mm_th.pdf");
+	cph->Print("dthesis_Fig/pdf/h_mm_ph.pdf");
+	ceps->Print("dthesis_Fig/pdf/h_mm_eps.pdf");
 #endif
 	TCanvas* c30 = new TCanvas("c30","c30");
 	c30->Divide(2,1);

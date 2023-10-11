@@ -3,15 +3,15 @@
 //--  Differential Cross Section  --//
 //----------------------------------//
 //
-//This is "result_2D_2023"
+//This is "result_2D_2022"
 //
 //K. Okuyama (Nov. 21, 2020)
 //K. Okuyama (Dec. 14, 2020)//Mom cut
 //K. Okuyama (May. 11, 2021)//Fitting w/ pion, Al
 //K. Okuyama (Jan. 28, 2022)//Kaon SR event by event (pick up from PathLength/mom_calib.C)
 //K. Okuyama (Feb. 1, 2022)//change it readable
-//K. Okuyama (Oct. 7, 2023)//SIMC:4318.5-->4313 GeV;after Acc./MEA also updated
-//K. Okuyama (Oct. 9, 2023)//for phi-dep. with result_2D_2023.C
+//K. Okuyama (May 2, 2023)//phi dependence
+//K. Okuyama (July 11, 2023)//theta dependence
 //
 //This is taken over from result_2D.C
 //	but directly taken over from result_2D_Jan.C
@@ -20,34 +20,6 @@
 //Kaon survival ratio (event by event)
 //subtracting Al and Pion contamination
 //No array branch mode 
-void SetTH2(TH2 *h, TString name, TString xname, TString yname, double min=0.8){
-  h->SetTitle(name);
-  h->SetMinimum(min);
-  h->SetLineWidth(0);
-  h->SetTitleSize(0.05,"");
-  h->SetMarkerStyle(20);
-  h->SetMarkerSize(1.5);
-  h->SetMarkerColor(1);
-
-  h->GetXaxis()->SetTitle(xname);
-  h->GetXaxis()->CenterTitle();
-  h->GetXaxis()->SetTitleFont(42);
-  h->GetXaxis()->SetTitleOffset(1.20);
-  h->GetXaxis()->SetTitleSize(0.05);
-  h->GetXaxis()->SetLabelFont(42);
-  h->GetXaxis()->SetLabelOffset(0.01);
-  h->GetXaxis()->SetDecimals(2);
-
-  h->GetYaxis()->SetTitle(yname);
-  h->GetYaxis()->CenterTitle();
-  h->GetYaxis()->SetTitleFont(42);
-  h->GetYaxis()->SetTitleOffset(1.20);
-  h->GetYaxis()->SetTitleSize(0.05);
-  h->GetYaxis()->SetLabelFont(42);
-  h->GetYaxis()->SetLabelOffset(0.01);
-  h->GetYaxis()->SetDecimals(2);
-  ((TGaxis*)h->GetYaxis())->SetMaxDigits(4);
-}
 
 //Voigt Function
 double F_Voigt( double *x, double *par )
@@ -175,17 +147,17 @@ double FMM_2BG( double *x, double *par ){
 
 }
 
-void result_2D_2023phi(){
+void result_2D_2023theta(){
 	string pdfname = "fitting.pdf";
 cout << "Output pdf file name is " << pdfname << endl;
   
-//change
   TFile *file = new TFile("h2all_2020Nov.root","read");//2020Nov updated
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_momDec.root","read");// 2020/12/14 Mom cut 
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_2021Jan.root","read");// 2021/1/4 Mom cut 
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_llccrr_new_2022effK.root","read");// 2022/1/30 Mom cut & effK in cs
-  TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_llccrr_new_2022effK_phi0.root","read");// 2023/10/6 Mom cut & effK in cs & 4.313 GeV & nmix750
+  TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_llccrr_new_2022effK_theta1.root","read");// 2022/1/30 Mom cut & effK in cs
   //TFile *file_mea = new TFile("./MixedEventAnalysis/bgmea_llccrr_new_tripleDCS2022.root","read");// 2022/6/5 Mom cut & effK in cs && LHRS in cs
+  //double nbunch = 6000.;//effetive bunches (6 bunches x 1000 mixtures)
   double nbunch = 4500.;//effetive bunches (6 bunches x 750 mixtures)
   TTree *tree = (TTree*)file->Get("tree_out");
 
@@ -234,7 +206,7 @@ cout << "Param file : " << daq_file.c_str() << endl;
 	double RHRS_total=0.;
 	int RHRS_total_bin=0;
 /*----- -10 < z < -8 -----*/
-	string AcceptanceR_table_z0 = "./information/RHRS_SIMC2023_10_z0_phi0.dat";//Acceptance Table (SIMC) //change
+	string AcceptanceR_table_z0 = "./information/RHRS_SIMC100bin_10_z0_theta1.dat";//Acceptance Table (SIMC)
 	string buf_z0;
 
 	ifstream ifp_z0(AcceptanceR_table_z0.c_str(),ios::in);
@@ -254,7 +226,7 @@ cout << "Param file : " << AcceptanceR_table_z0.c_str() << endl;
 	}
 	cout<<"HRS-R Acceptance (z0 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
 /*----- -8 < z < -6 -----*/
-	string AcceptanceR_table_z1 = "./information/RHRS_SIMC2023_10_z1_phi0.dat";//Acceptance Table (SIMC)
+	string AcceptanceR_table_z1 = "./information/RHRS_SIMC100bin_10_z1_theta1.dat";//Acceptance Table (SIMC)
 	string buf_z1;
 
 	ifstream ifp_z1(AcceptanceR_table_z1.c_str(),ios::in);
@@ -274,7 +246,7 @@ cout << "Param file : " << AcceptanceR_table_z1.c_str() << endl;
 	}
 	cout<<"HRS-R Acceptance (z1 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
 /*----- -6 < z < -4 -----*/
-	string AcceptanceR_table_z2 = "./information/RHRS_SIMC2023_10_z2_phi0.dat";//Acceptance Table (SIMC)
+	string AcceptanceR_table_z2 = "./information/RHRS_SIMC100bin_10_z2_theta1.dat";//Acceptance Table (SIMC)
 	string buf_z2;
 	RHRS_total=0.;
 	RHRS_total_bin=0;
@@ -296,7 +268,7 @@ cout << "Param file : " << AcceptanceR_table_z2.c_str() << endl;
 	}
 	cout<<"HRS-R Acceptance (z2 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
 /*----- -4 < z < -2 -----*/
-	string AcceptanceR_table_z3 = "./information/RHRS_SIMC2023_10_z3_phi0.dat";//Acceptance Table (SIMC)
+	string AcceptanceR_table_z3 = "./information/RHRS_SIMC100bin_10_z3_theta1.dat";//Acceptance Table (SIMC)
 	string buf_z3;
 	RHRS_total=0.;
 	RHRS_total_bin=0;
@@ -318,7 +290,7 @@ cout << "Param file : " << AcceptanceR_table_z3.c_str() << endl;
 	}
 	cout<<"HRS-R Acceptance (z3 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
 /*----- -2 < z < 0 -----*/
-	string AcceptanceR_table_z4 = "./information/RHRS_SIMC2023_10_z4_phi0.dat";//Acceptance Table (SIMC)
+	string AcceptanceR_table_z4 = "./information/RHRS_SIMC100bin_10_z4_theta1.dat";//Acceptance Table (SIMC)
 	string buf_z4;
 	RHRS_total=0.;
 	RHRS_total_bin=0;
@@ -340,7 +312,7 @@ cout << "Param file : " << AcceptanceR_table_z4.c_str() << endl;
 	}
 	cout<<"HRS-R Acceptance (z4 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
 /*----- 0 < z < 2 -----*/
-	string AcceptanceR_table_z5 = "./information/RHRS_SIMC2023_10_z5_phi0.dat";//Acceptance Table (SIMC)
+	string AcceptanceR_table_z5 = "./information/RHRS_SIMC100bin_10_z5_theta1.dat";//Acceptance Table (SIMC)
 	string buf_z5;
 	RHRS_total=0.;
 	RHRS_total_bin=0;
@@ -362,7 +334,7 @@ cout << "Param file : " << AcceptanceR_table_z5.c_str() << endl;
 	}
 	cout<<"HRS-R Acceptance (z5 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
 /*----- 2 < z < 4 -----*/
-	string AcceptanceR_table_z6 = "./information/RHRS_SIMC2023_10_z6_phi0.dat";//Acceptance Table (SIMC)
+	string AcceptanceR_table_z6 = "./information/RHRS_SIMC100bin_10_z6_theta1.dat";//Acceptance Table (SIMC)
 	string buf_z6;
 	RHRS_total=0.;
 	RHRS_total_bin=0;
@@ -384,7 +356,7 @@ cout << "Param file : " << AcceptanceR_table_z6.c_str() << endl;
 	}
 	cout<<"HRS-R Acceptance (z6 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
 /*----- 4 < z < 6 -----*/
-	string AcceptanceR_table_z7 = "./information/RHRS_SIMC2023_10_z7_phi0.dat";//Acceptance Table (SIMC)
+	string AcceptanceR_table_z7 = "./information/RHRS_SIMC100bin_10_z7_theta1.dat";//Acceptance Table (SIMC)
 	string buf_z7;
 	RHRS_total=0.;
 	RHRS_total_bin=0;
@@ -406,7 +378,7 @@ cout << "Param file : " << AcceptanceR_table_z7.c_str() << endl;
 	}
 	cout<<"HRS-R Acceptance (z7 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
 /*----- 6 < z < 8 -----*/
-	string AcceptanceR_table_z8 = "./information/RHRS_SIMC2023_10_z8_phi0.dat";//Acceptance Table (SIMC)
+	string AcceptanceR_table_z8 = "./information/RHRS_SIMC100bin_10_z8_theta1.dat";//Acceptance Table (SIMC)
 	string buf_z8;
 	RHRS_total=0.;
 	RHRS_total_bin=0;
@@ -428,7 +400,7 @@ cout << "Param file : " << AcceptanceR_table_z8.c_str() << endl;
 	}
 	cout<<"HRS-R Acceptance (z8 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
 /*----- 8 < z < 10 -----*/
-	string AcceptanceR_table_z9 = "./information/RHRS_SIMC2023_10_z9_phi0.dat";//Acceptance Table (SIMC)
+	string AcceptanceR_table_z9 = "./information/RHRS_SIMC100bin_10_z9_theta1.dat";//Acceptance Table (SIMC)
 	string buf_z9;
 	RHRS_total=0.;
 	RHRS_total_bin=0;
@@ -710,17 +682,6 @@ cout << "Param file : " << AcceptanceR_table_z9.c_str() << endl;
   TH2D* h_pepk = new TH2D("h_pepk", "p_{K} vs p_{e'}" ,50,1720.,1940.,50,1980.,2220.);
   TH1D* h_pe = new TH1D("h_pe", "p_{e'}" ,200,1980.,2220.);
   TH1D* h_pk = new TH1D("h_pk", "p_{K}" ,200,1720.,1940.);
-//added 2023/7/19 for D-thesis Chap.5
-  TH2F* h_mm_Qsq = new TH2F("h_mm_Qsq","",100,-100.,200.,50,0.2,0.8);
-  SetTH2(h_mm_Qsq, "", "Missing Mass - M_{#Lambda} [MeV/c^{2}]", "Q^{2} [(GeV/c)^{2}]", 0.4);
-  TH2F* h_mm_W = new TH2F("h_mm_W","",100,-100.,200.,50,2.05,2.25);
-  SetTH2(h_mm_W, "", "Missing Mass - M_{#Lambda} [MeV/c^{2}]", "W [GeV/c]", 0.4);
-  TH2F* h_mm_theta_gk_cm = new TH2F("h_mm_theta_gk_cm","",100,-100.,200.,50,-5.,25.);
-  SetTH2(h_mm_theta_gk_cm, "", "Missing Mass - M_{#Lambda} [MeV/c^{2}]", "#theta_{#gamma K}^{c.m.} [deg]", 0.4);
-  TH2F* h_mm_phi_gk = new TH2F("h_mm_phi_gk","",100,-100.,200.,50,0.,360.);
-  SetTH2(h_mm_phi_gk, "", "Missing Mass - M_{#Lambda} [MeV/c^{2}]", "#phi_{#gamma K} [deg]", 0.4);
-  TH2F* h_mm_eps = new TH2F("h_mm_eps","",100,-100.,200.,50,0.74,0.8);
-  SetTH2(h_mm_eps, "", "Missing Mass - M_{#Lambda} [MeV/c^{2}]", "Transverse polarization #varepsilon", 0.4);
   
   h1 ->SetLineColor(2);
   h1->SetLineWidth(2);
@@ -796,18 +757,18 @@ cout << "Param file : " << AcceptanceR_table_z9.c_str() << endl;
   bool event_selection_nocut = false;
   bool event_selection_strict = false;
   bool event_selection_noZ_new = false;
-  bool event_selection_momL1 = false;//VP Flux Syst.
-  bool event_selection_momL2 = false;//VP Flux Syst.
-  bool event_selection_momL3 = false;//VP Flux Syst.
-  bool event_selection_momL4 = false;//VP Flux Syst.
-  bool event_selection_momL5 = false;//VP Flux Syst.
-  bool event_selection_momL6 = false;//VP Flux Syst.
-  bool event_selection_momS1 = false;//VP Flux Syst.
-  bool event_selection_momS2 = false;//VP Flux Syst.
-  bool event_selection_momS3 = false;//VP Flux Syst.
-  bool event_selection_momS4 = false;//VP Flux Syst.
-  bool event_selection_momS5 = false;//VP Flux Syst.
-  bool event_selection_momS6 = false;//VP Flux Syst.
+//  bool event_selection_momL1 = false;//VP Flux Syst.
+//  bool event_selection_momL2 = false;//VP Flux Syst.
+//  bool event_selection_momL3 = false;//VP Flux Syst.
+//  bool event_selection_momL4 = false;//VP Flux Syst.
+//  bool event_selection_momL5 = false;//VP Flux Syst.
+//  bool event_selection_momL6 = false;//VP Flux Syst.
+//  bool event_selection_momS1 = false;//VP Flux Syst.
+//  bool event_selection_momS2 = false;//VP Flux Syst.
+//  bool event_selection_momS3 = false;//VP Flux Syst.
+//  bool event_selection_momS4 = false;//VP Flux Syst.
+//  bool event_selection_momS5 = false;//VP Flux Syst.
+//  bool event_selection_momS6 = false;//VP Flux Syst.
   bool cm2_angle1_cut=false;
   bool cm2_angle2_cut=false;
   bool cm3_angle1_cut=false;
@@ -822,8 +783,6 @@ cout << "Param file : " << AcceptanceR_table_z9.c_str() << endl;
   bool Qsq3_1_cut=false;
   bool Qsq3_2_cut=false;
   bool Qsq3_3_cut=false;
-  double z_par[100], ac_par[100], ct_par[100];
-  double z2_par[100][100], ac2_par[100][100];
   double rf_bunch=2.0;//ns (RF bunch structure)
   const double kcenter = 0.0;
   double mh = ML;//hypernuclei
@@ -865,7 +824,6 @@ cout<<"Ntar(H2)="<<ntar_h2<<endl;
 cout<<"Ne="<<Ne<<endl;
 cout<<"Ng="<<Ng<<endl;
 cout<<"cs="<<cs<<endl;
-	double csL[xbin];
 
 
 
@@ -971,30 +929,30 @@ cout<<"Entries in Cointime gate: "<<ENum<<endl;
 		else event_selection_strict=false;
 
 //VP Flux Systematic Error
-		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&R_tr_p<1.89)event_selection_momL1=true;
-		else event_selection_momL1=false;
-		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&R_tr_p<1.88)event_selection_momL2=true;
-		else event_selection_momL2=false;
-		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&R_tr_p<1.87)event_selection_momL3=true;
-		else event_selection_momL3=false;
-		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&R_tr_p<1.86)event_selection_momL4=true;
-		else event_selection_momL4=false;
-		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&R_tr_p<1.85)event_selection_momL5=true;
-		else event_selection_momL5=false;
-		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&R_tr_p<1.84)event_selection_momL6=true;
-		else event_selection_momL6=false;
-		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&R_tr_p>1.77)event_selection_momS1=true;
-		else event_selection_momS1=false;
-		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&R_tr_p>1.78)event_selection_momS2=true;
-		else event_selection_momS2=false;
-		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&R_tr_p>1.79)event_selection_momS3=true;
-		else event_selection_momS3=false;
-		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&R_tr_p>1.80)event_selection_momS4=true;
-		else event_selection_momS4=false;
-		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&R_tr_p>1.81)event_selection_momS5=true;
-		else event_selection_momS5=false;
-		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&R_tr_p>1.82)event_selection_momS6=true;
-		else event_selection_momS6=false;
+//		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&R_tr_p<1.89)event_selection_momL1=true;
+//		else event_selection_momL1=false;
+//		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&R_tr_p<1.88)event_selection_momL2=true;
+//		else event_selection_momL2=false;
+//		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&R_tr_p<1.87)event_selection_momL3=true;
+//		else event_selection_momL3=false;
+//		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&R_tr_p<1.86)event_selection_momL4=true;
+//		else event_selection_momL4=false;
+//		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&R_tr_p<1.85)event_selection_momL5=true;
+//		else event_selection_momL5=false;
+//		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&R_tr_p<1.84)event_selection_momL6=true;
+//		else event_selection_momL6=false;
+//		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&R_tr_p>1.77)event_selection_momS1=true;
+//		else event_selection_momS1=false;
+//		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&R_tr_p>1.78)event_selection_momS2=true;
+//		else event_selection_momS2=false;
+//		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&R_tr_p>1.79)event_selection_momS3=true;
+//		else event_selection_momS3=false;
+//		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&R_tr_p>1.80)event_selection_momS4=true;
+//		else event_selection_momS4=false;
+//		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&R_tr_p>1.81)event_selection_momS5=true;
+//		else event_selection_momS5=false;
+//		if(fabs(L_tr_vz-R_tr_vz)<0.025&&fabs(R_tr_vz+L_tr_vz)<0.2&&ac1sum<3.75&&ac2sum>3.&&ac2sum<10.&&R_Tr&&R_FP&&L_Tr&&L_FP&&R_tr_p>1.82)event_selection_momS6=true;
+//		else event_selection_momS6=false;
 //----------------------------Cut Condition Definition
 
 
@@ -1032,24 +990,9 @@ cout<<"Entries in Cointime gate: "<<ENum<<endl;
 		Missing = B_4vec + T_4vec - L_4vec - R_4vec;
 		mass = Missing.M();
 	    mm=mass - mh;//shift by ML
-		
-		if(event_selection&&ct_cut)hmm_L_fom_best->Fill(mm);
-		//if(event_selection_new&&ct_cut)hmm_L_fom_strict->Fill(mm);
-		if(event_selection_strict&&ct_cut){
-			hmm_L_fom_strict->Fill(mm);
-			ENum_strict++;
-			//if(mm<-0.03||mm>0.12)cout<<"mm="<<mm<<", L_mom="<<L_mom<<", R_mom="<<R_mom<<", L_tr_tg_th="<<L_tr_tg_th<<", R_tr_tg_th="<<R_tr_tg_th<<", L_tr_tg_ph="<<L_tr_tg_ph<<", R_tr_tg_ph="<<R_tr_tg_ph<<endl;
-		}
-		//if(event_selection_momS6&&ct_cut)hmm_L_fom_strict->Fill(mm);
 
-
-		if(event_selection_noZ_new&&ct_cut)hmm_L_fom_noZ_new->Fill(mm);
-
-		if(event_selection_nocut&&ct_cut)hmm_L_fom_nocut->Fill(mm);
 		double theta_ee = L_4vec.Theta();
-		//test double theta_ek = acos((phi_R*sin(phi0)+cos(phi0))/(sqrt(1+theta*theta+phi*phi)));//original frame
 		double theta_ek = R_4vec.Theta();
-		//double phi_L = atan((phi*cos(phi0)+sin(phi0))/theta);//LHRS frame
 		double phi_ee = L_4vec.Phi();//original frame
 		double phi_ek = R_4vec.Phi()+2*PI;//original frame
 
@@ -1062,6 +1005,21 @@ cout<<"Entries in Cointime gate: "<<ENum<<endl;
 		double theta_gk_lab = G_4vec.Angle(R_4vec.Vect());
 		double omega=G_4vec.E();
 		double beta=mom_g/(omega+Mp);
+
+//Phi dependence
+		TVector3 G_3vec = G_4vec.Vect();
+		TVector3 L_3vec = L_4vec.Vect();
+		TVector3 R_3vec = R_4vec.Vect();
+		TVector3 l_3vec = G_3vec.Cross(L_3vec);
+		TVector3 r_3vec = G_3vec.Cross(R_3vec);
+		TVector3 s_3vec = l_3vec.Cross(r_3vec);//for sgn(sign(phi_k))
+		TVector3 axis_3vec;
+		axis_3vec.SetXYZ(0.,-1.,0.);//along VP flux
+		double sgn = s_3vec*axis_3vec;
+		double phi_k_cos = (l_3vec*r_3vec)/l_3vec.Mag()/r_3vec.Mag();
+		double phi_k;
+		if(sgn>0.){phi_k = acos(phi_k_cos);}
+		else{phi_k = 2*PI-acos(phi_k_cos);}
 	
 		TVector3 boost;
 		TLorentzVector GT_4vec;
@@ -1083,30 +1041,6 @@ cout<<"Entries in Cointime gate: "<<ENum<<endl;
 //theta_gk_cm=0.12;
 		double gamma=1./sqrt(1-beta*beta);
 		double ER_cm=sqrt(pR_cm*pR_cm+MK*MK);
-		double W = sqrt((omega+Mp)*(omega+Mp)-mom_g*mom_g);
-		double q2=Qsq+omega*omega;
-		double eps=1/(1+2*(q2/Qsq)*tan(theta_ee/2)*tan(theta_ee/2));
-
-//Phi dependence
-		TVector3 G_3vec = G_4vec.Vect();
-		TVector3 L_3vec = L_4vec.Vect();
-		TVector3 R_3vec = R_4vec.Vect();
-		TVector3 l_3vec = G_3vec.Cross(L_3vec);
-		TVector3 r_3vec = G_3vec.Cross(R_3vec);
-		TVector3 s_3vec = l_3vec.Cross(r_3vec);//for sgn(sign(phi_k))
-		TVector3 axis_3vec;
-		axis_3vec.SetXYZ(0.,-1.,0.);//along VP flux
-		double sgn = s_3vec*axis_3vec;
-		double phi_k_cos = (l_3vec*r_3vec)/l_3vec.Mag()/r_3vec.Mag();
-		double phi_k;
-		if(sgn>0.){phi_k = acos(phi_k_cos);}
-		else{phi_k = 2*PI-acos(phi_k_cos);}
-//change
-		if(abs(phi_k-PI)<=PI/2.&&ct_cut==true){ct_cut=true;}//phi0
-		//if(abs(phi_k-PI)<=PI/4.&&ct_cut==true){ct_cut=true;}//phi1
-		//if(abs(phi_k-PI)>PI/4.&&abs(phi_k-PI)<=PI/2.&&ct_cut==true){ct_cut=true;}//phi2
-		//if(abs(phi_k-PI)<=PI/3.&&ct_cut==true){ct_cut=true;}//phi3
-		else{ct_cut=false;}
 //cout<<"beta="<<beta<<endl;
 //cout<<"gamma="<<gamma<<endl;
 
@@ -1116,7 +1050,25 @@ cout<<"Entries in Cointime gate: "<<ENum<<endl;
 		double tan_lab2 = sin(theta_gk_cm)/(gamma*(cos(theta_gk_cm)+(omega*Mp-Qsq*Qsq)/(omega*Mp+Mp*Mp)));
 		//if(tan_lab1!=tan_lab2)cout<<"tan1="<<atan(tan_lab1)<<", tan2="<<atan(tan_lab2)<<"theta_gk_lab="<<theta_gk_lab<<endl;
 
+//change
+		if(abs(theta_gk_cm*180/PI)<=8.&&ct_cut==true){ct_cut=true;}
+		//if(abs(theta_gk_cm*180/PI)>8.&&ct_cut==true){ct_cut=true;}
+		else{ct_cut=false;}
 
+		
+		if(event_selection&&ct_cut)hmm_L_fom_best->Fill(mm);
+		//if(event_selection_new&&ct_cut)hmm_L_fom_strict->Fill(mm);
+		if(event_selection_strict&&ct_cut){
+			hmm_L_fom_strict->Fill(mm);
+			ENum_strict++;
+			//if(mm<-0.03||mm>0.12)cout<<"mm="<<mm<<", L_mom="<<L_mom<<", R_mom="<<R_mom<<", L_tr_tg_th="<<L_tr_tg_th<<", R_tr_tg_th="<<R_tr_tg_th<<", L_tr_tg_ph="<<L_tr_tg_ph<<", R_tr_tg_ph="<<R_tr_tg_ph<<endl;
+		}
+		//if(event_selection_momS6&&ct_cut)hmm_L_fom_strict->Fill(mm);
+
+
+		if(event_selection_noZ_new&&ct_cut)hmm_L_fom_noZ_new->Fill(mm);
+
+		if(event_selection_nocut&&ct_cut)hmm_L_fom_nocut->Fill(mm);
 
 		h_theta_gk_cm->Fill(theta_gk_cm*180./PI);
 		if(L_mom>2.1)h_theta_gk_cm2->Fill(theta_gk_cm*180./PI);
@@ -1205,11 +1157,6 @@ cout<<"Entries in Cointime gate: "<<ENum<<endl;
 		if(event_selection_new&&ct_cut){
 			hcs_L_fom_strict->Fill(mm,cs);
 			if(cs>0.)ENum_strict_cs+=cs/150.;
-			h_mm_Qsq->Fill(mm*1000.,Qsq);
-			h_mm_W->Fill(mm*1000.,W);
-			h_mm_theta_gk_cm->Fill(mm*1000.,theta_gk_cm*180./PI);
-			h_mm_phi_gk->Fill(mm*1000.,phi_k*180./PI);
-			h_mm_eps->Fill(mm*1000.,eps);
 		}
 		//if(event_selection_momS6&&ct_cut)hcs_L_fom_strict->Fill(mm,cs);
 		//
@@ -1300,8 +1247,8 @@ cout<<"Entries in Cointime gate: "<<ENum<<endl;
 	//TH1F* hmm_pi_fom_nocut=(TH1F*)file->Get("hmm_pi_fom_noZ");
 	//TH1F* hmm_pi_fom_best=(TH1F*)file->Get("hmm_pi_fom_best");
 	TH1F* hmm_bg_fom_best=(TH1F*)file_mea->Get("hmm_mixacc_result_best");
-	TH1F* hmm_bg_fom_strict=(TH1F*)file_mea->Get("hmm_mixacc_result_new_phi1_1");//change//phi1_1,phi2_1,phi2_2,phi2_3
-	TH1F* hcs_bg_fom_strict=(TH1F*)file_mea->Get("hcs_mixacc_result_new_phi1_1");//change 
+	TH1F* hmm_bg_fom_strict=(TH1F*)file_mea->Get("hmm_mixacc_result_new_cm2_1");//change
+	TH1F* hcs_bg_fom_strict=(TH1F*)file_mea->Get("hcs_mixacc_result_new_cm2_1");//change
 	//TH1F* hmm_bg_fom_strict=(TH1F*)file_mea->Get("hmm_mixacc_result_momS6");
 	//TH1F* hcs_bg_fom_strict=(TH1F*)file_mea->Get("hcs_mixacc_result_momS6");
 	
@@ -1473,8 +1420,7 @@ cout<<"Entries in Cointime gate: "<<ENum<<endl;
 	//hmm_pi_wobg_fom_nocut->Add(hmm_pi_fom_nocut,hmm_bg_fom_nocut,1.0,-1.0);
 	
 //For Al B.G. function fitting
-	//hmm_Al_wobg_fom_noZ_new->Add(hmm_Al_fom_noZ_new,hmm_Albg_fom_noZ_new,1.0,-1.0);
-	hmm_Al_wobg_fom_noZ_new->Add(hmm_Al_fom_noZ_new,hmm_Albg_fom_noZ_new,1.0,0.0);
+	hmm_Al_wobg_fom_noZ_new->Add(hmm_Al_fom_noZ_new,hmm_Albg_fom_noZ_new,1.0,-1.0);
 	//hmm_Al_wobg_fom_noZ_new->Add(hmm_Al_fom_noZ_new,hmm_Albg_fom_nocut,1.0,-1.0);
 
 	//hmm_pi_wobg_fom_nocut->Add(hmm_Al_fom_nocut,hmm_Albg_fom_nocut,1.0,-1.0);
@@ -1557,7 +1503,7 @@ cout<<"Entries in Cointime gate: "<<ENum<<endl;
 	 fmm_strict_Lexp->SetNpx(20000);
 	 fmm_strict_Lexp->SetTitle("Missing Mass (strict)");
 
-//change (using only fit_flag=3)
+//change
 int fit_flag = 3;
 	//1: Fixed from SIMC (most reliable)
 	//2: Free			 (chi-square is the best)
@@ -1664,63 +1610,74 @@ int fit_flag = 3;
 	 ////fmm_strict_Lexp->SetParLimits(6,0.577,0.578);//relative strength
 switch(fit_flag){
 case 1: //Fixed from SIMC
-//simc_fitting2023
-	 fmm_strict_Lexp->FixParameter(0,0.000337527);//Landau width
-	 fmm_strict_Lexp->FixParameter(1,-0.000399571);
-	 fmm_strict_Lexp->SetParameter(2,1.24759);//total scale
-	 //fmm_strict_Lexp->SetParLimits(2,20.,30.);//total scale
-	 fmm_strict_Lexp->FixParameter(3,0.00129240);//sigma
-	 fmm_strict_Lexp->FixParameter(4,0.0499249);//att.
-	 fmm_strict_Lexp->FixParameter(5,0.000548956);//peak pos.
-	 fmm_strict_Lexp->FixParameter(6,0.716364);//relative strength
-
-	 fmm_strict_Lexp->FixParameter(7,0.000263497);//Landau width
-	 fmm_strict_Lexp->FixParameter(8,0.0755465);
-	 fmm_strict_Lexp->SetParameter(9,0.304532);//total scale
-	 //fmm_strict_Lexp->SetParLimits(9,15.,20.);//total scale
-	 fmm_strict_Lexp->FixParameter(10,0.00138720);//sigma
-	 fmm_strict_Lexp->FixParameter(11,0.0145474);//att.
-	 fmm_strict_Lexp->FixParameter(12,-0.0712964);//peak pos.
-	 fmm_strict_Lexp->FixParameter(13,0.289446);//relative strength
-	 //fmm_strict_Lexp->FixParameter(13,0.8);//relative strength
 //simc_fitting2022kai
-	 //fmm_strict_Lexp->FixParameter(0,0.000392691);//Landau width
-	 //fmm_strict_Lexp->FixParameter(1,-0.000294567);
-	 //fmm_strict_Lexp->SetParameter(2,1.30797);//total scale
-	 ////fmm_strict_Lexp->SetParLimits(2,20.,30.);//total scale
-	 //fmm_strict_Lexp->FixParameter(3,0.00146711);//sigma
-	 //fmm_strict_Lexp->FixParameter(4,0.0566266);//att.
-	 //fmm_strict_Lexp->FixParameter(5,-0.000345746);//peak pos.
-	 //fmm_strict_Lexp->FixParameter(6,0.584759);//relative strength
-	 //fmm_strict_Lexp->FixParameter(7,0.000343969);//Landau width
-	 //fmm_strict_Lexp->FixParameter(8,0.0756934);
-	 //fmm_strict_Lexp->SetParameter(9,0.304364);//total scale
-	 ////fmm_strict_Lexp->SetParLimits(9,15.,20.);//total scale
-	 //fmm_strict_Lexp->FixParameter(10,0.00140370);//sigma
-	 //fmm_strict_Lexp->FixParameter(11,0.0158351);//att.
-	 //fmm_strict_Lexp->FixParameter(12,-0.0712093);//peak pos.
-	 //fmm_strict_Lexp->FixParameter(13,0.276257);//relative strength
-	 ////fmm_strict_Lexp->FixParameter(13,0.8);//relative strength
+	 fmm_strict_Lexp->FixParameter(0,0.000392691);//Landau width
+	 fmm_strict_Lexp->FixParameter(1,-0.000294567);
+	 fmm_strict_Lexp->SetParameter(2,1.30797);//total scale
+	 //fmm_strict_Lexp->SetParLimits(2,20.,30.);//total scale
+	 fmm_strict_Lexp->FixParameter(3,0.00146711);//sigma
+	 fmm_strict_Lexp->FixParameter(4,0.0566266);//att.
+	 fmm_strict_Lexp->FixParameter(5,-0.000345746);//peak pos.
+	 fmm_strict_Lexp->FixParameter(6,0.584759);//relative strength
+
+
+//SigmaZ//
+	 //fmm_strict_Lexp->SetParLimits(8,def_mean_S-def_sig_S,def_mean_S+def_sig_S);
+	 //fmm_strict_Lexp->SetParLimits(10,0.,0.01);
+	 //fmm_strict_Lexp->SetParLimits(11,0.03,0.12);
+	 //fmm_strict_Lexp->SetParLimits(12,-1.*def_mean_S-def_sig_S,-1.*def_mean_S+def_sig_S);
+	 //fmm_strict_Lexp->SetParLimits(13,0.,1.5);//relative strength
+
+//default
+	 //fmm_strict_Lexp->SetParameter(7,0.0003);//Landau width
+	 //fmm_strict_Lexp->SetParameter(8,mean_S_strict);//MPV
+	 //fmm_strict_Lexp->SetParameter(9,14.);//total scale
+	 //fmm_strict_Lexp->SetParameter(10,0.0015);//sigma
+	 //fmm_strict_Lexp->SetParameter(11,0.05);//att
+	 //fmm_strict_Lexp->SetParameter(12,-1.*def_mean_S);//peak pos.
+	 //fmm_strict_Lexp->SetParameter(13,0.6);
+//default
+	 //fmm_strict_Lexp->FixParameter(7,0.000157968);//Landau width
+	 ////fmm_strict_Lexp->SetParLimits(7,0.000300,0.003100);//Landau width
+	 //fmm_strict_Lexp->FixParameter(8,0.0761140);//MPV
+	 ////fmm_strict_Lexp->SetParLimits(8,0.075,0.076);//MPV
+	 //fmm_strict_Lexp->SetParameter(9,17./2.);//total scale
+	 ////fmm_strict_Lexp->SetParLimits(9,3.,10.);//total scale
+	 //fmm_strict_Lexp->FixParameter(10,0.00168394);//sigma
+	 ////fmm_strict_Lexp->SetParLimits(10,0.0012,0.0013);//sigma
+	 //fmm_strict_Lexp->FixParameter(11,0.110712);//att
+	 ////fmm_strict_Lexp->SetParLimits(11,0.025,0.035);//att
+	 //fmm_strict_Lexp->FixParameter(12,-0.0809590);//peak pos.
+	 ////fmm_strict_Lexp->SetParLimits(12,-0.705,-0.704);//peak pos.
+	 //fmm_strict_Lexp->FixParameter(13,1.49999);
+	 ////fmm_strict_Lexp->SetParLimits(13,0.645,0.655);
+//simc_fitting2022kai
+	 fmm_strict_Lexp->FixParameter(7,0.000343969);//Landau width
+	 fmm_strict_Lexp->FixParameter(8,0.0756934);
+	 fmm_strict_Lexp->SetParameter(9,0.304364);//total scale
+	 //fmm_strict_Lexp->SetParLimits(9,15.,20.);//total scale
+	 fmm_strict_Lexp->FixParameter(10,0.00140370);//sigma
+	 fmm_strict_Lexp->FixParameter(11,0.0158351);//att.
+	 fmm_strict_Lexp->FixParameter(12,-0.0712093);//peak pos.
+	 fmm_strict_Lexp->FixParameter(13,0.276257);//relative strength
+	 //fmm_strict_Lexp->FixParameter(13,0.8);//relative strength
 	 break;
 	 
 case 2: //simc_fitting2022kai (Free)
-//simc_fitting2023
-	 fmm_strict_Lexp->SetParameter(0,0.000337527);//Landau width
-	 fmm_strict_Lexp->SetParameter(1,-0.000399571);
-	 fmm_strict_Lexp->SetParameter(2,1.24759);//total scale
-	 //fmm_strict_Lexp->SetParLimits(2,20.,30.);//total scale
-	 fmm_strict_Lexp->FixParameter(3,0.00129240);//sigma
-	 fmm_strict_Lexp->SetParameter(4,0.0499249);//att.
-	 fmm_strict_Lexp->SetParameter(5,0.000548956);//peak pos.
-	 fmm_strict_Lexp->SetParameter(6,0.716364);//relative strength
-
-	 fmm_strict_Lexp->SetParameter(7,0.000263497);//Landau width
-	 fmm_strict_Lexp->SetParameter(8,0.0755465);
-	 fmm_strict_Lexp->SetParameter(9,0.304532);//total scale
-	 fmm_strict_Lexp->FixParameter(10,0.00138720);//sigma
-	 fmm_strict_Lexp->SetParameter(11,0.0145474);//att.
-	 fmm_strict_Lexp->SetParameter(12,-0.0712964);//peak pos.
-	 fmm_strict_Lexp->SetParameter(13,0.289446);//relative strength
+	 fmm_strict_Lexp->SetParameter(0,0.000392691);//Landau width
+	 fmm_strict_Lexp->SetParameter(1,-0.000294567);
+	 fmm_strict_Lexp->SetParameter(2,1.30797);//total scale
+	 fmm_strict_Lexp->FixParameter(3,0.00146711);//sigma
+	 fmm_strict_Lexp->SetParameter(4,0.0566266);//att.
+	 fmm_strict_Lexp->SetParameter(5,-0.000345746);//peak pos.
+	 fmm_strict_Lexp->SetParameter(6,0.584759);//relative strength
+	 fmm_strict_Lexp->SetParameter(7,0.000343969);//Landau width
+	 fmm_strict_Lexp->SetParameter(8,0.0756934);
+	 fmm_strict_Lexp->SetParameter(9,0.304364);//total scale
+	 fmm_strict_Lexp->FixParameter(10,0.00140370);//sigma
+	 fmm_strict_Lexp->SetParameter(11,0.0158351);//att.
+	 fmm_strict_Lexp->SetParameter(12,-0.0712093);//peak pos.
+	 fmm_strict_Lexp->SetParameter(13,0.276257);//relative strength
 	 break;
 
 case 3: //Fixed from old fit
@@ -1744,7 +1701,6 @@ case 3: //Fixed from old fit
 
 //change ENum???
 	 fmm_strict_Lexp->FixParameter(14,(double)ENum_strict_cs*0.021*0.001);//scale(1.8%(pion)+0.3%(Al)) //B.G. ratio
-	 //fmm_strict_Lexp->FixParameter(14,(double)ENum_strict*0.021*0.001);//scale(1.8%(pion)+0.3%(Al)) //B.G. ratio
 	 /////fmm_strict_Lexp->FixParameter(14,(double)ENum_strict_cm2_2*0.021*0.001);//scale(1.8%(pion)+0.3%(Al)) //B.G. ratio
 	 //fmm_strict_Lexp->FixParameter(14,(double)ENum_strict_cs_cm2_1*0.021*0.001);//scale(1.8%(pion)+0.3%(Al)) //B.G. ratio
 	 fmm_strict_Lexp->FixParameter(15,Al_par1);//mean
@@ -1796,8 +1752,8 @@ case 3: //Fixed from old fit
 		}else{continue;}
 	 }//Filling to the resulting histogram for chi2 fitting
 	 //change
-	 h_Resulting->Fit("fmm_strict_Lexp","I","",fit_min_mm,fit_max_mm);//Total fitting (full) w/ 4Poly BG
 	 //hmm_wo_bg_fom_strict->Fit("fmm_strict_Lexp","I","",fit_min_mm,fit_max_mm);//Total fitting (full) w/ 4Poly BG
+	 h_Resulting->Fit("fmm_strict_Lexp","I","",fit_min_mm,fit_max_mm);//Total fitting (full) w/ 4Poly BG
 	 //hmm_wo_bg_fom_strict->Fit("fmm_strict_Lexp","LLI","",fit_min_mm,fit_max_mm);//Total fitting (div.) w/ 4Poly BG
 	 double chisq_strict = fmm_strict_Lexp->GetChisquare();
 	 double dof_strict  = fmm_strict_Lexp->GetNDF();
@@ -2133,7 +2089,6 @@ cout<<"BEST CUT START"<<endl;
 	 //fL_best->Draw("same");
 	 //fS_best->Draw("same");
 
-
 //	TCanvas* c3 = new TCanvas("c3","c3");
 //	c3->Divide(2,2);
 //	c3->cd(1);
@@ -2213,76 +2168,15 @@ cout<<"BEST CUT START"<<endl;
 	//c20->cd(3);
 	//h_pepk->Draw("colz");
 #endif
-#if 0
-	TCanvas* cQsq = new TCanvas("cQsq","cQsq");
-	h_mm_Qsq->Draw("colz");
-	cQsq->SetLeftMargin(0.14);
-	cQsq->SetRightMargin(0.14);
-	cQsq->SetTopMargin(0.14);
-	cQsq->SetBottomMargin(0.14);
-	cQsq->Modified();
-	cQsq->Update();
-	gPad->Modified();
-	gPad->Update();
-	
-	TCanvas* cW = new TCanvas("cW","cW");
-	h_mm_W->Draw("colz");
-	cW->SetLeftMargin(0.14);
-	cW->SetRightMargin(0.14);
-	cW->SetTopMargin(0.14);
-	cW->SetBottomMargin(0.14);
-	cW->Modified();
-	cW->Update();
-	gPad->Modified();
-	gPad->Update();
-
-	TCanvas* cth = new TCanvas("cth","cth");
-	h_mm_theta_gk_cm->Draw("colz");
-	cth->SetLeftMargin(0.14);
-	cth->SetRightMargin(0.14);
-	cth->SetTopMargin(0.14);
-	cth->SetBottomMargin(0.14);
-	cth->Modified();
-	cth->Update();
-	gPad->Modified();
-	gPad->Update();
-
-	TCanvas* cph = new TCanvas("cph","cph");
-	h_mm_phi_gk->Draw("colz");
-	cph->SetLeftMargin(0.14);
-	cph->SetRightMargin(0.14);
-	cph->SetTopMargin(0.14);
-	cph->SetBottomMargin(0.14);
-	cph->Modified();
-	cph->Update();
-	gPad->Modified();
-	gPad->Update();
-
-	TCanvas* ceps = new TCanvas("ceps","ceps");
-	h_mm_eps->Draw("colz");
-	ceps->SetLeftMargin(0.14);
-	ceps->SetRightMargin(0.14);
-	ceps->SetTopMargin(0.14);
-	ceps->SetBottomMargin(0.14);
-	ceps->Modified();
-	ceps->Update();
-	gPad->Modified();
-	gPad->Update();
-
-	cQsq->Print("dthesis_Fig/pdf/h_mm_Qsq.pdf");
-	cW->Print("dthesis_Fig/pdf/h_mm_W.pdf");
-	cth->Print("dthesis_Fig/pdf/h_mm_th.pdf");
-	cph->Print("dthesis_Fig/pdf/h_mm_ph.pdf");
-	ceps->Print("dthesis_Fig/pdf/h_mm_eps.pdf");
-#endif
 	TCanvas* c30 = new TCanvas("c30","c30");
-	c30->Divide(2,1);
-	c30->cd(1);
-	 hmm_Al_wobg_fom_noZ_new->Draw("");
-	 fAl_new->Draw("same");
-	c30->cd(2);
-	 hmm_pi_wobg_fom_best->Draw("");
-	 fpion->Draw("same");
+	Acceptance_map->Draw("lego2z");
+	//c30->Divide(2,1);
+	//c30->cd(1);
+	// hmm_Al_wobg_fom_noZ_new->Draw("");
+	// fAl_new->Draw("same");
+	//c30->cd(2);
+	// hmm_pi_wobg_fom_best->Draw("");
+	// fpion->Draw("same");
 cout << "Well done!" << endl;
 
 }//fit

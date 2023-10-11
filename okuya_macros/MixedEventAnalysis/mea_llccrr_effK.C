@@ -101,7 +101,7 @@ cout << "Param file : " << daq_file.c_str() << endl;
 	double RHRS_total=0.;
 	int RHRS_total_bin=0;
 /*----- -10 < z < -8 -----*/
-	string AcceptanceR_table_z0 = "../information/RHRS_SIMC100bin_10_z0.dat";//Acceptance Table (SIMC)
+	string AcceptanceR_table_z0 = "../information/RHRS_SIMC2023_10_z0.dat";//Acceptance Table (SIMC)
 	string buf_z0;
 
 	ifstream ifp_z0(AcceptanceR_table_z0.c_str(),ios::in);
@@ -121,7 +121,7 @@ cout << "Param file : " << AcceptanceR_table_z0.c_str() << endl;
 	}
 	cout<<"HRS-R Acceptance (z0 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
 /*----- -8 < z < -6 -----*/
-	string AcceptanceR_table_z1 = "../information/RHRS_SIMC100bin_10_z1.dat";//Acceptance Table (SIMC)
+	string AcceptanceR_table_z1 = "../information/RHRS_SIMC2023_10_z1.dat";//Acceptance Table (SIMC)
 	string buf_z1;
 
 	ifstream ifp_z1(AcceptanceR_table_z1.c_str(),ios::in);
@@ -141,7 +141,7 @@ cout << "Param file : " << AcceptanceR_table_z1.c_str() << endl;
 	}
 	cout<<"HRS-R Acceptance (z1 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
 /*----- -6 < z < -4 -----*/
-	string AcceptanceR_table_z2 = "../information/RHRS_SIMC100bin_10_z2.dat";//Acceptance Table (SIMC)
+	string AcceptanceR_table_z2 = "../information/RHRS_SIMC2023_10_z2.dat";//Acceptance Table (SIMC)
 	string buf_z2;
 	RHRS_total=0.;
 	RHRS_total_bin=0;
@@ -163,7 +163,7 @@ cout << "Param file : " << AcceptanceR_table_z2.c_str() << endl;
 	}
 	cout<<"HRS-R Acceptance (z2 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
 /*----- -4 < z < -2 -----*/
-	string AcceptanceR_table_z3 = "../information/RHRS_SIMC100bin_10_z3.dat";//Acceptance Table (SIMC)
+	string AcceptanceR_table_z3 = "../information/RHRS_SIMC2023_10_z3.dat";//Acceptance Table (SIMC)
 	string buf_z3;
 	RHRS_total=0.;
 	RHRS_total_bin=0;
@@ -185,7 +185,7 @@ cout << "Param file : " << AcceptanceR_table_z3.c_str() << endl;
 	}
 	cout<<"HRS-R Acceptance (z3 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
 /*----- -2 < z < 0 -----*/
-	string AcceptanceR_table_z4 = "../information/RHRS_SIMC100bin_10_z4.dat";//Acceptance Table (SIMC)
+	string AcceptanceR_table_z4 = "../information/RHRS_SIMC2023_10_z4.dat";//Acceptance Table (SIMC)
 	string buf_z4;
 	RHRS_total=0.;
 	RHRS_total_bin=0;
@@ -207,7 +207,7 @@ cout << "Param file : " << AcceptanceR_table_z4.c_str() << endl;
 	}
 	cout<<"HRS-R Acceptance (z4 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
 /*----- 0 < z < 2 -----*/
-	string AcceptanceR_table_z5 = "../information/RHRS_SIMC100bin_10_z5.dat";//Acceptance Table (SIMC)
+	string AcceptanceR_table_z5 = "../information/RHRS_SIMC2023_10_z5.dat";//Acceptance Table (SIMC)
 	string buf_z5;
 	RHRS_total=0.;
 	RHRS_total_bin=0;
@@ -229,7 +229,7 @@ cout << "Param file : " << AcceptanceR_table_z5.c_str() << endl;
 	}
 	cout<<"HRS-R Acceptance (z5 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
 /*----- 2 < z < 4 -----*/
-	string AcceptanceR_table_z6 = "../information/RHRS_SIMC100bin_10_z6.dat";//Acceptance Table (SIMC)
+	string AcceptanceR_table_z6 = "../information/RHRS_SIMC2023_10_z6.dat";//Acceptance Table (SIMC)
 	string buf_z6;
 	RHRS_total=0.;
 	RHRS_total_bin=0;
@@ -251,7 +251,7 @@ cout << "Param file : " << AcceptanceR_table_z6.c_str() << endl;
 	}
 	cout<<"HRS-R Acceptance (z6 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
 /*----- 4 < z < 6 -----*/
-	string AcceptanceR_table_z7 = "../information/RHRS_SIMC100bin_10_z7.dat";//Acceptance Table (SIMC)
+	string AcceptanceR_table_z7 = "../information/RHRS_SIMC2023_10_z7.dat";//Acceptance Table (SIMC)
 	string buf_z7;
 	RHRS_total=0.;
 	RHRS_total_bin=0;
@@ -273,7 +273,7 @@ cout << "Param file : " << AcceptanceR_table_z7.c_str() << endl;
 	}
 	cout<<"HRS-R Acceptance (z7 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
 /*----- 2 < z < 4 -----*/
-	string AcceptanceR_table_z8 = "../information/RHRS_SIMC100bin_10_z8.dat";//Acceptance Table (SIMC)
+	string AcceptanceR_table_z8 = "../information/RHRS_SIMC2023_10_z8.dat";//Acceptance Table (SIMC)
 	string buf_z8;
 	RHRS_total=0.;
 	RHRS_total_bin=0;
@@ -295,7 +295,7 @@ cout << "Param file : " << AcceptanceR_table_z8.c_str() << endl;
 	}
 	cout<<"HRS-R Acceptance (z8 average)="<<RHRS_total/(double)RHRS_total_bin<<endl;
 /*----- 2 < z < 4 -----*/
-	string AcceptanceR_table_z9 = "../information/RHRS_SIMC100bin_10_z9.dat";//Acceptance Table (SIMC)
+	string AcceptanceR_table_z9 = "../information/RHRS_SIMC2023_10_z9.dat";//Acceptance Table (SIMC)
 	string buf_z9;
 	RHRS_total=0.;
 	RHRS_total_bin=0;
@@ -639,7 +639,7 @@ cout << "Param file : " << AcceptanceR_table_z9.c_str() << endl;
 cout<<"Entries: "<<ENum<<endl;
   int time_div=ENum/100;
   if(ENum<100000)time_div=10000;
-  int nmix = 1000;//Num of mix
+  int nmix = 750;//Num of mix
   double mass,mm;
   TLorentzVector L_4vec;
   TLorentzVector R_4vec;
