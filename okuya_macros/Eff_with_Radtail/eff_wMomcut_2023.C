@@ -977,10 +977,12 @@ cout<<"BEST CUT START"<<endl;
 	 TH1D* hf2 = (TH1D*)c2->DrawFrame(-0.1,-20.,0.2,250.);
 	 hf2->GetXaxis()->SetTitle("Missing Mass - M_{#Lambda} [MeV/c^{2}]");
 	 hf2->GetYaxis()->SetTitle("Counts/(MeV/c^{2})");
-	 hf2->GetXaxis()->SetTitleOffset(1.10);
-	 hf2->GetYaxis()->SetTitleOffset(1.10);
+	 hf2->GetXaxis()->SetTitleOffset(0.90);
+	 hf2->GetYaxis()->SetTitleOffset(0.90);
 	 hf2->GetXaxis()->SetLabelOffset(100);
 	 hf2->GetYaxis()->SetLabelOffset(100);
+	 hf2->GetXaxis()->SetTitleSize(0.05);
+	 hf2->GetYaxis()->SetTitleSize(0.05);
 	 TGaxis* ax_strict = new TGaxis(-0.1,-20.,0.2,-20.,-100.,200.,510);
 	 TGaxis* ay_strict = new TGaxis(-0.1,-20.,-0.1,250.,-20.,250.,510);
 	 hmm_wo_bg_fom_strict->Draw("same");
@@ -1010,6 +1012,14 @@ cout<<"BEST CUT START"<<endl;
 	 //fS_strict->SetLineColor(kGreen);
 	 //fL_strict->Draw("same");
 	 //fS_strict->Draw("same");
+	 c2->SetLeftMargin(0.11);
+	 c2->SetRightMargin(0.11);
+	 c2->SetTopMargin(0.11);
+	 c2->SetBottomMargin(0.11);
+	 c2->Modified();
+	 c2->Update();
+	 gPad->Modified();
+	 gPad->Update();
 	 
 /*%%%%%%%%%%%%%%%%%%%%*/
 /*%%    No Z cut	%%*/
@@ -1156,10 +1166,12 @@ cout<<"BEST CUT START"<<endl;
 	 TH1D* hf3 = (TH1D*)c3->DrawFrame(-0.1,-20.,0.2,310.);
 	 hf3->GetXaxis()->SetTitle("Missing Mass - M_{#Lambda} [MeV/c^{2}]");
 	 hf3->GetYaxis()->SetTitle("Counts/(MeV/c^{2})");
-	 hf3->GetXaxis()->SetTitleOffset(1.10);
-	 hf3->GetYaxis()->SetTitleOffset(1.10);
+	 hf3->GetXaxis()->SetTitleOffset(0.90);
+	 hf3->GetYaxis()->SetTitleOffset(0.90);
 	 hf3->GetXaxis()->SetLabelOffset(100);
 	 hf3->GetYaxis()->SetLabelOffset(100);
+	 hf3->GetXaxis()->SetTitleSize(0.05);
+	 hf3->GetYaxis()->SetTitleSize(0.05);
 	 hf3->Draw("");
 	 TGaxis* ax_noZ_new = new TGaxis(-0.1,-20.,0.2,-20.,-100.,200.,510);
 	 TGaxis* ay_noZ_new = new TGaxis(-0.1,-20.,-0.1,310.,-20.,310.,510);
@@ -1190,6 +1202,14 @@ cout<<"BEST CUT START"<<endl;
 	 //fS_noZ->SetLineColor(kGreen);
 	 //fL_noZ->Draw("same");
 	 //fS_noZ->Draw("same");
+	 c3->SetLeftMargin(0.11);
+	 c3->SetRightMargin(0.11);
+	 c3->SetTopMargin(0.11);
+	 c3->SetBottomMargin(0.11);
+	 c3->Modified();
+	 c3->Update();
+	 gPad->Modified();
+	 gPad->Update();
 
 /////*%%%%%%%%%%%%%%%%%%%%*/
 /////*%%    Strict cut	%%*/
@@ -1496,10 +1516,12 @@ cout<<"BEST CUT START"<<endl;
 	 TH1D* hf6 = (TH1D*)c6->DrawFrame(-0.1,-20.,0.2,440.);
 	 hf6->GetXaxis()->SetTitle("Missing Mass - M_{#Lambda} [MeV/c^{2}]");
 	 hf6->GetYaxis()->SetTitle("Counts/(MeV/c^{2})");
-	 hf6->GetXaxis()->SetTitleOffset(1.10);
-	 hf6->GetYaxis()->SetTitleOffset(1.10);
+	 hf6->GetXaxis()->SetTitleOffset(0.90);
+	 hf6->GetYaxis()->SetTitleOffset(0.90);
 	 hf6->GetXaxis()->SetLabelOffset(100);
 	 hf6->GetYaxis()->SetLabelOffset(100);
+	 hf6->GetXaxis()->SetTitleSize(0.05);
+	 hf6->GetYaxis()->SetTitleSize(0.05);
 	 hf6->Draw("");
 	 TGaxis* ax_noAC = new TGaxis(-0.1,-20.,0.2,-20.,-100.,200.,510);
 	 TGaxis* ay_noAC = new TGaxis(-0.1,-20.,-0.1,440.,-20.,440.,510);
@@ -1530,6 +1552,14 @@ cout<<"BEST CUT START"<<endl;
 	 //fS_noAC->SetLineColor(kGreen);
 	 //fL_noAC->Draw("same");
 	 //fS_noAC->Draw("same");
+	 c6->SetLeftMargin(0.11);
+	 c6->SetRightMargin(0.11);
+	 c6->SetTopMargin(0.11);
+	 c6->SetBottomMargin(0.11);
+	 c6->Modified();
+	 c6->Update();
+	 gPad->Modified();
+	 gPad->Update();
 	 
 	 
 /*%%%%%%%%%%%%%%%%%%%%*/
@@ -1849,10 +1879,12 @@ cout<<"BEST CUT START"<<endl;
 	 TH1D* hf8 = (TH1D*)c8->DrawFrame(-0.1,-20.,0.2,260.);
 	 hf8->GetXaxis()->SetTitle("Missing Mass - M_{#Lambda} [MeV/c^{2}]");
 	 hf8->GetYaxis()->SetTitle("Counts/(MeV/c^{2})");
-	 hf8->GetXaxis()->SetTitleOffset(1.10);
-	 hf8->GetYaxis()->SetTitleOffset(1.10);
+	 hf8->GetXaxis()->SetTitleOffset(0.90);
+	 hf8->GetYaxis()->SetTitleOffset(0.90);
 	 hf8->GetXaxis()->SetLabelOffset(100);
 	 hf8->GetYaxis()->SetLabelOffset(100);
+	 hf8->GetXaxis()->SetTitleSize(0.05);
+	 hf8->GetYaxis()->SetTitleSize(0.05);
 	 hf8->Draw("");
 	 TGaxis* ax_noCT_strict = new TGaxis(-0.1,-20.,0.2,-20.,-100.,200.,510);
 	 TGaxis* ay_noCT_strict = new TGaxis(-0.1,-20.,-0.1,260.,-20.,260.,510);
@@ -1883,6 +1915,14 @@ cout<<"BEST CUT START"<<endl;
 	 //fS_noCT_strict->SetLineColor(kGreen);
 	 //fL_noCT_strict->Draw("same");
 	 //fS_noCT_strict->Draw("same");
+	 c8->SetLeftMargin(0.11);
+	 c8->SetRightMargin(0.11);
+	 c8->SetTopMargin(0.11);
+	 c8->SetBottomMargin(0.11);
+	 c8->Modified();
+	 c8->Update();
+	 gPad->Modified();
+	 gPad->Update();
 
 
 	TCanvas* c10 = new TCanvas("c10","c10");
@@ -2009,10 +2049,10 @@ cout<<"BEST CUT START"<<endl;
 	
 ///*--- Print ---*/
 cout << "Print is starting" << endl;
-	//c2->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/dthesis_Fig/pdf/eff_wall.pdf");
-	//c3->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/dthesis_Fig/pdf/eff_noZ.pdf");
-	//c6->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/dthesis_Fig/pdf/eff_noAC.pdf");
-	//c8->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/dthesis_Fig/pdf/eff_noCT.pdf");
+	c2->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/dthesis_Fig/pdf/eff_wall.pdf");
+	c3->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/dthesis_Fig/pdf/eff_noZ.pdf");
+	c6->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/dthesis_Fig/pdf/eff_noAC.pdf");
+	c8->Print("/data/41a/ELS/okuyama/JLab_nnL/okuya_macros/dthesis_Fig/pdf/eff_noCT.pdf");
 //	c1->Print(Form("%s[",pdfname.c_str()));
 //	c1->Print(Form("%s",pdfname.c_str()));
 //	c2->Print(Form("%s",pdfname.c_str()));
