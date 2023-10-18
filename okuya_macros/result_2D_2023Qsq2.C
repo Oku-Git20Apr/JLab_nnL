@@ -1551,7 +1551,7 @@ cout<<"Entries in Cointime gate: "<<ENum<<endl;
 	 fmm_strict_Lexp->SetTitle("Missing Mass (strict)");
 
 //change
-int fit_flag = 2;
+int fit_flag = 3;
 	//1: Fixed from SIMC (most reliable)
 	//2: Free			 (chi-square is the best)
 	//3: Fixed from data (out of acceptance)
@@ -1789,7 +1789,7 @@ case 3: //Fixed from old fit
 		}else{continue;}
 	 }//Filling to the resulting histogram for chi2 fitting
 	 //change
-	 h_Resulting->Fit("fmm_strict_Lexp","I","",fit_min_mm,fit_max_mm);//Total fitting (full) w/ 4Poly BG
+	 h_Resulting->Fit("fmm_strict_Lexp","LLI","",fit_min_mm,fit_max_mm);//Total fitting (full) w/ 4Poly BG
 	 //hmm_wo_bg_fom_strict->Fit("fmm_strict_Lexp","I","",fit_min_mm,fit_max_mm);//Total fitting (full) w/ 4Poly BG
 	 //hmm_wo_bg_fom_strict->Fit("fmm_strict_Lexp","LLI","",fit_min_mm,fit_max_mm);//Total fitting (div.) w/ 4Poly BG
 	 double chisq_strict = fmm_strict_Lexp->GetChisquare();

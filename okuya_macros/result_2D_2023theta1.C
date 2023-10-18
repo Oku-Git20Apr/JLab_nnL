@@ -1101,10 +1101,7 @@ cout<<"Entries in Cointime gate: "<<ENum<<endl;
 		double phi_k;
 		if(sgn>0.){phi_k = acos(phi_k_cos);}
 		else{phi_k = 2*PI-acos(phi_k_cos);}
-//change
-		if(theta_gk_cm*180./PI<8.&&ct_cut==true){ct_cut=true;}//theta1
-		//if(theta_gk_cm*180./PI>=8.&&ct_cut==true){ct_cut=true;}//theta2
-		else{ct_cut=false;}
+
 //cout<<"beta="<<beta<<endl;
 //cout<<"gamma="<<gamma<<endl;
 
@@ -1425,10 +1422,13 @@ cout<<"Entries in Cointime gate: "<<ENum<<endl;
 //===CHANGE===//
 	//hmm_wo_bg_fom_strict->Add(hcs_L_fom_strict,hcs_bg_fom_strict,1.0,-1.0);//All by hcs
 	//hmm_wo_bg_fom_strict->Scale(1./150.);
-	hmm_wo_bg_fom_strict->Add(hmm_L_fom_strict,hmm_bg_fom_strict,1.0,-1.0);//All by hmm
+	//hmm_wo_bg_fom_strict->Add(hmm_L_fom_strict,hmm_bg_fom_strict,1.0,-1.0);//All by hmm
+//===CHANGE===//
 	//hmm_wo_bg_fom_strict->Add(hcs_L_new_cm2_1,hcs_bg_new_cm2_1,1.0,-1.0);//2 div.
-	//hmm_wo_bg_fom_strict->Add(hcs_L_new_cm2_2,hcs_bg_new_cm2_2,1.0,-1.0);//2 div.
-	//hmm_wo_bg_fom_strict->Scale(2./150.);
+	//hmm_wo_bg_fom_strict->Scale(1./150.);
+	hmm_wo_bg_fom_strict->Add(hmm_L_new_cm2_1,hmm_bg_new_cm2_1,1.0,-1.0);//2 div.
+//============//
+	
 	//hmm_wo_bg_fom_strict->Add(hcs_L_new_cm3_1,hcs_bg_new_cm3_1,1.0,-1.0);//3 div.
 	//hmm_wo_bg_fom_strict->Add(hcs_L_new_cm3_2,hcs_bg_new_cm3_2,1.0,-1.0);//3 div.
 	//hmm_wo_bg_fom_strict->Add(hcs_L_new_cm3_3,hcs_bg_new_cm3_3,1.0,-1.0);//3 div.
@@ -1742,8 +1742,8 @@ case 3: //Fixed from old fit
 
 //change ENum???
 	 //fmm_strict_Lexp->FixParameter(14,(double)ENum_strict_cs*0.021*0.001);//scale(1.8%(pion)+0.3%(Al)) //B.G. ratio
-	 fmm_strict_Lexp->FixParameter(14,(double)ENum_strict*0.021*0.001);//scale(1.8%(pion)+0.3%(Al)) //B.G. ratio
-	 /////fmm_strict_Lexp->FixParameter(14,(double)ENum_strict_cm2_2*0.021*0.001);//scale(1.8%(pion)+0.3%(Al)) //B.G. ratio
+	 //fmm_strict_Lexp->FixParameter(14,(double)ENum_strict*0.021*0.001);//scale(1.8%(pion)+0.3%(Al)) //B.G. ratio
+	 fmm_strict_Lexp->FixParameter(14,(double)ENum_strict_cm2_1*0.021*0.001);//scale(1.8%(pion)+0.3%(Al)) //B.G. ratio
 	 //fmm_strict_Lexp->FixParameter(14,(double)ENum_strict_cs_cm2_1*0.021*0.001);//scale(1.8%(pion)+0.3%(Al)) //B.G. ratio
 	 fmm_strict_Lexp->FixParameter(15,Al_par1);//mean
 	 fmm_strict_Lexp->FixParameter(16,Al_par2);//Gsigma
@@ -1794,7 +1794,7 @@ case 3: //Fixed from old fit
 		}else{continue;}
 	 }//Filling to the resulting histogram for chi2 fitting
 	 //change
-	 h_Resulting->Fit("fmm_strict_Lexp","I","",fit_min_mm,fit_max_mm);//Total fitting (full) w/ 4Poly BG
+	 h_Resulting->Fit("fmm_strict_Lexp","LLI","",fit_min_mm,fit_max_mm);//Total fitting (full) w/ 4Poly BG
 	 //hmm_wo_bg_fom_strict->Fit("fmm_strict_Lexp","I","",fit_min_mm,fit_max_mm);//Total fitting (full) w/ 4Poly BG
 	 //hmm_wo_bg_fom_strict->Fit("fmm_strict_Lexp","LLI","",fit_min_mm,fit_max_mm);//Total fitting (div.) w/ 4Poly BG
 	 double chisq_strict = fmm_strict_Lexp->GetChisquare();
