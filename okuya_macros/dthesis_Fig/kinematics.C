@@ -66,7 +66,7 @@ void kinematics(){
   TTree *tree = (TTree*)file->Get("tree_out");
 
   TFile *file_ = new TFile("/data/41a/ELS/okuyama/SIMC_jlab/SIMC/rootfiles/okuyamacro/simcR.root","read");
-  TH1F* h_phi_k_simc=(TH1F*)file_->Get("h_phi_k");
+  //TH1F* h_phi_k_simc=(TH1F*)file_->Get("h_phi_k");
 
 //---Physics Constant---//
  
@@ -244,6 +244,11 @@ const double PI=3.14159265359;
   h2_gk->SetStats(0);
   h2_gk->GetXaxis()->SetTitle("#theta_{#gamma K}^{c.m.} [deg]");
   h2_gk->GetYaxis()->SetTitle("#phi_{#gamma K} [deg]");
+
+  TH2D* h_phi_Q2 = new TH2D("h_phi_Q2", "" ,72,0.,360.,60,0.2,0.8);
+  h_phi_Q2->SetStats(0);
+  h_phi_Q2->GetXaxis()->SetTitle("#phi_{#gamma K} [deg]");
+  h_phi_Q2->GetYaxis()->SetTitle("Q^{2} [(GeV/c)^{2}]");
 
   bool L_Tr = false;
   bool L_FP = false;
@@ -498,6 +503,7 @@ cout<<"Entries: "<<ENum<<endl;
 		h3_gk->Fill(xx,yy,zz);
 		h3_gk_cm->Fill(xx_cm,yy_cm,zz_cm);
 		h2_gk->Fill(theta_gk_cm*180./PI,phi_gk*180./PI);
+		h_phi_Q2->Fill(phi_gk*180./PI,Qsq);
 		}
 
 }//ENum
@@ -861,18 +867,30 @@ cout<<"Entries: "<<ENum<<endl;
 	gPad->SetTopMargin(0.14);
 	gPad->SetBottomMargin(0.14);
 
-	TCanvas* c65 = new TCanvas("c65","c65");
-	double val1,val2;
-	TH1D* h_phi_gk_cs = new TH1D("h_phi_gk_cs", "",100,0,2.*PI);
-	for(int i=0;i<100;i++){
-		val1 = h_phi_gk->GetBinContent(i+1);
-		val2 = h_phi_k_simc->GetBinContent(i+1);
-		val1 += PI;
-		val2 += PI;
-		if(val1!=0.&&val2!=0.){
-			h_phi_gk_cs->SetBinContent(i+1,1250.*val1/val2);
-			h_phi_gk_cs->SetBinError(i+1,1250.*sqrt(val1/val2/val2+val1*val1/val2/val2/val2));
-		}else{h_phi_gk_cs->SetBinContent(i+1,0.);}
-	}
-	h_phi_gk_cs->Draw("e");
+//	TCanvas* c65 = new TCanvas("c65","c65");
+//	double val1,val2;
+//	TH1D* h_phi_gk_cs = new TH1D("h_phi_gk_cs", "",100,0,2.*PI);
+//	for(int i=0;i<100;i++){
+//		val1 = h_phi_gk->GetBinContent(i+1);
+//		val2 = h_phi_k_simc->GetBinContent(i+1);
+//		val1 += PI;
+//		val2 += PI;
+//		if(val1!=0.&&val2!=0.){
+//			h_phi_gk_cs->SetBinContent(i+1,1250.*val1/val2);
+//			h_phi_gk_cs->SetBinError(i+1,1250.*sqrt(val1/val2/val2+val1*val1/val2/val2/val2));
+//		}else{h_phi_gk_cs->SetBinContent(i+1,0.);}
+//	}
+//	h_phi_gk_cs->Draw("e");
+
+	TCanvas* c66 = new TCanvas("c66","c66");
+	h_phi_Q2->Draw("colz");
+	c66->SetLeftMargin(0.14);
+	c66->SetRightMargin(0.14);
+	c66->SetTopMargin(0.14);
+	c66->SetBottomMargin(0.14);
+	c66->Modified();
+	c66->Update();
+	gPad->Modified();
+	gPad->Update();
+	c66->Print("./pdf/phi_Q2.pdf");
 }//kinematics
