@@ -1445,6 +1445,7 @@ void tuning::MakeHist(){
 	tree_out ->Branch("ac2_sum"     ,&tr.AC2_sum   ,"AC2_sum/D"  );
 	tree_out ->Branch("ac1_npe_sum"     ,&tr.AC1_npe_sum   ,"AC1_npe_sum/D"  );
 	tree_out ->Branch("ac2_npe_sum"     ,&tr.AC2_npe_sum   ,"AC2_npe_sum/D"  );
+	tree_out ->Branch("L.cer.asum_c"     ,&tr.gc_sum   ,"gc_sum/D"  );//okuyama_test
 	tree_out ->Branch("ac1_npe"     ,tr.AC1_npe   ,"AC1_npe[24]/D"  );
 	tree_out ->Branch("ac2_npe"     ,tr.AC2_npe   ,"AC2_npe[26]/D"  );    
 	tree_out ->Branch("ct_acc"     ,&tr.ct_acc   ,"ct_acc/D"  );
@@ -2304,6 +2305,7 @@ cout << "Event (Fill) : " << k << "/" << ENum << endl;
 	    for(int seg=0;seg<26;seg++)
 	      tr.AC2_npe[seg]=0.0;	  
 
+		tr.gc_sum=L_cer_asum_c;
 	    
 	  //==== AC ADC convert ch to npe =======//
 	  //	  tr.AC1_npe_sum=R_a1_asum_p/400.;
